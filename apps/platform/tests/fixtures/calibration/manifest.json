@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "dataset_type": "synthetic-test-fixture",
+  "samples": [
+    {
+      "participant_id": "P01",
+      "exercise_id": "lateral_raise",
+      "scenario": "CORRECT",
+      "device": "Fixture Camera A",
+      "resolution": "1280x720",
+      "lighting": "fixture-even",
+      "camera_position": "fixture-front",
+      "clothing_type": "fixture-fitted",
+      "session_file": "raw/P01-lateral-correct.json"
+    },
+    {
+      "participant_id": "P01",
+      "exercise_id": "lateral_raise",
+      "scenario": "RIGHT_ARM_LOW",
+      "device": "Fixture Camera A",
+      "resolution": "1280x720",
+      "lighting": "fixture-even",
+      "camera_position": "fixture-front",
+      "clothing_type": "fixture-fitted",
+      "session_file": "raw/P01-lateral-right-low.json"
+    },
+    {
+      "participant_id": "P02",
+      "exercise_id": "step_jack",
+      "scenario": "CORRECT",
+      "device": "Fixture Camera B",
+      "resolution": "1920×1080",
+      "lighting": "fixture-side-light",
+      "camera_position": "fixture-front",
+      "clothing_type": "fixture-loose",
+      "session_file": "raw/P02-step-correct.json"
+    },
+    {
+      "participant_id": "P02",
+      "exercise_id": "step_jack",
+      "scenario": "STEP_TOO_SMALL",
+      "device": "Fixture Camera B",
+      "resolution": "1920×1080",
+      "lighting": "fixture-side-light",
+      "camera_position": "fixture-front",
+      "clothing_type": "fixture-loose",
+      "session_file": "raw/P02-step-small.json"
+    }
+  ]
+}

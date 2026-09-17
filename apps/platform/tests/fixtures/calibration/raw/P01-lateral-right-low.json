@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "privacy": "derived-pose-metrics-only-no-video",
+  "generatedAt": "2026-01-01T00:01:00.000Z",
+  "frames": [
+    { "timestamp": 0, "exerciseId": "lateral_raise", "phase": "START", "repIndex": 0, "activeErrors": "", "torsoLean": 2, "leftShoulderAngle": 10, "rightShoulderAngle": 10, "leftElbowAngle": 174, "rightElbowAngle": 173, "symmetryDiff": 0 },
+    { "timestamp": 1400, "exerciseId": "lateral_raise", "phase": "TOP", "phaseTransition": "RAISING->TOP", "repIndex": 0, "activeErrors": "ARM_TOO_LOW_R|ASYMMETRY", "torsoLean": 3, "leftShoulderAngle": 90, "rightShoulderAngle": 68, "leftElbowAngle": 168, "rightElbowAngle": 166, "symmetryDiff": 22 },
+    { "timestamp": 3000, "exerciseId": "lateral_raise", "phase": "COMPLETE", "phaseTransition": "LOWERING->COMPLETE", "repIndex": 1, "activeErrors": "ARM_TOO_LOW_R|ASYMMETRY", "torsoLean": 3, "leftShoulderAngle": 11, "rightShoulderAngle": 10, "leftElbowAngle": 172, "rightElbowAngle": 171, "symmetryDiff": 1 }
+  ],
+  "repetitions": [
+    { "exerciseId": "lateral_raise", "repIndex": 1, "startTime": 100, "endTime": 3000, "peakShoulderLeft": 90, "peakShoulderRight": 68, "minimumElbowLeft": 168, "minimumElbowRight": 166, "maxSymmetryDiff": 22, "maxTorsoLean": 3, "duration": 2900, "finalRepScore": 70 }
+  ],
+  "performance": {}
+}

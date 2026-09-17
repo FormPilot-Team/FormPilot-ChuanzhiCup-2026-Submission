@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "privacy": "derived-pose-metrics-only-no-video",
+  "generatedAt": "2026-01-01T00:02:00.000Z",
+  "frames": [
+    { "timestamp": 0, "exerciseId": "step_jack", "phase": "CENTER", "repIndex": 0, "activeErrors": "", "torsoLean": 2, "openRatio": 1, "armAngle": 10, "currentSide": "" },
+    { "timestamp": 400, "exerciseId": "step_jack", "phase": "LEFT_OPEN", "phaseTransition": "LEFT_OPENING->LEFT_OPEN", "repIndex": 0, "activeErrors": "", "torsoLean": 3, "openRatio": 1.78, "armAngle": 145, "armLegSyncGapMs": 120, "currentSide": "left" },
+    { "timestamp": 1400, "exerciseId": "step_jack", "phase": "CENTER", "phaseTransition": "RETURNING_FROM_LEFT->CENTER", "repIndex": 1, "activeErrors": "", "torsoLean": 2, "openRatio": 1.05, "armAngle": 12, "currentSide": "" }
+  ],
+  "repetitions": [
+    { "exerciseId": "step_jack", "repIndex": 1, "startTime": 100, "endTime": 1400, "peakShoulderLeft": 145, "peakShoulderRight": 145, "minimumElbowLeft": 180, "minimumElbowRight": 180, "maxSymmetryDiff": 3, "maxTorsoLean": 3, "duration": 1300, "finalRepScore": 96, "side": "left", "peakOpenRatio": 1.78, "syncGapMs": 120 }
+  ],
+  "performance": {}
+}
