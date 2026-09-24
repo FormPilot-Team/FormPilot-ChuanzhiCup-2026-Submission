@@ -14,29 +14,50 @@ test('Hybrid AI Coach renders demo, camera, and coach-feedback columns without r
   await expect(page.getByTestId('realtime-feedback-slot')).toBeVisible()
 })
 
-test('missing real video uses the explicit fallback while preserving the mapped source', async ({ page }) => {
-  await page.goto('/?demo=1&exercise=squat')
+test('all six V1 demonstration videos load as real, muted browser media', async ({ page }) => {
+  const exercises = [
+    ['shoulder_rotation', '/assets/demos/shoulder-rotation.mp4', 1080, 1920],
+    ['overhead_raise', '/assets/demos/overhead-raise.mp4', 1200, 1080],
+    ['lateral_raise', '/assets/demos/lateral-raise.mp4', 1080, 1920],
+    ['step_jack', '/assets/demos/step-jack.mp4', 1080, 1080],
+    ['squat', '/assets/demos/squat.mp4', 1080, 1920],
+    ['knee_raise', '/assets/demos/alternating-knee-raise.mp4', 1080, 1920],
+  ] as const
 
-  const demonstration = page.getByTestId('demonstration-panel')
-  await expect(demonstration).toHaveAttribute('data-demo-source', '/assets/demos/squat.mp4')
-  await expect(page.getByTestId('demonstration-fallback')).toContainText('真人示范视频暂未可用')
+  for (const [exerciseId, source, width, height] of exercises) {
+    await page.goto(`/?demo=1&exercise=${exerciseId}`)
+    const demonstration = page.getByTestId('demonstration-panel')
+    await expect(demonstration).toHaveAttribute('data-demo-source', source)
+    await expect(demonstration).toHaveAttribute('data-media-status', 'ready')
+    await expect(demonstration.locator('video')).toHaveJSProperty('muted', true)
+    await expect(demonstration.locator('video')).toHaveJSProperty('loop', true)
+    await expect(demonstration.locator('video')).toHaveJSProperty('videoWidth', width)
+    await expect(demonstration.locator('video')).toHaveJSProperty('videoHeight', height)
+    expect(await demonstration.locator('video').evaluate((video) => (video as HTMLVideoElement).duration)).toBeGreaterThan(3)
+    await expect(page.getByTestId('demonstration-fallback')).toHaveCount(0)
+  }
 })
 
 test('course state drives ACTIVE play intent, PAUSED pause, and course-end reset intent', async ({ page }) => {
   test.setTimeout(30_000)
   await page.goto('/?demo=1&course=1&fixture=synthetic')
   const demonstration = page.getByTestId('demonstration-panel')
+  const video = demonstration.locator('video')
 
   await expect(demonstration).toHaveAttribute('data-demo-playback', 'playing', { timeout: 10_000 })
+  await expect(video).toHaveJSProperty('paused', false)
   await page.getByRole('button', { name: '暂停训练' }).click()
   await expect(demonstration).toHaveAttribute('data-demo-playback', 'paused')
+  await expect(video).toHaveJSProperty('paused', true)
   await page.getByRole('button', { name: '继续训练' }).first().click()
   await expect(demonstration).toHaveAttribute('data-demo-playback', 'playing')
+  await expect(video).toHaveJSProperty('paused', false)
 
   await page.getByRole('button', { name: '结束训练' }).click()
   await page.getByRole('button', { name: '结束并保存' }).click()
   await expect(demonstration).toHaveAttribute('data-demo-playback', 'stopped')
-  await expect(demonstration.locator('video')).toHaveJSProperty('currentTime', 0)
+  await expect(video).toHaveJSProperty('paused', true)
+  await expect(video).toHaveJSProperty('currentTime', 0)
 })
 
 test('TRANSITION switches the demonstration source to the next course exercise', async ({ page }) => {
@@ -46,4 +67,5 @@ test('TRANSITION switches the demonstration source to the next course exercise',
 
   await expect(demonstration).toHaveAttribute('data-demo-exercise', 'overhead_raise', { timeout: 12_000 })
   await expect(demonstration).toHaveAttribute('data-demo-source', '/assets/demos/overhead-raise.mp4')
+  await expect(demonstration).toHaveAttribute('data-media-status', 'ready')
 })
