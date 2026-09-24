@@ -12,6 +12,7 @@ import { coachMotionMode } from '../../features/coach/coachMotionPolicy'
 interface CoachPanelProps {
   viewModel: CoachCardViewModel
   showReferenceSkeleton: boolean
+  compact?: boolean
 }
 
 const stateTone: Record<CoachCardViewModel['state'], string> = {
@@ -22,7 +23,7 @@ const stateTone: Record<CoachCardViewModel['state'], string> = {
   TRANSITION: 'bg-blue-50 text-emerald-700',
 }
 
-export const CoachPanel = memo(function CoachPanel({ viewModel, showReferenceSkeleton }: CoachPanelProps) {
+export const CoachPanel = memo(function CoachPanel({ viewModel, showReferenceSkeleton, compact = false }: CoachPanelProps) {
   const [referencePose, setReferencePose] = useState<ReferencePose>()
   const frame = viewModel.coachAsset
   const referenceProfile = viewModel.referenceProfile
@@ -50,14 +51,14 @@ export const CoachPanel = memo(function CoachPanel({ viewModel, showReferenceSke
   }, [frame.poseAnchorSrc])
 
   return (
-    <section className="panel flex min-h-0 min-w-0 flex-col overflow-hidden" aria-labelledby="coach-title" data-coach-state={viewModel.state}>
-      <div className="flex items-center gap-2 px-5 pt-5">
+    <section className={cn('panel flex min-h-0 min-w-0 flex-col overflow-hidden', compact && 'h-full')} aria-labelledby="coach-title" data-coach-state={viewModel.state}>
+      <div className={cn('flex items-center gap-2', compact ? 'px-4 pt-4' : 'px-5 pt-5')}>
         <span className="grid size-8 place-items-center rounded-xl bg-blue-50 text-blue-600"><Bot size={18} /></span>
         <h2 id="coach-title" className="text-balance text-base font-bold text-slate-900">AI 教练</h2>
         <span className={cn('ml-1 rounded-lg px-2 py-1 text-xs font-semibold', stateTone[viewModel.state])} data-testid="coach-status-label">{viewModel.statusLabel}</span>
       </div>
 
-      <div className="relative mx-4 mt-3 min-h-[320px] min-w-0 flex-1 overflow-hidden rounded-2xl bg-[#f6f9fd]">
+      <div className={cn('relative mx-4 mt-3 min-w-0 flex-1 overflow-hidden rounded-2xl bg-[#f6f9fd]', compact ? 'min-h-[180px]' : 'min-h-[320px]')}>
         <CoachMotion frame={frame} mode={motionMode} />
         <CoachHighlightOverlay pose={referencePose} region={viewModel.highlightRegion} direction={viewModel.direction} />
         {showReferenceSkeleton && referencePose ? <ReferencePoseOverlay detectedPose={referencePose} canonicalPose={canonicalPose} /> : null}
@@ -98,8 +99,8 @@ export const CoachPanel = memo(function CoachPanel({ viewModel, showReferenceSke
         </div>
       </div>
 
-      <div className="m-4 mt-3 flex min-w-0 items-center rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"><Dumbbell size={21} /></span>
+      <div className={cn('mt-3 flex min-w-0 items-center rounded-2xl border border-slate-100 bg-white shadow-sm', compact ? 'm-3 p-3' : 'm-4 p-4')}>
+        <span className={cn('grid shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600', compact ? 'size-9' : 'size-11')}><Dumbbell size={compact ? 18 : 21} /></span>
         <div className="ml-3 min-w-0">
           <p className="truncate font-bold text-slate-900">{viewModel.exerciseName}</p>
           <p className="truncate text-xs text-slate-500">标准动作参照</p>

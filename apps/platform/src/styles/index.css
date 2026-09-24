@@ -38,7 +38,7 @@ button:focus-visible { outline: 3px solid rgb(147 197 253 / 0.7); outline-offset
 
 @media (max-width: 1279px) {
   .training-grid { grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr); }
-  .training-grid > :last-child { grid-column: 1 / -1; }
+  .training-grid > :last-child { grid-column: 1 / -1; max-height: none; overflow: visible; }
 }
 
 @media (max-width: 900px) {

@@ -1,7 +1,9 @@
 import { AppHeader } from '../../components/layout/AppHeader'
 import { CoachPanel } from '../../components/coach/CoachPanel'
 import { CameraPanel } from '../../components/camera/CameraPanel'
+import { DemonstrationVideo } from '../../components/demo/DemonstrationVideo'
 import { MetricsPanel } from '../../components/metrics/MetricsPanel'
+import { AICoachFeedbackDock } from '../../components/training/AICoachFeedbackDock'
 import { TrainingFooter } from '../../components/training/TrainingFooter'
 import { DebugPanel } from '../../components/feedback/DebugPanel'
 import { SessionCompleteDialog } from './SessionCompleteDialog'
@@ -10,6 +12,13 @@ import { useTrainingRuntime } from './useTrainingRuntime'
 export function TrainingPage() {
   const runtime = useTrainingRuntime()
   const { definition } = runtime
+  const demonstrationSnapshot = runtime.courseEnabled
+    ? runtime.courseSnapshot
+    : {
+        ...runtime.courseSnapshot,
+        state: runtime.session.status === 'paused' ? 'PAUSED' as const : 'ACTIVE' as const,
+        previousState: runtime.session.status === 'paused' ? 'ACTIVE' as const : undefined,
+      }
 
   return (
     <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900">
@@ -22,10 +31,11 @@ export function TrainingPage() {
           </div>
           <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-600" data-testid="course-state">{runtime.poseUnavailable ? runtime.framingProfile.poseLost : runtime.courseSnapshot.state === 'COUNTDOWN' ? `${runtime.courseSnapshot.countdown} · 准备开始` : runtime.courseSnapshot.state === 'TRANSITION' ? `完成 ✓ · 下一动作 ${runtime.nextDefinition?.displayName ?? '课程总结'}` : runtime.courseSnapshot.state === 'PAUSED' ? '课程已暂停' : runtime.courseSnapshot.state === 'COURSE_COMPLETE' ? '课程完成 ✓' : runtime.courseSnapshot.state === 'COURSE_INCOMPLETE' ? '课程未完成' : runtime.courseSnapshot.state === 'PREPARING' ? '请进入准备姿势' : '坚持，让更好的自己发生'}</p>
         </div>
-        <div className="training-grid grid min-h-[635px] min-w-0 gap-3 xl:h-[clamp(440px,calc(100dvh-300px),580px)] xl:min-h-0 xl:grid-cols-[minmax(0,410px)_minmax(0,1fr)_minmax(0,470px)]">
-          <CoachPanel
-            viewModel={runtime.coachViewModel}
-            showReferenceSkeleton={runtime.debug && runtime.showCoachReference}
+        <div className="training-grid grid min-h-[635px] min-w-0 gap-3 xl:h-[clamp(520px,calc(100dvh-300px),680px)] xl:min-h-0 xl:grid-cols-[minmax(280px,0.72fr)_minmax(460px,1.45fr)_minmax(340px,0.9fr)]" data-testid="hybrid-training-layout">
+          <DemonstrationVideo
+            currentExerciseId={definition.id}
+            nextExerciseId={runtime.nextDefinition?.id}
+            courseSnapshot={demonstrationSnapshot}
           />
           <CameraPanel
             videoRef={runtime.videoRef}
@@ -42,7 +52,18 @@ export function TrainingPage() {
             outOfFrameMessage={runtime.framingProfile.notInFrame}
             onStart={runtime.startCamera}
           />
-          <MetricsPanel result={runtime.result} presentation={definition.presentation} advice={runtime.feedback?.message} guidanceOnly={runtime.courseEnabled && definition.id === 'shoulder_rotation'} trackingState={runtime.session.status === 'paused' ? 'paused' : runtime.poseUnavailable ? 'adjust' : (runtime.cameraMode === 'live' || runtime.cameraMode === 'demo') && runtime.features ? 'normal' : 'preparing'} />
+          <AICoachFeedbackDock
+            coachSlot={(
+              <CoachPanel
+                viewModel={runtime.coachViewModel}
+                showReferenceSkeleton={runtime.debug && runtime.showCoachReference}
+                compact
+              />
+            )}
+            feedbackSlot={(
+              <MetricsPanel result={runtime.result} presentation={definition.presentation} advice={runtime.feedback?.message} guidanceOnly={runtime.courseEnabled && definition.id === 'shoulder_rotation'} trackingState={runtime.session.status === 'paused' ? 'paused' : runtime.poseUnavailable ? 'adjust' : (runtime.cameraMode === 'live' || runtime.cameraMode === 'demo') && runtime.features ? 'normal' : 'preparing'} />
+            )}
+          />
         </div>
         <div className="mt-3">
           <TrainingFooter

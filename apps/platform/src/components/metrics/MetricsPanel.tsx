@@ -16,7 +16,7 @@ export function MetricsPanel({ result, presentation, advice, guidanceOnly = fals
       : trackingState === 'paused' ? { label: '训练暂停', tone: 'bg-slate-100 text-slate-600' }
         : { label: '准备中', tone: 'bg-blue-50 text-blue-600' }
   return (
-    <section className="panel flex min-h-0 min-w-0 flex-col p-4" aria-labelledby="metrics-title">
+    <section className="panel flex h-full min-h-0 min-w-0 flex-col p-4" aria-labelledby="metrics-title">
       <div className="flex min-w-0 items-center gap-2 pb-3">
         <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"><Gauge size={18} /></span>
         <h2 id="metrics-title" className="min-w-0 truncate font-bold text-slate-900">实时反馈</h2>
