@@ -33,6 +33,7 @@ export interface ResolveCoachDockStateInput {
   exercise: CoachDockExerciseContext
   nextExerciseName?: string
   isSpeaking?: boolean
+  currentSpokenMessage?: string
 }
 
 export interface CoachDockState {
@@ -42,6 +43,7 @@ export interface CoachDockState {
   severity: CoachDockSeverity
   exerciseContext: string
   isSpeaking?: boolean
+  currentSpokenMessage?: string
 }
 
 const COPY = {
@@ -60,7 +62,11 @@ export function resolveCoachDockFeedback(viewModel: CoachCardViewModel): Pick<Re
 }
 
 export function resolveCoachDockState(input: ResolveCoachDockStateInput): CoachDockState {
-  const shared = { exerciseContext: input.exercise.name, isSpeaking: input.isSpeaking }
+  const shared = {
+    exerciseContext: input.exercise.name,
+    isSpeaking: input.isSpeaking,
+    currentSpokenMessage: input.isSpeaking ? input.currentSpokenMessage : undefined,
+  }
 
   if (input.courseState === 'COURSE_COMPLETE' || input.courseState === 'COURSE_INCOMPLETE') {
     return {

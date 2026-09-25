@@ -9,6 +9,7 @@ async function installSpeechStub(page: Page) {
       lang = ''
       rate = 1
       voice?: SpeechSynthesisVoice
+      onstart?: () => void
       onend?: () => void
       onerror?: () => void
       constructor(text: string) { this.text = text }
@@ -17,6 +18,7 @@ async function installSpeechStub(page: Page) {
     const synthesis = {
       speak(utterance: FakeUtterance) {
         speechEvents.push({ kind: 'speak', text: utterance.text, at: performance.now() })
+        utterance.onstart?.()
         window.setTimeout(() => utterance.onend?.(), 20)
       },
       cancel() { speechEvents.push({ kind: 'cancel', at: performance.now() }) },

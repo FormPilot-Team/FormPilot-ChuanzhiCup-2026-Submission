@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { selectChineseVoice } from '../src/adapters/speech/BrowserSpeechAdapter'
 import type { CourseSnapshot } from '../src/features/course/CourseController'
 import { deriveCourseVoiceEvents, VoiceGuidePolicy, type VoiceGuideContext, type VoiceGuideEvent, type VoicePriority } from '../src/features/voice/VoiceGuidePolicy'
+import { EncouragementPolicy } from '../src/features/voice/EncouragementPolicy'
 
 const exercises = [
   { id: 'shoulder_rotation', name: '肩部环绕' },
@@ -104,8 +105,18 @@ describe('VoiceGuidePolicy', () => {
     expect(policy.handle(event('confirmed_correction'), context({ currentPriority: 2 }))).toEqual({ kind: 'drop' })
   })
 
-  it.each(['pause', 'mute', 'exercise_switch', 'manual_end'] as const)('%s cancels active speech', (kind) => {
+  it.each(['mute', 'exercise_switch', 'manual_end'] as const)('%s cancels active speech', (kind) => {
     expect(new VoiceGuidePolicy().handle(event(kind), context())).toEqual({ kind: 'cancel' })
+  })
+
+  it('interrupts current speech with pause and speaks resume once unpaused', () => {
+    const policy = new VoiceGuidePolicy()
+    expect(policy.handle(event('pause', { text: '训练已暂停。' }), context({ paused: true, currentPriority: 5 }))).toMatchObject({
+      kind: 'speak', event: 'pause', priority: 1, interrupt: true,
+    })
+    expect(policy.handle(event('resume', { text: '继续训练。' }), context())).toMatchObject({
+      kind: 'speak', event: 'resume', priority: 1,
+    })
   })
 
   it('drops speech while muted, paused, or unavailable without affecting policy callers', () => {
@@ -134,5 +145,36 @@ describe('VoiceGuidePolicy', () => {
       if (command.kind === 'speak') priorities.set(kind, command.priority)
     }
     expect(Object.fromEntries(priorities)).toEqual({ course_complete: 1, start: 2, confirmed_correction: 3, countdown: 4, recovery_positive: 5 })
+  })
+})
+
+describe('EncouragementPolicy', () => {
+  const input = (changes: Partial<Parameters<EncouragementPolicy['update']>[0]> = {}) => ({
+    exerciseId: 'shoulder_rotation' as const,
+    exerciseIndex: 0,
+    courseState: 'ACTIVE' as const,
+    poseValid: true,
+    hasCorrection: false,
+    hasRecovery: false,
+    at: 0,
+    ...changes,
+  })
+
+  it('speaks once after six continuously stable seconds per exercise', () => {
+    const policy = new EncouragementPolicy()
+    expect(policy.update(input())).toBeUndefined()
+    expect(policy.update(input({ at: 5999 }))).toBeUndefined()
+    expect(policy.update(input({ at: 6000 }))).toBe('很好，保持这个节奏。')
+    expect(policy.update(input({ at: 12000 }))).toBeUndefined()
+  })
+
+  it('resets the stable window for corrections, recovery, pose loss, or higher-priority speech', () => {
+    const policy = new EncouragementPolicy()
+    policy.update(input())
+    expect(policy.update(input({ at: 4000, hasCorrection: true }))).toBeUndefined()
+    expect(policy.update(input({ at: 5000 }))).toBeUndefined()
+    expect(policy.update(input({ at: 11000, currentVoicePriority: 2 }))).toBeUndefined()
+    expect(policy.update(input({ at: 12000 }))).toBeUndefined()
+    expect(policy.update(input({ at: 18000 }))).toBe('很好，保持这个节奏。')
   })
 })

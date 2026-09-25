@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { PoseOverlayDrawOptions, PoseOverlayHandle } from '../../components/pose/PoseOverlay'
 import { getCoachAnimationFrame, PlaceholderCoachAnimationAdapter } from '../../adapters/coachAnimation/PlaceholderCoachAnimationAdapter'
 import { BrowserCameraAdapter, cameraErrorPresentation, type CameraFailureKind } from '../../adapters/camera/BrowserCameraAdapter'
-import { BrowserSpeechAdapter } from '../../adapters/speech/BrowserSpeechAdapter'
+import { BrowserSpeechAdapter, type VoicePlaybackState } from '../../adapters/speech/BrowserSpeechAdapter'
 import { PoseDetector } from '../../features/pose/PoseDetector'
 import { PoseFilter } from '../../features/pose/PoseFilter'
 import { normalizePoseFrame } from '../../features/pose/PoseNormalizer'
@@ -26,6 +26,7 @@ import { CoachCardStateResolver } from '../../features/coach/CoachCardStateResol
 import type { CoachCardResolverInput, CoachExerciseInput } from '../../features/coach/types'
 import { getFramingProfile } from '../../features/framing/framingProfiles'
 import { deriveCourseVoiceEvents, VoiceGuidePolicy, type VoiceGuideCommand, type VoiceGuideEvent } from '../../features/voice/VoiceGuidePolicy'
+import { EncouragementPolicy } from '../../features/voice/EncouragementPolicy'
 
 type CameraMode = 'idle' | 'requesting_permission' | 'model_loading' | 'live' | 'demo' | 'error'
 
@@ -142,6 +143,7 @@ export function useTrainingRuntime() {
   const courseStepIndexRef = useRef(0)
   const speechRef = useRef(new BrowserSpeechAdapter())
   const voicePolicyRef = useRef(new VoiceGuidePolicy())
+  const encouragementPolicyRef = useRef(new EncouragementPolicy())
   const voiceEnabledRef = useRef(true)
   const performanceRef = useRef(new PerformanceTracker())
   const diagnosticsRef = useRef(new SessionDiagnosticsRecorder())
@@ -198,6 +200,7 @@ export function useTrainingRuntime() {
   const [poseUnavailable, setPoseUnavailable] = useState(false)
   const [voiceEnabled, setVoiceEnabled] = useState(true)
   const [voiceAvailable, setVoiceAvailable] = useState(() => speechRef.current.isAvailable())
+  const [voicePlayback, setVoicePlayback] = useState<VoicePlaybackState>({ isSpeaking: false })
   const initialCoachInputRef = useRef<CoachCardResolverInput>({
     now: performance.now(),
     courseSnapshot: courseEnabled ? courseRef.current.getSnapshot() : { state: demo ? 'ACTIVE' : 'PREPARING', countdown: 0 },
@@ -232,7 +235,7 @@ export function useTrainingRuntime() {
       speechRef.current.cancel()
       return
     }
-    if (command.kind === 'speak') speechRef.current.speak(command.text, command.priority, command.interrupt)
+    if (command.kind === 'speak') speechRef.current.speak(command.text, command.priority, command.interrupt, command.event)
   }, [])
 
   const dispatchVoiceEvent = useCallback((event: VoiceGuideEvent) => {
@@ -276,6 +279,7 @@ export function useTrainingRuntime() {
     demoExerciseStartedAtRef.current = performance.now()
     feedbackRef.current = undefined
     recoveredFeedbackRef.current = undefined
+    encouragementPolicyRef.current.resetForExercise()
     lastUiUpdateRef.current = 0
     switchingRef.current = false
     const nextDemoFrame = demo ? firstDemoFrame(next) : undefined
@@ -426,6 +430,25 @@ export function useTrainingRuntime() {
       })
     }
     if (output.recoveredFeedback) recoveredFeedbackRef.current = output.recoveredFeedback
+
+    if (courseEnabled) {
+      const encouragement = encouragementPolicyRef.current.update({
+        exerciseId: output.result.exerciseId,
+        exerciseIndex: courseAfter.stepIndex,
+        courseState: courseAfter.state,
+        poseValid: output.features.confidence >= .65 && output.features.bodyInFrame,
+        hasCorrection: Boolean(output.confirmedPrimaryFeedback || output.feedback?.kind === 'correction'),
+        hasRecovery: Boolean(output.recoveredFeedback || output.feedback?.kind === 'recovery'),
+        currentVoicePriority: speechRef.current.currentPriority(),
+        at: rawFrame.timestamp,
+      })
+      if (encouragement) dispatchVoiceEvent({
+        kind: 'encouragement',
+        text: encouragement,
+        at: rawFrame.timestamp,
+        id: `encouragement-${output.result.exerciseId}`,
+      })
+    }
 
     const wallNow = performance.now()
     if (wallNow - lastUiUpdateRef.current >= 100) {
@@ -587,6 +610,8 @@ export function useTrainingRuntime() {
 
   useEffect(() => speechRef.current.onAvailabilityChange(setVoiceAvailable), [])
 
+  useEffect(() => speechRef.current.onPlaybackStateChange(setVoicePlayback), [])
+
   useEffect(() => {
     const camera = cameraRef.current
     const detector = detectorRef.current
@@ -684,7 +709,7 @@ export function useTrainingRuntime() {
     setSession(next)
     if (next.status === 'paused') {
       pauseStartedAtRef.current = now
-      dispatchVoiceEvent({ kind: 'pause', at: now }); coachRef.current.pause()
+      dispatchVoiceEvent({ kind: 'pause', text: '训练已暂停。', at: now }); coachRef.current.pause()
     } else {
       if (pauseStartedAtRef.current !== undefined && !noPoseCoursePausedRef.current) {
         const pauseDuration = now - pauseStartedAtRef.current
@@ -697,6 +722,7 @@ export function useTrainingRuntime() {
         noPosePauseStartedAtRef.current ??= noPoseStartedAtRef.current ?? now
       }
       coachRef.current.play()
+      dispatchVoiceEvent({ kind: 'resume', text: '继续训练。', at: now })
     }
     const coachInput = { ...coachInputRef.current, now, courseSnapshot: nextCourseSnapshot }
     coachInputRef.current = coachInput
@@ -776,6 +802,7 @@ export function useTrainingRuntime() {
     framingProfile,
     voiceEnabled,
     voiceAvailable,
+    voicePlayback,
     preparationMessage: poseUnavailable ? framingProfile.poseLost
       : courseEnabled && ['PREPARING', 'COUNTDOWN'].includes(courseSnapshot.state) && features && !features.bodyInFrame
       ? framingProfile.notInFrame

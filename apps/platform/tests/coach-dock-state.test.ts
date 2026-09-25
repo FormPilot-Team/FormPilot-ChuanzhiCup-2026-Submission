@@ -57,4 +57,17 @@ describe('resolveCoachDockState', () => {
   it('keeps the optional voice synchronization interface passive', () => {
     expect(resolve({ isSpeaking: undefined }).isSpeaking).toBeUndefined()
   })
+
+  it('exposes the spoken message only while real playback is active without replacing primary feedback', () => {
+    expect(resolve({
+      activeCorrection: { message: '右臂再抬高一些' },
+      isSpeaking: true,
+      currentSpokenMessage: '三',
+    })).toMatchObject({
+      primaryMessage: '右臂再抬高一些',
+      isSpeaking: true,
+      currentSpokenMessage: '三',
+    })
+    expect(resolve({ isSpeaking: false, currentSpokenMessage: '旧消息' }).currentSpokenMessage).toBeUndefined()
+  })
 })

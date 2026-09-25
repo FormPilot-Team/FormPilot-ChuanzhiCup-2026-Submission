@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Bot, Radio } from 'lucide-react'
+import { Bot, Radio, Volume2 } from 'lucide-react'
 import type { CoachDockState } from '../../features/coach/coachDockState'
 import { cn } from '../../lib/cn'
 import { PrimaryFeedback } from './PrimaryFeedback'
@@ -28,7 +28,7 @@ export function AICoachDock({ state, metrics }: AICoachDockProps) {
           <p className="truncate text-xs text-slate-500">正在观察 · {state.exerciseContext}</p>
         </div>
         <span className={cn('ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold', statusTone[state.severity])} data-testid="coach-status-label">
-          <Radio size={12} aria-hidden="true" />{state.isSpeaking ? '正在讲解' : state.statusLabel}
+          <Radio size={12} aria-hidden="true" />{state.isSpeaking ? '语音指导中' : state.statusLabel}
         </span>
       </div>
 
@@ -45,6 +45,12 @@ export function AICoachDock({ state, metrics }: AICoachDockProps) {
         <div className="flex min-w-0 flex-col justify-center">
           <p className="text-xs font-semibold text-blue-600">教练指导</p>
           <p className="mt-2 text-pretty text-lg font-bold leading-7 text-slate-900" data-testid="coach-primary-message">{state.primaryMessage}</p>
+          {state.isSpeaking && state.currentSpokenMessage ? (
+            <div className="mt-3 rounded-xl bg-blue-50 px-3 py-2 text-sm text-blue-800" role="status" aria-live="polite" data-testid="coach-spoken-message">
+              <p className="flex items-center gap-1.5 text-xs font-semibold text-blue-600"><Volume2 size={14} aria-hidden="true" />正在说话</p>
+              <p className="mt-1 text-pretty leading-5">{state.currentSpokenMessage}</p>
+            </div>
+          ) : null}
         </div>
       </div>
 

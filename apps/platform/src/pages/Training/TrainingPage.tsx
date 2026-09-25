@@ -31,6 +31,8 @@ export function TrainingPage() {
       activeText: definition.presentation.coach.activeText,
     },
     nextExerciseName: runtime.nextDefinition?.displayName,
+    isSpeaking: runtime.voicePlayback.isSpeaking,
+    currentSpokenMessage: runtime.voicePlayback.currentMessage,
   })
   const overlayCourseState = runtime.courseEnabled
     ? demonstrationSnapshot.state

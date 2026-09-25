@@ -12,6 +12,8 @@ export type VoiceGuideEventKind =
   | 'transition'
   | 'course_complete'
   | 'pause'
+  | 'resume'
+  | 'encouragement'
   | 'exercise_switch'
   | 'manual_end'
   | 'mute'
@@ -32,7 +34,7 @@ export interface VoiceGuideContext {
 }
 
 export type VoiceGuideCommand =
-  | { kind: 'speak'; text: string; priority: VoicePriority; interrupt: boolean }
+  | { kind: 'speak'; text: string; event: VoiceGuideEventKind; priority: VoicePriority; interrupt: boolean }
   | { kind: 'cancel' }
   | { kind: 'drop' }
 
@@ -41,15 +43,18 @@ export interface VoiceCourseExercise {
   name: string
 }
 
-const EVENT_PRIORITY: Record<Exclude<VoiceGuideEventKind, 'pause' | 'exercise_switch' | 'manual_end' | 'mute'>, VoicePriority> = {
+const EVENT_PRIORITY: Record<Exclude<VoiceGuideEventKind, 'exercise_switch' | 'manual_end' | 'mute'>, VoicePriority> = {
   pose_lost: 1,
   course_complete: 1,
+  pause: 1,
   start: 2,
   preparation: 2,
   transition: 2,
+  resume: 1,
   confirmed_correction: 3,
   countdown: 4,
   recovery_positive: 5,
+  encouragement: 5,
 }
 
 const POSE_QUALITY_CODES: ReadonlySet<MotionErrorCode> = new Set(['BODY_OUT_OF_FRAME', 'POSE_LOW_CONFIDENCE'])
@@ -103,10 +108,10 @@ export class VoiceGuidePolicy {
   private lastPoseLostAt = Number.NEGATIVE_INFINITY
 
   handle(event: VoiceGuideEvent, context: VoiceGuideContext): VoiceGuideCommand {
-    if (event.kind === 'pause' || event.kind === 'exercise_switch' || event.kind === 'manual_end' || event.kind === 'mute') {
+    if (event.kind === 'exercise_switch' || event.kind === 'manual_end' || event.kind === 'mute') {
       return { kind: 'cancel' }
     }
-    if (context.muted || !context.available || context.paused || !event.text) return { kind: 'drop' }
+    if (context.muted || !context.available || (context.paused && event.kind !== 'pause') || !event.text) return { kind: 'drop' }
     if (event.id && event.id === this.lastFeedbackId) return { kind: 'drop' }
 
     if (event.kind === 'confirmed_correction' && event.code && POSE_QUALITY_CODES.has(event.code)) {
@@ -125,7 +130,7 @@ export class VoiceGuidePolicy {
       if (priority > current) return { kind: 'drop' }
       if (priority === current && priority >= 4) return { kind: 'drop' }
     }
-    return { kind: 'speak', text: event.text, priority, interrupt: current !== undefined }
+    return { kind: 'speak', text: event.text, event: event.kind, priority, interrupt: current !== undefined || event.kind === 'pause' }
   }
 
   onPoseAvailability(available: boolean, at: number, context: VoiceGuideContext): VoiceGuideCommand {
