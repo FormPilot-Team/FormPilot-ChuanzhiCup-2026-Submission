@@ -16,6 +16,7 @@ import type { FeedbackEvent } from '../../features/feedback/types'
 import { TrainingSession } from '../../features/training/TrainingSession'
 import { LocalStorageTrainingSessionRepository } from '../../features/training/LocalStorageTrainingSessionRepository'
 import type { TrainingCaptureSource, TrainingSessionState } from '../../features/training/types'
+import { resolveTrainingMode } from '../../features/training/trainingMode'
 import { createExerciseDemoPoseFrame, createGestureDemoPoseFrame } from '../../data/demoPose'
 import { PerformanceTracker, type PerformanceSnapshot } from '../../features/diagnostics/PerformanceTracker'
 import { SessionDiagnosticsRecorder, type DiagnosticsDataSource } from '../../features/diagnostics/SessionDiagnosticsRecorder'
@@ -108,7 +109,8 @@ export function useTrainingRuntime() {
   const paramsRef = useRef(new URLSearchParams(window.location.search))
   const debug = paramsRef.current.get('debug') === '1'
   const demo = paramsRef.current.get('demo') === '1'
-  const fast = paramsRef.current.get('fast') === '1'
+  const trainingMode = resolveTrainingMode(paramsRef.current.get('fast') === '1')
+  const fast = trainingMode === 'fast'
   const voiceTestMode = import.meta.env.DEV && paramsRef.current.get('voice') === '1'
   const voiceFlowEnabled = !demo || voiceTestMode
   const syntheticFixture = import.meta.env.DEV && paramsRef.current.get('fixture') === 'synthetic'
@@ -142,6 +144,7 @@ export function useTrainingRuntime() {
     new LocalStorageTrainingSessionRepository(),
     courseEnabled ? courseOrder : standaloneOrder,
     captureSource(demo, syntheticFixture),
+    trainingMode,
   ))
   const courseRef = useRef(new CourseController(activeCourseDefinition))
   const courseStepIndexRef = useRef(0)

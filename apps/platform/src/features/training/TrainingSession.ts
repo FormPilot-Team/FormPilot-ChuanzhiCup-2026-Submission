@@ -5,6 +5,8 @@ import { MemoryTrainingSessionRepository } from './MemoryTrainingSessionReposito
 import type { TrainingSessionRepository } from './TrainingSessionRepository'
 import type { ExerciseSessionResult, TrainingCaptureSource, TrainingSessionState } from './types'
 import { ELECTRONIC_COACH_COURSE_V1 } from '../course/CourseDefinition'
+import { ENGINEERING_THRESHOLD_VERSION, EXERCISE_SPEC_VERSION } from '../exercises/thresholdVersioning'
+import type { TrainingMode } from './types'
 
 function createExercise(exerciseId: ExerciseId, startedAt: number): ExerciseSessionResult {
   const step = ELECTRONIC_COACH_COURSE_V1.steps.find((item) => item.exerciseId === exerciseId)
@@ -35,12 +37,18 @@ export class TrainingSession {
     private readonly repository: TrainingSessionRepository = new MemoryTrainingSessionRepository(),
     exerciseOrder: ExerciseId[] = EXERCISE_ORDER,
     source: TrainingCaptureSource = 'live',
+    mode: TrainingMode = 'normal',
   ) {
     const order = [...exerciseOrder]
     this.state = {
       schemaVersion: 2,
       id: createSessionId(now),
       source,
+      mode,
+      rulesVersion: {
+        spec: EXERCISE_SPEC_VERSION,
+        threshold: ENGINEERING_THRESHOLD_VERSION,
+      },
       startedAt: now,
       status: 'ready',
       courseId: ELECTRONIC_COACH_COURSE_V1.id,

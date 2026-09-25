@@ -6,7 +6,8 @@ import { calculateOverheadRaiseScoreComponents } from './scoring'
 
 export interface OverheadRaiseStateSnapshot extends ExerciseState {
   phase: ExercisePhase; repCount: number; repStartedAt?: number; peakShoulderL: number; peakShoulderR: number
-  minElbowL: number; minElbowR: number; maxSymmetryDiff: number; maxTorsoLean: number; incomplete: boolean
+  minElbowL: number; minElbowR: number; topElbowL?: number; topElbowR?: number
+  maxSymmetryDiff: number; maxTorsoLean: number; incomplete: boolean
   completedRep?: OverheadRaiseRepSummary
 }
 const initial = (): OverheadRaiseStateSnapshot => ({ phase: 'START', repCount: 0, peakShoulderL: 0, peakShoulderR: 0, minElbowL: 180, minElbowR: 180, maxSymmetryDiff: 0, maxTorsoLean: 0, incomplete: false })
@@ -30,11 +31,15 @@ export class OverheadRaiseStateMachine {
     else if (this.state.phase === 'TOP' && f.shoulderVelocity < -this.config.directionVelocity) target = 'LOWERING'
     else if (this.state.phase === 'LOWERING' && f.meanShoulderAngle <= this.config.startMaxAngle) target = 'COMPLETE'
     if (target && this.gate.confirm(target, this.config.phasePersistenceFrames)) this.transition(target, f); else if (!target) this.gate.clear()
+    if (this.state.phase === 'TOP' && target !== 'LOWERING' && f.confidence >= this.config.visibilityThreshold && f.bodyInFrame) {
+      if (Number.isFinite(f.elbowAngleL)) this.state.topElbowL = Math.min(this.state.topElbowL ?? 180, f.elbowAngleL)
+      if (Number.isFinite(f.elbowAngleR)) this.state.topElbowR = Math.min(this.state.topElbowR ?? 180, f.elbowAngleR)
+    }
     const output = { ...this.state }; if (output.phase === 'COMPLETE') this.emitted = true; this.state.completedRep = undefined; return output
   }
   private transition(target: ExercisePhase, f: OverheadRaiseFeatures): void {
     this.state.phase = target
-    if (target === 'RAISING') { this.state.repStartedAt = f.timestamp; this.state.peakShoulderL = f.shoulderAngleL; this.state.peakShoulderR = f.shoulderAngleR; this.state.minElbowL = f.elbowAngleL; this.state.minElbowR = f.elbowAngleR; this.state.maxSymmetryDiff = f.symmetryDiff; this.state.maxTorsoLean = f.torsoLean; this.state.incomplete = false }
+    if (target === 'RAISING') { this.state.repStartedAt = f.timestamp; this.state.peakShoulderL = f.shoulderAngleL; this.state.peakShoulderR = f.shoulderAngleR; this.state.minElbowL = f.elbowAngleL; this.state.minElbowR = f.elbowAngleR; this.state.topElbowL = undefined; this.state.topElbowR = undefined; this.state.maxSymmetryDiff = f.symmetryDiff; this.state.maxTorsoLean = f.torsoLean; this.state.incomplete = false }
     if (target === 'COMPLETE' && this.state.repStartedAt !== undefined && !this.state.incomplete) {
       const errors: MotionErrorCode[] = []
       if (Math.min(this.state.peakShoulderL, this.state.peakShoulderR) < this.config.topMinAngle) errors.push('ARMS_TOO_LOW')
@@ -46,7 +51,7 @@ export class OverheadRaiseStateMachine {
       if (durationMs < this.config.repDurationMinMs) errors.push('TOO_FAST')
       const scores = calculateOverheadRaiseScoreComponents(this.state.peakShoulderL, this.state.peakShoulderR,
         this.state.minElbowL, this.state.minElbowR, this.state.maxSymmetryDiff, this.state.maxTorsoLean, durationMs, this.config)
-      this.state.repCount += 1; this.state.completedRep = { exerciseId: 'overhead_raise', repIndex: this.state.repCount, startedAt: this.state.repStartedAt, completedAt: f.timestamp, durationMs, peakShoulderL: this.state.peakShoulderL, peakShoulderR: this.state.peakShoulderR, minElbowL: this.state.minElbowL, minElbowR: this.state.minElbowR, maxSymmetryDiff: this.state.maxSymmetryDiff, maxTorsoLean: this.state.maxTorsoLean, amplitudeScore: scores.amplitude, elbowScore: scores.elbow, synchronizationScore: scores.synchronization, stabilityScore: scores.stability, tempoScore: scores.tempo, overallScore: scores.overall, errors }
+      this.state.repCount += 1; this.state.completedRep = { exerciseId: 'overhead_raise', repIndex: this.state.repCount, startedAt: this.state.repStartedAt, completedAt: f.timestamp, durationMs, peakShoulderL: this.state.peakShoulderL, peakShoulderR: this.state.peakShoulderR, minElbowL: this.state.minElbowL, minElbowR: this.state.minElbowR, topElbowL: this.state.topElbowL, topElbowR: this.state.topElbowR, maxSymmetryDiff: this.state.maxSymmetryDiff, maxTorsoLean: this.state.maxTorsoLean, amplitudeScore: scores.amplitude, elbowScore: scores.elbow, synchronizationScore: scores.synchronization, stabilityScore: scores.stability, tempoScore: scores.tempo, overallScore: scores.overall, errors }
     }
   }
 }

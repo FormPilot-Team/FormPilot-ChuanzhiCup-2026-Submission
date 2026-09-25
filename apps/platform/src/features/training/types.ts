@@ -3,6 +3,12 @@ import type { ExerciseId, MotionErrorCode, RepSummary, RuleMetrics } from '../ex
 import type { CourseTargetType, EvaluationMode } from '../course/CourseDefinition'
 
 export type TrainingCaptureSource = 'live' | 'demo' | 'synthetic'
+export type TrainingMode = 'normal' | 'fast'
+
+export interface TrainingRulesVersion {
+  spec: string
+  threshold: string
+}
 
 export interface RepetitionResult {
   rep: RepSummary
@@ -30,6 +36,8 @@ export interface TrainingSessionState {
   schemaVersion: 2
   id: string
   source: TrainingCaptureSource
+  mode?: TrainingMode
+  rulesVersion?: TrainingRulesVersion
   startedAt: number
   endedAt?: number
   status: 'ready' | 'active' | 'paused' | 'completed'

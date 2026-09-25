@@ -31,7 +31,13 @@ test('six-step fast course completes in frozen order and saves scored-only summa
   await page.screenshot({ path: 'test-results/regression-screenshots/phase5/10-course-complete-summary.png' })
 
   const latest = await page.evaluate(() => JSON.parse(localStorage.getItem('ai-coach.sessions:v2') ?? '[]').at(-1))
-  expect(latest.courseStatus).toBe('completed')
+  expect(latest).toMatchObject({
+    schemaVersion: 2,
+    mode: 'fast',
+    rulesVersion: { spec: 'exercise-rules-v1.0', threshold: 'engineering-v1' },
+    courseStatus: 'completed',
+  })
+  expect(latest).not.toHaveProperty('analysis')
   expect(latest.exercises.map((item: { exerciseId: string }) => item.exerciseId)).toEqual([
     'shoulder_rotation','overhead_raise','lateral_raise','step_jack','squat','knee_raise',
   ])

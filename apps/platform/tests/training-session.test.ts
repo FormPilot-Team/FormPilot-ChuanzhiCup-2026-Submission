@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { TrainingSession } from '../src/features/training/TrainingSession'
+import { countFeedbackEvents } from '../src/features/training/feedbackCounts'
 import type { TrainingSessionRepository } from '../src/features/training/TrainingSessionRepository'
 import type { TrainingSessionState } from '../src/features/training/types'
 import { ruleResult, snapshot } from './helpers/fixtures'
@@ -20,6 +21,17 @@ const rep = {
 }
 
 describe('TrainingSession', () => {
+  it('freezes rulesVersion and records normal/fast mode on new live sessions', () => {
+    const normal = new TrainingSession(100).snapshot()
+    const fast = new TrainingSession(100, undefined, undefined, 'live', 'fast').snapshot()
+    expect(normal).toMatchObject({
+      source: 'live',
+      mode: 'normal',
+      rulesVersion: { spec: 'exercise-rules-v1.0', threshold: 'engineering-v1' },
+    })
+    expect(fast.mode).toBe('fast')
+  })
+
   it('tracks lifecycle and deduplicates the same completed repetition', () => {
     const session = new TrainingSession(100)
     expect(session.start().status).toBe('active')
@@ -94,5 +106,18 @@ describe('TrainingSession', () => {
     const session = new TrainingSession(100)
     session.start()
     expect(session.finish(500, 'incomplete')).toMatchObject({ status:'completed', courseStatus:'incomplete', totalDurationMs:400 })
+  })
+
+  it('keeps totalFeedbackCount legacy semantics while correction and recovery remain derivable', () => {
+    const session = new TrainingSession(100)
+    session.start()
+    const correction = { id:'feedback-1', timestamp:1300, kind:'correction' as const, exerciseId:'lateral_raise' as const, code:'TORSO_LEAN' as const, message:'保持躯干直立', severity:.7 }
+    const recovery = { ...correction, id: 'feedback-2', timestamp: 2000, kind: 'recovery' as const }
+    session.record(ruleResult(), snapshot(), correction)
+    session.record(ruleResult(), snapshot(), recovery)
+    const final = session.finish(3000)
+    expect(final.totalFeedbackCount).toBe(2)
+    expect(countFeedbackEvents(final, 'correction')).toBe(1)
+    expect(countFeedbackEvents(final, 'recovery')).toBe(1)
   })
 })
