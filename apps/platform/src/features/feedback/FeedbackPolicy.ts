@@ -6,6 +6,8 @@ export interface FeedbackPolicyConfig {
   recoveryMs: number
   sameFeedbackCooldownMs: number
   differentFeedbackGapMs: number
+  confirmMsByCode?: Partial<Record<MotionErrorCode, number>>
+  recoveryMsByCode?: Partial<Record<MotionErrorCode, number>>
 }
 
 export const DEFAULT_FEEDBACK_POLICY: FeedbackPolicyConfig = {
@@ -79,7 +81,8 @@ export class FeedbackPolicy {
 
     if (this.active && !presentCodes.has(this.active.code)) {
       this.recoveryStartedAt ??= now
-      if (now - this.recoveryStartedAt >= this.config.recoveryMs) {
+      const recoveryMs = this.config.recoveryMsByCode?.[this.active.code] ?? this.config.recoveryMs
+      if (now - this.recoveryStartedAt >= recoveryMs) {
         const previous = this.active
         this.active = undefined
         this.recoveryStartedAt = undefined
@@ -97,7 +100,8 @@ export class FeedbackPolicy {
 
     const candidate = result.errors[0]
     if (!candidate) return undefined
-    if (now - (this.firstSeen.get(candidate.code) ?? now) < this.config.confirmMs) return undefined
+    const confirmMs = this.config.confirmMsByCode?.[candidate.code] ?? this.config.confirmMs
+    if (now - (this.firstSeen.get(candidate.code) ?? now) < confirmMs) return undefined
     const lastSame = this.lastSpoken.get(candidate.code) ?? -Infinity
     const gap = candidate.code === this.lastOutputCode ? this.config.sameFeedbackCooldownMs : this.config.differentFeedbackGapMs
     this.active = candidate

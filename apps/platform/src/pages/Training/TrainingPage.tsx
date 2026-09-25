@@ -49,7 +49,7 @@ export function TrainingPage() {
             <h1 className="text-balance text-2xl font-bold text-slate-950 lg:text-3xl">今日训练 · {definition.presentation.subtitle}</h1>
             <p className="mt-1 text-pretty text-sm text-slate-500">第 {runtime.exerciseIndex + 1} / {runtime.exerciseNames.length} 项 · 实时姿态识别与动作纠正</p>
           </div>
-          <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-600" data-testid="course-state">{runtime.poseUnavailable ? runtime.framingProfile.poseLost : runtime.courseSnapshot.state === 'COUNTDOWN' ? `${runtime.courseSnapshot.countdown} · 准备开始` : runtime.courseSnapshot.state === 'TRANSITION' ? `完成 ✓ · 下一动作 ${runtime.nextDefinition?.displayName ?? '课程总结'}` : runtime.courseSnapshot.state === 'PAUSED' ? '课程已暂停' : runtime.courseSnapshot.state === 'COURSE_COMPLETE' ? '课程完成 ✓' : runtime.courseSnapshot.state === 'COURSE_INCOMPLETE' ? '课程未完成' : runtime.courseSnapshot.state === 'PREPARING' ? '请进入准备姿势' : '坚持，让更好的自己发生'}</p>
+          <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-600" data-testid="course-state">{runtime.poseUnavailable ? runtime.framingProfile.poseLost : runtime.courseSnapshot.state === 'PAUSED' ? '训练已暂停 · 课程已暂停' : runtime.courseSnapshot.state === 'COUNTDOWN' ? `${runtime.courseSnapshot.countdown} · 准备开始` : runtime.courseSnapshot.state === 'TRANSITION' ? `完成 ✓ · 下一动作 ${runtime.nextDefinition?.displayName ?? '课程总结'}` : runtime.courseSnapshot.state === 'COURSE_COMPLETE' ? '课程完成 ✓' : runtime.courseSnapshot.state === 'COURSE_INCOMPLETE' ? '课程未完成' : runtime.courseSnapshot.state === 'PREPARING' ? '请进入准备姿势' : '坚持，让更好的自己发生'}</p>
         </div>
         <div className="training-grid grid min-h-[635px] min-w-0 gap-3 xl:h-[clamp(520px,calc(100dvh-300px),680px)] xl:min-h-0 xl:grid-cols-[minmax(280px,0.72fr)_minmax(460px,1.45fr)_minmax(340px,0.9fr)]" data-testid="hybrid-training-layout">
           <DemonstrationVideo
@@ -69,6 +69,9 @@ export function TrainingPage() {
             demoAsset={definition.presentation.cameraDemo}
             demoFrameSrc={runtime.demoFrameSrc}
             preparationMessage={runtime.preparationMessage}
+            gesturePrompt={runtime.gesturePrompt}
+            gestureProgress={runtime.gestureProgress}
+            gestureHolding={runtime.gestureHolding}
             outOfFrameMessage={runtime.framingProfile.notInFrame}
             showPoseOverlay={shouldShowPoseOverlay(overlayCourseState)}
             onStart={runtime.startCamera}

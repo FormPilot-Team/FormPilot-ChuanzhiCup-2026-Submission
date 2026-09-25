@@ -38,8 +38,8 @@ export class OverheadRaiseStateMachine {
     if (target === 'COMPLETE' && this.state.repStartedAt !== undefined && !this.state.incomplete) {
       const errors: MotionErrorCode[] = []
       if (Math.min(this.state.peakShoulderL, this.state.peakShoulderR) < this.config.topMinAngle) errors.push('ARMS_TOO_LOW')
-      if (this.state.minElbowL < this.config.elbowMinAngle) errors.push('ELBOW_TOO_BENT_L')
-      if (this.state.minElbowR < this.config.elbowMinAngle) errors.push('ELBOW_TOO_BENT_R')
+      if (this.state.minElbowL < this.config.elbowCorrectionAngle) errors.push('ELBOW_TOO_BENT_L')
+      if (this.state.minElbowR < this.config.elbowCorrectionAngle) errors.push('ELBOW_TOO_BENT_R')
       if (this.state.maxSymmetryDiff > this.config.symmetryMaxDiff) errors.push('ASYMMETRY')
       if (this.state.maxTorsoLean > this.config.torsoLeanMax) errors.push('TORSO_LEAN')
       const durationMs = f.timestamp - this.state.repStartedAt

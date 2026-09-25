@@ -18,12 +18,15 @@ interface CameraPanelProps {
   demoAsset: { portraitSrc: string; landscapeSrc: string; alt: string; fit?: 'cover' | 'contain' }
   demoFrameSrc?: string
   preparationMessage?: string
+  gesturePrompt?: string
+  gestureProgress?: number
+  gestureHolding?: boolean
   outOfFrameMessage: string
   showPoseOverlay?: boolean
   onStart: () => void
 }
 
-export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMessage, errorKind, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, outOfFrameMessage, showPoseOverlay = true, onStart }: CameraPanelProps) {
+export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMessage, errorKind, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, onStart }: CameraPanelProps) {
   const status = mode === 'demo' ? '演示模式' : mode === 'live' ? '摄像头已连接 · AI 实时分析中' : mode === 'requesting_permission' ? '等待摄像头授权' : mode === 'model_loading' ? '正在加载识别模型' : mode === 'error' ? '连接异常' : '等待连接摄像头'
   const blocking = ['idle', 'error', 'requesting_permission', 'model_loading'].includes(mode)
   const loading = mode === 'requesting_permission' || mode === 'model_loading'
@@ -51,8 +54,19 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMes
         <PoseOverlay ref={overlayRef} visible={showPoseOverlay} />
         {mode === 'live' || mode === 'demo' ? <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-xl bg-slate-900/65 px-3 py-2 text-xs font-medium text-white"><ScanLine size={15} />AI 识别中</span> : null}
         {preparationMessage && (mode === 'demo' || mode === 'live') ? (
-          <div className="absolute inset-x-4 top-16 rounded-xl bg-white/95 px-4 py-3 text-center text-lg font-bold text-blue-700 shadow-sm sm:text-xl" role="status" data-testid="preparation-state">
+          <div className="absolute inset-x-4 top-16 rounded-xl bg-white/95 px-4 py-3 text-center text-pretty text-lg font-bold text-blue-700 shadow-sm sm:text-xl" role="status" data-testid="preparation-state">
             {preparationMessage}
+          </div>
+        ) : null}
+        {gesturePrompt && (mode === 'demo' || mode === 'live') ? (
+          <div className="absolute inset-x-4 top-16 rounded-xl bg-white/95 px-4 py-3 text-center shadow-sm" role="status" data-testid="gesture-control">
+            <p className="text-pretty text-lg font-bold text-blue-700 sm:text-xl">{gesturePrompt}</p>
+            {gestureHolding ? (
+              <div className="mt-2 flex items-center gap-3 text-sm font-semibold text-blue-600" data-testid="gesture-hold-progress">
+                <progress className="h-2 flex-1 accent-blue-600" max={1} value={gestureProgress} aria-label="手势保持进度" />
+                <span className="min-w-14 tabular-nums">保持中… {Math.round(gestureProgress * 100)}%</span>
+              </div>
+            ) : null}
           </div>
         ) : null}
         {feedback ? (

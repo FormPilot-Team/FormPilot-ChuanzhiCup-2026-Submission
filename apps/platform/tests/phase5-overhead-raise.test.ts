@@ -57,13 +57,16 @@ describe('Overhead Raise engineering-v1', () => {
 
   it.each([
     ['ARMS_TOO_LOW', { peakShoulderL: 140 }],
-    ['ELBOW_TOO_BENT_L', { minElbowL: 140 }],
-    ['ELBOW_TOO_BENT_R', { minElbowR: 140 }],
     ['ASYMMETRY', { maxSymmetryDiff: 20 }],
     ['TORSO_LEAN', { maxTorsoLean: 16 }],
   ] as const)('reports %s independently', (code, changes) => {
     const result = evaluateOverheadRaiseRules(features(), state(changes))
     expect(result.errors.map((error) => error.code)).toContain(code)
+  })
+
+  it('reports current left and right elbow correction zones independently', () => {
+    expect(evaluateOverheadRaiseRules(features({ elbowAngleL: 130 }), state()).errors.map((error) => error.code)).toContain('ELBOW_TOO_BENT_L')
+    expect(evaluateOverheadRaiseRules(features({ elbowAngleR: 130 }), state()).errors.map((error) => error.code)).toContain('ELBOW_TOO_BENT_R')
   })
 
   it('reports pose confidence and frame-boundary quality failures', () => {

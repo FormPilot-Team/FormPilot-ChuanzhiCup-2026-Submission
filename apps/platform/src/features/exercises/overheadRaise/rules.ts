@@ -10,8 +10,8 @@ export function evaluateOverheadRaiseRules(f: OverheadRaiseFeatures, s: Overhead
   const valid = !errors.length; const top = s.phase === 'TOP' || s.phase === 'LOWERING' || s.phase === 'COMPLETE'
   if (valid && top) {
     if (Math.min(s.peakShoulderL, s.peakShoulderR) < c.topMinAngle) errors.push(makeMotionError('ARMS_TOO_LOW', .8, '双臂继续举过头顶'))
-    if (s.minElbowL < c.elbowMinAngle) errors.push(makeMotionError('ELBOW_TOO_BENT_L', .7, '左手肘再伸直一些', 'left'))
-    if (s.minElbowR < c.elbowMinAngle) errors.push(makeMotionError('ELBOW_TOO_BENT_R', .7, '右手肘再伸直一些', 'right'))
+    if (f.elbowAngleL < c.elbowCorrectionAngle) errors.push(makeMotionError('ELBOW_TOO_BENT_L', (c.elbowCorrectionAngle - f.elbowAngleL) / 45, '左手肘再伸直一些', 'left'))
+    if (f.elbowAngleR < c.elbowCorrectionAngle) errors.push(makeMotionError('ELBOW_TOO_BENT_R', (c.elbowCorrectionAngle - f.elbowAngleR) / 45, '右手肘再伸直一些', 'right'))
     if (s.maxSymmetryDiff > c.symmetryMaxDiff) errors.push(makeMotionError('ASYMMETRY', .7, '双臂保持同一高度'))
     if (s.maxTorsoLean > c.torsoLeanMax) errors.push(makeMotionError('TORSO_LEAN', .7, '保持躯干直立'))
   }

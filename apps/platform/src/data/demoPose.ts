@@ -60,6 +60,41 @@ export function createExerciseDemoPoseFrame(exerciseId: ExerciseId, timestamp: n
   return { ...frame, landmarks }
 }
 
+export function createGestureDemoPoseFrame(timestamp: number, gesture: 'start' | 'pause' | 'none', baseFrame?: PoseFrame): PoseFrame {
+  const base = baseFrame ?? createArmDemoPoseFrame(0, 165, 2400)
+  if (gesture === 'none') return { ...base, timestamp }
+  const landmarks = [...base.landmarks]
+  const leftShoulder = landmarks[11]
+  const rightShoulder = landmarks[12]
+  const leftHip = landmarks[23]
+  const rightHip = landmarks[24]
+  const centerX = (leftShoulder.x + rightShoulder.x) / 2
+  const shoulderY = (leftShoulder.y + rightShoulder.y) / 2
+  const hipY = (leftHip.y + rightHip.y) / 2
+  const shoulderWidth = Math.abs(leftShoulder.x - rightShoulder.x)
+  const torsoLength = Math.abs(hipY - shoulderY)
+  const leftSide = Math.sign(leftShoulder.x - centerX) || -1
+  const rightSide = Math.sign(rightShoulder.x - centerX) || 1
+  const elbowY = shoulderY + torsoLength * 0.38
+  const wristY = shoulderY + torsoLength * 0.52
+  if (gesture === 'start') {
+    Object.assign(landmarks, {
+      13: point(leftShoulder.x + leftSide * shoulderWidth * 0.3, elbowY),
+      14: point(rightShoulder.x + rightSide * shoulderWidth * 0.3, elbowY),
+      15: point(centerX + leftSide * shoulderWidth * 0.05, wristY),
+      16: point(centerX + rightSide * shoulderWidth * 0.05, wristY),
+    })
+  } else {
+    Object.assign(landmarks, {
+      13: point(leftShoulder.x + leftSide * shoulderWidth * 0.35, elbowY),
+      14: point(rightShoulder.x + rightSide * shoulderWidth * 0.35, elbowY),
+      15: point(centerX - leftSide * shoulderWidth * 0.45, wristY),
+      16: point(centerX - rightSide * shoulderWidth * 0.45, wristY),
+    })
+  }
+  return { ...base, timestamp, landmarks }
+}
+
 function createOverheadRaiseDemoPoseFrame(timestamp: number): PoseFrame {
   const cycle = timestamp % 5000
   let motionTimestamp = 0

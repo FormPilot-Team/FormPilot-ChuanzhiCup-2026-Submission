@@ -16,7 +16,7 @@ import type { FeedbackEvent } from '../../features/feedback/types'
 import { TrainingSession } from '../../features/training/TrainingSession'
 import { LocalStorageTrainingSessionRepository } from '../../features/training/LocalStorageTrainingSessionRepository'
 import type { TrainingCaptureSource, TrainingSessionState } from '../../features/training/types'
-import { createExerciseDemoPoseFrame } from '../../data/demoPose'
+import { createExerciseDemoPoseFrame, createGestureDemoPoseFrame } from '../../data/demoPose'
 import { PerformanceTracker, type PerformanceSnapshot } from '../../features/diagnostics/PerformanceTracker'
 import { SessionDiagnosticsRecorder, type DiagnosticsDataSource } from '../../features/diagnostics/SessionDiagnosticsRecorder'
 import { CourseController, type CourseSnapshot } from '../../features/course/CourseController'
@@ -27,6 +27,7 @@ import type { CoachCardResolverInput, CoachExerciseInput } from '../../features/
 import { getFramingProfile } from '../../features/framing/framingProfiles'
 import { deriveCourseVoiceEvents, VoiceGuidePolicy, type VoiceGuideCommand, type VoiceGuideEvent } from '../../features/voice/VoiceGuidePolicy'
 import { EncouragementPolicy } from '../../features/voice/EncouragementPolicy'
+import { GestureRuntimeController, type GestureAction } from '../../features/gesture/GestureRuntimeController'
 
 type CameraMode = 'idle' | 'requesting_permission' | 'model_loading' | 'live' | 'demo' | 'error'
 
@@ -111,12 +112,13 @@ export function useTrainingRuntime() {
   const voiceTestMode = import.meta.env.DEV && paramsRef.current.get('voice') === '1'
   const voiceFlowEnabled = !demo || voiceTestMode
   const syntheticFixture = import.meta.env.DEV && paramsRef.current.get('fixture') === 'synthetic'
+  const manualGestureFixture = syntheticFixture && paramsRef.current.get('gesture') === 'manual'
   const coachFixture = syntheticFixture ? paramsRef.current.get('coachFixture') ?? undefined : undefined
   const requested = paramsRef.current.get('exercise')
   // Preserve standalone/demo diagnostic URLs; the normal product entry is the six-step course.
   const courseEnabled = !isRegisteredExerciseId(requested) && (!demo || paramsRef.current.get('course') === '1')
   const courseOrder = ELECTRONIC_COACH_COURSE_V1.steps.map((step) => step.exerciseId)
-  const activeCourseDefinition = fast ? { ...ELECTRONIC_COACH_COURSE_V1, countdownSeconds: .1, transitionMs: 250 } : ELECTRONIC_COACH_COURSE_V1
+  const activeCourseDefinition = fast ? { ...ELECTRONIC_COACH_COURSE_V1, countdownSeconds: .1, transitionMs: 600 } : ELECTRONIC_COACH_COURSE_V1
   const standaloneOrderRef = useRef<ExerciseId[]>(isRegisteredExerciseId(requested) && !EXERCISE_ORDER.includes(requested) ? [requested] : EXERCISE_ORDER)
   const standaloneOrder = standaloneOrderRef.current
   const initialExerciseId: ExerciseId = isRegisteredExerciseId(requested) ? requested : courseEnabled ? courseOrder[0] : standaloneOrder[0]
@@ -129,6 +131,8 @@ export function useTrainingRuntime() {
   const detectorRef = useRef(new PoseDetector())
   if (import.meta.env.DEV) Object.assign(window, { __poseDetector: detectorRef.current })
   const filterRef = useRef(new PoseFilter())
+  const gestureFilterRef = useRef(new PoseFilter({ medianWindow: 3, emaAlpha: 0.5 }))
+  const gestureControllerRef = useRef(new GestureRuntimeController())
   const runtimeRef = useRef<ExerciseRuntime>(createExerciseRuntime(initialDefinition))
   const coachRef = useRef(new PlaceholderCoachAnimationAdapter())
   const coachResolverRef = useRef(new CoachCardStateResolver())
@@ -169,6 +173,8 @@ export function useTrainingRuntime() {
   const noPoseCoursePausedRef = useRef(false)
   const noPosePauseStartedAtRef = useRef<number | undefined>(undefined)
   const poseUnavailableRef = useRef(false)
+  const startGestureConfirmedRef = useRef(false)
+  const gestureActionRef = useRef<() => void>(() => undefined)
 
   if (initialExerciseId !== (courseEnabled ? courseOrder[0] : standaloneOrder[0]) && sessionRef.current.snapshot().activeExerciseId !== initialExerciseId) {
     sessionRef.current.switchExercise(initialExerciseId)
@@ -201,6 +207,7 @@ export function useTrainingRuntime() {
   const [voiceEnabled, setVoiceEnabled] = useState(true)
   const [voiceAvailable, setVoiceAvailable] = useState(() => speechRef.current.isAvailable())
   const [voicePlayback, setVoicePlayback] = useState<VoicePlaybackState>({ isSpeaking: false })
+  const [gestureStatus, setGestureStatus] = useState<{ action?: GestureAction; progress: number }>({ progress: 0 })
   const initialCoachInputRef = useRef<CoachCardResolverInput>({
     now: performance.now(),
     courseSnapshot: courseEnabled ? courseRef.current.getSnapshot() : { state: demo ? 'ACTIVE' : 'PREPARING', countdown: 0 },
@@ -270,6 +277,9 @@ export function useTrainingRuntime() {
     dispatchVoiceEvent({ kind: 'exercise_switch', at: performance.now() })
     runtimeRef.current = createExerciseRuntime(next)
     filterRef.current.reset()
+    gestureFilterRef.current.reset()
+    gestureControllerRef.current.reset()
+    startGestureConfirmedRef.current = false
     overlayRef.current?.clear()
     coachRef.current.reset()
     coachRef.current.loadExercise(exerciseId)
@@ -289,6 +299,7 @@ export function useTrainingRuntime() {
     setExerciseState(initialState(next))
     setResult(initialResult(next))
     setFeatures(undefined)
+    setGestureStatus({ progress: 0 })
     setFeedback(undefined)
     setRemainingSeconds(next.presentation.durationSeconds)
     setCoachFrame(coachRef.current.getFrame())
@@ -359,7 +370,22 @@ export function useTrainingRuntime() {
       noPosePauseStartedAtRef.current = undefined
       setCourseSnapshot(courseRef.current.resume(rawFrame.timestamp))
     }
-    if (sessionRef.current.status() !== 'active' || completedRef.current) return
+    if (completedRef.current) return
+    const gestureFiltered = gestureFilterRef.current.push(rawFrame)
+    const gesturePose = normalizePoseFrame(gestureFiltered)
+    if (!gesturePose) return
+    if (sessionRef.current.status() === 'paused') {
+      const gesture = courseEnabled
+        ? gestureControllerRef.current.update({ courseState: courseRef.current.getSnapshot().state, framingValid: true, pose: gesturePose })
+        : { progress: 0, action: undefined, triggered: undefined, holding: false }
+      setGestureStatus({ action: gesture.action, progress: gesture.progress })
+      if (gesture.triggered === 'resume') {
+        gestureActionRef.current()
+        setGestureStatus({ progress: 0 })
+      }
+      return
+    }
+    if (sessionRef.current.status() !== 'active') return
     const exerciseFrame = { ...rawFrame, timestamp: rawFrame.timestamp - pausedDurationRef.current }
     const filtered = filterRef.current.push(exerciseFrame)
     const normalized = normalizePoseFrame(filtered)
@@ -367,6 +393,20 @@ export function useTrainingRuntime() {
     const courseBefore = courseRef.current.getSnapshot()
     const shouldProcessRep = !courseEnabled || courseBefore.state === 'ACTIVE'
     const extracted = runtimeRef.current.extract(normalized)
+    const framingValid = extracted.confidence >= .65 && extracted.bodyInFrame
+      && (!('baselineReady' in extracted) || Boolean(extracted.baselineReady))
+    if (courseEnabled && ['PREPARING', 'COUNTDOWN'].includes(courseBefore.state) && !framingValid) startGestureConfirmedRef.current = false
+    const gesture = courseEnabled
+      ? gestureControllerRef.current.update({ courseState: courseBefore.state, framingValid, pose: gesturePose })
+      : { progress: 0, action: undefined, triggered: undefined, holding: false }
+    setGestureStatus({ action: gesture.action, progress: gesture.progress })
+    if (gesture.triggered === 'start') startGestureConfirmedRef.current = true
+    if (gesture.triggered === 'pause') {
+      gestureActionRef.current()
+      setGestureStatus({ progress: 0 })
+      return
+    }
+    if (gesture.action === 'pause' && gesture.holding) return
     const engineOutput = shouldProcessRep
       ? runtimeRef.current.processFeatures(extracted)
       : { result: { ...initialResult(runtimeRef.current.definition), confidence: extracted.confidence }, state: initialState(runtimeRef.current.definition), feedback: undefined, confirmedPrimaryFeedback: undefined, recoveredFeedback: undefined }
@@ -385,10 +425,19 @@ export function useTrainingRuntime() {
       coachTargetValue = target
       coachProgress = progress
       courseAfter = courseRef.current.update(rawFrame.timestamp, {
-        ready: output.features.confidence >= .65 && output.features.bodyInFrame && (!('baselineReady' in output.features) || Boolean(output.features.baselineReady)),
+        ready: framingValid && startGestureConfirmedRef.current,
         progress, target,
       })
-      if (courseBefore.state !== 'ACTIVE' && courseAfter.state === 'ACTIVE') runtimeRef.current.resetEngine()
+      if (courseAfter.state !== courseBefore.state) {
+        gestureControllerRef.current.reset()
+        setGestureStatus({ progress: 0 })
+      }
+      if (courseBefore.state !== 'ACTIVE' && courseAfter.state === 'ACTIVE') {
+        if ('baselineReady' in output.features) runtimeRef.current.resetEngine()
+        else runtimeRef.current.reset()
+        filterRef.current.reset()
+        demoExerciseStartedAtRef.current = performance.now()
+      }
     }
     if (!courseEnabled || courseBefore.state === 'ACTIVE') sessionRef.current.record(output.result, output.state, output.feedback)
     diagnosticsRef.current.record(output.features, output.state, output.result)
@@ -532,6 +581,9 @@ export function useTrainingRuntime() {
     const step = ELECTRONIC_COACH_COURSE_V1.steps[courseBefore.stepIndex]
     const target = resolveCourseTarget(step, fast)
     if (courseBefore.state === 'PREPARING' || courseBefore.state === 'COUNTDOWN') {
+      startGestureConfirmedRef.current = false
+      gestureControllerRef.current.reset()
+      setGestureStatus({ progress: 0 })
       courseAfter = courseRef.current.update(timestamp, { ready: false, progress: 0, target })
     } else if (courseBefore.state === 'ACTIVE' && !noPoseCoursePausedRef.current) {
       const lostAt = noPoseStartedAtRef.current
@@ -554,10 +606,6 @@ export function useTrainingRuntime() {
     let lastInferenceAt = 0
     const tick = (timestamp: number) => {
       performanceRef.current.markUiFrame(timestamp)
-      if (sessionRef.current.status() === 'paused') {
-        if (!disposed && !completedRef.current) rafRef.current = requestAnimationFrame(tick)
-        return
-      }
       if (timestamp - lastInferenceAt >= 33) {
         lastInferenceAt = timestamp
         const exerciseTime = timestamp - demoExerciseStartedAtRef.current
@@ -570,8 +618,20 @@ export function useTrainingRuntime() {
         }
         const started = performance.now()
         const forceNoPose = import.meta.env.DEV && Boolean((window as typeof window & { __forceNoPose?: boolean }).__forceNoPose)
+        const requestedGesture = import.meta.env.DEV
+          ? (window as typeof window & { __gestureTestPose?: 'start' | 'pause' | 'none' }).__gestureTestPose
+          : undefined
+        const autoStartGesture = syntheticFixture && courseEnabled && !manualGestureFixture
+          && courseRef.current.getSnapshot().state === 'PREPARING'
+        const exerciseFixtureFrame = syntheticFixture
+          ? { ...createExerciseDemoPoseFrame(runtimeRef.current.definition.id, autoStartGesture ? 0 : exerciseTime, coachFixture), timestamp }
+          : undefined
         const frame = forceNoPose ? null : syntheticFixture
-          ? createExerciseDemoPoseFrame(runtimeRef.current.definition.id, exerciseTime, coachFixture)
+          ? requestedGesture
+            ? createGestureDemoPoseFrame(timestamp, requestedGesture, exerciseFixtureFrame)
+            : autoStartGesture
+              ? createGestureDemoPoseFrame(timestamp, 'start', exerciseFixtureFrame)
+              : exerciseFixtureFrame
           : image && (!selectedDemoFrame || new URL(image.currentSrc || image.src).pathname === selectedDemoFrame.src)
             ? detectorRef.current.detect(image, timestamp)
             : null
@@ -606,7 +666,7 @@ export function useTrainingRuntime() {
     }
     void start()
     return () => { disposed = true; cancelAnimationFrame(rafRef.current) }
-  }, [coachFixture, debug, demo, dispatchCourseVoice, syntheticFixture])
+  }, [coachFixture, courseEnabled, debug, demo, dispatchCourseVoice, manualGestureFixture, syntheticFixture])
 
   useEffect(() => speechRef.current.onAvailabilityChange(setVoiceAvailable), [])
 
@@ -659,10 +719,7 @@ export function useTrainingRuntime() {
         if (completedRef.current || generation !== cameraLoopGenerationRef.current) return
         const timestamp = performance.now()
         performanceRef.current.markUiFrame(timestamp)
-        const paused = sessionRef.current.status() === 'paused'
-        if (paused) {
-          performanceRef.current.markSkippedFrame()
-        } else if (video.currentTime === lastVideoTimeRef.current) {
+        if (video.currentTime === lastVideoTimeRef.current) {
           performanceRef.current.markSkippedFrame()
         } else {
           lastVideoTimeRef.current = video.currentTime
@@ -673,7 +730,7 @@ export function useTrainingRuntime() {
           if (frame) processFrameRef.current(frame, { mirrored: true, sourceWidth: video.videoWidth, sourceHeight: video.videoHeight, fit: 'contain' })
           else processNoPoseRef.current(timestamp)
         }
-        if (!paused && timestamp - lastPerformanceUpdateRef.current >= 250) {
+        if (timestamp - lastPerformanceUpdateRef.current >= 250) {
           lastPerformanceUpdateRef.current = timestamp
           setPerformanceData(performanceRef.current.snapshot(timestamp))
         }
@@ -697,6 +754,8 @@ export function useTrainingRuntime() {
   }
 
   const togglePause = useCallback(() => {
+    gestureControllerRef.current.reset()
+    setGestureStatus({ progress: 0 })
     const next = sessionRef.current.togglePause()
     const now = performance.now()
     const waitingForPose = poseUnavailableRef.current && next.status === 'active'
@@ -728,6 +787,8 @@ export function useTrainingRuntime() {
     coachInputRef.current = coachInput
     setCoachViewModel(coachResolverRef.current.resolve(coachInput))
   }, [courseEnabled, dispatchVoiceEvent])
+
+  gestureActionRef.current = togglePause
 
   const toggleVoice = useCallback(() => {
     const nextEnabled = !voiceEnabledRef.current
@@ -776,6 +837,13 @@ export function useTrainingRuntime() {
   const exerciseIndex = activeOrder.indexOf(definition.id)
   const nextDefinition = exerciseIndex < activeOrder.length - 1 ? getExerciseDefinition(activeOrder[exerciseIndex + 1]) : undefined
   const framingProfile = getFramingProfile(definition.id)
+  const currentFramingValid = Boolean(features && features.confidence >= .65 && features.bodyInFrame
+    && (!('baselineReady' in features) || Boolean(features.baselineReady)))
+  const gesturePrompt = courseEnabled && courseSnapshot.state === 'PAUSED'
+    ? '双手在胸前合拢并保持，继续训练'
+    : courseEnabled && courseSnapshot.state === 'PREPARING' && currentFramingValid
+      ? '双手在胸前合拢并保持，开始训练'
+      : undefined
 
   return {
     debug,
@@ -803,12 +871,16 @@ export function useTrainingRuntime() {
     voiceEnabled,
     voiceAvailable,
     voicePlayback,
-    preparationMessage: poseUnavailable ? framingProfile.poseLost
+    gesturePrompt,
+    gestureProgress: gesturePrompt ? gestureStatus.progress : 0,
+    gestureHolding: Boolean(gesturePrompt && gestureStatus.progress > 0),
+    preparationMessage: courseEnabled && courseSnapshot.state === 'PAUSED' ? undefined
+      : poseUnavailable ? framingProfile.poseLost
       : courseEnabled && ['PREPARING', 'COUNTDOWN'].includes(courseSnapshot.state) && features && !features.bodyInFrame
       ? framingProfile.notInFrame
       : definition.id === 'knee_raise' && (!features || !('baselineReady' in features) || !features.baselineReady)
       ? '请自然站立，准备开始'
-      : coachViewModel.state === 'PREPARING' && courseEnabled ? definition.presentation.coach.preparationText : undefined,
+      : coachViewModel.state === 'PREPARING' && courseEnabled && !currentFramingValid ? definition.presentation.coach.preparationText : undefined,
     overlayRef,
     startCamera,
     togglePause,
