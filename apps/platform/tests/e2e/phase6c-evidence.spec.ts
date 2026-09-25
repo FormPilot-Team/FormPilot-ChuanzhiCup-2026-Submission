@@ -18,7 +18,7 @@ test('captures the Phase 6C final demo evidence set', async ({ page }) => {
   })
 
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'AI 电子教练', level: 1 })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'FormPilot', level: 1 })).toBeVisible()
   await shot(page, 'home', true)
   await page.setViewportSize({ width: 390, height: 844 })
   await shot(page, 'mobile-home', true)

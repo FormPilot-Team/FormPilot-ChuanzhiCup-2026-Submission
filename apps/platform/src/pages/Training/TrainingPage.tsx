@@ -8,6 +8,7 @@ import { DebugPanel } from '../../components/feedback/DebugPanel'
 import { SessionCompleteDialog } from './SessionCompleteDialog'
 import { useTrainingRuntime } from './useTrainingRuntime'
 import { resolveCoachDockFeedback, resolveCoachDockState } from '../../features/coach/coachDockState'
+import { shouldShowPoseOverlay } from '../../features/pose/poseOverlayVisibility'
 
 export function TrainingPage() {
   const runtime = useTrainingRuntime()
@@ -31,6 +32,11 @@ export function TrainingPage() {
     },
     nextExerciseName: runtime.nextDefinition?.displayName,
   })
+  const overlayCourseState = runtime.courseEnabled
+    ? demonstrationSnapshot.state
+    : runtime.cameraMode === 'live' || runtime.cameraMode === 'demo'
+      ? demonstrationSnapshot.state
+      : undefined
 
   return (
     <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900">
@@ -62,6 +68,7 @@ export function TrainingPage() {
             demoFrameSrc={runtime.demoFrameSrc}
             preparationMessage={runtime.preparationMessage}
             outOfFrameMessage={runtime.framingProfile.notInFrame}
+            showPoseOverlay={shouldShowPoseOverlay(overlayCourseState)}
             onStart={runtime.startCamera}
           />
           <AICoachFeedbackDock

@@ -26,7 +26,11 @@ function activeSide(errors: ReadonlyArray<MotionError>): 'left' | 'right' | unde
   return errors.find((item) => item.side)?.side
 }
 
-export const PoseOverlay = forwardRef<PoseOverlayHandle>(function PoseOverlay(_, ref) {
+interface PoseOverlayProps {
+  visible?: boolean
+}
+
+export const PoseOverlay = forwardRef<PoseOverlayHandle, PoseOverlayProps>(function PoseOverlay({ visible = true }, ref) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sizeRef = useRef({ width: 0, height: 0 })
 
@@ -118,5 +122,14 @@ export const PoseOverlay = forwardRef<PoseOverlayHandle>(function PoseOverlay(_,
     },
   }))
 
-  return <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 size-full" aria-hidden="true" />
+  return (
+    <canvas
+      ref={canvasRef}
+      className="pointer-events-none absolute inset-0 size-full"
+      aria-hidden="true"
+      data-testid="pose-overlay"
+      data-overlay-visible={visible ? 'true' : 'false'}
+      hidden={!visible}
+    />
+  )
 })

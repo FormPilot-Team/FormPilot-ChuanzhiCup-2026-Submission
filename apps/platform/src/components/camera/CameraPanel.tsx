@@ -19,10 +19,11 @@ interface CameraPanelProps {
   demoFrameSrc?: string
   preparationMessage?: string
   outOfFrameMessage: string
+  showPoseOverlay?: boolean
   onStart: () => void
 }
 
-export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMessage, errorKind, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, outOfFrameMessage, onStart }: CameraPanelProps) {
+export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMessage, errorKind, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, outOfFrameMessage, showPoseOverlay = true, onStart }: CameraPanelProps) {
   const status = mode === 'demo' ? '演示模式' : mode === 'live' ? '摄像头已连接 · AI 实时分析中' : mode === 'requesting_permission' ? '等待摄像头授权' : mode === 'model_loading' ? '正在加载识别模型' : mode === 'error' ? '连接异常' : '等待连接摄像头'
   const blocking = ['idle', 'error', 'requesting_permission', 'model_loading'].includes(mode)
   const loading = mode === 'requesting_permission' || mode === 'model_loading'
@@ -47,7 +48,7 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMes
         ) : (
           <video ref={videoRef} muted playsInline className="size-full scale-x-[-1] object-contain" />
         )}
-        <PoseOverlay ref={overlayRef} />
+        <PoseOverlay ref={overlayRef} visible={showPoseOverlay} />
         {mode === 'live' || mode === 'demo' ? <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-xl bg-slate-900/65 px-3 py-2 text-xs font-medium text-white"><ScanLine size={15} />AI 识别中</span> : null}
         {preparationMessage && (mode === 'demo' || mode === 'live') ? (
           <div className="absolute inset-x-4 top-16 rounded-xl bg-white/95 px-4 py-3 text-center text-lg font-bold text-blue-700 shadow-sm sm:text-xl" role="status" data-testid="preparation-state">

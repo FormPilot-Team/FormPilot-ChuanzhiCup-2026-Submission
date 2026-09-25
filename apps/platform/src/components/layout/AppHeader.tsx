@@ -10,7 +10,7 @@ export function AppHeader() {
         <a href="/" className="flex min-w-0 shrink-0 items-center gap-3 rounded-xl focus-visible:outline-none">
           <span className="grid size-10 place-items-center rounded-2xl bg-blue-500 text-white shadow-sm"><Bot size={23} /></span>
           <div>
-            <p className="text-lg font-bold text-slate-900">AI 电子教练</p>
+            <p className="text-lg font-bold text-slate-900">FormPilot</p>
             <p className="hidden text-xs text-slate-500 sm:block">实时识别 · 动作纠正 · 训练复盘</p>
           </div>
         </a>

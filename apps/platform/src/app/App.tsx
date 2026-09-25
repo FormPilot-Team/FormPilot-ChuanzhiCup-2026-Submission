@@ -6,7 +6,7 @@ export default function App() {
   const { pathname, search } = window.location
   const reportMatch = pathname.match(/^\/report\/([^/]+)$/)
   if (reportMatch) {
-    document.title = 'AI 电子教练 · 训练报告'
+    document.title = 'FormPilot · 训练报告'
     return <TrainingReportPage sessionId={decodeURIComponent(reportMatch[1])} />
   }
 
@@ -14,10 +14,10 @@ export default function App() {
   const params = new URLSearchParams(search)
   const usesLegacyTrainingEntry = pathname === '/' && legacyTrainingParams.some((key) => params.has(key))
   if (pathname === '/train' || usesLegacyTrainingEntry) {
-    document.title = 'AI 电子教练 · 训练'
+    document.title = 'FormPilot · 训练'
     return <TrainingPage />
   }
 
-  document.title = 'AI 电子教练'
+  document.title = 'FormPilot'
   return <HomePage />
 }

@@ -21,7 +21,7 @@ export function HomePage() {
         <section className="panel overflow-hidden px-5 py-8 sm:px-8 sm:py-10 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] lg:items-center lg:gap-10 lg:px-12 lg:py-12" aria-labelledby="home-title">
           <div>
             <p className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700"><Bot size={17} />六动作实时训练课程</p>
-            <h1 id="home-title" className="mt-5 max-w-2xl text-balance text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">AI 电子教练</h1>
+            <h1 id="home-title" className="mt-5 max-w-2xl text-balance text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">FormPilot</h1>
             <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-600 sm:text-lg">实时识别训练动作，并提供针对性的动作纠正与训练复盘。</p>
             <button type="button" onClick={() => window.location.assign('/train')} className="primary-button mt-7 inline-flex items-center gap-2 px-6 py-3 text-base">开始训练<ArrowRight size={18} /></button>
           </div>

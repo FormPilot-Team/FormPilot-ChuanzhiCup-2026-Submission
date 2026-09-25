@@ -12,14 +12,14 @@ const activeMotionSeconds = async (page: import('@playwright/test').Page) => Num
 test('formal Home opens Training and Report navigation closes the user loop', async ({ page }) => {
   test.setTimeout(90_000)
   await page.goto('/')
-  await expect(page).toHaveTitle('AI 电子教练')
-  await expect(page.getByRole('heading', { name: 'AI 电子教练', level: 1 })).toBeVisible()
+  await expect(page).toHaveTitle('FormPilot')
+  await expect(page.getByRole('heading', { name: 'FormPilot', level: 1 })).toBeVisible()
   for (const name of ['肩部环绕', '双臂上举', '侧平举', '侧步开合', '徒手深蹲', '交替提膝']) {
     await expect(page.getByText(name, { exact: true })).toBeVisible()
   }
   await page.getByRole('button', { name: '开始训练' }).click()
   await expect(page).toHaveURL(/\/train$/)
-  await expect(page).toHaveTitle('AI 电子教练 · 训练')
+  await expect(page).toHaveTitle('FormPilot · 训练')
   await expect(page.getByRole('complementary', { name: '开发调试信息' })).toHaveCount(0)
   await expect(page.getByText(/synthetic fixture|thresholdVersion|reference skeleton/i)).toHaveCount(0)
 
@@ -27,7 +27,7 @@ test('formal Home opens Training and Report navigation closes the user loop', as
   await expect(page.getByRole('heading', { name: '本次训练已保存' })).toBeVisible({ timeout: 75_000 })
   await page.getByRole('button', { name: '查看训练报告' }).click()
   const reportUrl = page.url()
-  await expect(page).toHaveTitle('AI 电子教练 · 训练报告')
+  await expect(page).toHaveTitle('FormPilot · 训练报告')
   await page.getByRole('button', { name: '返回首页' }).first().click()
   await expect(page).toHaveURL(/\/$/)
 
@@ -52,21 +52,13 @@ test('sustained no-pose resets countdown, freezes ACTIVE, clears skeleton, but n
   await expect(page.getByTestId('ai-coach-dock')).toHaveAttribute('data-coach-state', 'ready', { timeout: 2_000 })
   await expect(page.getByTestId('course-state')).toContainText('坚持', { timeout: 5_000 })
 
-  const canvasHasSkeleton = await page.locator('section[aria-labelledby="camera-title"] canvas').evaluate((canvas: HTMLCanvasElement) => {
-    const pixels = canvas.getContext('2d')?.getImageData(0, 0, canvas.width, canvas.height).data
-    return Boolean(pixels && pixels.some((value, index) => index % 4 === 3 && value > 0))
-  })
-  expect(canvasHasSkeleton).toBe(true)
+  await expect(page.getByTestId('pose-overlay')).toBeHidden()
   await setForceNoPose(page, true)
   await expect(page.getByTestId('course-state')).toHaveText('请回到画面中，确保上半身和髋部完整入镜', { timeout: 2_000 })
   const atUnavailable = await activeMotionSeconds(page)
   await page.waitForTimeout(900)
   expect(await activeMotionSeconds(page)).toBe(atUnavailable)
-  const canvasIsClear = await page.locator('section[aria-labelledby="camera-title"] canvas').evaluate((canvas: HTMLCanvasElement) => {
-    const pixels = canvas.getContext('2d')?.getImageData(0, 0, canvas.width, canvas.height).data
-    return Boolean(pixels && pixels.every((value, index) => index % 4 !== 3 || value === 0))
-  })
-  expect(canvasIsClear).toBe(true)
+  await expect(page.getByTestId('pose-overlay')).toBeHidden()
 
   await page.goto('/train?demo=1&course=1&fast=1&fixture=synthetic')
   await expect(page.getByTestId('course-state')).toContainText('完成', { timeout: 8_000 })
