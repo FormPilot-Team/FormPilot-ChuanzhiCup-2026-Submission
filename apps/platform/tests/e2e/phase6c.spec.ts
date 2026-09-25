@@ -43,13 +43,13 @@ test('formal Home opens Training and Report navigation closes the user loop', as
 test('sustained no-pose resets countdown, freezes ACTIVE, clears skeleton, but not TRANSITION or completion', async ({ page }) => {
   test.setTimeout(100_000)
   await page.goto('/train?demo=1&course=1&fixture=synthetic&debug=1')
-  await expect(page.getByTestId('coach-countdown')).toBeVisible({ timeout: 8_000 })
+  await expect(page.getByTestId('ai-coach-dock')).toHaveAttribute('data-coach-state', 'ready', { timeout: 8_000 })
   await setForceNoPose(page, true)
   await expect(page.getByTestId('course-state')).toHaveText('请回到画面中，确保上半身和髋部完整入镜', { timeout: 2_000 })
   await page.waitForTimeout(3_200)
   await expect(page.getByTestId('course-state')).toHaveText('请回到画面中，确保上半身和髋部完整入镜')
   await setForceNoPose(page, false)
-  await expect(page.getByTestId('coach-countdown')).toBeVisible({ timeout: 2_000 })
+  await expect(page.getByTestId('ai-coach-dock')).toHaveAttribute('data-coach-state', 'ready', { timeout: 2_000 })
   await expect(page.getByTestId('course-state')).toContainText('坚持', { timeout: 5_000 })
 
   const canvasHasSkeleton = await page.locator('section[aria-labelledby="camera-title"] canvas').evaluate((canvas: HTMLCanvasElement) => {

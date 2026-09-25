@@ -28,7 +28,7 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMes
   const loading = mode === 'requesting_permission' || mode === 'model_loading'
   const title = mode === 'requesting_permission' ? '正在等待摄像头授权…' : mode === 'model_loading' ? '正在加载姿态识别模型…' : mode === 'error' ? '暂时无法开始识别' : '准备开始实时动作检测'
   return (
-    <section className="panel flex min-h-0 min-w-0 flex-col p-3" aria-labelledby="camera-title">
+    <section className="panel flex min-h-0 min-w-0 flex-col p-3" aria-labelledby="camera-title" data-testid="camera-panel">
       <div className="flex h-12 items-center gap-2 px-2">
         <span className="grid size-8 place-items-center rounded-xl bg-blue-50 text-blue-600"><ScanLine size={19} /></span>
         <h2 id="camera-title" className="font-bold text-slate-900">实时动作检测</h2>

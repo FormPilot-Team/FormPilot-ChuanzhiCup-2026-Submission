@@ -43,15 +43,12 @@ test('Squat dynamic Demo completes one real PoseDetector repetition', async ({ p
   expect(modelRequests).toHaveLength(1)
 })
 
-test('Squat Coach debug shows detected and canonical skeletons plus split validation', async ({ page }) => {
+test('Squat debug and Static Coach remain observable together', async ({ page }) => {
   test.setTimeout(60_000)
   await page.setViewportSize({ width: 1600, height: 1000 })
   await page.goto('/?demo=1&debug=1&exercise=squat')
   await expect(debugValue(page, 'Pose confidence')).not.toHaveText('0.00', { timeout: 30_000 })
-  await page.getByLabel('Show Coach Reference Skeleton').check()
-  await expect(page.getByTestId('detected-coach-skeleton')).toBeVisible()
-  await expect(page.getByTestId('canonical-reference-skeleton')).toBeVisible()
-  await expect(page.getByTestId('coach-validation-debug')).toContainText('Detectable PASS · Similarity PASS')
-  await page.locator('section[aria-labelledby="coach-title"]').screenshot({ path: 'test-results/regression-screenshots/phase3_1/squat-coach-reference-refined.png' })
-  await page.getByTestId('coach-validation-debug').screenshot({ path: 'test-results/regression-screenshots/phase3_1/squat-coach-validation-debug.png' })
+  await expect(debugValue(page, 'coachState')).not.toHaveText('')
+  await expect(page.getByTestId('coach-identity').locator('img')).toHaveAttribute('src', '/assets/overhead-raise-demo-start.png')
+  await page.getByTestId('ai-coach-dock').screenshot({ path: 'test-results/regression-screenshots/phase3_1/squat-static-coach.png' })
 })

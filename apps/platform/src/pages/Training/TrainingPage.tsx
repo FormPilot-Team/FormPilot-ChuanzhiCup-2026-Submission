@@ -1,5 +1,4 @@
 import { AppHeader } from '../../components/layout/AppHeader'
-import { CoachPanel } from '../../components/coach/CoachPanel'
 import { CameraPanel } from '../../components/camera/CameraPanel'
 import { DemonstrationVideo } from '../../components/demo/DemonstrationVideo'
 import { MetricsPanel } from '../../components/metrics/MetricsPanel'
@@ -8,6 +7,7 @@ import { TrainingFooter } from '../../components/training/TrainingFooter'
 import { DebugPanel } from '../../components/feedback/DebugPanel'
 import { SessionCompleteDialog } from './SessionCompleteDialog'
 import { useTrainingRuntime } from './useTrainingRuntime'
+import { resolveCoachDockFeedback, resolveCoachDockState } from '../../features/coach/coachDockState'
 
 export function TrainingPage() {
   const runtime = useTrainingRuntime()
@@ -19,6 +19,18 @@ export function TrainingPage() {
         state: runtime.session.status === 'paused' ? 'PAUSED' as const : 'ACTIVE' as const,
         previousState: runtime.session.status === 'paused' ? 'ACTIVE' as const : undefined,
       }
+  const coachDockState = resolveCoachDockState({
+    courseState: demonstrationSnapshot.state,
+    poseReady: !runtime.poseUnavailable && Boolean(runtime.features?.bodyInFrame),
+    ...resolveCoachDockFeedback(runtime.coachViewModel),
+    exercise: {
+      name: definition.displayName,
+      guidance: definition.presentation.guidance,
+      preparationText: definition.presentation.coach.preparationText,
+      activeText: definition.presentation.coach.activeText,
+    },
+    nextExerciseName: runtime.nextDefinition?.displayName,
+  })
 
   return (
     <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900">
@@ -53,14 +65,8 @@ export function TrainingPage() {
             onStart={runtime.startCamera}
           />
           <AICoachFeedbackDock
-            coachSlot={(
-              <CoachPanel
-                viewModel={runtime.coachViewModel}
-                showReferenceSkeleton={runtime.debug && runtime.showCoachReference}
-                compact
-              />
-            )}
-            feedbackSlot={(
+            state={coachDockState}
+            metrics={(
               <MetricsPanel result={runtime.result} presentation={definition.presentation} advice={runtime.feedback?.message} guidanceOnly={runtime.courseEnabled && definition.id === 'shoulder_rotation'} trackingState={runtime.session.status === 'paused' ? 'paused' : runtime.poseUnavailable ? 'adjust' : (runtime.cameraMode === 'live' || runtime.cameraMode === 'demo') && runtime.features ? 'normal' : 'preparing'} />
             )}
           />

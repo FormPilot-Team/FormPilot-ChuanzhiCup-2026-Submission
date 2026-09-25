@@ -27,7 +27,7 @@ button:focus-visible { outline: 3px solid rgb(147 197 253 / 0.7); outline-offset
 }
 
 @layer components {
-  .panel { @apply rounded-3xl border border-slate-200/80 bg-white shadow-sm; }
+  .panel { @apply rounded-2xl border border-slate-200/80 bg-white shadow-sm; }
   .tool-button { @apply grid size-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50; }
   .primary-button { @apply rounded-xl bg-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600; }
   .secondary-button { @apply rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50; }

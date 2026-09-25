@@ -35,13 +35,13 @@ test('Knee Raise real image sequence establishes baseline and completes LEFT + R
   expect(modelRequests).toHaveLength(1)
 })
 
-test('Knee Raise Coach asset passes detectability and canonical similarity', async ({ page }) => {
+test('Knee Raise runtime keeps the frozen Static Coach identity visible', async ({ page }) => {
   await page.setViewportSize({ width: 1600, height: 1000 })
   await page.goto('/?demo=1&debug=1&exercise=knee_raise')
   await expect(debugValue(page, 'Pose confidence')).not.toHaveText('0.00', { timeout: 30_000 })
-  await page.getByLabel('Show Coach Reference Skeleton').check()
-  await expect(page.getByTestId('coach-validation-debug')).toContainText('Detectable PASS · Similarity PASS')
-  await page.locator('section[aria-labelledby="coach-title"]').screenshot({ path: 'test-results/regression-screenshots/phase4/knee-raise-coach-reference.png' })
+  await expect(debugValue(page, 'coachState')).not.toHaveText('')
+  await expect(page.getByTestId('coach-identity').locator('img')).toHaveAttribute('src', '/assets/overhead-raise-demo-start.png')
+  await page.getByTestId('ai-coach-dock').screenshot({ path: 'test-results/regression-screenshots/phase4/knee-raise-static-coach.png' })
 })
 
 test('four-exercise fast session reaches Knee Raise without another MediaPipe initialization', async ({ page }) => {

@@ -321,6 +321,7 @@ export function useTrainingRuntime() {
     filterRef.current.reset()
     runtimeRef.current.reset()
     overlayRef.current?.clear()
+    setCourseSnapshot(courseRef.current.getSnapshot())
     setSession(sessionRef.current.finish(Date.now(), 'completed'))
     setPersistFailed(!sessionRef.current.didPersist())
     setCameraMode('idle')
