@@ -2,16 +2,21 @@ import {
   Activity, AlertTriangle, ArrowLeft, CalendarDays, Check, ChevronDown, CircleDashed, Clock3, Dumbbell,
   Gauge, History, Info, RefreshCw, ShieldCheck, Target, TrendingUp,
 } from 'lucide-react'
+import { SMART_TRAINING_PATH, trainingEntryPath } from '../../app/routes'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { CapabilityRadar } from '../../components/report/CapabilityRadar'
 import type {
   CapabilityDimensionAnalysis, ExerciseAnalysis, Finding, FocusItem, IssueAnalysis, PriorityIssue, TrainingAnalysis,
 } from '../../features/analysis'
+import { isTrainingIncomplete } from '../../features/history/TrainingHistory'
+import { REPORT_EXERCISE_PRESENTATION } from '../../features/report/presentation'
+import { freeTrainingLabel, resolveTrainingScope, type TrainingScope } from '../../features/training/trainingScope'
 import type { TrainingSessionState } from '../../features/training/types'
 import { cn } from '../../lib/cn'
 import {
-  CAPABILITY_EXPLANATIONS, EXERCISE_NAMES, comparisonRatioText, completionProgress, formatDate, formatDuration,
-  formatShortDate, issueTrendText, ratioText, scoreTrendText,
+  CAPABILITY_EXPLANATIONS, EXERCISE_NAMES, FREE_TRAINING_COMPARISON_TEXT, comparisonRatioText, completionProgress, formatDate,
+  formatDuration, formatShortDate, freeTrainingProgressText, freeTrainingSummary, freeTrainingUnscoredText, issueTrendText, ratioText,
+  scoreTrendText,
 } from './reportPresentation'
 import { useTrainingReportAnalysis } from './useTrainingReportAnalysis'
 
@@ -49,11 +54,16 @@ function comparisonText(analysis: TrainingAnalysis): string {
 }
 
 export function ReportHero({ analysis, session }: { analysis: TrainingAnalysis; session: TrainingSessionState }) {
+  const scope = resolveTrainingScope(session)
+  const freeExerciseId = scope.kind === 'free_training' ? scope.exerciseId : null
   const fullCourse = analysis.overall.scope === 'FULL_COURSE'
   const partialScore = analysis.overall.scope === 'COMPLETED_EXERCISES'
   const overallTrend = analysis.comparison.level === 'FULL' ? scoreTrendText(analysis.overall.trend, analysis.overall.delta) : null
-  const completionLabel = analysis.courseComplete ? '训练完成' : '本次训练未完整完成'
-  const CompletionIcon = analysis.courseComplete ? Check : CircleDashed
+  const complete = !isTrainingIncomplete(session, analysis, scope)
+  const completionLabel = freeExerciseId
+    ? `${freeTrainingLabel(freeExerciseId)} · ${complete ? '已完成' : '未完成'}`
+    : analysis.courseComplete ? '训练完成' : '本次训练未完整完成'
+  const CompletionIcon = complete ? Check : CircleDashed
 
   return (
     <section className="overflow-hidden rounded-2xl bg-slate-950 text-white" aria-labelledby="report-title" data-testid="report-summary">
@@ -67,13 +77,15 @@ export function ReportHero({ analysis, session }: { analysis: TrainingAnalysis; 
           <div className="mt-7 flex flex-wrap items-end gap-x-5 gap-y-2" data-testid="overall-score-scope">
             {fullCourse ? <><span className="text-6xl font-bold tabular-nums sm:text-7xl">{analysis.overall.score}</span><span className="pb-2 text-base font-semibold text-slate-300">综合评分</span></> : null}
             {partialScore ? <><span className="text-6xl font-bold tabular-nums sm:text-7xl">{analysis.overall.score}</span><span className="max-w-36 pb-2 text-base font-semibold leading-6 text-slate-300">已完成动作平均分</span></> : null}
-            {analysis.overall.scope === 'UNAVAILABLE' ? <p className="text-balance text-2xl font-bold text-white sm:text-3xl">暂不给出综合评分</p> : null}
+            {analysis.overall.scope === 'UNAVAILABLE' ? <p className="text-balance text-2xl font-bold text-white sm:text-3xl">{freeExerciseId ? freeTrainingUnscoredText(freeExerciseId) : '暂不给出综合评分'}</p> : null}
           </div>
           {overallTrend ? <p className={cn('mt-3 text-sm font-semibold', analysis.overall.trend === 'DECLINED' ? 'text-amber-200' : 'text-emerald-300')}>{overallTrend}</p> : null}
-          <p className="mt-5 max-w-2xl text-pretty text-sm leading-6 text-slate-300">{comparisonText(analysis)}</p>
+          <p className="mt-5 max-w-2xl text-pretty text-sm leading-6 text-slate-300">{freeExerciseId ? FREE_TRAINING_COMPARISON_TEXT : comparisonText(analysis)}</p>
         </div>
         <dl className="grid content-center border-t border-white/10 bg-white/[0.04] sm:grid-cols-3 lg:grid-cols-1 lg:border-l lg:border-t-0">
-          <HeroFact icon={Target} label="完成动作" value={`${analysis.overall.completedExercises} / ${analysis.overall.totalExercises}`} />
+          {freeExerciseId
+            ? <HeroFact icon={Target} label="训练动作" value={`${REPORT_EXERCISE_PRESENTATION[freeExerciseId].name} · ${freeTrainingProgressText(analysis, freeExerciseId)}`} />
+            : <HeroFact icon={Target} label="完成动作" value={`${analysis.overall.completedExercises} / ${analysis.overall.totalExercises}`} />}
           <HeroFact icon={Clock3} label="训练时间" value={formatDuration(sessionDuration(session))} />
           <HeroFact icon={CalendarDays} label="训练日期" value={formatDate(analysis.sessionStartedAt)} />
         </dl>
@@ -243,13 +255,17 @@ function GuidanceCard({ analysis }: { analysis: TrainingAnalysis }) {
   )
 }
 
-export function ExercisePerformanceSection({ analysis }: { analysis: TrainingAnalysis }) {
+export function ExercisePerformanceSection({ analysis, scope }: { analysis: TrainingAnalysis; scope?: TrainingScope }) {
+  // Free training shows only its own exercise; the other course steps were never part of it.
+  const freeExerciseId = scope?.kind === 'free_training' ? scope.exerciseId : null
+  const exercises = freeExerciseId ? analysis.exercises.filter((exercise) => exercise.exerciseId === freeExerciseId) : analysis.exercises
+  const showGuidance = !freeExerciseId || freeExerciseId === 'shoulder_rotation'
   return (
     <section aria-labelledby="exercise-performance-title" data-testid="report-exercises">
-      <SectionHeading id="exercise-performance-title" icon={Dumbbell} title="动作表现" description="先看每个动作的评分、完成度与一句话结论，需要时再展开证据。" />
-      <div className="mt-6 grid gap-3 lg:grid-cols-2">
-        <GuidanceCard analysis={analysis} />
-        {analysis.exercises.map((exercise) => <ExerciseReportCard key={exercise.exerciseId} exercise={exercise} />)}
+      <SectionHeading id="exercise-performance-title" icon={Dumbbell} title="动作表现" description={freeExerciseId ? '查看本次动作的评分、完成度与结论，需要时再展开证据。' : '先看每个动作的评分、完成度与一句话结论，需要时再展开证据。'} />
+      <div className={cn('mt-6 grid gap-3', !freeExerciseId && 'lg:grid-cols-2')}>
+        {showGuidance ? <GuidanceCard analysis={analysis} /> : null}
+        {exercises.map((exercise) => <ExerciseReportCard key={exercise.exerciseId} exercise={exercise} />)}
       </div>
     </section>
   )
@@ -379,7 +395,8 @@ function missingEvidenceNotes(analysis: TrainingAnalysis): string[] {
   })
 }
 
-export function DataNotesSection({ analysis }: { analysis: TrainingAnalysis }) {
+export function DataNotesSection({ analysis, scope }: { analysis: TrainingAnalysis; scope?: TrainingScope }) {
+  const guidanceRelevant = scope?.kind !== 'free_training' || scope.exerciseId === 'shoulder_rotation'
   const promptCount = analysis.dataQuality.poseQuality.outOfFramePrompts + analysis.dataQuality.poseQuality.lowConfidencePrompts
   const notes = [...new Set([...analysis.dataQuality.notes, ...missingEvidenceNotes(analysis)])]
   return (
@@ -402,7 +419,7 @@ export function DataNotesSection({ analysis }: { analysis: TrainingAnalysis }) {
             {analysis.comparison.level === 'PARTIAL' ? <li>历史比较仅覆盖双方共同完成的 {analysis.comparison.commonExerciseIds.length} 个动作。</li> : null}
             {analysis.dataQuality.limitedExercises.map((item) => <li key={item.exerciseId}>{EXERCISE_NAMES[item.exerciseId]}仅有 {item.analyzedReps} 次有效动作，本次分析范围有限。</li>)}
             {notes.map((note) => <li key={note}>{note}</li>)}
-            <li>肩部环绕属于热身引导，不计入综合评分或五维能力。</li>
+            {guidanceRelevant ? <li>肩部环绕属于热身引导，不计入综合评分或五维能力。</li> : null}
           </ul>
         </div>
       </details>
@@ -414,7 +431,10 @@ function DataFact({ label, value }: { label: string; value: string }) {
   return <div className="rounded-xl bg-slate-50 px-4 py-3"><dt className="text-xs font-medium text-slate-500">{label}</dt><dd className="mt-1 font-bold tabular-nums text-slate-900">{value}</dd></div>
 }
 
-export function TrainingReportView({ analysis, session }: { analysis: TrainingAnalysis; session: TrainingSessionState }) {
+export function TrainingReportView({ analysis: analyzed, session }: { analysis: TrainingAnalysis; session: TrainingSessionState }) {
+  const scope = resolveTrainingScope(session)
+  // Free training only rewords analysis-v1's course-scoped summary sentences; all other analysis output is shown as is.
+  const analysis = scope.kind === 'free_training' ? { ...analyzed, summary: freeTrainingSummary(analyzed, scope.exerciseId) } : analyzed
   return (
     <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f5f7fa] text-slate-900">
       <AppHeader />
@@ -424,16 +444,17 @@ export function TrainingReportView({ analysis, session }: { analysis: TrainingAn
           <ReportHero analysis={analysis} session={session} />
           <TrainingAnalysisSection analysis={analysis} />
           <PriorityIssuesSection analysis={analysis} />
-          <ExercisePerformanceSection analysis={analysis} />
-          <CapabilitySection analysis={analysis} />
+          <ExercisePerformanceSection analysis={analysis} scope={scope} />
+          {/* The five-dimension view needs several exercises; a one-exercise session can never fill it. */}
+          {scope.kind === 'free_training' ? null : <CapabilitySection analysis={analysis} />}
           <ProgressSection analysis={analysis} />
           <NextFocusSection analysis={analysis} />
-          <DataNotesSection analysis={analysis} />
+          <DataNotesSection analysis={analysis} scope={scope} />
           <section className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-blue-700 p-6 text-white sm:flex-row sm:items-center sm:p-7" aria-label="报告操作">
             <div><h2 className="text-balance text-xl font-bold">带着重点，再练一次</h2><p className="mt-1 text-pretty text-sm text-blue-100">下一次训练会生成新的独立报告。</p></div>
             <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
               <a href="/history" className="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-300 px-5 py-3 text-sm font-bold text-white hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"><History size={17} />查看训练记录</a>
-              <button type="button" onClick={() => window.location.assign('/train')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-800 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"><RefreshCw size={17} />再次训练</button>
+              <button type="button" onClick={() => window.location.assign(trainingEntryPath(scope))} className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-800 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"><RefreshCw size={17} />再次训练</button>
             </div>
           </section>
         </div>
@@ -444,7 +465,7 @@ export function TrainingReportView({ analysis, session }: { analysis: TrainingAn
 
 function RecoveryLayout({ title, description, testId, showTrain = true }: { title: string; description: string; testId: string; showTrain?: boolean }) {
   return (
-    <div className="min-h-dvh bg-[#f5f7fa] text-slate-900"><AppHeader /><main className="mx-auto grid min-h-[70dvh] max-w-3xl place-items-center px-4 py-12"><section className="report-panel w-full p-8 text-center" data-testid={testId}><span className="mx-auto grid size-12 place-items-center rounded-xl bg-slate-100 text-slate-600"><AlertTriangle size={22} /></span><h1 className="mt-4 text-balance text-2xl font-bold">{title}</h1><p className="mx-auto mt-2 max-w-md text-pretty text-sm leading-6 text-slate-600">{description}</p><div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row"><button type="button" onClick={() => window.location.assign('/')} className="secondary-button inline-flex items-center justify-center gap-2"><ArrowLeft size={16} />返回首页</button>{showTrain ? <button type="button" onClick={() => window.location.assign('/train')} className="primary-button inline-flex items-center justify-center gap-2">开始训练<TrendingUp size={16} /></button> : null}</div></section></main></div>
+    <div className="min-h-dvh bg-[#f5f7fa] text-slate-900"><AppHeader /><main className="mx-auto grid min-h-[70dvh] max-w-3xl place-items-center px-4 py-12"><section className="report-panel w-full p-8 text-center" data-testid={testId}><span className="mx-auto grid size-12 place-items-center rounded-xl bg-slate-100 text-slate-600"><AlertTriangle size={22} /></span><h1 className="mt-4 text-balance text-2xl font-bold">{title}</h1><p className="mx-auto mt-2 max-w-md text-pretty text-sm leading-6 text-slate-600">{description}</p><div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row"><button type="button" onClick={() => window.location.assign('/')} className="secondary-button inline-flex items-center justify-center gap-2"><ArrowLeft size={16} />返回首页</button>{showTrain ? <button type="button" onClick={() => window.location.assign(SMART_TRAINING_PATH)} className="primary-button inline-flex items-center justify-center gap-2">开始训练<TrendingUp size={16} /></button> : null}</div></section></main></div>
   )
 }
 

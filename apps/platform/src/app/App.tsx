@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react'
 import { HomePage } from '../pages/Home/HomePage'
+import { SmartTrainingPage } from '../pages/SmartTraining/SmartTrainingPage'
 import { TrainingPage } from '../pages/Training/TrainingPage'
+import { HISTORY_PATH, SMART_TRAINING_PATH, isTrainingRoute } from './routes'
 
 const TrainingReportPage = lazy(async () => {
   const module = await import('../pages/Report/TrainingReportPage')
@@ -24,7 +26,7 @@ export default function App() {
     )
   }
 
-  if (pathname === '/history') {
+  if (pathname === HISTORY_PATH) {
     document.title = 'FormPilot · 训练记录'
     return (
       <Suspense fallback={<div className="grid min-h-dvh place-items-center bg-[#f5f7fa] px-4 text-sm font-semibold text-slate-600" role="status">正在读取训练记录…</div>}>
@@ -33,12 +35,14 @@ export default function App() {
     )
   }
 
-  const legacyTrainingParams = ['demo', 'course', 'debug', 'fast', 'exercise', 'fixture', 'coachFixture']
-  const params = new URLSearchParams(search)
-  const usesLegacyTrainingEntry = pathname === '/' && legacyTrainingParams.some((key) => params.has(key))
-  if (pathname === '/train' || usesLegacyTrainingEntry) {
+  if (isTrainingRoute(pathname, search)) {
     document.title = 'FormPilot · 训练'
     return <TrainingPage />
+  }
+
+  if (pathname === SMART_TRAINING_PATH) {
+    document.title = 'FormPilot · 智能训练'
+    return <SmartTrainingPage />
   }
 
   document.title = 'FormPilot'

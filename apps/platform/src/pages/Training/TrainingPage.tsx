@@ -10,9 +10,25 @@ import { useTrainingRuntime } from './useTrainingRuntime'
 import { resolveCoachDockFeedback, resolveCoachDockState } from '../../features/coach/coachDockState'
 import { shouldShowPoseOverlay } from '../../features/pose/poseOverlayVisibility'
 
+type TrainingRuntime = ReturnType<typeof useTrainingRuntime>
+
+function courseStateText(runtime: TrainingRuntime, freeTraining: boolean): string {
+  if (runtime.poseUnavailable) return runtime.framingProfile.poseLost
+  switch (runtime.courseSnapshot.state) {
+    case 'PAUSED': return freeTraining ? '训练已暂停' : '训练已暂停 · 课程已暂停'
+    case 'COUNTDOWN': return `${runtime.courseSnapshot.countdown} · 准备开始`
+    case 'TRANSITION': return freeTraining ? '完成 ✓ · 即将生成报告' : `完成 ✓ · 下一动作 ${runtime.nextDefinition?.displayName ?? '课程总结'}`
+    case 'COURSE_COMPLETE': return freeTraining ? '训练完成 ✓' : '课程完成 ✓'
+    case 'COURSE_INCOMPLETE': return freeTraining ? '训练未完成' : '课程未完成'
+    case 'PREPARING': return '请进入准备姿势'
+    default: return '坚持，让更好的自己发生'
+  }
+}
+
 export function TrainingPage() {
   const runtime = useTrainingRuntime()
   const { definition } = runtime
+  const freeTraining = runtime.freeTrainingExerciseId !== undefined
   const demonstrationSnapshot = runtime.courseEnabled
     ? runtime.courseSnapshot
     : {
@@ -46,10 +62,10 @@ export function TrainingPage() {
       <main className="mx-auto min-w-0 max-w-[1600px] px-4 py-5 lg:px-7">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-balance text-2xl font-bold text-slate-950 lg:text-3xl">今日训练 · {definition.presentation.subtitle}</h1>
-            <p className="mt-1 text-pretty text-sm text-slate-500">第 {runtime.exerciseIndex + 1} / {runtime.exerciseNames.length} 项 · 实时姿态识别与动作纠正</p>
+            <h1 className="text-balance text-2xl font-bold text-slate-950 lg:text-3xl">{freeTraining ? '自由训练' : '今日训练'} · {definition.presentation.subtitle}</h1>
+            <p className="mt-1 text-pretty text-sm text-slate-500">{freeTraining ? '单个动作' : `第 ${runtime.exerciseIndex + 1} / ${runtime.exerciseNames.length} 项`} · 实时姿态识别与动作纠正</p>
           </div>
-          <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-600" data-testid="course-state">{runtime.poseUnavailable ? runtime.framingProfile.poseLost : runtime.courseSnapshot.state === 'PAUSED' ? '训练已暂停 · 课程已暂停' : runtime.courseSnapshot.state === 'COUNTDOWN' ? `${runtime.courseSnapshot.countdown} · 准备开始` : runtime.courseSnapshot.state === 'TRANSITION' ? `完成 ✓ · 下一动作 ${runtime.nextDefinition?.displayName ?? '课程总结'}` : runtime.courseSnapshot.state === 'COURSE_COMPLETE' ? '课程完成 ✓' : runtime.courseSnapshot.state === 'COURSE_INCOMPLETE' ? '课程未完成' : runtime.courseSnapshot.state === 'PREPARING' ? '请进入准备姿势' : '坚持，让更好的自己发生'}</p>
+          <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-600" data-testid="course-state">{courseStateText(runtime, freeTraining)}</p>
         </div>
         <div className="training-grid grid min-h-[635px] min-w-0 gap-3 xl:h-[clamp(520px,calc(100dvh-300px),680px)] xl:min-h-0 xl:grid-cols-[minmax(280px,0.72fr)_minmax(460px,1.45fr)_minmax(340px,0.9fr)]" data-testid="hybrid-training-layout">
           <DemonstrationVideo
@@ -93,6 +109,7 @@ export function TrainingPage() {
             currentName={definition.displayName}
             nextName={runtime.nextDefinition?.displayName}
             sessionStatus={runtime.session.status}
+            freeTraining={freeTraining}
             voiceEnabled={runtime.voiceEnabled}
             voiceAvailable={runtime.voiceAvailable}
             onPause={runtime.togglePause}

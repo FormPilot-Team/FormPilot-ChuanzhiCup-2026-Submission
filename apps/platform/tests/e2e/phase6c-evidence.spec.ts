@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test'
+import { markOnboardingSeen } from './support/onboarding'
 
 const shot = (page: import('@playwright/test').Page, name: string, fullPage = false) => page.screenshot({ path: `screenshots/phase6c/${name}.png`, fullPage })
 
 test('captures the Phase 6C final demo evidence set', async ({ page }) => {
   test.setTimeout(150_000)
+  await markOnboardingSeen(page)
   await page.addInitScript(() => {
     Object.defineProperty(navigator.mediaDevices, 'getUserMedia', { configurable: true, value: async () => {
       const failure = (window as typeof window & { __cameraFailure?: string }).__cameraFailure

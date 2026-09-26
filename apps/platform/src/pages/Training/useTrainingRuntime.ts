@@ -22,6 +22,7 @@ import { PerformanceTracker, type PerformanceSnapshot } from '../../features/dia
 import { SessionDiagnosticsRecorder, type DiagnosticsDataSource } from '../../features/diagnostics/SessionDiagnosticsRecorder'
 import { CourseController, type CourseSnapshot } from '../../features/course/CourseController'
 import { ELECTRONIC_COACH_COURSE_V1, resolveCourseTarget } from '../../features/course/CourseDefinition'
+import { createFreeTrainingCourse } from '../../features/course/freeTraining'
 import type { CourseTargetType } from '../../features/course/CourseDefinition'
 import { CoachCardStateResolver } from '../../features/coach/CoachCardStateResolver'
 import type { CoachCardResolverInput, CoachExerciseInput } from '../../features/coach/types'
@@ -100,11 +101,6 @@ function coachExerciseInput(definition: ExerciseDefinition): CoachExerciseInput 
   }
 }
 
-const COURSE_VOICE_EXERCISES = ELECTRONIC_COACH_COURSE_V1.steps.map((step) => {
-  const definition = getExerciseDefinition(step.exerciseId)
-  return { id: definition.id, name: definition.displayName }
-})
-
 export function useTrainingRuntime() {
   const paramsRef = useRef(new URLSearchParams(window.location.search))
   const debug = paramsRef.current.get('debug') === '1'
@@ -117,13 +113,23 @@ export function useTrainingRuntime() {
   const manualGestureFixture = syntheticFixture && paramsRef.current.get('gesture') === 'manual'
   const coachFixture = syntheticFixture ? paramsRef.current.get('coachFixture') ?? undefined : undefined
   const requested = paramsRef.current.get('exercise')
-  // Preserve standalone/demo diagnostic URLs; the normal product entry is the six-step course.
-  const courseEnabled = !isRegisteredExerciseId(requested) && (!demo || paramsRef.current.get('course') === '1')
-  const courseOrder = ELECTRONIC_COACH_COURSE_V1.steps.map((step) => step.exerciseId)
-  const activeCourseDefinition = fast ? { ...ELECTRONIC_COACH_COURSE_V1, countdownSeconds: .1, transitionMs: 600 } : ELECTRONIC_COACH_COURSE_V1
-  const standaloneOrderRef = useRef<ExerciseId[]>(isRegisteredExerciseId(requested) && !EXERCISE_ORDER.includes(requested) ? [requested] : EXERCISE_ORDER)
+  const requestedExercise = isRegisteredExerciseId(requested) ? requested : undefined
+  // Product entries always run the course flow: the six-step course, or one of its steps as free training
+  // (`/train?exercise=<id>`). `?demo=1&exercise=<id>` without `course=1` keeps the legacy standalone diagnostics.
+  const courseEnabled = !demo || paramsRef.current.get('course') === '1'
+  const freeTrainingExerciseId = courseEnabled ? requestedExercise : undefined
+  const courseDefinitionRef = useRef(freeTrainingExerciseId ? createFreeTrainingCourse(freeTrainingExerciseId) : ELECTRONIC_COACH_COURSE_V1)
+  const course = courseDefinitionRef.current
+  const courseOrder = course.steps.map((step) => step.exerciseId)
+  const courseVoiceExercisesRef = useRef(course.steps.map((step) => {
+    const stepDefinition = getExerciseDefinition(step.exerciseId)
+    return { id: stepDefinition.id, name: stepDefinition.displayName }
+  }))
+  const courseVoiceExercises = courseVoiceExercisesRef.current
+  const activeCourseDefinition = fast ? { ...course, countdownSeconds: .1, transitionMs: 600 } : course
+  const standaloneOrderRef = useRef<ExerciseId[]>(requestedExercise && !EXERCISE_ORDER.includes(requestedExercise) ? [requestedExercise] : EXERCISE_ORDER)
   const standaloneOrder = standaloneOrderRef.current
-  const initialExerciseId: ExerciseId = isRegisteredExerciseId(requested) ? requested : courseEnabled ? courseOrder[0] : standaloneOrder[0]
+  const initialExerciseId: ExerciseId = requestedExercise ?? (courseEnabled ? courseOrder[0] : standaloneOrder[0])
   const initialDefinition = getExerciseDefinition(initialExerciseId)
 
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -216,9 +222,9 @@ export function useTrainingRuntime() {
     courseSnapshot: courseEnabled ? courseRef.current.getSnapshot() : { state: demo ? 'ACTIVE' : 'PREPARING', countdown: 0 },
     exerciseReady: demo,
     exercise: coachExerciseInput(initialDefinition),
-    targetType: courseEnabled ? ELECTRONIC_COACH_COURSE_V1.steps[0].target.type : 'reps',
+    targetType: courseEnabled ? course.steps[0].target.type : 'reps',
     currentProgress: 0,
-    targetValue: courseEnabled ? resolveCourseTarget(ELECTRONIC_COACH_COURSE_V1.steps[0], fast) : fast ? initialDefinition.presentation.fastTargetReps : initialDefinition.presentation.targetReps,
+    targetValue: courseEnabled ? resolveCourseTarget(course.steps[0], fast) : fast ? initialDefinition.presentation.fastTargetReps : initialDefinition.presentation.targetReps,
   })
   const coachInputRef = useRef(initialCoachInputRef.current)
   const [coachViewModel, setCoachViewModel] = useState(() => coachResolverRef.current.resolve(initialCoachInputRef.current))
@@ -272,8 +278,8 @@ export function useTrainingRuntime() {
 
   const dispatchCourseVoice = useCallback((before: CourseSnapshot | undefined, after: CourseSnapshot, at: number) => {
     if (!courseEnabled || !voiceFlowEnabled) return
-    for (const event of deriveCourseVoiceEvents(before, after, COURSE_VOICE_EXERCISES, at)) dispatchVoiceEvent(event)
-  }, [courseEnabled, dispatchVoiceEvent, voiceFlowEnabled])
+    for (const event of deriveCourseVoiceEvents(before, after, courseVoiceExercises, at)) dispatchVoiceEvent(event)
+  }, [courseEnabled, courseVoiceExercises, dispatchVoiceEvent, voiceFlowEnabled])
 
   const activateExercise = useCallback((exerciseId: ExerciseId) => {
     const next = getExerciseDefinition(exerciseId)
@@ -307,7 +313,7 @@ export function useTrainingRuntime() {
     setRemainingSeconds(next.presentation.durationSeconds)
     setCoachFrame(coachRef.current.getFrame())
     const snapshot = courseRef.current.getSnapshot()
-    const step = courseEnabled ? ELECTRONIC_COACH_COURSE_V1.steps[snapshot.stepIndex] : undefined
+    const step = courseEnabled ? course.steps[snapshot.stepIndex] : undefined
     const coachInput: CoachCardResolverInput = {
       now: performance.now() - pausedDurationRef.current,
       courseSnapshot: courseEnabled ? snapshot : { state: 'ACTIVE', countdown: 0 },
@@ -316,8 +322,8 @@ export function useTrainingRuntime() {
       targetType: step?.target.type ?? 'reps',
       currentProgress: 0,
       targetValue: step ? resolveCourseTarget(step, fast) : targetReps(exerciseId),
-      nextExercise: courseEnabled && snapshot.stepIndex < ELECTRONIC_COACH_COURSE_V1.steps.length - 1
-        ? coachExerciseInput(getExerciseDefinition(ELECTRONIC_COACH_COURSE_V1.steps[snapshot.stepIndex + 1].exerciseId))
+      nextExercise: courseEnabled && snapshot.stepIndex < course.steps.length - 1
+        ? coachExerciseInput(getExerciseDefinition(course.steps[snapshot.stepIndex + 1].exerciseId))
         : undefined,
     }
     coachInputRef.current = coachInput
@@ -327,7 +333,7 @@ export function useTrainingRuntime() {
     setPhaseTrace([...phaseTraceRef.current])
     setLastSquatRep(undefined)
     setLastKneeRaiseRep(undefined)
-  }, [courseEnabled, demo, dispatchVoiceEvent, fast, targetReps])
+  }, [course, courseEnabled, demo, dispatchVoiceEvent, fast, targetReps])
 
   const finishCompletedCourse = useCallback(() => {
     if (completedRef.current) return
@@ -348,14 +354,14 @@ export function useTrainingRuntime() {
   const applyCourseLifecycle = useCallback((courseBefore: CourseSnapshot, courseAfter: CourseSnapshot, completedExerciseId?: ExerciseId) => {
     if (courseAfter.stepIndex !== courseStepIndexRef.current) {
       courseStepIndexRef.current = courseAfter.stepIndex
-      activateExercise(ELECTRONIC_COACH_COURSE_V1.steps[courseAfter.stepIndex].exerciseId)
+      activateExercise(course.steps[courseAfter.stepIndex].exerciseId)
       return
     }
     if (courseAfter.state === 'TRANSITION' && courseBefore.state === 'ACTIVE' && completedExerciseId === 'shoulder_rotation') {
       sessionRef.current.completeGuidanceExercise('shoulder_rotation', Date.now())
     }
     if (courseAfter.state === 'COURSE_COMPLETE') finishCompletedCourse()
-  }, [activateExercise, finishCompletedCourse])
+  }, [activateExercise, course, finishCompletedCourse])
 
   const processFrame = useCallback((rawFrame: PoseFrame, overlayOptions: PoseOverlayDrawOptions = {}) => {
     noPoseStartedAtRef.current = undefined
@@ -419,7 +425,7 @@ export function useTrainingRuntime() {
     let coachTargetValue = targetReps(output.result.exerciseId)
     let coachProgress = output.state.repCount
     if (courseEnabled) {
-      const step = ELECTRONIC_COACH_COURSE_V1.steps[courseBefore.stepIndex]
+      const step = course.steps[courseBefore.stepIndex]
       const target = resolveCourseTarget(step, fast)
       const progress = step.target.type === 'duration' && activeMotionDurationMs(output.state) !== undefined ? activeMotionDurationMs(output.state)! / 1000
         : step.target.type === 'duration' ? courseBefore.elapsedMs / 1000
@@ -510,13 +516,13 @@ export function useTrainingRuntime() {
       setFeatures(output.features)
       setResult(output.result)
       setExerciseState(output.state)
-      setRemainingSeconds(courseEnabled && ELECTRONIC_COACH_COURSE_V1.steps[courseAfter.stepIndex].target.type === 'duration'
-        ? Math.max(0, resolveCourseTarget(ELECTRONIC_COACH_COURSE_V1.steps[courseAfter.stepIndex], fast) - Math.floor((activeMotionDurationMs(output.state) ?? courseAfter.elapsedMs) / 1000))
+      setRemainingSeconds(courseEnabled && course.steps[courseAfter.stepIndex].target.type === 'duration'
+        ? Math.max(0, resolveCourseTarget(course.steps[courseAfter.stepIndex], fast) - Math.floor((activeMotionDurationMs(output.state) ?? courseAfter.elapsedMs) / 1000))
         : Math.max(0, runtimeRef.current.definition.presentation.durationSeconds - elapsedSeconds))
       setPerformanceData(performanceRef.current.snapshot(wallNow))
       if (courseEnabled) setCourseSnapshot(courseAfter)
-      const nextCoachExercise = courseEnabled && courseAfter.stepIndex < ELECTRONIC_COACH_COURSE_V1.steps.length - 1
-        ? coachExerciseInput(getExerciseDefinition(ELECTRONIC_COACH_COURSE_V1.steps[courseAfter.stepIndex + 1].exerciseId))
+      const nextCoachExercise = courseEnabled && courseAfter.stepIndex < course.steps.length - 1
+        ? coachExerciseInput(getExerciseDefinition(course.steps[courseAfter.stepIndex + 1].exerciseId))
         : undefined
       const coachInput: CoachCardResolverInput = {
         now: output.features.timestamp,
@@ -563,7 +569,7 @@ export function useTrainingRuntime() {
     setSession(sessionRef.current.finish())
     setPersistFailed(!sessionRef.current.didPersist())
     setCameraMode('idle')
-  }, [activateExercise, applyCourseLifecycle, courseEnabled, dispatchCourseVoice, dispatchPoseAvailability, dispatchVoiceEvent, fast, standaloneOrder, targetReps])
+  }, [activateExercise, applyCourseLifecycle, course, courseEnabled, dispatchCourseVoice, dispatchPoseAvailability, dispatchVoiceEvent, fast, standaloneOrder, targetReps])
 
   processFrameRef.current = processFrame
 
@@ -581,7 +587,7 @@ export function useTrainingRuntime() {
 
     const courseBefore = courseRef.current.getSnapshot()
     let courseAfter = courseBefore
-    const step = ELECTRONIC_COACH_COURSE_V1.steps[courseBefore.stepIndex]
+    const step = course.steps[courseBefore.stepIndex]
     const target = resolveCourseTarget(step, fast)
     if (courseBefore.state === 'PREPARING' || courseBefore.state === 'COUNTDOWN') {
       startGestureConfirmedRef.current = false
@@ -599,7 +605,7 @@ export function useTrainingRuntime() {
     if (courseAfter !== courseBefore || courseAfter.state !== courseBefore.state) setCourseSnapshot(courseAfter)
     applyCourseLifecycle(courseBefore, courseAfter)
     dispatchCourseVoice(courseBefore, courseAfter, timestamp)
-  }, [applyCourseLifecycle, courseEnabled, dispatchCourseVoice, dispatchPoseAvailability, fast])
+  }, [applyCourseLifecycle, course, courseEnabled, dispatchCourseVoice, dispatchPoseAvailability, fast])
 
   processNoPoseRef.current = processNoPose
 
@@ -892,11 +898,12 @@ export function useTrainingRuntime() {
     targetReps: targetReps(definition.id),
     courseSnapshot,
     courseEnabled,
-    courseTargetType: courseEnabled ? ELECTRONIC_COACH_COURSE_V1.steps[courseSnapshot.stepIndex].target.type : 'reps',
-    courseTarget: courseEnabled ? resolveCourseTarget(ELECTRONIC_COACH_COURSE_V1.steps[courseSnapshot.stepIndex], fast) : targetReps(definition.id),
+    freeTrainingExerciseId,
+    courseTargetType: courseEnabled ? course.steps[courseSnapshot.stepIndex].target.type : 'reps',
+    courseTarget: courseEnabled ? resolveCourseTarget(course.steps[courseSnapshot.stepIndex], fast) : targetReps(definition.id),
     courseProgress: courseEnabled
-      ? ELECTRONIC_COACH_COURSE_V1.steps[courseSnapshot.stepIndex].target.type === 'duration' ? Math.min(resolveCourseTarget(ELECTRONIC_COACH_COURSE_V1.steps[courseSnapshot.stepIndex], fast), Math.floor((activeMotionDurationMs(exerciseState) ?? courseSnapshot.elapsedMs) / 1000))
-        : ELECTRONIC_COACH_COURSE_V1.steps[courseSnapshot.stepIndex].target.type === 'cycles' ? Math.floor(exerciseState.repCount / 2) : exerciseState.repCount
+      ? course.steps[courseSnapshot.stepIndex].target.type === 'duration' ? Math.min(resolveCourseTarget(course.steps[courseSnapshot.stepIndex], fast), Math.floor((activeMotionDurationMs(exerciseState) ?? courseSnapshot.elapsedMs) / 1000))
+        : course.steps[courseSnapshot.stepIndex].target.type === 'cycles' ? Math.floor(exerciseState.repCount / 2) : exerciseState.repCount
       : exerciseState.repCount,
     exerciseIndex,
     nextDefinition,
@@ -906,7 +913,7 @@ export function useTrainingRuntime() {
       { label: 'Demo frame', value: demoFrame?.id ?? 'n/a' },
       { label: 'Pose pipeline', value: syntheticFixture ? 'DEV shortcut' : 'PoseDetector → Filter → Normalizer → Runtime' },
       { label: 'Course state', value: courseSnapshot.state },
-      { label: 'Course step', value: `${courseSnapshot.stepIndex + 1} / ${ELECTRONIC_COACH_COURSE_V1.steps.length}` },
+      { label: 'Course step', value: `${courseSnapshot.stepIndex + 1} / ${course.steps.length}` },
       { label: 'Course countdown', value: String(courseSnapshot.countdown) },
       { label: 'Phase trace', value: phaseTrace.join(' → ') },
       { label: 'MediaPipe init count', value: String(detectorRef.current.initializationCount) },

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { markOnboardingSeen } from './support/onboarding'
 
 const setForceNoPose = (page: import('@playwright/test').Page, value: boolean) => page.evaluate((next) => {
   (window as typeof window & { __forceNoPose?: boolean }).__forceNoPose = next
@@ -11,13 +12,17 @@ const activeMotionSeconds = async (page: import('@playwright/test').Page) => Num
 
 test('formal Home opens Training and Report navigation closes the user loop', async ({ page }) => {
   test.setTimeout(90_000)
+  await markOnboardingSeen(page)
   await page.goto('/')
   await expect(page).toHaveTitle('FormPilot')
   await expect(page.getByRole('heading', { name: 'FormPilot', level: 1 })).toBeVisible()
+  await page.getByRole('link', { name: /进入训练/ }).click()
+  await expect(page).toHaveURL(/\/smart-training$/)
+  const courseOrder = page.getByRole('list', { name: '完整训练动作顺序' })
   for (const name of ['肩部环绕', '双臂上举', '侧平举', '侧步开合', '徒手深蹲', '交替提膝']) {
-    await expect(page.getByText(name, { exact: true })).toBeVisible()
+    await expect(courseOrder.getByText(name, { exact: true })).toBeVisible()
   }
-  await page.getByRole('button', { name: '开始训练' }).click()
+  await page.getByRole('link', { name: /开始完整训练/ }).click()
   await expect(page).toHaveURL(/\/train$/)
   await expect(page).toHaveTitle('FormPilot · 训练')
   await expect(page.getByRole('complementary', { name: '开发调试信息' })).toHaveCount(0)

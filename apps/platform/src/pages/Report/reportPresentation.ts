@@ -1,6 +1,9 @@
+import { ANALYSIS_CONFIG_V1 } from '../../features/analysis'
 import type {
-  CapabilityDimension, CompletionAnalysis, IssueTrend, Ratio, ScoredExerciseId, Trend,
+  CapabilityDimension, CompletionAnalysis, IssueTrend, Ratio, ScoredExerciseId, SummarySentence, TrainingAnalysis, Trend,
 } from '../../features/analysis'
+import type { ExerciseId } from '../../features/exercises/types'
+import { REPORT_EXERCISE_PRESENTATION } from '../../features/report/presentation'
 
 export const EXERCISE_NAMES: Readonly<Record<ScoredExerciseId, string>> = {
   overhead_raise: '双臂上举',
@@ -39,6 +42,58 @@ export function formatDuration(durationMs: number | null): string {
 export function completionProgress(completion: CompletionAnalysis): string {
   const unit = completion.unit === 'cycles' ? '组' : '次'
   return `${completion.progress} / ${completion.target} ${unit}`
+}
+
+/** Free training is NOT_COURSE_FLOW in analysis-v1; say so in product terms instead of course terms. */
+export const FREE_TRAINING_COMPARISON_TEXT = '自由训练只评估本次动作，不参与完整课程的历史对比和长期趋势。'
+
+export function freeTrainingProgressText(analysis: TrainingAnalysis, exerciseId: ExerciseId): string {
+  if (exerciseId === 'shoulder_rotation') return analysis.guidance.status === 'completed' ? '已完成' : '未完成'
+  const exercise = analysis.exercises.find((item) => item.exerciseId === exerciseId)
+  return exercise ? completionProgress(exercise.completion) : '未开始'
+}
+
+export function freeTrainingUnscoredText(exerciseId: ExerciseId): string {
+  return exerciseId === 'shoulder_rotation' ? '热身引导，不计分' : '暂不评分'
+}
+
+function freeTrainingOverallText(analysis: TrainingAnalysis, exerciseId: ExerciseId): string {
+  const name = REPORT_EXERCISE_PRESENTATION[exerciseId].name
+  if (exerciseId === 'shoulder_rotation') {
+    return analysis.guidance.status === 'completed'
+      ? `本次自由训练完成了${name}热身引导，该动作不计分。`
+      : `本次自由训练提前结束，${name}热身引导未完成，该动作不计分。`
+  }
+  const exercise = analysis.exercises.find((item) => item.exerciseId === exerciseId)
+  if (!exercise || exercise.completion.status === 'not_started') return `本次自由训练没有记录到${name}的有效动作。`
+  const progress = completionProgress(exercise.completion)
+  if (exercise.completion.status !== 'completed') return `本次自由训练提前结束，${name}完成 ${progress}。`
+  return exercise.score === null
+    ? `本次自由训练完成${name} ${progress}，有效识别次数不足，暂不评分。`
+    : `本次自由训练完成${name} ${progress}，得分 ${exercise.score} 分。`
+}
+
+function freeTrainingLimitedText(analysis: TrainingAnalysis, exerciseId: ExerciseId): string {
+  if (exerciseId === 'shoulder_rotation') return '肩部环绕属于热身引导，不做动作问题分析。'
+  const exercise = analysis.exercises.find((item) => item.exerciseId === exerciseId)
+  return !exercise || exercise.reps.analyzed < ANALYSIS_CONFIG_V1.issue.minEvaluableReps
+    ? `本次${REPORT_EXERCISE_PRESENTATION[exerciseId].name}有效识别次数不足，分析范围有限。`
+    : '自由训练只包含一个动作，本次分析范围有限。'
+}
+
+/**
+ * analysis-v1 has no free-training scope: its OVERALL sentence ("本次训练未完成…") and its "some exercises not started"
+ * limited-data sentence are written for the six-step course. For free training the report restates those two for its
+ * one exercise from the same analysis numbers; every other sentence is shown exactly as analysed.
+ */
+export function freeTrainingSummary(analysis: TrainingAnalysis, exerciseId: ExerciseId): SummarySentence[] {
+  return analysis.summary.map((sentence) => {
+    if (sentence.slot === 'OVERALL') return { ...sentence, text: freeTrainingOverallText(analysis, exerciseId) }
+    if (sentence.slot === 'LIMITED_DATA' && sentence.evidenceRefs.includes('dataQuality:limitedExercises')) {
+      return { ...sentence, text: freeTrainingLimitedText(analysis, exerciseId) }
+    }
+    return sentence
+  })
 }
 
 export function scoreTrendText(trend: Trend | null, delta: number | null): string | null {

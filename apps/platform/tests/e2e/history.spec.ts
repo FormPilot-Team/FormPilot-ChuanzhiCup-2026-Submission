@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { SESSION_STORAGE_KEY } from '../../src/features/training/LocalStorageTrainingSessionRepository'
 import type { TrainingSessionState } from '../../src/features/training/types'
 import { LEGACY_SESSION, PARTIAL_SESSION, at, makeSession } from '../analysis-fixtures'
+import { markOnboardingSeen } from './support/onboarding'
 
 function course(id: string, day: number, issue = false): TrainingSessionState {
   return makeSession({
@@ -19,11 +20,13 @@ async function seed(page: Page, sessions: TrainingSessionState[]) {
 }
 
 test('History A: zero records has a useful empty state and Home keeps the entry', async ({ page }) => {
+  await markOnboardingSeen(page)
   await page.goto('/history')
   await expect(page.getByTestId('history-empty')).toContainText('还没有训练记录')
   await page.goto('/')
   await expect(page.getByTestId('home-training-history')).toContainText('还没有训练记录')
   await expect(page.getByRole('link', { name: '训练记录', exact: true })).toHaveAttribute('href', '/history')
+  await expect(page.getByTestId('tool-card-history')).toHaveAttribute('href', '/history')
 })
 
 test('History B: three complete courses show the list, trend, and recurring issue', async ({ page }) => {

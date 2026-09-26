@@ -48,13 +48,13 @@ test('upper-body crop starts the first three exercises but full-body Step Jack w
   await expect(page.getByTestId('course-state')).toContainText('请进入准备姿势')
 })
 
-test('live camera preview uses contain and Home explains action-specific positioning', async ({ page }) => {
+test('live camera preview uses contain and the smart-training entry explains action-specific positioning', async ({ page }) => {
   await page.goto('/train')
   const cameraVideo = page.getByRole('region', { name: '实时动作检测' }).locator('video')
   await expect(cameraVideo).toHaveClass(/object-contain/)
   await expect(cameraVideo).not.toHaveClass(/object-cover/)
 
-  await page.goto('/')
+  await page.goto('/smart-training')
   await expect(page.getByText('训练过程中请根据动作提示调整站位，确保所需身体区域完整入镜')).toBeVisible()
   await expect(page.getByText('进入下肢动作时，请确保全身完整可见')).toBeVisible()
 })

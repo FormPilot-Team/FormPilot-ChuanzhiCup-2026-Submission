@@ -3,6 +3,7 @@ import {
   AlertTriangle, ArrowLeft, ArrowRight, CalendarDays, ChartNoAxesCombined, Check, CircleDashed,
   Clock3, History, RefreshCw, TrendingUp,
 } from 'lucide-react'
+import { SMART_TRAINING_PATH } from '../../app/routes'
 import { AppHeader } from '../../components/layout/AppHeader'
 import {
   historyComparisonText, historyScoreText, loadTrainingHistory, type TrainingHistoryItem,
@@ -10,6 +11,7 @@ import {
 } from '../../features/history/TrainingHistory'
 import { LocalStorageTrainingSessionRepository } from '../../features/training/LocalStorageTrainingSessionRepository'
 import type { TrainingSessionRepository } from '../../features/training/TrainingSessionRepository'
+import { freeTrainingLabel } from '../../features/training/trainingScope'
 import { cn } from '../../lib/cn'
 import { formatDate, formatDuration, formatShortDate } from '../Report/reportPresentation'
 
@@ -39,6 +41,7 @@ function HistoryCard({ item }: { item: TrainingHistoryItem }) {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <time className="text-base font-bold text-slate-950" dateTime={new Date(item.session.startedAt).toISOString()}>{formatDate(item.session.startedAt)}</time>
+              {item.scope.kind === 'free_training' ? <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800" data-testid="history-free-training-label">{freeTrainingLabel(item.scope.exerciseId)}</span> : null}
               {item.legacy ? <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">旧版本记录</span> : null}
               <span className={cn('inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold', item.incomplete ? 'bg-slate-100 text-slate-700' : 'bg-emerald-50 text-emerald-800')}>
                 <CompletionIcon size={13} aria-hidden="true" />{item.incomplete ? '训练未完成' : '训练完成'}
@@ -46,7 +49,7 @@ function HistoryCard({ item }: { item: TrainingHistoryItem }) {
             </div>
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-3 text-sm">
               <span className="inline-flex items-center gap-2 font-semibold text-slate-700"><Clock3 size={16} className="text-slate-400" aria-hidden="true" />{formatDuration(sessionDuration(item))}</span>
-              <span className="inline-flex items-center gap-2 font-bold tabular-nums text-slate-950"><TrendingUp size={16} className="text-blue-600" aria-hidden="true" />{historyScoreText(item.analysis)}</span>
+              <span className="inline-flex items-center gap-2 font-bold tabular-nums text-slate-950"><TrendingUp size={16} className="text-blue-600" aria-hidden="true" />{historyScoreText(item.analysis, item.scope)}</span>
               {comparison ? <span className="font-semibold tabular-nums text-slate-600">{comparison}</span> : null}
             </div>
             {priority ? <p className="mt-4 text-pretty text-sm font-semibold text-slate-700">重点：{priority.reportLabel}</p> : null}
@@ -139,7 +142,7 @@ export function TrainingHistoryView({ items, overview }: { items: TrainingHistor
         <header className="mb-6 flex items-start gap-4 sm:mb-8"><span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-slate-950 text-white"><History size={23} aria-hidden="true" /></span><div><h1 className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">训练记录</h1><p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">重新查看每次训练报告，并了解近期完整课程的评分变化与反复问题。</p></div></header>
 
         {items.length === 0 ? (
-          <section className="report-panel p-8 text-center sm:p-10" data-testid="history-empty"><CalendarDays className="mx-auto text-slate-400" size={34} aria-hidden="true" /><h2 className="mt-4 text-balance text-xl font-bold text-slate-950">还没有训练记录</h2><p className="mx-auto mt-2 max-w-md text-pretty text-sm leading-6 text-slate-600">完成一次训练后，报告会保存在这里。</p><a href="/train" className="primary-button mt-6 inline-flex items-center justify-center gap-2">开始训练<ArrowRight size={16} aria-hidden="true" /></a></section>
+          <section className="report-panel p-8 text-center sm:p-10" data-testid="history-empty"><CalendarDays className="mx-auto text-slate-400" size={34} aria-hidden="true" /><h2 className="mt-4 text-balance text-xl font-bold text-slate-950">还没有训练记录</h2><p className="mx-auto mt-2 max-w-md text-pretty text-sm leading-6 text-slate-600">完成一次训练后，报告会保存在这里。</p><a href={SMART_TRAINING_PATH} className="primary-button mt-6 inline-flex items-center justify-center gap-2">开始训练<ArrowRight size={16} aria-hidden="true" /></a></section>
         ) : (
           <div className="space-y-5 sm:space-y-6">
             <ProgressOverview overview={overview} />

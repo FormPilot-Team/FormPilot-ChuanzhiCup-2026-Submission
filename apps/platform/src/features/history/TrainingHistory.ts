@@ -1,10 +1,14 @@
 import { analyzeTraining, type TrainingAnalysis } from '../analysis'
+import type { ExerciseId } from '../exercises/types'
 import type { TrainingSessionRepository } from '../training/TrainingSessionRepository'
+import { resolveTrainingScope, type TrainingScope } from '../training/trainingScope'
 import type { TrainingSessionState } from '../training/types'
 
 export interface TrainingHistoryItem {
   session: TrainingSessionState
   analysis: TrainingAnalysis
+  /** Presentation label source (full course / free training); analysis never reads it. */
+  scope: TrainingScope
   incomplete: boolean
   legacy: boolean
 }
@@ -54,6 +58,18 @@ export function isPrimaryHistorySession(session: TrainingSessionState): boolean 
   return session.source !== 'demo' && session.source !== 'synthetic' && session.mode !== 'fast'
 }
 
+/** Free training is finished when its one exercise reached the target and the session ended normally. */
+function freeTrainingIncomplete(session: TrainingSessionState, analysis: TrainingAnalysis, exerciseId: ExerciseId): boolean {
+  if (session.courseStatus !== 'completed') return true
+  if (exerciseId === 'shoulder_rotation') return analysis.guidance.status !== 'completed'
+  return analysis.exercises.find((item) => item.exerciseId === exerciseId)?.completion.status !== 'completed'
+}
+
+/** Course sessions keep analysis-v1's course completeness; free training is judged on its own exercise. */
+export function isTrainingIncomplete(session: TrainingSessionState, analysis: TrainingAnalysis, scope: TrainingScope): boolean {
+  return scope.kind === 'free_training' ? freeTrainingIncomplete(session, analysis, scope.exerciseId) : !analysis.courseComplete
+}
+
 export function buildTrainingHistoryItems(sessions: readonly TrainingSessionState[]): TrainingHistoryItem[] {
   const history = [...sessions]
   return history
@@ -61,10 +77,12 @@ export function buildTrainingHistoryItems(sessions: readonly TrainingSessionStat
     .sort(compareHistorySessions)
     .map((session) => {
       const analysis = analyzeTraining(session, history)
+      const scope = resolveTrainingScope(session)
       return {
         session,
         analysis,
-        incomplete: !analysis.courseComplete,
+        scope,
+        incomplete: isTrainingIncomplete(session, analysis, scope),
         legacy: analysis.dataQuality.rulesSupport === 'LEGACY_UNVERSIONED' || analysis.mode === 'unknown',
       }
     })
@@ -82,7 +100,8 @@ export function isReliableFullCourse(analysis: TrainingAnalysis): boolean {
     && !flags.has('NOT_FINALIZED')
 }
 
-export function historyScoreText(analysis: TrainingAnalysis): string {
+export function historyScoreText(analysis: TrainingAnalysis, scope?: TrainingScope): string {
+  if (scope?.kind === 'free_training' && scope.exerciseId === 'shoulder_rotation') return '热身引导 · 不计分'
   if (analysis.overall.scope === 'FULL_COURSE') return `综合评分 ${analysis.overall.score}`
   if (analysis.overall.scope === 'COMPLETED_EXERCISES') return `已完成动作平均分 ${analysis.overall.score}`
   return '暂无可靠评分'
