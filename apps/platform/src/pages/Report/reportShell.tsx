@@ -29,7 +29,7 @@ export function ReportLayout({ children, dataRoutine }: { children: ReactNode; d
   return (
     <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900" data-routine={dataRoutine}>
       <AppHeader />
-      <main className="mx-auto min-w-0 max-w-[1240px] px-4 pb-12 pt-4 sm:px-6 lg:px-8">
+      <main className="mx-auto min-w-0 max-w-[1240px] px-4 pb-24 pt-4 sm:px-6 lg:px-8">
         <button type="button" onClick={() => window.location.assign('/')} className="mb-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} aria-hidden="true" />返回首页</button>
         <div className="space-y-4 sm:space-y-5">{children}</div>
       </main>

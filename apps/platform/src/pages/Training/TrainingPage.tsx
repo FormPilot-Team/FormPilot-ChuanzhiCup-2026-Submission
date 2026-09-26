@@ -1,4 +1,6 @@
+import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
+import { buildWarmUpCoachContext, warmUpGuide } from '../../features/coachContext/liveCoachContexts'
 import { CameraPanel } from '../../components/camera/CameraPanel'
 import { DemonstrationVideo } from '../../components/demo/DemonstrationVideo'
 import { MetricsPanel } from '../../components/metrics/MetricsPanel'
@@ -50,6 +52,22 @@ export function TrainingPage() {
     isSpeaking: runtime.voicePlayback.isSpeaking,
     currentSpokenMessage: runtime.voicePlayback.currentMessage,
   })
+  const targetUnit = runtime.courseTargetType === 'duration' ? '秒' as const : runtime.courseTargetType === 'cycles' ? '组' as const : '次' as const
+  const coachContext = {
+    page: 'training' as const,
+    live: buildWarmUpCoachContext({
+      definition,
+      position: { index: runtime.exerciseIndex, total: runtime.exerciseNames.length },
+      freeTraining,
+      courseState: demonstrationSnapshot.state,
+      progress: runtime.courseProgress,
+      target: runtime.courseTarget,
+      targetUnit,
+      score: runtime.result.currentScore > 0 ? Math.round(runtime.result.currentScore) : null,
+      feedback: runtime.feedback,
+    }),
+    guide: warmUpGuide(definition, targetUnit),
+  }
   const overlayCourseState = runtime.courseEnabled
     ? demonstrationSnapshot.state
     : runtime.cameraMode === 'live' || runtime.cameraMode === 'demo'
@@ -65,7 +83,10 @@ export function TrainingPage() {
             <h1 className="text-balance text-2xl font-bold text-slate-950 lg:text-3xl">{freeTraining ? '自由训练' : '今日训练'} · {definition.presentation.subtitle}</h1>
             <p className="mt-1 text-pretty text-sm text-slate-500">{freeTraining ? '单个动作' : `第 ${runtime.exerciseIndex + 1} / ${runtime.exerciseNames.length} 项`} · 实时姿态识别与动作纠正</p>
           </div>
-          <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-600" data-testid="course-state">{courseStateText(runtime, freeTraining)}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <AICoach context={coachContext} variant="inline" />
+            <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-600" data-testid="course-state">{courseStateText(runtime, freeTraining)}</p>
+          </div>
         </div>
         <div className="training-grid grid min-h-[635px] min-w-0 gap-3 xl:h-[clamp(520px,calc(100dvh-300px),680px)] xl:min-h-0 xl:grid-cols-[minmax(280px,0.72fr)_minmax(460px,1.45fr)_minmax(340px,0.9fr)]" data-testid="hybrid-training-layout">
           <DemonstrationVideo

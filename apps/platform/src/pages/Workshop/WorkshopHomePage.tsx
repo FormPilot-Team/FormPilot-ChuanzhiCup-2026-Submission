@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { HOME_PATH, WORKSHOP_NEW_PATH, customTrainingPath, workshopActionPath } from '../../app/routes'
 import { WORKSHOP_FLOW } from '../../app/modeCatalog'
+import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { PoseSketch } from '../../components/workshop/PoseSketch'
 import { BODY_AREAS, SIGNAL_SOURCE_OPTIONS } from '../../features/workshop/catalog'
@@ -134,7 +135,7 @@ export function WorkshopHomePage({ repository = localRepository }: { repository?
   return (
     <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900">
       <AppHeader />
-      <main className="mx-auto min-w-0 max-w-[1200px] px-4 pb-14 pt-5 sm:px-6 lg:px-8">
+      <main className="mx-auto min-w-0 max-w-[1200px] px-4 pb-24 pt-5 sm:px-6 lg:px-8">
         <a href={HOME_PATH} className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} aria-hidden="true" />返回首页</a>
         <header className="fp-hero relative overflow-hidden rounded-3xl border border-white/80 p-5 shadow-[0_18px_40px_-28px_rgb(30_64_175/0.35)] sm:p-7">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -208,6 +209,7 @@ export function WorkshopHomePage({ repository = localRepository }: { repository?
           )}
         </section>
       </main>
+      <AICoach context={{ page: 'workshop' }} />
     </div>
   )
 }

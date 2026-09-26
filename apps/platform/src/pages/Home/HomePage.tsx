@@ -6,8 +6,12 @@ import { MyActionsStrip } from '../../components/home/MyActionsStrip'
 import { MyTrainingSummary } from '../../components/home/MyTrainingSummary'
 import { TrainingModeCard } from '../../components/home/TrainingModeCard'
 import { WorkshopTeaser } from '../../components/home/WorkshopTeaser'
+import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { OnboardingDialog } from '../../components/onboarding/OnboardingDialog'
+import { historyEntryDigest } from '../../features/aiCoach/digests'
+import type { CoachPageContext } from '../../features/aiCoach/types'
+import { buildRecentReports } from '../../features/coachContext/recentReports'
 import { loadTrainingHistory } from '../../features/history/TrainingHistory'
 import { mergeHistoryEntries } from '../../features/history/historyEntries'
 import { buildHomeTrainingSummary } from '../../features/history/homeSummary'
@@ -45,10 +49,16 @@ export function HomePage({ repository = localRepository, routineRepository = loc
     const smart = loadTrainingHistory(repository)
     const routine = loadRoutineHistory(routineRepository)
     const custom = loadCustomHistory(customRepository)
-    const entries = mergeHistoryEntries(smart.status === 'ready' ? smart.items : [], routine.status === 'ready' ? routine.items : [], custom.status === 'ready' ? custom.items : [])
+    const smartItems = smart.status === 'ready' ? smart.items : []
+    const routineItems = routine.status === 'ready' ? routine.items : []
+    const customItems = custom.status === 'ready' ? custom.items : []
+    const entries = mergeHistoryEntries(smartItems, routineItems, customItems)
+    const latest = entries.find((entry) => !entry.incomplete)
     return {
       summary: buildHomeTrainingSummary(entries, now ?? Date.now()),
       unavailable: smart.status === 'error' || routine.status === 'error' || custom.status === 'error',
+      recent: buildRecentReports(smartItems, routineItems, 5, customItems),
+      latest: latest ? historyEntryDigest(latest) : null,
     }
   }, [customRepository, now, repository, routineRepository])
   const myActions = useMemo(() => {
@@ -71,6 +81,8 @@ export function HomePage({ repository = localRepository, routineRepository = loc
     heading?.focus({ preventScroll: true })
   }, [])
 
+  const coachContext: CoachPageContext = { page: 'home', recent: history.recent, latest: history.latest, week: { count: history.summary.weekCount, previous: history.summary.previousWeekCount } }
+
   const closeOnboarding = (outcome: OnboardingOutcome) => {
     recordOnboarding(outcome)
     setOnboardingOpen(false)
@@ -79,7 +91,7 @@ export function HomePage({ repository = localRepository, routineRepository = loc
   return (
     <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900">
       <AppHeader />
-      <main className="mx-auto max-w-[1200px] px-4 pb-14 pt-5 sm:px-6 sm:pt-7 lg:px-8">
+      <main className="mx-auto max-w-[1200px] px-4 pb-24 pt-5 sm:px-6 sm:pt-7 lg:px-8">
         <HomeHero onOpenGuide={() => setOnboardingOpen(true)} />
 
         <section id={START_TRAINING_ANCHOR} className="mt-8 scroll-mt-4 sm:mt-10" aria-labelledby="start-training-title" data-testid="home-start-training">
@@ -102,6 +114,7 @@ export function HomePage({ repository = localRepository, routineRepository = loc
           <MyTrainingSummary summary={history.summary} unavailable={history.unavailable} />
         </div>
       </main>
+      <AICoach context={coachContext} />
       <OnboardingDialog open={onboardingOpen} onClose={closeOnboarding} />
     </div>
   )

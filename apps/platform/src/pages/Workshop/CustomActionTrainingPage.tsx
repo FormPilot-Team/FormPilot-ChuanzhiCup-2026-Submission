@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { WORKSHOP_PATH, customTrainingPath, reportPath, workshopActionPath } from '../../app/routes'
 import { CameraPanel } from '../../components/camera/CameraPanel'
 import { COACH_AVATAR_ASSET } from '../../components/coach/coachIdentity'
+import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
+import { buildCustomCoachContext, customGuide } from '../../features/coachContext/liveCoachContexts'
 import { PoseSketch } from '../../components/workshop/PoseSketch'
 import { ProgressMeter, RequirementResults } from '../../components/workshop/RecognitionReadout'
 import { BODY_AREAS } from '../../features/workshop/catalog'
@@ -147,7 +149,10 @@ function CustomTrainingView({ action }: { action: CustomActionDefinition }) {
               <span>{BODY_AREAS[action.bodyArea].label}</span><span aria-hidden="true">·</span><span>目标 {goalText(action.goal)}</span>
             </p>
           </div>
-          <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-700" data-testid="custom-state" data-course-state={courseSnapshot.state} data-session-status={runtime.sessionStatus}>{stateText(runtime)}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <AICoach context={{ page: 'training', live: buildCustomCoachContext({ action, setup, courseState: courseSnapshot.state, count: runtime.count, target: step.target, snapshot }), guide: customGuide(action, setup) }} variant="inline" />
+            <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-700" data-testid="custom-state" data-course-state={courseSnapshot.state} data-session-status={runtime.sessionStatus}>{stateText(runtime)}</p>
+          </div>
         </div>
 
         {!setup.ready ? (

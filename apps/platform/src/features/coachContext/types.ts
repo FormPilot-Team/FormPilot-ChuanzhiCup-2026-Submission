@@ -1,9 +1,9 @@
 /**
- * What a future AI Coach conversation may read about the user's training. Reserved in the Integration Phase:
- * training modes expose it, nothing consumes it yet, and no LLM is involved. Everything here is already shown to
- * the user on screen or in a report, so the coach can only explain, never invent.
+ * What the AI Coach (features/aiCoach) may read about the user's training. Training modes expose it; no LLM is
+ * involved. Everything here is already shown to the user on screen or in a report, so the coach can only explain,
+ * never invent.
  */
-export type CoachModeKind = 'smart-training' | 'routine'
+export type CoachModeKind = 'smart-training' | 'routine' | 'custom-action'
 
 export type CoachFeedbackTone = 'neutral' | 'info' | 'success' | 'warning'
 
@@ -35,6 +35,8 @@ export interface CoachSessionStats {
   totalSeconds: number | null
   /** Mode-specific live numbers (percentages 0–100 or counts); never re-derived by the coach. */
   metrics: Readonly<Record<string, number | null>>
+  /** Counting unit of `progress` / `target` when the mode counts (次 / 组 / 秒). */
+  unit?: string
 }
 
 export interface RecentReportSummary {

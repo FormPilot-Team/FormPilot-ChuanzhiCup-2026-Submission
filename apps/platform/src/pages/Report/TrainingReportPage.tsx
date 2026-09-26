@@ -3,7 +3,9 @@ import {
   Target, TrendingUp,
 } from 'lucide-react'
 import { HISTORY_PATH, START_TRAINING_PATH, freeTrainingPath, trainingEntryPath } from '../../app/routes'
+import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
+import { customDigest, routineDigest, warmUpDigest } from '../../features/aiCoach/digests'
 import { CapabilityRadar } from '../../components/report/CapabilityRadar'
 import type {
   CapabilityDimensionAnalysis, ExerciseAnalysis, Finding, FocusItem, IssueAnalysis, PriorityIssue, TrainingAnalysis,
@@ -518,9 +520,9 @@ export function TrainingReportPage({ sessionId }: { sessionId: string }) {
   const routine = useRoutineReport(sessionId)
   const custom = useCustomActionReport(sessionId)
   const state = useTrainingReportAnalysis(sessionId)
-  if (routine.status === 'ready') return <RoutineReportView report={routine.report} />
-  if (custom.status === 'ready') return <CustomActionReportView report={custom.report} actionExists={custom.actionExists} />
+  if (routine.status === 'ready') return <><RoutineReportView report={routine.report} /><AICoach context={{ page: 'report', digest: routineDigest(routine.report) }} /></>
+  if (custom.status === 'ready') return <><CustomActionReportView report={custom.report} actionExists={custom.actionExists} /><AICoach context={{ page: 'report', digest: customDigest(custom.report) }} /></>
   if (state.status === 'not_found') return routine.status === 'error' || custom.status === 'error' ? <ReportReadError /> : <ReportNotFound />
   if (state.status === 'error') return <ReportReadError />
-  return <TrainingReportView analysis={state.analysis} session={state.session} />
+  return <><TrainingReportView analysis={state.analysis} session={state.session} /><AICoach context={{ page: 'report', digest: warmUpDigest(state.analysis, state.session) }} /></>
 }

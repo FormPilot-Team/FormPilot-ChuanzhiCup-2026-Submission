@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, ArrowLeft, ArrowRight, Check, Play, Save } from 'lucide-react'
 import { WORKSHOP_PATH, customTrainingPath } from '../../app/routes'
 import { CameraPanel } from '../../components/camera/CameraPanel'
+import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { JOINT_LABEL } from '../../features/workshop/catalog'
 import {
@@ -234,7 +235,7 @@ export function ActionEditorPage({ actionId, repository = localRepository }: { a
   return (
     <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900">
       <AppHeader />
-      <main className="mx-auto min-w-0 max-w-[1280px] px-4 pb-14 pt-5 sm:px-6 lg:px-8">
+      <main className="mx-auto min-w-0 max-w-[1280px] px-4 pb-24 pt-5 sm:px-6 lg:px-8">
         <a href={WORKSHOP_PATH} className="mb-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} aria-hidden="true" />动作工坊</a>
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">
@@ -349,6 +350,7 @@ export function ActionEditorPage({ actionId, repository = localRepository }: { a
           ) : null}
         </div>
       </main>
+      <AICoach context={{ page: 'workshop' }} />
     </div>
   )
 }

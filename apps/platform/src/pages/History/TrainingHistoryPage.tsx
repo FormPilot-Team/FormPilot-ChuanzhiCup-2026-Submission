@@ -4,7 +4,11 @@ import {
   Clock3, History, RefreshCw, TrendingUp,
 } from 'lucide-react'
 import { START_TRAINING_PATH } from '../../app/routes'
+import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
+import { historyEntryDigest } from '../../features/aiCoach/digests'
+import { buildRecentReports } from '../../features/coachContext/recentReports'
+import { buildHomeTrainingSummary } from '../../features/history/homeSummary'
 import {
   historyComparisonText, historyScoreText, loadTrainingHistory, type TrainingHistoryItem,
   type TrainingHistoryOverview, type TrainingTrendPoint,
@@ -169,7 +173,7 @@ export function TrainingHistoryView({ items, overview, routineItems = [], routin
   return (
     <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900">
       <AppHeader />
-      <main className="mx-auto min-w-0 max-w-[1200px] px-4 pb-12 pt-5 sm:px-6 lg:px-8">
+      <main className="mx-auto min-w-0 max-w-[1200px] px-4 pb-24 pt-5 sm:px-6 lg:px-8">
         <a href="/" className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} aria-hidden="true" />返回首页</a>
         <header className="mb-6 flex items-start gap-4 sm:mb-8"><span className="fp-energy-gradient grid size-12 shrink-0 place-items-center rounded-2xl text-white shadow-[0_8px_18px_-10px_rgb(14_165_233/0.9)]"><History size={23} aria-hidden="true" /></span><div><h1 className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">我的训练</h1><p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">查看每次训练的报告，了解热身训练、跟练课程和我的动作的近期变化。</p></div></header>
         {routineUnavailable ? <p className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900" role="status" data-testid="history-routine-unavailable">跟练课程记录暂时无法读取，其他训练记录不受影响。</p> : null}
@@ -216,14 +220,22 @@ export function TrainingHistoryPage({ repository = localRepository, routineRepos
   const routine = useMemo(() => loadRoutineHistory(routineRepository), [routineRepository])
   const custom = useMemo(() => loadCustomHistory(customRepository), [customRepository])
   if (state.status === 'error') return <TrainingHistoryError />
+  const routineItems = routine.status === 'ready' ? routine.items : []
+  const customItems = custom.status === 'ready' ? custom.items : []
+  const entries = mergeHistoryEntries(state.items, routineItems, customItems)
+  const latest = entries.find((entry) => !entry.incomplete)
+  const week = buildHomeTrainingSummary(entries, Date.now())
   return (
+    <>
     <TrainingHistoryView
       items={state.items}
       overview={state.overview}
       routineItems={routine.status === 'ready' ? routine.items : []}
       routineUnavailable={routine.status === 'error'}
-      customItems={custom.status === 'ready' ? custom.items : []}
+      customItems={customItems}
       customUnavailable={custom.status === 'error'}
     />
+    <AICoach context={{ page: 'history', recent: buildRecentReports(state.items, routineItems, 5, customItems), latest: latest ? historyEntryDigest(latest) : null, week: { count: week.weekCount, previous: week.previousWeekCount } }} />
+    </>
   )
 }

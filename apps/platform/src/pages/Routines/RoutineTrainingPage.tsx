@@ -1,7 +1,9 @@
 import { ArrowLeft } from 'lucide-react'
 import { routinePath } from '../../app/routes'
 import { CameraPanel } from '../../components/camera/CameraPanel'
+import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
+import { routineGuide } from '../../features/coachContext/liveCoachContexts'
 import { RoutineFeedbackPanel, type RoutineTrackingState } from '../../components/routines/RoutineFeedbackPanel'
 import { RoutineFooter } from '../../components/routines/RoutineFooter'
 import { RoutineVideoStage } from '../../components/routines/RoutineVideoStage'
@@ -83,7 +85,10 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
               <span aria-hidden="true">·</span><span>跟随标准视频，实时比对动作</span>
             </p>
           </div>
-          <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-600" data-testid="routine-state" data-course-state={courseSnapshot.state} data-session-status={runtime.sessionStatus}>{stateText(runtime)}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <AICoach context={{ page: 'training', live: runtime.coachContext, guide: routineGuide(program, chapter) }} variant="inline" />
+            <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-600" data-testid="routine-state" data-course-state={courseSnapshot.state} data-session-status={runtime.sessionStatus}>{stateText(runtime)}</p>
+          </div>
         </div>
 
         <div className={cn('grid min-w-0 gap-3', program.video.contentAspect >= 1.6 ? LANDSCAPE_COLUMNS.wide : LANDSCAPE_COLUMNS.standard)} data-testid="routine-training-layout" data-layout="landscape-coach">
