@@ -61,3 +61,11 @@ export function seconds(ms: number): string {
   const value = ms / 1000
   return Number.isInteger(value) ? String(value) : value.toFixed(1)
 }
+
+/** Missing TOP-phase elbow evidence must never be described as "no issue". */
+export function insufficientElbowEvidenceText(evaluableReps: number, includeExerciseName = false): string {
+  const prefix = includeExerciseName ? `${exerciseName('overhead_raise')}：` : ''
+  return evaluableReps > 0
+    ? `${prefix}手肘伸展仅有 ${evaluableReps} 次可判断，当前证据不足。`
+    : `${prefix}缺少可判断的手肘伸展数据，当前证据不足。`
+}

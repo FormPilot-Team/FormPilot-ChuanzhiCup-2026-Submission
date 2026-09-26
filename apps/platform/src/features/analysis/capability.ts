@@ -64,15 +64,21 @@ function unitValues(exerciseId: ScoredExerciseId, dimension: Exclude<CapabilityD
 function formContribution(exerciseId: ScoredExerciseId, evidence: ReadonlyMap<string, IssueEvidence>): DimensionContribution {
   const usable: Array<{ n: number; a: number }> = []
   let missing = 0
+  let maxEvaluable = 0
   for (const canonicalId of FORM_CHECKS[exerciseId]) {
     const check = evidence.get(canonicalId)
     if (!check) continue
     missing += check.missingEvidenceReps
     const n = check.units.length
-    if (n >= CAP.minEvaluablePerContributor) usable.push({ n, a: check.units.filter((unit) => unit.affected).length })
+    maxEvaluable = Math.max(maxEvaluable, n)
+    if (n >= ANALYSIS_CONFIG_V1.issue.minEvaluableReps) usable.push({ n, a: check.units.filter((unit) => unit.affected).length })
   }
   if (usable.length === 0) {
-    return { value: null, evaluableReps: 0, unavailableReason: missing > 0 ? 'EVIDENCE_MISSING' : 'INSUFFICIENT_EVALUABLE_REPS' }
+    return {
+      value: null,
+      evaluableReps: maxEvaluable,
+      unavailableReason: maxEvaluable === 0 && missing > 0 ? 'EVIDENCE_MISSING' : 'INSUFFICIENT_EVALUABLE_REPS',
+    }
   }
   const compliance = usable.reduce((sum, check) => sum + (check.n - check.a) / check.n, 0) / usable.length
   return { value: Math.round(100 * compliance), evaluableReps: Math.max(...usable.map((check) => check.n)), unavailableReason: null }

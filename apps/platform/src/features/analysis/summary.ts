@@ -1,5 +1,5 @@
 import { ANALYSIS_CONFIG_V1 } from './config'
-import { exerciseList } from './copy'
+import { exerciseList, insufficientElbowEvidenceText } from './copy'
 import { compareCodeUnits } from './ratio'
 import type {
   Comparison, ExerciseAnalysis, Finding, Overall, PriorityIssue, RulesSupport, ScoredExerciseId, SummarySentence,
@@ -72,34 +72,37 @@ export function buildSummary(input: {
     // Always kept, whatever the overall trend.
     sentences.push({ slot: 'PRIORITY', text: `本次最需要关注：${top.text}。`, evidenceRefs: [`priority:${top.id}`, ...top.canonicalIds.map((id) => `issue:${id}`)] })
   } else {
-    const minReps = ANALYSIS_CONFIG_V1.issue.minEvaluableReps
-    const analyzable = input.exercises.filter((item) => item.reps.analyzed >= minReps)
-    const limited: ScoredExerciseId[] = input.exercises
-      .filter((item) => item.completion.status !== 'not_started' && item.reps.analyzed < minReps)
-      .map((item) => item.exerciseId)
-    if (analyzable.length >= ANALYSIS_CONFIG_V1.summary.noPriorityMinExercises) {
-      // "No priority" must not hide what could not be judged.
-      const caveats: string[] = []
-      if (limited.length) caveats.push(`${exerciseList(limited)}有效识别次数不足，未纳入分析`)
-      for (const exercise of input.exercises) {
-        const unjudged = Math.max(0, ...exercise.issues
-          .filter((issue) => issue.significance === 'INSUFFICIENT_EVIDENCE')
-          .map((issue) => issue.missingEvidenceReps))
-        if (unjudged > 0 && !limited.includes(exercise.exerciseId)) caveats.push(`${exercise.displayName}有 ${unjudged} 次无法判断举到顶部时手肘是否伸直`)
-      }
-      const qualifier = caveats.length ? `（${caveats.join('；')}）` : ''
-      sentences.push({
-        slot: 'NO_PRIORITY',
-        text: `本次没有需要优先纠正的问题${qualifier}。`,
-        evidenceRefs: analyzable.map((item) => `exercise:${item.exerciseId}`),
-      })
-    } else {
-      const notStarted = input.exercises.some((item) => item.completion.status === 'not_started')
+    const elbowEvidence = input.exercises.flatMap((exercise) => exercise.issues
+      .filter((issue) => issue.groupId === 'overhead_raise.elbow_extension'
+        && issue.significance === 'INSUFFICIENT_EVIDENCE' && issue.missingEvidenceReps > 0))
+    if (elbowEvidence.length > 0) {
+      const evaluable = Math.min(...elbowEvidence.map((issue) => issue.stats?.evaluable ?? 0))
       sentences.push({
         slot: 'LIMITED_DATA',
-        text: notStarted ? '本次有动作未开始或有效识别次数不足，分析范围有限。' : '部分动作有效识别次数不足，本次分析范围有限。',
-        evidenceRefs: ['dataQuality:limitedExercises'],
+        text: insufficientElbowEvidenceText(evaluable, true),
+        evidenceRefs: elbowEvidence.map((issue) => `issue:${issue.canonicalId}`),
       })
+    } else {
+      const minReps = ANALYSIS_CONFIG_V1.issue.minEvaluableReps
+      const analyzable = input.exercises.filter((item) => item.reps.analyzed >= minReps)
+      const limited: ScoredExerciseId[] = input.exercises
+        .filter((item) => item.completion.status !== 'not_started' && item.reps.analyzed < minReps)
+        .map((item) => item.exerciseId)
+      if (analyzable.length >= ANALYSIS_CONFIG_V1.summary.noPriorityMinExercises) {
+        const qualifier = limited.length ? `（${exerciseList(limited)}有效识别次数不足，未纳入分析）` : ''
+        sentences.push({
+          slot: 'NO_PRIORITY',
+          text: `本次没有需要优先纠正的问题${qualifier}。`,
+          evidenceRefs: analyzable.map((item) => `exercise:${item.exerciseId}`),
+        })
+      } else {
+        const notStarted = input.exercises.some((item) => item.completion.status === 'not_started')
+        sentences.push({
+          slot: 'LIMITED_DATA',
+          text: notStarted ? '本次有动作未开始或有效识别次数不足，分析范围有限。' : '部分动作有效识别次数不足，本次分析范围有限。',
+          evidenceRefs: ['dataQuality:limitedExercises'],
+        })
+      }
     }
   }
 

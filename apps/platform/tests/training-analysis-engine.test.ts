@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   ANALYSIS_CONFIG_V1, ANALYSIS_VERSION, NON_REPORTABLE_ISSUES, REPORT_ISSUE_TAXONOMY, analyzeTraining, isSignificant, issueTrend,
-  kneeRaisePairs, maxAffectedForImprovement, plannedUnits, scoreTrend, significanceOf,
+  kneeRaisePairs, maxAffectedForCompliantTarget, maxAffectedForImprovement, maxAffectedWithoutSignificance, plannedUnits, scoreTrend, significanceOf,
 } from '../src/features/analysis'
 import type { IssueAnalysis, TrainingAnalysis } from '../src/features/analysis'
 import type { MotionErrorCode } from '../src/features/exercises/types'
@@ -173,10 +173,18 @@ describe('analysis-v1 significance and trends (8F-1A §11-§13)', () => {
   })
 })
 
-describe('analysis-v1 next-focus target math (8F-1A §20)', () => {
-  it('reproduces the frozen examples', () => {
+describe('analysis-v1 next-focus target math (8F-1E)', () => {
+  it('keeps the exact IMPROVED/RESOLVED calculation and applies the easier compliant boundary', () => {
     expect(6 - maxAffectedForImprovement(4, 6, 6)).toBe(4)
     expect(12 - maxAffectedForImprovement(6, 12, 12)).toBe(9)
+    expect(6 - maxAffectedForCompliantTarget(2, 6, 6)).toBe(5)
+    expect(5 - maxAffectedForCompliantTarget(2, 5, 5)).toBe(4)
+    expect(12 - maxAffectedForCompliantTarget(4, 12, 12)).toBe(9)
+    expect(6 - maxAffectedForCompliantTarget(4, 6, 6)).toBe(4)
+    expect(12 - maxAffectedForCompliantTarget(6, 12, 12)).toBe(9)
+    expect(maxAffectedWithoutSignificance(5)).toBe(1)
+    expect(maxAffectedWithoutSignificance(6)).toBe(1)
+    expect(maxAffectedWithoutSignificance(12)).toBe(3)
     expect(plannedUnits('lateral_raise.arm_height.left')).toBe(6)
     expect(plannedUnits('step_jack.step_width')).toBe(12)
     expect(plannedUnits('step_jack.alternation')).toBe(11)
@@ -337,7 +345,8 @@ describe('analysis-v1 golden fixtures (8F-1A §26)', () => {
     expect(exercise(asCurrent, 'overhead_raise').capabilityContribution.FORM).toMatchObject({ value: null, unavailableReason: 'EVIDENCE_MISSING' })
     expect(asCurrent.dataQuality.missingEvidence.every((item) => item.reason === 'LEGACY_SESSION_NO_TOP_ELBOW')).toBe(true)
     expect(asCurrent.dataQuality.sessionFlags).toEqual(expect.arrayContaining(['LEGACY_RULES_UNVERSIONED', 'MODE_UNKNOWN']))
-    expect(asCurrent.summary.find((item) => item.slot === 'NO_PRIORITY')?.text).toContain('双臂上举有 6 次无法判断')
+    expect(asCurrent.summary.find((item) => item.slot === 'NO_PRIORITY')).toBeUndefined()
+    expect(asCurrent.summary.find((item) => item.slot === 'LIMITED_DATA')?.text).toBe('双臂上举：缺少可判断的手肘伸展数据，当前证据不足。')
 
     const asPrevious = analyzeTraining(FIRST_SESSION, [{ ...LEGACY_SESSION, startedAt: at(0) }])
     expect(asPrevious.comparison).toMatchObject({ level: 'NONE', reason: 'NO_ELIGIBLE_PREVIOUS' })
@@ -370,11 +379,31 @@ describe('analysis-v1 golden fixtures (8F-1A §26)', () => {
       { exerciseId: 'overhead_raise', canonicalId: 'overhead_raise.elbow_extension.left', reps: 3, reason: 'TOP_ELBOW_NOT_CAPTURED' },
       { exerciseId: 'overhead_raise', canonicalId: 'overhead_raise.elbow_extension.right', reps: 3, reason: 'TOP_ELBOW_NOT_CAPTURED' },
     ])
-    expect(overhead.takeaway).toBe('本动作没有需要优先纠正的问题；另有 3 次无法判断举到顶部时手肘是否伸直。')
+    expect(overhead.capabilityContribution.FORM).toEqual({ value: null, evaluableReps: 3, unavailableReason: 'INSUFFICIENT_EVALUABLE_REPS' })
+    expect(overhead.takeaway).toBe('手肘伸展仅有 3 次可判断，当前证据不足。')
+    expect(result.summary.find((item) => item.slot === 'NO_PRIORITY')).toBeUndefined()
+    expect(result.summary.find((item) => item.slot === 'LIMITED_DATA')?.text).toBe('双臂上举：手肘伸展仅有 3 次可判断，当前证据不足。')
 
     const topOk = analyzeTraining(LOW_MIN_ELBOW_TOP_OK, [])
     expect(issue(topOk, 'overhead_raise.elbow_extension.left').stats).toEqual(R(0, 6))
     expect(issue(topOk, 'overhead_raise.elbow_extension.right').stats).toEqual(R(0, 6))
+  })
+
+  it('FORM requires 4 evaluable units while continuous capability items still require 3', () => {
+    const three = analyzeTraining(makeSession({
+      id: 'form-three', startedAt: at(2),
+      exercises: { lateral_raise: { poseInvalid: { 3: 'BODY_OUT_OF_FRAME', 4: 'BODY_OUT_OF_FRAME', 5: 'BODY_OUT_OF_FRAME' } } },
+    }), [])
+    expect(exercise(three, 'lateral_raise').capabilityContribution.FORM)
+      .toEqual({ value: null, evaluableReps: 3, unavailableReason: 'INSUFFICIENT_EVALUABLE_REPS' })
+    expect(exercise(three, 'lateral_raise').capabilityContribution.AMPLITUDE.value).not.toBeNull()
+
+    const four = analyzeTraining(makeSession({
+      id: 'form-four', startedAt: at(3),
+      exercises: { lateral_raise: { poseInvalid: { 4: 'BODY_OUT_OF_FRAME', 5: 'BODY_OUT_OF_FRAME' } } },
+    }), [])
+    expect(exercise(four, 'lateral_raise').capabilityContribution.FORM)
+      .toEqual({ value: 100, evaluableReps: 4, unavailableReason: null })
   })
 })
 

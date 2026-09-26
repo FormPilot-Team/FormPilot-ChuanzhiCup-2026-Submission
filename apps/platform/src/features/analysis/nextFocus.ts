@@ -40,9 +40,30 @@ export function maxAffectedForImprovement(affected: number, evaluable: number, p
   return Math.max(0, Math.min(byCount, byRate))
 }
 
+/** Largest affected count that is strictly below the significant-issue boundary for the planned denominator. */
+export function maxAffectedWithoutSignificance(planned: number): number {
+  if (planned < ISSUE.minEvaluableReps) return planned
+  const belowCount = ISSUE.significantMinCount - 1
+  const { num, den } = ISSUE.significantMinRate
+  // Significant uses den * affected >= num * planned, so non-significant must remain strictly below it.
+  const belowRate = Math.floor((num * planned - 1) / den)
+  return Math.max(0, Math.min(planned, Math.max(belowCount, belowRate)))
+}
+
+/**
+ * The compliant target uses the easier of two still-valid outcomes: an IMPROVED/RESOLVED trend, or an issue that is
+ * no longer SIGNIFICANT. A larger allowed affected count means a lower, more achievable compliant-at-least target.
+ */
+export function maxAffectedForCompliantTarget(affected: number, evaluable: number, planned: number): number {
+  return Math.max(
+    maxAffectedForImprovement(affected, evaluable, planned),
+    maxAffectedWithoutSignificance(planned),
+  )
+}
+
 function memberTarget(item: PriorityMember): { outOf: number; compliantAtLeast: number; unit: IssueUnit } {
   const outOf = plannedUnits(item.canonicalId)
-  return { outOf, compliantAtLeast: outOf - maxAffectedForImprovement(item.stats.affected, item.stats.evaluable, outOf), unit: item.unit }
+  return { outOf, compliantAtLeast: outOf - maxAffectedForCompliantTarget(item.stats.affected, item.stats.evaluable, outOf), unit: item.unit }
 }
 
 function sideName(side: PriorityMember['side']): string {

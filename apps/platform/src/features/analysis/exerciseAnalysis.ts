@@ -1,5 +1,5 @@
 import { ANALYSIS_CONFIG_V1 } from './config'
-import { exerciseName, SIDE_PAIR_COPY } from './copy'
+import { exerciseName, insufficientElbowEvidenceText, SIDE_PAIR_COPY } from './copy'
 import { buildIssues, withinSessionFinding } from './issueAnalysis'
 import { finite, ratioText, scoreTrend } from './ratio'
 import type { ExerciseFacts } from './sessionFacts'
@@ -46,6 +46,12 @@ function takeaway(facts: ExerciseFacts, issues: readonly IssueAnalysis[], rulesS
       return `${name}：${label}，左侧 ${ratioText(left.stats as NonNullable<IssueAnalysis['stats']>, left.unit)}，右侧 ${ratioText(right.stats as NonNullable<IssueAnalysis['stats']>, right.unit)}。`
     }
     return `${name}：${top.reportLabel}，${ratioText(top.stats, top.unit)}。`
+  }
+  const elbowEvidence = issues.filter((issue) => issue.groupId === 'overhead_raise.elbow_extension'
+    && issue.significance === 'INSUFFICIENT_EVIDENCE' && issue.missingEvidenceReps > 0)
+  if (elbowEvidence.length > 0) {
+    const evaluable = Math.min(...elbowEvidence.map((issue) => issue.stats?.evaluable ?? 0))
+    return insufficientElbowEvidenceText(evaluable)
   }
   if (within) return within.text
   // v1's only optional evidence is the overhead TOP-phase elbow; never let "no issue" hide reps that could not be judged.
