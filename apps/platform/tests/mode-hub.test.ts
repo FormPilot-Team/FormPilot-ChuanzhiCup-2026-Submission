@@ -6,7 +6,9 @@ import { HISTORY_PATH, SMART_TRAINING_PATH } from '../src/app/routes'
 import type { TrainingSessionRepository } from '../src/features/training/TrainingSessionRepository'
 import type { TrainingSessionState } from '../src/features/training/types'
 import { HomePage } from '../src/pages/Home/HomePage'
+import { MemoryRoutineSessionRepository } from '../src/features/routines/session/RoutineSessionRepository'
 import { FIRST_SESSION, PARTIAL_SESSION, at, makeSession } from './analysis-fixtures'
+import { routineRecord } from './helpers/routineFixtures'
 
 function repository(sessions: TrainingSessionState[]): TrainingSessionRepository {
   return { save: () => true, get: (id) => sessions.find((item) => item.id === id), list: () => sessions }
@@ -29,11 +31,16 @@ function card(html: string, testId: string): string {
 const COURSE_EXERCISE_NAMES = ['肩部环绕', '双臂上举', '侧平举', '侧步开合', '徒手深蹲', '交替提膝']
 
 describe('Mode Hub catalog', () => {
-  it('lists the five FormPilot entries with only smart training and history available', () => {
+  it('lists smart training first, then the four integrated follow-along routines, all available', () => {
     expect(TRAINING_MODES.map((item) => [item.id, item.title, item.status])).toEqual([
       ['smart-training', '智能训练', 'available'],
-      ['baduanjin', '八段锦', 'coming_soon'],
-      ['taichi', '太极拳', 'coming_soon'],
+      ['baduanjin', '八段锦', 'available'],
+      ['taijiquan', '太极拳', 'available'],
+      ['wuqinxi', '五禽戏', 'available'],
+      ['yijinjing', '易筋经', 'available'],
+    ])
+    expect(TRAINING_MODES.filter((item) => item.id !== 'smart-training').map((item) => item.route)).toEqual([
+      '/routines/baduanjin', '/routines/taijiquan', '/routines/wuqinxi', '/routines/yijinjing',
     ])
     expect(TOOL_ENTRIES.map((item) => [item.id, item.title, item.status])).toEqual([
       ['motion-workshop', '动作工坊', 'coming_soon'],
@@ -82,16 +89,23 @@ describe('Home Mode Hub', () => {
     expect(smart).toContain('可使用')
   })
 
-  it('shows 八段锦, 太极拳 and 动作工坊 as coming soon without any link or button', () => {
+  it('links each routine card to its entry page and keeps 动作工坊 coming soon without any link or button', () => {
     const html = home()
-    for (const testId of ['mode-card-baduanjin', 'mode-card-taichi', 'tool-card-motion-workshop']) {
-      const markup = card(html, testId)
-      expect(markup, testId).toContain('即将整合')
-      expect(markup, testId).not.toContain('可使用')
-      expect(markup, testId).not.toContain('href=')
-      expect(markup, testId).not.toContain('<button')
-      expect(markup, testId).not.toContain('tabindex')
+    for (const id of ['baduanjin', 'taijiquan', 'wuqinxi', 'yijinjing']) {
+      const markup = card(html, `mode-card-${id}`)
+      expect(markup, id).toContain(`href="/routines/${id}"`)
+      expect(markup, id).toContain('可使用')
+      expect(markup, id).toContain('开始跟练')
+      expect(markup, id).not.toContain('即将整合')
     }
+    expect(html).toContain('功法跟练')
+    expect(html.indexOf('mode-card-smart-training')).toBeLessThan(html.indexOf('mode-card-baduanjin'))
+    const workshop = card(html, 'tool-card-motion-workshop')
+    expect(workshop).toContain('即将整合')
+    expect(workshop).not.toContain('可使用')
+    expect(workshop).not.toContain('href=')
+    expect(workshop).not.toContain('<button')
+    expect(workshop).not.toContain('tabindex')
   })
 
   it('keeps 训练记录 and 使用说明 available as smaller tool cards', () => {
@@ -114,6 +128,15 @@ describe('Home Mode Hub', () => {
     expect(recent).toContain(`href="/report/${FIRST_SESSION.id}"`)
     expect(recent).toContain('综合评分')
     expect(recent).toContain('查看报告')
+  })
+
+  it('summarises a latest follow-along routine next to Smart Training records', () => {
+    const routine = routineRecord({ id: 'routine-latest', startedAt: at(40), programId: 'yijinjing' })
+    const html = renderToStaticMarkup(createElement(HomePage, { repository: repository([FIRST_SESSION]), routineRepository: new MemoryRoutineSessionRepository([routine]) }))
+    const recent = card(html, 'home-training-history')
+    expect(recent).toContain('href="/report/routine-latest"')
+    expect(recent).toContain('易筋经 · 整套跟练')
+    expect(recent).toContain('跟练相似度 80%')
   })
 
   it('labels a latest free training as free training, never as a course score', () => {

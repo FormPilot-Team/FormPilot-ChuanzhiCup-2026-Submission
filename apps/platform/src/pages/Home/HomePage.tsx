@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react'
 import { ArrowRight, CalendarDays, CircleCheck, Clock3 } from 'lucide-react'
-import { GUIDE_ENTRY, MODE_STATUS_LABEL, TOOL_ENTRIES, TRAINING_MODES, modeEntryRoute, type ModeHubEntry, type ModeStatus } from '../../app/modeCatalog'
+import { GUIDE_ENTRY, MODE_STATUS_LABEL, PRIMARY_TRAINING_MODE, ROUTINE_MODES, TOOL_ENTRIES, modeEntryRoute, type ModeHubEntry, type ModeStatus } from '../../app/modeCatalog'
 import { HISTORY_PATH, reportPath } from '../../app/routes'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { OnboardingDialog } from '../../components/onboarding/OnboardingDialog'
 import { PoseRecognitionIllustration } from '../../components/onboarding/OnboardingIllustrations'
 import { historyScoreText, loadTrainingHistory } from '../../features/history/TrainingHistory'
+import { loadRoutineHistory, mergeHistoryEntries } from '../../features/history/routineHistory'
 import { recordOnboarding, shouldAutoOpenOnboarding, type OnboardingOutcome } from '../../features/onboarding/onboarding'
+import { scopeTitle } from '../../features/routines/scope'
+import { LocalStorageRoutineSessionRepository, type RoutineSessionRepository } from '../../features/routines/session/RoutineSessionRepository'
 import { LocalStorageTrainingSessionRepository } from '../../features/training/LocalStorageTrainingSessionRepository'
 import type { TrainingSessionRepository } from '../../features/training/TrainingSessionRepository'
 import { freeTrainingLabel } from '../../features/training/trainingScope'
@@ -14,6 +17,7 @@ import { cn } from '../../lib/cn'
 import { formatDate } from '../Report/reportPresentation'
 
 const localRepository = new LocalStorageTrainingSessionRepository()
+const localRoutineRepository = new LocalStorageRoutineSessionRepository()
 
 function StatusBadge({ status }: { status: ModeStatus }) {
   const available = status === 'available'
@@ -110,34 +114,41 @@ function ToolCard({ entry }: { entry: ModeHubEntry }) {
   return <article className="min-w-0 rounded-2xl border border-dashed border-slate-300 bg-white/60 p-5" aria-label={entry.title} data-testid={`tool-card-${entry.id}`}>{body}</article>
 }
 
-function RecentTraining({ repository }: { repository: TrainingSessionRepository }) {
+/** The latest finished training in any mode. Each source loads on its own, so one failing never hides the other. */
+function RecentTraining({ repository, routineRepository }: { repository: TrainingSessionRepository; routineRepository: RoutineSessionRepository }) {
   const latest = useMemo(() => {
-    const history = loadTrainingHistory(repository)
-    return history.status === 'ready' ? history.items.find((item) => !item.incomplete) : undefined
-  }, [repository])
+    const smart = loadTrainingHistory(repository)
+    const routine = loadRoutineHistory(routineRepository)
+    return mergeHistoryEntries(smart.status === 'ready' ? smart.items : [], routine.status === 'ready' ? routine.items : [])
+      .find((entry) => !entry.incomplete)
+  }, [repository, routineRepository])
+  const summary = latest?.kind === 'smart'
+    ? { label: latest.smart.scope.kind === 'free_training' ? freeTrainingLabel(latest.smart.scope.exerciseId) : undefined, score: historyScoreText(latest.smart.analysis, latest.smart.scope) }
+    : latest?.kind === 'routine'
+      ? { label: scopeTitle(latest.routine.report.program, latest.routine.record.scope), score: latest.routine.report.headline }
+      : undefined
   return (
     <section className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between" aria-labelledby="recent-training-title" data-testid="home-training-history">
       <div className="flex min-w-0 items-center gap-3">
         <CalendarDays size={18} className="shrink-0 text-slate-400" aria-hidden="true" />
         <div className="min-w-0 text-sm">
           <h2 id="recent-training-title" className="inline font-bold text-slate-900">最近训练</h2>
-          {latest ? (
+          {latest && summary ? (
             <p className="mt-0.5 text-pretty leading-6 tabular-nums text-slate-600 sm:ml-3 sm:mt-0 sm:inline">
-              <time dateTime={new Date(latest.session.startedAt).toISOString()}>{formatDate(latest.session.startedAt)}</time>
-              {latest.scope.kind === 'free_training' ? <><span className="mx-2 text-slate-300" aria-hidden="true">·</span>{freeTrainingLabel(latest.scope.exerciseId)}</> : null}
-              <span className="mx-2 text-slate-300" aria-hidden="true">·</span><span className="font-semibold text-slate-800">{historyScoreText(latest.analysis, latest.scope)}</span>
+              <time dateTime={new Date(latest.startedAt).toISOString()}>{formatDate(latest.startedAt)}</time>
+              {summary.label ? <><span className="mx-2 text-slate-300" aria-hidden="true">·</span>{summary.label}</> : null}
+              <span className="mx-2 text-slate-300" aria-hidden="true">·</span><span className="font-semibold text-slate-800">{summary.score}</span>
             </p>
           ) : <p className="mt-0.5 text-slate-500 sm:ml-3 sm:mt-0 sm:inline">还没有训练记录</p>}
         </div>
       </div>
-      <a href={latest ? reportPath(latest.session.id) : HISTORY_PATH} className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-xl px-3 py-2 text-sm font-bold text-blue-700 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:self-auto">{latest ? '查看报告' : '查看训练记录'}<ArrowRight size={16} aria-hidden="true" /></a>
+      <a href={latest ? reportPath(latest.id) : HISTORY_PATH} className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-xl px-3 py-2 text-sm font-bold text-blue-700 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:self-auto">{latest ? '查看报告' : '查看训练记录'}<ArrowRight size={16} aria-hidden="true" /></a>
     </section>
   )
 }
 
-export function HomePage({ repository = localRepository }: { repository?: TrainingSessionRepository }) {
+export function HomePage({ repository = localRepository, routineRepository = localRoutineRepository }: { repository?: TrainingSessionRepository; routineRepository?: RoutineSessionRepository }) {
   const [onboardingOpen, setOnboardingOpen] = useState(() => shouldAutoOpenOnboarding())
-  const [primaryMode, ...otherModes] = TRAINING_MODES
   const closeOnboarding = (outcome: OnboardingOutcome) => {
     recordOnboarding(outcome)
     setOnboardingOpen(false)
@@ -153,10 +164,16 @@ export function HomePage({ repository = localRepository }: { repository?: Traini
 
         <section className="mt-8 sm:mt-10" aria-labelledby="modes-title">
           <h2 id="modes-title" className="text-balance text-lg font-bold text-slate-900">今天想用 FormPilot 做什么？</h2>
-          <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-            <PrimaryModeCard mode={primaryMode} />
-            <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-1">
-              {otherModes.map((mode) => <ModeCard key={mode.id} mode={mode} />)}
+          <div className="mt-4">
+            <PrimaryModeCard mode={PRIMARY_TRAINING_MODE} />
+          </div>
+          <div className="mt-6" role="group" aria-labelledby="routine-modes-title">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <p id="routine-modes-title" className="text-balance font-bold text-slate-900">功法跟练</p>
+              <p className="text-pretty text-sm text-slate-500">跟随标准示范视频练习，实时比对动作与节奏</p>
+            </div>
+            <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {ROUTINE_MODES.map((mode) => <ModeCard key={mode.id} mode={mode} />)}
             </div>
           </div>
         </section>
@@ -171,7 +188,7 @@ export function HomePage({ repository = localRepository }: { repository?: Traini
           </div>
         </section>
 
-        <RecentTraining repository={repository} />
+        <RecentTraining repository={repository} routineRepository={routineRepository} />
       </main>
       <OnboardingDialog open={onboardingOpen} onClose={closeOnboarding} />
     </div>

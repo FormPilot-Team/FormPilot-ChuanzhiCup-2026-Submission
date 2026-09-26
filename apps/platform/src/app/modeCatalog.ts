@@ -1,11 +1,13 @@
-import { BookOpen, Dumbbell, History, Leaf, type LucideIcon, Orbit, Wrench } from 'lucide-react'
-import { HISTORY_PATH, SMART_TRAINING_PATH } from './routes'
+import { BookOpen, Dumbbell, History, Leaf, type LucideIcon, Mountain, Orbit, PawPrint, Wrench } from 'lucide-react'
+import { ROUTINE_PROGRAMS } from '../features/routines/programs'
+import type { RoutineId } from '../features/routines/types'
+import { HISTORY_PATH, SMART_TRAINING_PATH, routinePath } from './routes'
 
 export type ModeStatus = 'available' | 'coming_soon'
 
 /**
- * One Mode Hub entry. Integrating a mode later only means giving it a `route` and switching `status` to
- * 'available'; a coming-soon entry is rendered without any link or button, so it can never open an empty page.
+ * One Mode Hub entry. Integrating a mode means giving it a `route` and switching `status` to 'available'; a
+ * coming-soon entry is rendered without any link or button, so it can never open an empty page.
  */
 export interface ModeHubEntry {
   id: string
@@ -23,33 +25,38 @@ export const MODE_STATUS_LABEL: Readonly<Record<ModeStatus, string>> = Object.fr
   coming_soon: '即将整合',
 })
 
-/** First tier: training modes. The first entry is the current primary product entry. */
-export const TRAINING_MODES: readonly ModeHubEntry[] = Object.freeze([
-  {
-    id: 'smart-training',
-    title: '智能训练',
-    description: '实时识别你的动作，训练中给出纠错提示和语音指导，结束后生成训练报告。',
-    status: 'available',
-    route: SMART_TRAINING_PATH,
-    cta: '进入训练',
-    highlights: ['实时姿态识别', 'AI 纠错', '语音指导', '训练报告'],
-    icon: Dumbbell,
-  },
-  {
-    id: 'baduanjin',
-    title: '八段锦',
-    description: '跟随示范完成八段锦练习，并获得姿态指导。',
-    status: 'coming_soon',
-    icon: Leaf,
-  },
-  {
-    id: 'taichi',
-    title: '太极拳',
-    description: '跟随示范练习太极拳动作，并获得姿态指导。',
-    status: 'coming_soon',
-    icon: Orbit,
-  },
-] satisfies ModeHubEntry[])
+/** The primary training mode: first on the Mode Hub and the largest card. */
+export const PRIMARY_TRAINING_MODE: ModeHubEntry = Object.freeze({
+  id: 'smart-training',
+  title: '智能训练',
+  description: '实时识别你的动作，训练中给出纠错提示和语音指导，结束后生成训练报告。',
+  status: 'available',
+  route: SMART_TRAINING_PATH,
+  cta: '进入训练',
+  highlights: ['实时姿态识别', 'AI 纠错', '语音指导', '训练报告'],
+  icon: Dumbbell,
+} satisfies ModeHubEntry)
+
+const ROUTINE_ICONS: Readonly<Record<RoutineId, LucideIcon>> = {
+  baduanjin: Leaf,
+  taijiquan: Orbit,
+  wuqinxi: PawPrint,
+  yijinjing: Mountain,
+}
+
+/** Follow-along routines, integrated from the teammate version; each opens its own entry page. */
+export const ROUTINE_MODES: readonly ModeHubEntry[] = Object.freeze(ROUTINE_PROGRAMS.map((program) => ({
+  id: program.id,
+  title: program.title,
+  description: `${program.subtitle}，跟随标准视频练习，实时比对动作与节奏。`,
+  status: 'available' as const,
+  route: routinePath(program.id),
+  cta: '开始跟练',
+  icon: ROUTINE_ICONS[program.id],
+})))
+
+/** First tier: training modes. The first entry is the primary product entry. */
+export const TRAINING_MODES: readonly ModeHubEntry[] = Object.freeze([PRIMARY_TRAINING_MODE, ...ROUTINE_MODES])
 
 /** Second tier: tools and records. "使用说明" is local help, so the Home page adds it next to these. */
 export const TOOL_ENTRIES: readonly ModeHubEntry[] = Object.freeze([

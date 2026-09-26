@@ -134,18 +134,25 @@ test.describe('8G Mode Hub and smart-training entry', () => {
     }
   })
 
-  test('E: 八段锦, 太极拳 and 动作工坊 are visibly coming soon and lead nowhere', async ({ page }) => {
+  test('E: the four routines lead to their entry pages while 动作工坊 stays coming soon and leads nowhere', async ({ page }) => {
     await page.goto('/')
-    for (const testId of ['mode-card-baduanjin', 'mode-card-taichi', 'tool-card-motion-workshop']) {
-      const card = page.getByTestId(testId)
-      await expect(card, testId).toContainText('即将整合')
-      await expect(card.getByRole('link'), testId).toHaveCount(0)
-      await expect(card.getByRole('button'), testId).toHaveCount(0)
+    for (const [id, title] of [['baduanjin', '八段锦'], ['taijiquan', '太极拳'], ['wuqinxi', '五禽戏'], ['yijinjing', '易筋经']]) {
+      const card = page.getByTestId(`mode-card-${id}`)
+      await expect(card, id).toContainText('可使用')
+      await expect(card, id).toHaveAttribute('href', `/routines/${id}`)
+      await expect(card, id).not.toContainText('即将整合')
       await card.click()
-      await expect(page).toHaveURL(/\/$/)
-      await expect(page.getByTestId('mode-card-smart-training')).toContainText('可使用')
+      await expect(page).toHaveURL(new RegExp(`/routines/${id}$`))
+      await expect(page.getByRole('heading', { level: 1, name: title })).toBeVisible()
+      await page.goto('/')
     }
-    await expect(page.getByRole('link', { name: /八段锦|太极拳|动作工坊/ })).toHaveCount(0)
+    const workshop = page.getByTestId('tool-card-motion-workshop')
+    await expect(workshop).toContainText('即将整合')
+    await expect(workshop.getByRole('link')).toHaveCount(0)
+    await expect(workshop.getByRole('button')).toHaveCount(0)
+    await workshop.click()
+    await expect(page).toHaveURL(/\/$/)
+    await expect(page.getByRole('link', { name: /动作工坊/ })).toHaveCount(0)
   })
 
   test('F: Home → 训练记录 opens History, and every page can get back Home', async ({ page }) => {
