@@ -18,29 +18,15 @@ import {
   formatDuration, formatShortDate, freeTrainingProgressText, freeTrainingSummary, freeTrainingUnscoredText, issueTrendText, ratioText,
   scoreTrendText,
 } from './reportPresentation'
+import { HeroFact, SectionHeading } from './reportShell'
+import { RoutineReportView } from './RoutineReportView'
+import { useRoutineReport } from './useRoutineReport'
 import { useTrainingReportAnalysis } from './useTrainingReportAnalysis'
 
 function sessionDuration(session: TrainingSessionState): number | null {
   if (typeof session.totalDurationMs === 'number' && Number.isFinite(session.totalDurationMs)) return Math.max(0, session.totalDurationMs)
   if (typeof session.endedAt === 'number' && Number.isFinite(session.endedAt)) return Math.max(0, session.endedAt - session.startedAt)
   return null
-}
-
-function SectionHeading({ id, icon: Icon, title, description }: {
-  id: string
-  icon: typeof Activity
-  title: string
-  description?: string
-}) {
-  return (
-    <div className="flex items-start gap-3">
-      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700" aria-hidden="true"><Icon size={18} /></span>
-      <div>
-        <h2 id={id} className="text-balance text-xl font-bold text-slate-950 sm:text-2xl">{title}</h2>
-        {description ? <p className="mt-1 max-w-3xl text-pretty text-sm leading-6 text-slate-600">{description}</p> : null}
-      </div>
-    </div>
-  )
 }
 
 function comparisonText(analysis: TrainingAnalysis): string {
@@ -91,15 +77,6 @@ export function ReportHero({ analysis, session }: { analysis: TrainingAnalysis; 
         </dl>
       </div>
     </section>
-  )
-}
-
-function HeroFact({ icon: Icon, label, value }: { icon: typeof Target; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-3 border-b border-white/10 px-6 py-5 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 lg:border-b lg:border-r-0">
-      <Icon size={18} className="shrink-0 text-blue-300" aria-hidden="true" />
-      <div className="min-w-0"><dt className="text-xs font-medium text-slate-400">{label}</dt><dd className="mt-1 text-sm font-semibold tabular-nums text-white">{value}</dd></div>
-    </div>
   )
 }
 
@@ -477,9 +454,12 @@ export function ReportReadError() {
   return <RecoveryLayout title="暂时无法读取训练报告" description="本地训练记录读取失败，请稍后重试。已有训练不会因此被重新计算。" testId="report-read-error" />
 }
 
+/** One report route for every mode: a follow-along routine record opens its routine report, anything else Smart Training's. */
 export function TrainingReportPage({ sessionId }: { sessionId: string }) {
+  const routine = useRoutineReport(sessionId)
   const state = useTrainingReportAnalysis(sessionId)
-  if (state.status === 'not_found') return <ReportNotFound />
+  if (routine.status === 'ready') return <RoutineReportView report={routine.report} />
+  if (state.status === 'not_found') return routine.status === 'error' ? <ReportReadError /> : <ReportNotFound />
   if (state.status === 'error') return <ReportReadError />
   return <TrainingReportView analysis={state.analysis} session={state.session} />
 }
