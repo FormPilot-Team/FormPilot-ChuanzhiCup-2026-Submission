@@ -7,9 +7,38 @@ export const SMART_TRAINING_PATH = '/smart-training'
 /** The one training page. Without `exercise` it runs the standard six-step course. */
 export const TRAINING_PATH = '/train'
 export const HISTORY_PATH = '/history'
+/** Follow-along routines (八段锦, 太极拳, 五禽戏, 易筋经): index, one entry page per routine, and its training page. */
+export const ROUTINES_PATH = '/routines'
 
 export function reportPath(sessionId: string): string {
   return `/report/${encodeURIComponent(sessionId)}`
+}
+
+export function routinePath(routineId: string): string {
+  return `${ROUTINES_PATH}/${encodeURIComponent(routineId)}`
+}
+
+/** A routine's training page: the whole routine, or one numbered form (`?form=<chapterId>`). */
+export function routineTrainingPath(routineId: string, chapterId?: string): string {
+  return `${routinePath(routineId)}/train${chapterId ? `?form=${encodeURIComponent(chapterId)}` : ''}`
+}
+
+export type RoutineRoute =
+  | { kind: 'index' }
+  | { kind: 'entry'; routineId: string }
+  | { kind: 'train'; routineId: string }
+
+export function parseRoutineRoute(pathname: string): RoutineRoute | undefined {
+  if (pathname === ROUTINES_PATH || pathname === `${ROUTINES_PATH}/`) return { kind: 'index' }
+  const match = /^\/routines\/([^/]+)(\/train)?\/?$/.exec(pathname)
+  if (!match) return undefined
+  let routineId: string
+  try {
+    routineId = decodeURIComponent(match[1])
+  } catch {
+    return undefined
+  }
+  return match[2] ? { kind: 'train', routineId } : { kind: 'entry', routineId }
 }
 
 /** Product free-training entry. Never carries `fast`, which stays a DEV-only test switch. */

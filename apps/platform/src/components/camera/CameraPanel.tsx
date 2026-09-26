@@ -23,22 +23,26 @@ interface CameraPanelProps {
   gestureHolding?: boolean
   outOfFrameMessage: string
   showPoseOverlay?: boolean
+  /** `compact` sizes the stage to the camera's 16:9 picture for layouts where the camera is not the main stage. */
+  variant?: 'default' | 'compact'
   onStart: () => void
 }
 
-export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMessage, errorKind, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, onStart }: CameraPanelProps) {
+export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMessage, errorKind, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, variant = 'default', onStart }: CameraPanelProps) {
+  const compact = variant === 'compact'
+  const promptText = compact ? 'text-base' : 'text-lg sm:text-xl'
   const status = mode === 'demo' ? '演示模式' : mode === 'live' ? '摄像头已连接 · AI 实时分析中' : mode === 'requesting_permission' ? '等待摄像头授权' : mode === 'model_loading' ? '正在加载识别模型' : mode === 'error' ? '连接异常' : '等待连接摄像头'
   const blocking = ['idle', 'error', 'requesting_permission', 'model_loading'].includes(mode)
   const loading = mode === 'requesting_permission' || mode === 'model_loading'
   const title = mode === 'requesting_permission' ? '正在等待摄像头授权…' : mode === 'model_loading' ? '正在加载姿态识别模型…' : mode === 'error' ? '暂时无法开始识别' : '准备开始实时动作检测'
   return (
-    <section className="panel flex min-h-0 min-w-0 flex-col p-3" aria-labelledby="camera-title" data-testid="camera-panel">
-      <div className="flex h-12 items-center gap-2 px-2">
+    <section className="panel flex min-h-0 min-w-0 flex-col p-3" aria-labelledby="camera-title" data-testid="camera-panel" data-variant={variant}>
+      <div className={compact ? 'flex h-10 items-center gap-2 px-1 pb-1' : 'flex h-12 items-center gap-2 px-2'}>
         <span className="grid size-8 place-items-center rounded-xl bg-blue-50 text-blue-600"><ScanLine size={19} /></span>
         <h2 id="camera-title" className="font-bold text-slate-900">实时动作检测</h2>
         <span className="ml-auto hidden items-center gap-1.5 text-xs text-slate-500 sm:inline-flex"><i className={mode === 'live' || mode === 'demo' ? 'size-2 rounded-full bg-emerald-400' : mode === 'error' ? 'size-2 rounded-full bg-coral-500' : loading ? 'size-2 rounded-full bg-amber-400' : 'size-2 rounded-full bg-slate-300'} />{status}</span>
       </div>
-      <div className="camera-stage relative min-h-[380px] flex-1 overflow-hidden rounded-2xl bg-slate-100">
+      <div className={compact ? 'relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-100' : 'camera-stage relative min-h-[380px] flex-1 overflow-hidden rounded-2xl bg-slate-100'}>
         {mode === 'demo' ? (
           demoFrameSrc ? (
             <img ref={demoImageRef} src={demoFrameSrc} alt={demoAsset.alt} className={demoAsset.fit === 'contain' ? 'size-full object-contain object-center' : 'size-full object-cover object-center'} data-demo-source="real-image-sequence" />
@@ -54,13 +58,13 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMes
         <PoseOverlay ref={overlayRef} visible={showPoseOverlay} />
         {mode === 'live' || mode === 'demo' ? <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-xl bg-slate-900/65 px-3 py-2 text-xs font-medium text-white"><ScanLine size={15} />AI 识别中</span> : null}
         {preparationMessage && (mode === 'demo' || mode === 'live') ? (
-          <div className="absolute inset-x-4 top-16 rounded-xl bg-white/95 px-4 py-3 text-center text-pretty text-lg font-bold text-blue-700 shadow-sm sm:text-xl" role="status" data-testid="preparation-state">
+          <div className={`absolute inset-x-4 ${compact ? 'top-12' : 'top-16'} rounded-xl bg-white/95 px-4 py-3 text-center text-pretty ${promptText} font-bold text-blue-700 shadow-sm`} role="status" data-testid="preparation-state">
             {preparationMessage}
           </div>
         ) : null}
         {gesturePrompt && (mode === 'demo' || mode === 'live') ? (
-          <div className="absolute inset-x-4 top-16 rounded-xl bg-white/95 px-4 py-3 text-center shadow-sm" role="status" data-testid="gesture-control">
-            <p className="text-pretty text-lg font-bold text-blue-700 sm:text-xl">{gesturePrompt}</p>
+          <div className={`absolute inset-x-4 ${compact ? 'top-12' : 'top-16'} rounded-xl bg-white/95 px-4 py-3 text-center shadow-sm`} role="status" data-testid="gesture-control">
+            <p className={`text-pretty ${promptText} font-bold text-blue-700`}>{gesturePrompt}</p>
             {gestureHolding ? (
               <div className="mt-2 flex items-center gap-3 text-sm font-semibold text-blue-600" data-testid="gesture-hold-progress">
                 <progress className="h-2 flex-1 accent-blue-600" max={1} value={gestureProgress} aria-label="手势保持进度" />
@@ -86,7 +90,7 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMes
           </div>
         ) : null}
         {errors.some((item) => item.code === 'BODY_OUT_OF_FRAME' || item.code === 'POSE_LOW_CONFIDENCE') ? (
-          <div className="absolute inset-x-4 bottom-4 rounded-xl bg-white/95 px-4 py-3 text-center text-lg font-bold text-coral-600 shadow-sm sm:text-xl">{outOfFrameMessage}</div>
+          <div className={`absolute inset-x-4 bottom-4 rounded-xl bg-white/95 px-4 py-3 text-center ${promptText} font-bold text-coral-600 shadow-sm`}>{outOfFrameMessage}</div>
         ) : null}
       </div>
     </section>

@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react'
 import { HomePage } from '../pages/Home/HomePage'
 import { SmartTrainingPage } from '../pages/SmartTraining/SmartTrainingPage'
 import { TrainingPage } from '../pages/Training/TrainingPage'
-import { HISTORY_PATH, SMART_TRAINING_PATH, isTrainingRoute } from './routes'
+import { HISTORY_PATH, SMART_TRAINING_PATH, isTrainingRoute, parseRoutineRoute } from './routes'
 
 const TrainingReportPage = lazy(async () => {
   const module = await import('../pages/Report/TrainingReportPage')
@@ -12,6 +12,11 @@ const TrainingReportPage = lazy(async () => {
 const TrainingHistoryPage = lazy(async () => {
   const module = await import('../pages/History/TrainingHistoryPage')
   return { default: module.TrainingHistoryPage }
+})
+
+const RoutineRoutePage = lazy(async () => {
+  const module = await import('../pages/Routines/RoutineRoutePage')
+  return { default: module.RoutineRoutePage }
 })
 
 export default function App() {
@@ -31,6 +36,16 @@ export default function App() {
     return (
       <Suspense fallback={<div className="grid min-h-dvh place-items-center bg-[#f5f7fa] px-4 text-sm font-semibold text-slate-600" role="status">正在读取训练记录…</div>}>
         <TrainingHistoryPage />
+      </Suspense>
+    )
+  }
+
+  const routineRoute = parseRoutineRoute(pathname)
+  if (routineRoute) {
+    document.title = 'FormPilot · 功法跟练'
+    return (
+      <Suspense fallback={<div className="grid min-h-dvh place-items-center bg-[#f6f9fc] px-4 text-sm font-semibold text-slate-600" role="status">正在打开功法跟练…</div>}>
+        <RoutineRoutePage route={routineRoute} />
       </Suspense>
     )
   }
