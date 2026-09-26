@@ -2,7 +2,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { MODE_STATUS_LABEL, ROUTINE_MODES, TRAINING_MODES, WARM_UP_MODE, WORKSHOP_ENTRY, modeEntryRoute } from '../src/app/modeCatalog'
-import { HISTORY_PATH, SMART_TRAINING_PATH, START_TRAINING_PATH } from '../src/app/routes'
+import { HISTORY_PATH, SMART_TRAINING_PATH, START_TRAINING_PATH, WORKSHOP_PATH } from '../src/app/routes'
 import { buildHomeTrainingSummary, startOfLocalWeek, weekChangeText } from '../src/features/history/homeSummary'
 import { mergeHistoryEntries } from '../src/features/history/historyEntries'
 import { buildTrainingHistoryItems } from '../src/features/history/TrainingHistory'
@@ -71,12 +71,12 @@ describe('training mode catalog', () => {
     expect(MODE_STATUS_LABEL).toEqual({ available: '可使用', coming_soon: '即将开放' })
   })
 
-  it('never gives a coming-soon entry a route', () => {
+  it('links available entries and never gives a coming-soon entry a route', () => {
     expect(modeEntryRoute(WARM_UP_MODE)).toBe(SMART_TRAINING_PATH)
-    expect(WORKSHOP_ENTRY.status).toBe('coming_soon')
-    expect(WORKSHOP_ENTRY.route).toBeUndefined()
-    // Even a route typed in by mistake does not make a coming-soon card clickable.
-    expect(modeEntryRoute({ ...WORKSHOP_ENTRY, route: '/somewhere' })).toBeUndefined()
+    expect(WORKSHOP_ENTRY).toMatchObject({ status: 'available', route: WORKSHOP_PATH, cta: '进入动作工坊' })
+    expect(modeEntryRoute(WORKSHOP_ENTRY)).toBe(WORKSHOP_PATH)
+    // A coming-soon entry stays static even with a route typed in by mistake.
+    expect(modeEntryRoute({ ...WORKSHOP_ENTRY, status: 'coming_soon' })).toBeUndefined()
   })
 
   it('keeps product language: no smart-training or 功法跟练 names, no developer wording', () => {
@@ -121,14 +121,14 @@ describe('Home', () => {
     expect(section.match(/md:col-span-3/g)).toHaveLength(2)
   })
 
-  it('shows 动作工坊 as its own section, coming soon without any link or button', () => {
+  it('shows 动作工坊 as its own product section with its flow and one way in', () => {
     const workshop = card(home(), 'home-workshop')
     expect(workshop).toContain('动作工坊')
-    expect(workshop).toContain('即将开放')
+    expect(workshop).not.toContain('即将开放')
     for (const step of ['创建动作', '设置识别要求', '测试', '保存', '开始训练']) expect(workshop).toContain(step)
-    expect(workshop).not.toContain('href=')
-    expect(workshop).not.toContain('<button')
-    expect(workshop).not.toContain('tabindex')
+    expect(workshop.match(/href="/g)).toHaveLength(1)
+    expect(workshop).toContain(`href="${WORKSHOP_PATH}"`)
+    expect(workshop).toContain('进入动作工坊')
   })
 
   it('keeps 使用说明 as a small utility button next to the hero', () => {
@@ -187,6 +187,10 @@ describe('Home', () => {
     expect(nav).toContain('开始训练')
     expect(nav).toContain(`href="${HISTORY_PATH}"`)
     expect(nav).toContain('我的训练')
+    expect(nav).toContain(`href="${WORKSHOP_PATH}"`)
+    expect(nav).toContain('动作工坊')
+    expect(nav.indexOf('开始训练')).toBeLessThan(nav.indexOf('动作工坊'))
+    expect(nav.indexOf('动作工坊')).toBeLessThan(nav.indexOf('我的训练'))
     expect(nav).not.toMatch(/智能训练|功法跟练|训练记录/)
   })
 })

@@ -2,7 +2,7 @@ import { BookOpen, Flame, Leaf, type LucideIcon, Mountain, Orbit, PawPrint, Wand
 import { ROUTINE_PROGRAMS } from '../features/routines/programs'
 import { formatClock, formCount } from '../features/routines/scope'
 import type { RoutineId } from '../features/routines/types'
-import { SMART_TRAINING_PATH, routinePath } from './routes'
+import { SMART_TRAINING_PATH, WORKSHOP_PATH, routinePath } from './routes'
 
 export type ModeStatus = 'available' | 'coming_soon'
 
@@ -84,7 +84,9 @@ export const WORKSHOP_ENTRY: ModeHubEntry = Object.freeze({
   id: 'motion-workshop',
   title: '动作工坊',
   description: '教 FormPilot 学会你的动作：设置识别要求、测试并保存，之后就能直接训练。',
-  status: 'coming_soon',
+  status: 'available',
+  route: WORKSHOP_PATH,
+  cta: '进入动作工坊',
   icon: WandSparkles,
   motif: 'pulse',
   accent: 'brand',

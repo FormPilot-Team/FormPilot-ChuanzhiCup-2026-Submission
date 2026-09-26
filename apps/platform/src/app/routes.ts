@@ -44,6 +44,38 @@ export function parseRoutineRoute(pathname: string): RoutineRoute | undefined {
   return match[2] ? { kind: 'train', routineId } : { kind: 'entry', routineId }
 }
 
+/** 动作工坊: the user's own actions (list), creating one, editing one, and training one. */
+export const WORKSHOP_PATH = '/workshop'
+export const WORKSHOP_NEW_PATH = `${WORKSHOP_PATH}/new`
+
+export function workshopActionPath(actionId: string): string {
+  return `${WORKSHOP_PATH}/${encodeURIComponent(actionId)}`
+}
+
+export function customTrainingPath(actionId: string): string {
+  return `${workshopActionPath(actionId)}/train`
+}
+
+export type WorkshopRoute =
+  | { kind: 'home' }
+  | { kind: 'new' }
+  | { kind: 'edit'; actionId: string }
+  | { kind: 'train'; actionId: string }
+
+export function parseWorkshopRoute(pathname: string): WorkshopRoute | undefined {
+  if (pathname === WORKSHOP_PATH || pathname === `${WORKSHOP_PATH}/`) return { kind: 'home' }
+  if (pathname === WORKSHOP_NEW_PATH || pathname === `${WORKSHOP_NEW_PATH}/`) return { kind: 'new' }
+  const match = /^\/workshop\/([^/]+)(\/train)?\/?$/.exec(pathname)
+  if (!match) return undefined
+  let actionId: string
+  try {
+    actionId = decodeURIComponent(match[1])
+  } catch {
+    return undefined
+  }
+  return match[2] ? { kind: 'train', actionId } : { kind: 'edit', actionId }
+}
+
 /** Product free-training entry. Never carries `fast`, which stays a DEV-only test switch. */
 export function freeTrainingPath(exerciseId: ExerciseId): string {
   return `${TRAINING_PATH}?exercise=${encodeURIComponent(exerciseId)}`

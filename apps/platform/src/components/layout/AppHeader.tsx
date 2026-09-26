@@ -1,18 +1,21 @@
-import { Bot, ChartLine, Dumbbell, House, type LucideIcon } from 'lucide-react'
-import { HISTORY_PATH, HOME_PATH, SMART_TRAINING_PATH, START_TRAINING_PATH, isTrainingRoute, parseRoutineRoute } from '../../app/routes'
+import { Bot, ChartLine, Dumbbell, House, type LucideIcon, WandSparkles } from 'lucide-react'
+import { HISTORY_PATH, HOME_PATH, SMART_TRAINING_PATH, START_TRAINING_PATH, WORKSHOP_PATH, isTrainingRoute, parseRoutineRoute, parseWorkshopRoute } from '../../app/routes'
 import { cn } from '../../lib/cn'
 
-type NavKey = 'home' | 'training' | 'history'
+type NavKey = 'home' | 'training' | 'workshop' | 'history'
 
-/** Product language: 开始训练 leads to Home's training section (no extra page), 我的训练 to History. */
+/** Product language: 开始训练 leads to Home's training section (no extra page), 动作工坊 to /workshop, 我的训练 to History. */
 const NAV_ITEMS: ReadonlyArray<{ key: NavKey; href: string; label: string; icon: LucideIcon }> = [
   { key: 'home', href: HOME_PATH, label: '首页', icon: House },
   { key: 'training', href: START_TRAINING_PATH, label: '开始训练', icon: Dumbbell },
+  { key: 'workshop', href: WORKSHOP_PATH, label: '动作工坊', icon: WandSparkles },
   { key: 'history', href: HISTORY_PATH, label: '我的训练', icon: ChartLine },
 ]
 
 function activeNav(pathname: string, search: string): NavKey | undefined {
   if (pathname === SMART_TRAINING_PATH || isTrainingRoute(pathname, search) || parseRoutineRoute(pathname)) return 'training'
+  const workshop = parseWorkshopRoute(pathname)
+  if (workshop) return workshop.kind === 'train' ? 'training' : 'workshop'
   if (pathname === HISTORY_PATH || pathname.startsWith('/report/')) return 'history'
   return pathname === HOME_PATH ? 'home' : undefined
 }
