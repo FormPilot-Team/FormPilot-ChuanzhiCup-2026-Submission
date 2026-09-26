@@ -16,7 +16,7 @@ test('formal Home opens Training and Report navigation closes the user loop', as
   await page.goto('/')
   await expect(page).toHaveTitle('FormPilot')
   await expect(page.getByRole('heading', { name: 'FormPilot', level: 1 })).toBeVisible()
-  await page.getByRole('link', { name: /进入训练/ }).click()
+  await page.getByRole('link', { name: '开始训练 · 热身训练' }).click()
   await expect(page).toHaveURL(/\/smart-training$/)
   const courseOrder = page.getByRole('list', { name: '完整训练动作顺序' })
   for (const name of ['肩部环绕', '双臂上举', '侧平举', '侧步开合', '徒手深蹲', '交替提膝']) {

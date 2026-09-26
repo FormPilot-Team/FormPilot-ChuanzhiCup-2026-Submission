@@ -1,8 +1,12 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { MODE_STATUS_LABEL, TOOL_ENTRIES, TRAINING_MODES, modeEntryRoute, type ModeHubEntry } from '../src/app/modeCatalog'
-import { HISTORY_PATH, SMART_TRAINING_PATH } from '../src/app/routes'
+import { MODE_STATUS_LABEL, ROUTINE_MODES, TRAINING_MODES, WARM_UP_MODE, WORKSHOP_ENTRY, modeEntryRoute } from '../src/app/modeCatalog'
+import { HISTORY_PATH, SMART_TRAINING_PATH, START_TRAINING_PATH } from '../src/app/routes'
+import { buildHomeTrainingSummary, startOfLocalWeek, weekChangeText } from '../src/features/history/homeSummary'
+import { mergeHistoryEntries } from '../src/features/history/historyEntries'
+import { buildTrainingHistoryItems } from '../src/features/history/TrainingHistory'
+import { buildRoutineHistoryItems } from '../src/features/history/routineHistory'
 import type { TrainingSessionRepository } from '../src/features/training/TrainingSessionRepository'
 import type { TrainingSessionState } from '../src/features/training/types'
 import { HomePage } from '../src/pages/Home/HomePage'
@@ -14,138 +18,159 @@ function repository(sessions: TrainingSessionState[]): TrainingSessionRepository
   return { save: () => true, get: (id) => sessions.find((item) => item.id === id), list: () => sessions }
 }
 
-function home(sessions: TrainingSessionState[] = []): string {
-  return renderToStaticMarkup(createElement(HomePage, { repository: repository(sessions) }))
+function home(sessions: TrainingSessionState[] = [], now = at(60)): string {
+  return renderToStaticMarkup(createElement(HomePage, { repository: repository(sessions), now }))
 }
 
-/** The markup of one card, from its data-testid to the end of its element. */
+/** The markup of one element, from its data-testid to the end of its element. */
 function card(html: string, testId: string): string {
   const start = html.indexOf(`data-testid="${testId}"`)
   expect(start, testId).toBeGreaterThan(-1)
   const open = html.lastIndexOf('<', start)
   const tag = html.slice(open + 1, html.indexOf(' ', open))
-  const close = html.indexOf(`</${tag}>`, start)
-  return html.slice(open, close + tag.length + 3)
+  // Count nested elements of the same tag so a section containing sections is cut at its own end.
+  let depth = 0
+  let index = open
+  const pattern = new RegExp(`<(/?)${tag}[\\s>]`, 'g')
+  pattern.lastIndex = open
+  for (let match = pattern.exec(html); match; match = pattern.exec(html)) {
+    depth += match[1] ? -1 : 1
+    index = match.index
+    if (depth === 0) break
+  }
+  return html.slice(open, index + tag.length + 3)
+}
+
+function mainContent(html: string): string {
+  return html.slice(html.indexOf('<main'), html.indexOf('</main>'))
 }
 
 const COURSE_EXERCISE_NAMES = ['肩部环绕', '双臂上举', '侧平举', '侧步开合', '徒手深蹲', '交替提膝']
 
-describe('Mode Hub catalog', () => {
-  it('lists smart training first, then the four integrated follow-along routines, all available', () => {
+describe('training mode catalog', () => {
+  it('lists five official modes on one level: 热身训练 first, then the four follow-along courses', () => {
     expect(TRAINING_MODES.map((item) => [item.id, item.title, item.status])).toEqual([
-      ['smart-training', '智能训练', 'available'],
+      ['smart-training', '热身训练', 'available'],
       ['baduanjin', '八段锦', 'available'],
       ['taijiquan', '太极拳', 'available'],
       ['wuqinxi', '五禽戏', 'available'],
       ['yijinjing', '易筋经', 'available'],
     ])
-    expect(TRAINING_MODES.filter((item) => item.id !== 'smart-training').map((item) => item.route)).toEqual([
-      '/routines/baduanjin', '/routines/taijiquan', '/routines/wuqinxi', '/routines/yijinjing',
+    expect(TRAINING_MODES.map((item) => item.route)).toEqual([
+      SMART_TRAINING_PATH, '/routines/baduanjin', '/routines/taijiquan', '/routines/wuqinxi', '/routines/yijinjing',
     ])
-    expect(TOOL_ENTRIES.map((item) => [item.id, item.title, item.status])).toEqual([
-      ['motion-workshop', '动作工坊', 'coming_soon'],
-      ['history', '训练记录', 'available'],
-    ])
-    expect(MODE_STATUS_LABEL).toEqual({ available: '可使用', coming_soon: '即将整合' })
-  })
-
-  it('links available entries to real routes and never gives a coming-soon entry a route', () => {
-    const all = [...TRAINING_MODES, ...TOOL_ENTRIES]
-    expect(modeEntryRoute(all.find((item) => item.id === 'smart-training') as ModeHubEntry)).toBe(SMART_TRAINING_PATH)
-    expect(modeEntryRoute(all.find((item) => item.id === 'history') as ModeHubEntry)).toBe(HISTORY_PATH)
-    for (const entry of all.filter((item) => item.status === 'coming_soon')) {
-      expect(entry.route, entry.id).toBeUndefined()
-      // Even a route typed in by mistake does not make a coming-soon card clickable.
-      expect(modeEntryRoute({ ...entry, route: '/somewhere' }), entry.id).toBeUndefined()
+    // Light emphasis only: the warm-up is the one recommended mode, and every mode carries the same kind of data.
+    expect(TRAINING_MODES.filter((item) => item.badge).map((item) => item.id)).toEqual(['smart-training'])
+    for (const mode of TRAINING_MODES) {
+      expect(mode.meta, mode.id).toBeTruthy()
+      expect(mode.cta, mode.id).toBeTruthy()
+      expect(mode.motif, mode.id).toBeTruthy()
     }
+    expect(new Set(TRAINING_MODES.map((item) => item.motif)).size).toBe(5)
+    expect(ROUTINE_MODES.map((item) => item.meta)).toEqual(['全套 12:08 · 8 式', '全套 5:40 · 24 式', '全套 13:42 · 10 动', '全套 12:45 · 12 势'])
+    expect(MODE_STATUS_LABEL).toEqual({ available: '可使用', coming_soon: '即将开放' })
   })
 
-  it('describes the primary mode by its capabilities and keeps developer wording out of the workshop', () => {
-    expect(TRAINING_MODES[0].cta).toBe('进入训练')
-    expect(TRAINING_MODES[0].highlights).toEqual(['实时姿态识别', 'AI 纠错', '语音指导', '训练报告'])
-    const copy = [...TRAINING_MODES, ...TOOL_ENTRIES].map((item) => `${item.title}${item.description}`).join('\n')
-    expect(copy).not.toMatch(/工作台|JSON|参数|开发|编辑器/)
+  it('never gives a coming-soon entry a route', () => {
+    expect(modeEntryRoute(WARM_UP_MODE)).toBe(SMART_TRAINING_PATH)
+    expect(WORKSHOP_ENTRY.status).toBe('coming_soon')
+    expect(WORKSHOP_ENTRY.route).toBeUndefined()
+    // Even a route typed in by mistake does not make a coming-soon card clickable.
+    expect(modeEntryRoute({ ...WORKSHOP_ENTRY, route: '/somewhere' })).toBeUndefined()
+  })
+
+  it('keeps product language: no smart-training or 功法跟练 names, no developer wording', () => {
+    const copy = [...TRAINING_MODES, WORKSHOP_ENTRY].map((item) => `${item.title}${item.description}${item.meta ?? ''}${item.cta ?? ''}`).join('\n')
+    expect(copy).not.toMatch(/智能训练|功法跟练|工作台|JSON|参数|开发|编辑器/)
   })
 })
 
-describe('Home Mode Hub', () => {
-  it('answers what to do today with the modes first and the six exercises out of the first level', () => {
+describe('Home', () => {
+  it('opens with a compact FormPilot hero and the coach welcome, not the pose-skeleton illustration', () => {
     const html = home()
     expect(html).toContain('<h1')
     expect(html).toContain('FormPilot')
-    expect(html).toContain('实时动作识别与智能训练指导')
-    expect(html).toContain('今天想用 FormPilot 做什么？')
+    const hero = card(html, 'home-hero')
+    expect(hero).toContain('/assets/coach/coach-welcome.webp')
+    expect(hero).toContain('今天想练什么？我会陪你完成训练。')
+    // The old pixel-skeleton card art is gone from the page itself (the first-run guide keeps its own diagrams).
+    expect(mainContent(html)).not.toMatch(/示意图|<circle cx="120" cy="36"/)
+    expect(html).not.toMatch(/智能训练|功法跟练|工具与记录|最近训练/)
     for (const name of COURSE_EXERCISE_NAMES) expect(html, name).not.toContain(name)
-    expect(html).not.toContain('六动作课程概览')
-    expect(html.indexOf('智能训练')).toBeLessThan(html.indexOf('八段锦'))
-    expect(html.indexOf('太极拳')).toBeLessThan(html.indexOf('工具与记录'))
-    expect(html.indexOf('工具与记录')).toBeLessThan(html.indexOf('最近训练'))
   })
 
-  it('enters smart training through its card', () => {
-    const smart = card(home(), 'mode-card-smart-training')
-    expect(smart).toContain(`href="${SMART_TRAINING_PATH}"`)
-    expect(smart).toContain('进入训练')
-    expect(smart).toContain('可使用')
-  })
-
-  it('links each routine card to its entry page and keeps 动作工坊 coming soon without any link or button', () => {
+  it('puts the five modes in one 开始训练 grid as same-size cards, warm-up first', () => {
     const html = home()
-    for (const id of ['baduanjin', 'taijiquan', 'wuqinxi', 'yijinjing']) {
-      const markup = card(html, `mode-card-${id}`)
-      expect(markup, id).toContain(`href="/routines/${id}"`)
-      expect(markup, id).toContain('可使用')
-      expect(markup, id).toContain('开始跟练')
-      expect(markup, id).not.toContain('即将整合')
+    const section = card(html, 'home-start-training')
+    expect(section).toContain('id="start-training"')
+    expect(section).toContain('开始训练')
+    const positions = TRAINING_MODES.map((mode) => section.indexOf(`data-testid="mode-card-${mode.id}"`))
+    expect(positions.every((position) => position > -1)).toBe(true)
+    expect([...positions].sort((left, right) => left - right)).toEqual(positions)
+    for (const mode of TRAINING_MODES) {
+      const markup = card(section, `mode-card-${mode.id}`)
+      expect(markup.startsWith('<a '), mode.id).toBe(true)
+      expect(markup, mode.id).toContain(`href="${mode.route}"`)
+      expect(markup, mode.id).toContain(`aria-label="${mode.cta} · ${mode.title}"`)
+      expect(markup, mode.id).not.toContain('即将开放')
     }
-    expect(html).toContain('功法跟练')
-    expect(html.indexOf('mode-card-smart-training')).toBeLessThan(html.indexOf('mode-card-baduanjin'))
-    const workshop = card(html, 'tool-card-motion-workshop')
-    expect(workshop).toContain('即将整合')
-    expect(workshop).not.toContain('可使用')
+    expect(card(section, 'mode-card-smart-training')).toContain('推荐')
+    expect(section.match(/推荐/g)).toHaveLength(2) // one badge per layout (phone row, card top)
+    // 3 + 2 on wide screens: the first three span two of six columns, the last two span three.
+    expect(section.match(/md:col-span-2/g)).toHaveLength(3)
+    expect(section.match(/md:col-span-3/g)).toHaveLength(2)
+  })
+
+  it('shows 动作工坊 as its own section, coming soon without any link or button', () => {
+    const workshop = card(home(), 'home-workshop')
+    expect(workshop).toContain('动作工坊')
+    expect(workshop).toContain('即将开放')
+    for (const step of ['创建动作', '设置识别要求', '测试', '保存', '开始训练']) expect(workshop).toContain(step)
     expect(workshop).not.toContain('href=')
     expect(workshop).not.toContain('<button')
     expect(workshop).not.toContain('tabindex')
   })
 
-  it('keeps 训练记录 and 使用说明 available as smaller tool cards', () => {
-    const html = home()
-    expect(card(html, 'tool-card-history')).toContain(`href="${HISTORY_PATH}"`)
-    const guide = card(html, 'tool-card-guide')
-    expect(guide).toContain('<button')
+  it('keeps 使用说明 as a small utility button next to the hero', () => {
+    const guide = card(card(home(), 'home-hero'), 'home-guide')
+    expect(guide.startsWith('<button')).toBe(true)
     expect(guide).toContain('使用说明')
   })
 
-  it('shows the empty recent-training state with a way into History', () => {
-    const recent = card(home(), 'home-training-history')
-    expect(recent).toContain('最近训练')
-    expect(recent).toContain('还没有训练记录')
-    expect(recent).toContain(`href="${HISTORY_PATH}"`)
+  it('merges 训练记录 and 最近训练 into one 我的训练 summary with a single way into History', () => {
+    const html = home()
+    const summary = card(html, 'home-training-history')
+    expect(summary).toContain('我的训练')
+    expect(summary).toContain('还没有训练记录')
+    expect(summary).toContain('查看训练记录')
+    expect(summary).toContain(`href="${HISTORY_PATH}"`)
+    expect(mainContent(html).match(new RegExp(`href="${HISTORY_PATH}"`, 'g'))).toHaveLength(1)
   })
 
   it('summarises the latest finished training, skipping unfinished records', () => {
-    const recent = card(home([FIRST_SESSION, { ...PARTIAL_SESSION.current, startedAt: at(20) }]), 'home-training-history')
-    expect(recent).toContain(`href="/report/${FIRST_SESSION.id}"`)
-    expect(recent).toContain('综合评分')
-    expect(recent).toContain('查看报告')
+    const summary = card(home([FIRST_SESSION, { ...PARTIAL_SESSION.current, startedAt: at(20) }]), 'home-training-history')
+    expect(summary).toContain(`href="/report/${FIRST_SESSION.id}"`)
+    expect(summary).toContain('热身训练 · 完整训练')
+    expect(summary).toContain('综合评分')
+    expect(summary).toContain('查看报告')
   })
 
-  it('summarises a latest follow-along routine next to Smart Training records', () => {
+  it('summarises a latest follow-along course next to warm-up records', () => {
     const routine = routineRecord({ id: 'routine-latest', startedAt: at(40), programId: 'yijinjing' })
-    const html = renderToStaticMarkup(createElement(HomePage, { repository: repository([FIRST_SESSION]), routineRepository: new MemoryRoutineSessionRepository([routine]) }))
-    const recent = card(html, 'home-training-history')
-    expect(recent).toContain('href="/report/routine-latest"')
-    expect(recent).toContain('易筋经 · 整套跟练')
-    expect(recent).toContain('跟练相似度 80%')
+    const html = renderToStaticMarkup(createElement(HomePage, { repository: repository([FIRST_SESSION]), routineRepository: new MemoryRoutineSessionRepository([routine]), now: at(41) }))
+    const summary = card(html, 'home-training-history')
+    expect(summary).toContain('href="/report/routine-latest"')
+    expect(summary).toContain('易筋经 · 整套跟练')
+    expect(summary).toContain('跟练相似度 80%')
   })
 
   it('labels a latest free training as free training, never as a course score', () => {
     const free = makeSession({ id: 'free-squat', startedAt: at(30), include: ['squat'], exerciseOrder: ['squat'], courseStatus: 'completed' })
-    const recent = card(home([FIRST_SESSION, free]), 'home-training-history')
-    expect(recent).toContain('href="/report/free-squat"')
-    expect(recent).toContain('自由训练 · 徒手深蹲')
-    expect(recent).toContain('已完成动作平均分')
-    expect(recent).not.toContain('综合评分')
+    const summary = card(home([FIRST_SESSION, free]), 'home-training-history')
+    expect(summary).toContain('href="/report/free-squat"')
+    expect(summary).toContain('自由训练 · 徒手深蹲')
+    expect(summary).toContain('已完成动作平均分')
+    expect(summary).not.toContain('综合评分')
   })
 
   it('opens the first-run guide when it has never been seen', () => {
@@ -153,5 +178,56 @@ describe('Home Mode Hub', () => {
     const html = home()
     expect(html).toContain('data-testid="onboarding-dialog"')
     expect(html).toContain('欢迎使用 FormPilot')
+  })
+
+  it('links the header 开始训练 to Home\'s training section and 我的训练 to History', () => {
+    const html = home()
+    const nav = html.slice(html.indexOf('aria-label="主导航"'), html.indexOf('</nav>'))
+    expect(nav).toContain(`href="${START_TRAINING_PATH}"`)
+    expect(nav).toContain('开始训练')
+    expect(nav).toContain(`href="${HISTORY_PATH}"`)
+    expect(nav).toContain('我的训练')
+    expect(nav).not.toMatch(/智能训练|功法跟练|训练记录/)
+  })
+})
+
+describe('我的训练 weekly summary', () => {
+  // A Wednesday at 10:00 local time.
+  const now = new Date(2026, 8, 23, 10, 0).getTime()
+  const entry = (id: string, startedAt: number) => makeSession({ id, startedAt })
+
+  it('counts finished trainings of the current local week, Monday first, and compares with last week', () => {
+    const sessions = [
+      entry('mon', new Date(2026, 8, 21, 8).getTime()),
+      entry('wed-a', new Date(2026, 8, 23, 7).getTime()),
+      entry('wed-b', new Date(2026, 8, 23, 9).getTime()),
+      entry('last-sun', new Date(2026, 8, 20, 21).getTime()),
+      { ...PARTIAL_SESSION.current, id: 'unfinished', startedAt: new Date(2026, 8, 22, 9).getTime() },
+    ]
+    const summary = buildHomeTrainingSummary(mergeHistoryEntries(buildTrainingHistoryItems(sessions), []), now)
+    expect(startOfLocalWeek(now).getTime()).toBe(new Date(2026, 8, 21).getTime())
+    expect(summary.weekCount).toBe(3)
+    expect(summary.previousWeekCount).toBe(1)
+    expect(summary.week.map((day) => [day.label, day.count, day.today, day.future])).toEqual([
+      ['一', 1, false, false], ['二', 0, false, false], ['三', 2, true, false], ['四', 0, false, true],
+      ['五', 0, false, true], ['六', 0, false, true], ['日', 0, false, true],
+    ])
+    expect(summary.latest).toMatchObject({ id: 'wed-b', title: '热身训练 · 完整训练' })
+    expect(weekChangeText(summary)).toBe('比上周多 2 次')
+  })
+
+  it('describes the week-over-week change without inventing one', () => {
+    expect(weekChangeText({ weekCount: 0, previousWeekCount: 0 })).toBeNull()
+    expect(weekChangeText({ weekCount: 2, previousWeekCount: 0 })).toBe('上周没有完成的训练')
+    expect(weekChangeText({ weekCount: 1, previousWeekCount: 1 })).toBe('与上周持平')
+    expect(weekChangeText({ weekCount: 1, previousWeekCount: 3 })).toBe('比上周少 2 次')
+  })
+
+  it('includes follow-along courses in the same week', () => {
+    const routine = buildRoutineHistoryItems([routineRecord({ id: 'r-tue', startedAt: new Date(2026, 8, 22, 18).getTime() })])
+    const summary = buildHomeTrainingSummary(mergeHistoryEntries([], routine), now)
+    expect(summary.weekCount).toBe(1)
+    expect(summary.week[1].count).toBe(1)
+    expect(summary.latest?.title).toBe('八段锦 · 整套跟练')
   })
 })

@@ -15,7 +15,7 @@ function RoutineTrainingRoute({ program }: { program: RoutineProgram }) {
 
 function routineDocumentTitle(route: RoutineRoute): string {
   const program = route.kind === 'index' ? undefined : findRoutineProgram(route.routineId)
-  if (!program) return 'FormPilot · 功法跟练'
+  if (!program) return 'FormPilot · 跟练课程'
   return route.kind === 'train' ? `FormPilot · ${program.title}跟练` : `FormPilot · ${program.title}`
 }
 

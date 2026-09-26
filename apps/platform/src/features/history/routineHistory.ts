@@ -1,7 +1,6 @@
 import { buildRoutineReport, type RoutineReport } from '../routines/report/routineReport'
 import type { RoutineSessionRepository } from '../routines/session/RoutineSessionRepository'
 import type { RoutineSessionRecord } from '../routines/session/types'
-import type { TrainingHistoryItem } from './TrainingHistory'
 
 export interface RoutineHistoryItem {
   record: RoutineSessionRecord
@@ -40,15 +39,5 @@ export function loadRoutineHistory(repository: RoutineSessionRepository): Routin
   }
 }
 
-/** One training history across modes, newest first. Each kind keeps its own data and report. */
-export type HistoryEntry =
-  | { kind: 'smart'; id: string; startedAt: number; incomplete: boolean; smart: TrainingHistoryItem }
-  | { kind: 'routine'; id: string; startedAt: number; incomplete: boolean; routine: RoutineHistoryItem }
-
-export function mergeHistoryEntries(smart: readonly TrainingHistoryItem[], routine: readonly RoutineHistoryItem[]): HistoryEntry[] {
-  const entries: HistoryEntry[] = [
-    ...smart.map((item) => ({ kind: 'smart' as const, id: item.session.id, startedAt: item.session.startedAt, incomplete: item.incomplete, smart: item })),
-    ...routine.map((item) => ({ kind: 'routine' as const, id: item.record.id, startedAt: item.record.startedAt, incomplete: item.incomplete, routine: item })),
-  ]
-  return entries.sort((left, right) => right.startedAt - left.startedAt || (left.id === right.id ? 0 : left.id < right.id ? 1 : -1))
-}
+/** The merged cross-mode timeline lives in historyEntries; re-exported for existing callers. */
+export { mergeHistoryEntries, type HistoryEntry } from './historyEntries'

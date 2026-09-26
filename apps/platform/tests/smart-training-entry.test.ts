@@ -64,7 +64,8 @@ describe('smart-training entry page', () => {
   it('offers the full course first, with the product copy and the standard /train entry', () => {
     const html = page()
     expect(html).toContain('<h1')
-    expect(html).toContain('智能训练')
+    expect(html).toContain('热身训练')
+    expect(html).not.toContain('智能训练')
     expect(html).toContain('完整训练')
     expect(html).toContain('依次完成 6 个动作，获得完整训练报告和历史比较。')
     expect(html).toContain(`href="${TRAINING_PATH}"`)

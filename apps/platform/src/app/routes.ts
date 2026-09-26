@@ -2,7 +2,10 @@ import type { ExerciseId } from '../features/exercises/types'
 import type { TrainingScope } from '../features/training/trainingScope'
 
 export const HOME_PATH = '/'
-/** Smart-training entry: full course or one exercise, chosen before the camera starts. */
+/** Home's "开始训练" section: the five training modes and the user's own actions. */
+export const START_TRAINING_ANCHOR = 'start-training'
+export const START_TRAINING_PATH = `${HOME_PATH}#${START_TRAINING_ANCHOR}`
+/** 热身训练 entry (internal name: smart training): full course or one exercise, chosen before the camera starts. */
 export const SMART_TRAINING_PATH = '/smart-training'
 /** The one training page. Without `exercise` it runs the standard six-step course. */
 export const TRAINING_PATH = '/train'

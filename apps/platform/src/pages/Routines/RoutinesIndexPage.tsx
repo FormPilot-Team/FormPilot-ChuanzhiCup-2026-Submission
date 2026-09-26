@@ -14,19 +14,19 @@ const HOW_IT_WORKS = [
 
 export function RoutinesIndexPage({ unknownRoutine = false }: { unknownRoutine?: boolean }) {
   return (
-    <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900">
+    <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900">
       <AppHeader />
       <main className="mx-auto min-w-0 max-w-[1200px] px-4 pb-12 pt-5 sm:px-6 lg:px-8 lg:pb-16">
         <a href={HOME_PATH} className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} aria-hidden="true" />返回首页</a>
         <header>
-          <h1 className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">功法跟练</h1>
+          <h1 className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">跟练课程</h1>
           <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">跟随标准示范视频练习八段锦、太极拳、五禽戏与易筋经，FormPilot 实时比对你的动作与节奏。</p>
         </header>
         {unknownRoutine ? (
-          <p className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900" role="status" data-testid="routine-not-found">没有找到这个功法，请从下面选择一套开始。</p>
+          <p className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900" role="status" data-testid="routine-not-found">没有找到这个课程，请从下面选择一套开始。</p>
         ) : null}
 
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2" aria-label="全部功法" data-testid="routines-index">
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2" aria-label="全部跟练课程" data-testid="routines-index">
           {ROUTINE_PROGRAMS.map((program) => {
             const accent = ROUTINE_ACCENT[program.accent]
             return (

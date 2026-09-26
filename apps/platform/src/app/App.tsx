@@ -32,9 +32,9 @@ export default function App() {
   }
 
   if (pathname === HISTORY_PATH) {
-    document.title = 'FormPilot · 训练记录'
+    document.title = 'FormPilot · 我的训练'
     return (
-      <Suspense fallback={<div className="grid min-h-dvh place-items-center bg-[#f5f7fa] px-4 text-sm font-semibold text-slate-600" role="status">正在读取训练记录…</div>}>
+      <Suspense fallback={<div className="grid min-h-dvh place-items-center bg-[#f5f7fa] px-4 text-sm font-semibold text-slate-600" role="status">正在读取我的训练…</div>}>
         <TrainingHistoryPage />
       </Suspense>
     )
@@ -42,9 +42,9 @@ export default function App() {
 
   const routineRoute = parseRoutineRoute(pathname)
   if (routineRoute) {
-    document.title = 'FormPilot · 功法跟练'
+    document.title = 'FormPilot · 跟练课程'
     return (
-      <Suspense fallback={<div className="grid min-h-dvh place-items-center bg-[#f6f9fc] px-4 text-sm font-semibold text-slate-600" role="status">正在打开功法跟练…</div>}>
+      <Suspense fallback={<div className="grid min-h-dvh place-items-center bg-[#f6f9fc] px-4 text-sm font-semibold text-slate-600" role="status">正在打开跟练课程…</div>}>
         <RoutineRoutePage route={routineRoute} />
       </Suspense>
     )
@@ -56,7 +56,7 @@ export default function App() {
   }
 
   if (pathname === SMART_TRAINING_PATH) {
-    document.title = 'FormPilot · 智能训练'
+    document.title = 'FormPilot · 热身训练'
     return <SmartTrainingPage />
   }
 

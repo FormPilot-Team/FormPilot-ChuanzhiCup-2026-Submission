@@ -21,14 +21,14 @@ export function SmartTrainingPage() {
     setGuideOpen(false)
   }
   return (
-    <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900">
+    <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900">
       <AppHeader />
       <main className="mx-auto min-w-0 max-w-[1200px] px-4 pb-12 pt-5 sm:px-6 lg:px-8 lg:pb-16">
         <a href={HOME_PATH} className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} aria-hidden="true" />返回首页</a>
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">智能训练</h1>
-            <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">实时姿态识别、AI 纠错与语音指导，训练结束后自动生成报告。</p>
+            <h1 className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">热身训练</h1>
+            <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">6 个热身动作，实时识别并纠正动作，全程语音指导，训练结束后自动生成报告。</p>
           </div>
           <button type="button" onClick={() => setGuideOpen(true)} className="secondary-button inline-flex items-center justify-center gap-2 self-start sm:self-auto">
             <Hand size={17} aria-hidden="true" />开始 / 暂停手势

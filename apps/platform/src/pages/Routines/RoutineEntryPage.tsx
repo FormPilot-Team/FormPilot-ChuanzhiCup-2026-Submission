@@ -54,14 +54,14 @@ export function RoutineEntryPage({ program, repository = localRepository }: { pr
   const forms = formCount(program)
   const extras = program.chapters.length - forms
   return (
-    <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900" data-routine={program.id}>
+    <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900" data-routine={program.id}>
       <AppHeader />
       <main className="mx-auto min-w-0 max-w-[1200px] px-4 pb-12 pt-5 sm:px-6 lg:px-8 lg:pb-16">
         <a href={HOME_PATH} className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} aria-hidden="true" />返回首页</a>
 
         <section className="panel grid min-w-0 gap-6 overflow-hidden p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,.95fr)] lg:items-center lg:gap-10 lg:p-8" aria-labelledby="routine-title" data-testid="routine-entry">
           <div className="min-w-0">
-            <p className={cn('inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold', accent.chip)}>传统功法跟练 · {program.subtitle}</p>
+            <p className={cn('inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold', accent.chip)}>跟练课程 · {program.subtitle}</p>
             <h1 id="routine-title" className="mt-4 text-balance text-3xl font-bold text-slate-950 sm:text-4xl">{program.title}</h1>
             <p className="mt-3 max-w-xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">{program.description}</p>
             <dl className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm">

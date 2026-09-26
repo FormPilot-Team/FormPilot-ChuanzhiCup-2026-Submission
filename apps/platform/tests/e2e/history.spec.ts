@@ -25,8 +25,8 @@ test('History A: zero records has a useful empty state and Home keeps the entry'
   await expect(page.getByTestId('history-empty')).toContainText('还没有训练记录')
   await page.goto('/')
   await expect(page.getByTestId('home-training-history')).toContainText('还没有训练记录')
-  await expect(page.getByRole('link', { name: '训练记录', exact: true })).toHaveAttribute('href', '/history')
-  await expect(page.getByTestId('tool-card-history')).toHaveAttribute('href', '/history')
+  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '我的训练', exact: true })).toHaveAttribute('href', '/history')
+  await expect(page.getByTestId('home-history-link')).toHaveAttribute('href', '/history')
 })
 
 test('History B: three complete courses show the list, trend, and recurring issue', async ({ page }) => {
@@ -99,7 +99,7 @@ test('History responsive audit: cards and trend never overflow target viewports'
   ]) {
     await page.setViewportSize(viewport)
     await page.goto('/history')
-    await expect(page.getByRole('heading', { name: '训练记录', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: '我的训练', exact: true })).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     if (viewport.width === 1440) await page.screenshot({ path: 'test-results/history-1440x900.png', fullPage: true })
     if (viewport.width === 390) await page.screenshot({ path: 'test-results/history-390x844.png', fullPage: true })

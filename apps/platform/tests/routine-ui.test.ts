@@ -37,9 +37,10 @@ describe('routine pages', () => {
   it('lists the four routines on the index, each linking to its entry page', () => {
     const markup = html(createElement(RoutinesIndexPage))
     for (const id of ['baduanjin', 'taijiquan', 'wuqinxi', 'yijinjing']) expect(markup).toContain(`href="/routines/${id}"`)
-    expect(markup).toContain('功法跟练')
+    expect(markup).toContain('跟练课程')
+    expect(markup).not.toContain('功法跟练')
     expect(markup).not.toContain('routine-not-found')
-    expect(html(createElement(RoutinesIndexPage, { unknownRoutine: true }))).toContain('没有找到这个功法')
+    expect(html(createElement(RoutinesIndexPage, { unknownRoutine: true }))).toContain('没有找到这个课程')
   })
 
   it('shows a routine entry with its chapters, single-form practice and recent runs', () => {
@@ -73,11 +74,11 @@ describe('routine history and report views', () => {
     expect(markup).toContain('五禽戏 · 整套跟练')
     expect(markup).toContain('跟练相似度 80%')
     expect(markup.indexOf('history-card-routine-a')).toBeLessThan(markup.indexOf(`history-card-${FIRST_SESSION.id}`))
-    expect(markup).toContain('智能训练 · 近期进步')
+    expect(markup).toContain('热身训练 · 近期进步')
     expect(markup).toContain('按训练模式筛选')
     const onlyRoutines = html(createElement(TrainingHistoryView, { items: [], overview: buildTrainingHistoryOverview([]), routineItems: routine }))
     expect(onlyRoutines).not.toContain('history-empty')
-    expect(html(createElement(TrainingHistoryView, { items: [], overview: buildTrainingHistoryOverview([]), routineUnavailable: true }))).toContain('功法跟练记录暂时无法读取')
+    expect(html(createElement(TrainingHistoryView, { items: [], overview: buildTrainingHistoryOverview([]), routineUnavailable: true }))).toContain('跟练课程记录暂时无法读取')
   })
 
   it('renders a routine report in the shared report shell', () => {

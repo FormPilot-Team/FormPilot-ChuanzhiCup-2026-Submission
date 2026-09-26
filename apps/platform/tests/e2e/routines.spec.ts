@@ -41,13 +41,13 @@ test.beforeEach(async ({ page }) => {
   await markOnboardingSeen(page)
 })
 
-test('Routine A: Home and 功法跟练 lead to every routine, its entry page and its training route', async ({ page }) => {
+test('Routine A: Home and the 跟练课程 index lead to every routine, its entry page and its training route', async ({ page }) => {
   await page.goto('/')
   await page.getByTestId('mode-card-baduanjin').click()
   await expect(page).toHaveURL(/\/routines\/baduanjin$/)
   await expect(page.getByRole('heading', { level: 1, name: '八段锦' })).toBeVisible()
   await expect(page.getByTestId('routine-forms').locator('li')).toHaveCount(10)
-  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '功法跟练' })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '开始训练' })).toHaveAttribute('aria-current', 'page')
   await page.getByTestId('routine-start-full').click()
   await expect(page).toHaveURL(/\/routines\/baduanjin\/train$/)
   await expect(page.getByRole('heading', { level: 1, name: '八段锦 · 整套跟练' })).toBeVisible()
@@ -56,8 +56,8 @@ test('Routine A: Home and 功法跟练 lead to every routine, its entry page and
   await expect(page.getByRole('button', { name: '启用摄像头' })).toBeVisible()
   await expect(routineState(page)).toContainText('启用摄像头后开始')
 
-  await page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '功法跟练' }).click()
-  await expect(page).toHaveURL(/\/routines$/)
+  await page.goto('/routines')
+  await expect(page.getByRole('heading', { level: 1, name: '跟练课程' })).toBeVisible()
   for (const id of ['baduanjin', 'taijiquan', 'wuqinxi', 'yijinjing']) await expect(page.getByTestId(`routine-card-${id}`)).toHaveAttribute('href', `/routines/${id}`)
   await page.getByTestId('routine-card-taijiquan').click()
   await expect(page.getByTestId('routine-forms').locator('li')).toHaveCount(24)
@@ -223,9 +223,9 @@ test('Routine I: History, Home and the report route show saved routine records',
   await page.getByText('显示未完成训练').click()
   await expect(list.locator('article')).toHaveCount(2)
   await expect(page.getByTestId('history-card-routine-e2e-form')).toContainText('太极拳 · 第十式 · 云手')
-  await page.getByRole('group', { name: '按训练模式筛选' }).getByRole('button', { name: '智能训练' }).click()
+  await page.getByRole('group', { name: '按训练模式筛选' }).getByRole('button', { name: '热身训练' }).click()
   await expect(page.getByTestId('history-incomplete-hidden')).toContainText('换一个筛选条件看看')
-  await page.getByRole('group', { name: '按训练模式筛选' }).getByRole('button', { name: '功法跟练' }).click()
+  await page.getByRole('group', { name: '按训练模式筛选' }).getByRole('button', { name: '跟练课程' }).click()
   await expect(list.locator('article')).toHaveCount(2)
   await page.getByTestId('history-card-routine-e2e-full').click()
   await expect(page).toHaveURL(/\/report\/routine-e2e-full$/)

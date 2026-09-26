@@ -120,8 +120,3 @@ export function OnboardingIllustration({ stepId }: { stepId: OnboardingStepId })
   const Illustration = ILLUSTRATIONS[stepId]
   return <Illustration />
 }
-
-/** The pose-in-frame mark reused on the Home smart-training card. */
-export function PoseRecognitionIllustration() {
-  return <WelcomeIllustration />
-}

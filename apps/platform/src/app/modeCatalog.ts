@@ -1,13 +1,20 @@
-import { BookOpen, Dumbbell, History, Leaf, type LucideIcon, Mountain, Orbit, PawPrint, Wrench } from 'lucide-react'
+import { BookOpen, Flame, Leaf, type LucideIcon, Mountain, Orbit, PawPrint, WandSparkles } from 'lucide-react'
 import { ROUTINE_PROGRAMS } from '../features/routines/programs'
+import { formatClock, formCount } from '../features/routines/scope'
 import type { RoutineId } from '../features/routines/types'
-import { HISTORY_PATH, SMART_TRAINING_PATH, routinePath } from './routes'
+import { SMART_TRAINING_PATH, routinePath } from './routes'
 
 export type ModeStatus = 'available' | 'coming_soon'
 
+/** Decorative motion motif of a mode card: one visual system, a different movement signature per mode. */
+export type ModeMotif = 'pulse' | 'lift' | 'orbit' | 'leap' | 'stretch'
+
+/** Accent family: tints and motif strokes only. Actions, focus rings and links stay FormPilot blue. */
+export type ModeAccent = 'brand' | 'emerald' | 'indigo' | 'amber' | 'violet'
+
 /**
- * One Mode Hub entry. Integrating a mode means giving it a `route` and switching `status` to 'available'; a
- * coming-soon entry is rendered without any link or button, so it can never open an empty page.
+ * One training mode or tool on Home. Integrating a mode means giving it a `route` and switching `status` to
+ * 'available'; a coming-soon entry is rendered without any link or button, so it can never open an empty page.
  */
 export interface ModeHubEntry {
   id: string
@@ -16,35 +23,46 @@ export interface ModeHubEntry {
   status: ModeStatus
   route?: string
   cta?: string
-  highlights?: readonly string[]
+  /** One short line of facts (length, number of forms …). */
+  meta?: string
+  /** Light emphasis only (e.g. 推荐); never a larger card. */
+  badge?: string
   icon: LucideIcon
+  motif: ModeMotif
+  accent: ModeAccent
 }
 
 export const MODE_STATUS_LABEL: Readonly<Record<ModeStatus, string>> = Object.freeze({
   available: '可使用',
-  coming_soon: '即将整合',
+  coming_soon: '即将开放',
 })
 
-/** The primary training mode: first on the Mode Hub and the largest card. */
-export const PRIMARY_TRAINING_MODE: ModeHubEntry = Object.freeze({
+/**
+ * 热身训练: the six-exercise course with realtime correction. Internally still "smart training" (route, session
+ * store, analysis-v1); only the product name changed.
+ */
+export const WARM_UP_MODE: ModeHubEntry = Object.freeze({
   id: 'smart-training',
-  title: '智能训练',
-  description: '实时识别你的动作，训练中给出纠错提示和语音指导，结束后生成训练报告。',
+  title: '热身训练',
+  description: '6 个热身动作，实时识别并纠正动作，全程语音指导，结束生成训练报告。',
   status: 'available',
   route: SMART_TRAINING_PATH,
-  cta: '进入训练',
-  highlights: ['实时姿态识别', 'AI 纠错', '语音指导', '训练报告'],
-  icon: Dumbbell,
+  cta: '开始训练',
+  meta: '6 个动作 · 完整或单项练习',
+  badge: '推荐',
+  icon: Flame,
+  motif: 'pulse',
+  accent: 'brand',
 } satisfies ModeHubEntry)
 
-const ROUTINE_ICONS: Readonly<Record<RoutineId, LucideIcon>> = {
-  baduanjin: Leaf,
-  taijiquan: Orbit,
-  wuqinxi: PawPrint,
-  yijinjing: Mountain,
+const ROUTINE_LOOK: Readonly<Record<RoutineId, { icon: LucideIcon; motif: ModeMotif }>> = {
+  baduanjin: { icon: Leaf, motif: 'lift' },
+  taijiquan: { icon: Orbit, motif: 'orbit' },
+  wuqinxi: { icon: PawPrint, motif: 'leap' },
+  yijinjing: { icon: Mountain, motif: 'stretch' },
 }
 
-/** Follow-along routines, integrated from the teammate version; each opens its own entry page. */
+/** Follow-along courses (internally: routines); each opens its own entry page. */
 export const ROUTINE_MODES: readonly ModeHubEntry[] = Object.freeze(ROUTINE_PROGRAMS.map((program) => ({
   id: program.id,
   title: program.title,
@@ -52,31 +70,30 @@ export const ROUTINE_MODES: readonly ModeHubEntry[] = Object.freeze(ROUTINE_PROG
   status: 'available' as const,
   route: routinePath(program.id),
   cta: '开始跟练',
-  icon: ROUTINE_ICONS[program.id],
+  meta: `全套 ${formatClock(program.video.durationSeconds)} · ${formCount(program)} ${program.formUnit}`,
+  icon: ROUTINE_LOOK[program.id].icon,
+  motif: ROUTINE_LOOK[program.id].motif,
+  accent: program.accent,
 })))
 
-/** First tier: training modes. The first entry is the primary product entry. */
-export const TRAINING_MODES: readonly ModeHubEntry[] = Object.freeze([PRIMARY_TRAINING_MODE, ...ROUTINE_MODES])
+/** "开始训练": five official modes on one level. The warm-up is first and lightly emphasised, never bigger. */
+export const TRAINING_MODES: readonly ModeHubEntry[] = Object.freeze([WARM_UP_MODE, ...ROUTINE_MODES])
 
-/** Second tier: tools and records. "使用说明" is local help, so the Home page adds it next to these. */
-export const TOOL_ENTRIES: readonly ModeHubEntry[] = Object.freeze([
-  {
-    id: 'motion-workshop',
-    title: '动作工坊',
-    description: '创建动作、设置识别要求并测试，保存成自己的训练。',
-    status: 'coming_soon',
-    icon: Wrench,
-  },
-  {
-    id: 'history',
-    title: '训练记录',
-    description: '查看每次训练报告和近期进步。',
-    status: 'available',
-    route: HISTORY_PATH,
-    icon: History,
-  },
-] satisfies ModeHubEntry[])
+/** 动作工坊: create, test and save your own actions. */
+export const WORKSHOP_ENTRY: ModeHubEntry = Object.freeze({
+  id: 'motion-workshop',
+  title: '动作工坊',
+  description: '教 FormPilot 学会你的动作：设置识别要求、测试并保存，之后就能直接训练。',
+  status: 'coming_soon',
+  icon: WandSparkles,
+  motif: 'pulse',
+  accent: 'brand',
+} satisfies ModeHubEntry)
 
+/** The workshop's user flow, in user language. */
+export const WORKSHOP_FLOW = ['创建动作', '设置识别要求', '测试', '保存', '开始训练'] as const
+
+/** 使用说明 is a utility, not a product area: a small entry next to the Home hero. */
 export const GUIDE_ENTRY = Object.freeze({
   title: '使用说明',
   description: '开始、暂停手势和入镜要求。',

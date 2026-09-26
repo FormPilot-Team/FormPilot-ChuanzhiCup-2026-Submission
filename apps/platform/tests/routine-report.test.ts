@@ -125,6 +125,6 @@ describe('routine history', () => {
     expect(recent).toHaveLength(2)
     expect(recent[0]).toMatchObject({ sessionId: 'r-new', modeId: 'taijiquan', modeTitle: '太极拳 · 整套跟练', reportPath: '/report/r-new', completed: true })
     expect(recent[0].headline).toContain('跟练相似度')
-    expect(recent[1]).toMatchObject({ modeId: 'smart-training', modeTitle: '智能训练 · 完整训练' })
+    expect(recent[1]).toMatchObject({ modeId: 'smart-training', modeTitle: '热身训练 · 完整训练' })
   })
 })

@@ -3,7 +3,7 @@ import {
   AlertTriangle, ArrowLeft, ArrowRight, CalendarDays, ChartNoAxesCombined, Check, CircleDashed,
   Clock3, History, RefreshCw, TrendingUp,
 } from 'lucide-react'
-import { HOME_PATH } from '../../app/routes'
+import { START_TRAINING_PATH } from '../../app/routes'
 import { AppHeader } from '../../components/layout/AppHeader'
 import {
   historyComparisonText, historyScoreText, loadTrainingHistory, type TrainingHistoryItem,
@@ -25,8 +25,8 @@ type HistoryFilter = 'all' | 'smart' | 'routine'
 
 const FILTERS: ReadonlyArray<{ id: HistoryFilter; label: string }> = [
   { id: 'all', label: '全部' },
-  { id: 'smart', label: '智能训练' },
-  { id: 'routine', label: '功法跟练' },
+  { id: 'smart', label: '热身训练' },
+  { id: 'routine', label: '跟练课程' },
 ]
 
 function sessionDuration(item: TrainingHistoryItem): number | null {
@@ -116,7 +116,7 @@ function ProgressOverview({ overview }: { overview: TrainingHistoryOverview }) {
   if (!overview.available) {
     return (
       <section className="report-panel p-5 sm:p-7" aria-labelledby="recent-progress-title" data-testid="history-progress-unavailable">
-        <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700"><ChartNoAxesCombined size={20} aria-hidden="true" /></span><div><h2 id="recent-progress-title" className="text-balance text-xl font-bold text-slate-950">智能训练 · 近期进步</h2><p className="mt-2 text-pretty text-sm leading-6 text-slate-600">完成至少 3 次智能训练完整课程后，这里会显示近期变化。</p></div></div>
+        <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700"><ChartNoAxesCombined size={20} aria-hidden="true" /></span><div><h2 id="recent-progress-title" className="text-balance text-xl font-bold text-slate-950">热身训练 · 近期进步</h2><p className="mt-2 text-pretty text-sm leading-6 text-slate-600">完成至少 3 次热身训练完整课程后，这里会显示近期变化。</p></div></div>
       </section>
     )
   }
@@ -128,7 +128,7 @@ function ProgressOverview({ overview }: { overview: TrainingHistoryOverview }) {
   return (
     <section className="report-panel p-5 sm:p-7" aria-labelledby="recent-progress-title" data-testid="history-progress-overview">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div><h2 id="recent-progress-title" className="text-balance text-xl font-bold text-slate-950">智能训练 · 近期进步</h2><p className="mt-1 text-pretty text-sm leading-6 text-slate-600">仅统计规则一致、完整完成的智能训练课程。</p></div>
+        <div><h2 id="recent-progress-title" className="text-balance text-xl font-bold text-slate-950">热身训练 · 近期进步</h2><p className="mt-1 text-pretty text-sm leading-6 text-slate-600">仅统计规则一致、完整完成的热身训练课程。</p></div>
         {last ? <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm"><p className="text-slate-600">最近一次 <strong className="text-lg tabular-nums text-slate-950">{last.score} 分</strong></p><p className="text-slate-600">相比第一条 <strong className="tabular-nums text-slate-950">{deltaText} 分</strong></p></div> : null}
       </div>
       <div className="mt-6 grid min-w-0 gap-7 xl:grid-cols-[minmax(0,1.5fr)_minmax(260px,.7fr)]">
@@ -159,25 +159,25 @@ export function TrainingHistoryView({ items, overview, routineItems = [], routin
   const hiddenIncomplete = entries.filter((entry) => entry.incomplete).length
   const empty = items.length === 0 && routineItems.length === 0
   return (
-    <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f5f7fa] text-slate-900">
+    <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900">
       <AppHeader />
       <main className="mx-auto min-w-0 max-w-[1200px] px-4 pb-12 pt-5 sm:px-6 lg:px-8">
         <a href="/" className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} aria-hidden="true" />返回首页</a>
-        <header className="mb-6 flex items-start gap-4 sm:mb-8"><span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-slate-950 text-white"><History size={23} aria-hidden="true" /></span><div><h1 className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">训练记录</h1><p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">重新查看每次训练报告，了解智能训练与功法跟练的近期变化。</p></div></header>
-        {routineUnavailable ? <p className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900" role="status" data-testid="history-routine-unavailable">功法跟练记录暂时无法读取，其他训练记录不受影响。</p> : null}
+        <header className="mb-6 flex items-start gap-4 sm:mb-8"><span className="fp-energy-gradient grid size-12 shrink-0 place-items-center rounded-2xl text-white shadow-[0_8px_18px_-10px_rgb(14_165_233/0.9)]"><History size={23} aria-hidden="true" /></span><div><h1 className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">我的训练</h1><p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">查看每次训练的报告，了解热身训练与跟练课程的近期变化。</p></div></header>
+        {routineUnavailable ? <p className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900" role="status" data-testid="history-routine-unavailable">跟练课程记录暂时无法读取，其他训练记录不受影响。</p> : null}
 
         {empty ? (
-          <section className="report-panel p-8 text-center sm:p-10" data-testid="history-empty"><CalendarDays className="mx-auto text-slate-400" size={34} aria-hidden="true" /><h2 className="mt-4 text-balance text-xl font-bold text-slate-950">还没有训练记录</h2><p className="mx-auto mt-2 max-w-md text-pretty text-sm leading-6 text-slate-600">完成一次训练后，报告会保存在这里。</p><a href={HOME_PATH} className="primary-button mt-6 inline-flex items-center justify-center gap-2">开始训练<ArrowRight size={16} aria-hidden="true" /></a></section>
+          <section className="report-panel p-8 text-center sm:p-10" data-testid="history-empty"><CalendarDays className="mx-auto text-slate-400" size={34} aria-hidden="true" /><h2 className="mt-4 text-balance text-xl font-bold text-slate-950">还没有训练记录</h2><p className="mx-auto mt-2 max-w-md text-pretty text-sm leading-6 text-slate-600">完成一次训练后，报告会保存在这里。</p><a href={START_TRAINING_PATH} className="primary-button mt-6 inline-flex items-center justify-center gap-2">开始训练<ArrowRight size={16} aria-hidden="true" /></a></section>
         ) : (
           <div className="space-y-5 sm:space-y-6">
             <ProgressOverview overview={overview} />
             <section aria-labelledby="history-list-title">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div><h2 id="history-list-title" className="text-balance text-xl font-bold text-slate-950">全部训练</h2><p className="mt-1 text-pretty text-sm text-slate-500">最新记录排在最前</p></div>
+                <div><h2 id="history-list-title" className="text-balance text-xl font-bold text-slate-950">训练记录</h2><p className="mt-1 text-pretty text-sm text-slate-500">最新记录排在最前</p></div>
                 <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
                   <div className="inline-flex rounded-xl bg-white p-1 shadow-sm" role="group" aria-label="按训练模式筛选" data-testid="history-filter">
                     {FILTERS.map((item) => (
-                      <button key={item.id} type="button" onClick={() => setFilter(item.id)} aria-pressed={filter === item.id} className={cn('rounded-lg px-3 py-1.5 text-sm font-semibold', filter === item.id ? 'bg-slate-950 text-white' : 'text-slate-600 hover:bg-slate-50')}>{item.label}</button>
+                      <button key={item.id} type="button" onClick={() => setFilter(item.id)} aria-pressed={filter === item.id} className={cn('rounded-lg px-3 py-1.5 text-sm font-semibold', filter === item.id ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-50')}>{item.label}</button>
                     ))}
                   </div>
                   <label className="inline-flex cursor-pointer items-center gap-3 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm"><input type="checkbox" checked={showIncomplete} onChange={(event) => setShowIncomplete(event.target.checked)} className="size-4 accent-blue-600" />显示未完成训练{hiddenIncomplete ? <span className="tabular-nums text-slate-400">{hiddenIncomplete}</span> : null}</label>
