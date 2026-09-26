@@ -33,7 +33,7 @@ test('formal Home opens Training and Report navigation closes the user loop', as
 
   await page.goto(reportUrl)
   const previousId = reportUrl.split('/').at(-1)
-  await page.getByRole('button', { name: '重新训练' }).click()
+  await page.getByRole('button', { name: '再次训练' }).click()
   await expect(page).toHaveURL(/\/train$/)
   await expect(page.getByRole('heading', { name: '今日训练 · 肩部活动引导' })).toBeVisible()
   await expect.poll(() => page.evaluate((oldId) => JSON.parse(localStorage.getItem('ai-coach.sessions:v2') ?? '[]')

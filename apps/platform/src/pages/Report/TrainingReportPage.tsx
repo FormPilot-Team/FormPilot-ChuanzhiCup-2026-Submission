@@ -1,161 +1,461 @@
-import { ArrowLeft, CalendarDays, Check, ChevronDown, CircleDashed, Clock3, Dumbbell, MessageCircleWarning, RefreshCw, Sparkles, Target, TrendingUp } from 'lucide-react'
+import {
+  Activity, AlertTriangle, ArrowLeft, CalendarDays, Check, ChevronDown, CircleDashed, Clock3, Dumbbell,
+  Gauge, History, Info, RefreshCw, ShieldCheck, Target, TrendingUp,
+} from 'lucide-react'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { CapabilityRadar } from '../../components/report/CapabilityRadar'
-import { buildTrainingReport } from '../../features/report/TrainingReportBuilder'
-import type { CapabilitySummaryItem, ExerciseReportSummary, ReportIssue, ReportRecommendation, TrainingReportData } from '../../features/report/types'
-import { LocalStorageTrainingSessionRepository } from '../../features/training/LocalStorageTrainingSessionRepository'
+import type {
+  CapabilityDimensionAnalysis, ExerciseAnalysis, Finding, FocusItem, IssueAnalysis, PriorityIssue, TrainingAnalysis,
+} from '../../features/analysis'
+import type { TrainingSessionState } from '../../features/training/types'
 import { cn } from '../../lib/cn'
+import {
+  CAPABILITY_EXPLANATIONS, EXERCISE_NAMES, comparisonRatioText, completionProgress, formatDate, formatDuration,
+  formatShortDate, issueTrendText, ratioText, scoreTrendText,
+} from './reportPresentation'
+import { useTrainingReportAnalysis } from './useTrainingReportAnalysis'
 
-function formatDate(timestamp: number): string {
-  return new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(timestamp)
+function sessionDuration(session: TrainingSessionState): number | null {
+  if (typeof session.totalDurationMs === 'number' && Number.isFinite(session.totalDurationMs)) return Math.max(0, session.totalDurationMs)
+  if (typeof session.endedAt === 'number' && Number.isFinite(session.endedAt)) return Math.max(0, session.endedAt - session.startedAt)
+  return null
 }
 
-function formatDuration(durationMs: number | null): string {
-  if (durationMs === null) return '—'
-  const totalSeconds = Math.max(0, Math.round(durationMs / 1000))
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-  return minutes ? `${minutes}分 ${seconds.toString().padStart(2, '0')}秒` : `${seconds}秒`
-}
-
-function progressText(exercise: ExerciseReportSummary): string {
-  if (exercise.evaluationMode === 'guidance') return exercise.completion === 'completed' ? '引导完成' : '引导未完成'
-  if (exercise.progress === null || exercise.target === null || exercise.targetType === null) return '本次训练尚未完成该动作'
-  return `${exercise.progress} / ${exercise.target}${exercise.targetType === 'cycles' ? ' 组' : ' 次'}`
-}
-
-export function ReportSummary({ report }: { report: TrainingReportData }) {
-  const complete = report.completion.status === 'complete'
-  const CompletionIcon = complete ? Check : CircleDashed
+function SectionHeading({ id, icon: Icon, title, description }: {
+  id: string
+  icon: typeof Activity
+  title: string
+  description?: string
+}) {
   return (
-    <section className="panel overflow-hidden p-5 sm:p-7" aria-labelledby="report-summary-title" data-testid="report-summary">
-      <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(220px,.6fr)]">
-        <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <span className={cn('grid size-11 place-items-center rounded-2xl', complete ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500')}><CompletionIcon size={23} /></span>
-            <div>
-              <p className="text-sm font-semibold text-blue-600">训练报告</p>
-              <h1 id="report-summary-title" className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">{report.completion.label}</h1>
-            </div>
+    <div className="flex items-start gap-3">
+      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700" aria-hidden="true"><Icon size={18} /></span>
+      <div>
+        <h2 id={id} className="text-balance text-xl font-bold text-slate-950 sm:text-2xl">{title}</h2>
+        {description ? <p className="mt-1 max-w-3xl text-pretty text-sm leading-6 text-slate-600">{description}</p> : null}
+      </div>
+    </div>
+  )
+}
+
+function comparisonText(analysis: TrainingAnalysis): string {
+  if (analysis.comparison.level === 'FULL' && analysis.comparison.previousStartedAt !== null) {
+    return `对比 ${formatShortDate(analysis.comparison.previousStartedAt)}`
+  }
+  if (analysis.comparison.level === 'PARTIAL') {
+    return `已与上次共同完成的 ${analysis.comparison.commonExerciseIds.length} 个动作进行对比`
+  }
+  return analysis.comparison.reasonText ?? '当前没有可用的历史对比。'
+}
+
+export function ReportHero({ analysis, session }: { analysis: TrainingAnalysis; session: TrainingSessionState }) {
+  const fullCourse = analysis.overall.scope === 'FULL_COURSE'
+  const partialScore = analysis.overall.scope === 'COMPLETED_EXERCISES'
+  const overallTrend = analysis.comparison.level === 'FULL' ? scoreTrendText(analysis.overall.trend, analysis.overall.delta) : null
+  const completionLabel = analysis.courseComplete ? '训练完成' : '本次训练未完整完成'
+  const CompletionIcon = analysis.courseComplete ? Check : CircleDashed
+
+  return (
+    <section className="overflow-hidden rounded-2xl bg-slate-950 text-white" aria-labelledby="report-title" data-testid="report-summary">
+      <div className="grid lg:grid-cols-[minmax(0,1.25fr)_minmax(310px,.75fr)]">
+        <div className="p-6 sm:p-8 lg:p-10">
+          <div className="flex items-center gap-3 text-sm font-semibold text-blue-200">
+            <span className="grid size-9 place-items-center rounded-xl bg-white/10"><CompletionIcon size={18} /></span>
+            {completionLabel}
           </div>
-          <p className="mt-4 text-pretty text-base text-slate-600">{report.courseName}</p>
-          <p className="mt-1 inline-flex items-center gap-2 text-sm text-slate-500"><CalendarDays size={16} />{formatDate(report.startedAt)}</p>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <SummaryMetric icon={Clock3} label="训练时长" value={formatDuration(report.durationMs)} />
-            <SummaryMetric icon={Target} label="课程完成度" value={`${report.completion.completed} / ${report.completion.total}`} />
-            <SummaryMetric icon={TrendingUp} label={report.overallScoreScope === 'completed_scored_average' ? '已完成动作平均分' : '课程总评'} value={report.overallScore === null ? '—' : String(report.overallScore)} />
-            <SummaryMetric icon={MessageCircleWarning} label="反馈记录" value={`${report.feedbackCount} 条`} />
+          <h1 id="report-title" className="mt-6 max-w-3xl text-balance text-3xl font-bold leading-tight sm:text-4xl">这次训练，重点已经清楚了</h1>
+          <div className="mt-7 flex flex-wrap items-end gap-x-5 gap-y-2" data-testid="overall-score-scope">
+            {fullCourse ? <><span className="text-6xl font-bold tabular-nums sm:text-7xl">{analysis.overall.score}</span><span className="pb-2 text-base font-semibold text-slate-300">综合评分</span></> : null}
+            {partialScore ? <><span className="text-6xl font-bold tabular-nums sm:text-7xl">{analysis.overall.score}</span><span className="max-w-36 pb-2 text-base font-semibold leading-6 text-slate-300">已完成动作平均分</span></> : null}
+            {analysis.overall.scope === 'UNAVAILABLE' ? <p className="text-balance text-2xl font-bold text-white sm:text-3xl">暂不给出综合评分</p> : null}
           </div>
-          <p className="mt-4 text-pretty text-sm text-slate-500" data-testid="overall-score-scope">{report.overallScoreDescription}</p>
+          {overallTrend ? <p className={cn('mt-3 text-sm font-semibold', analysis.overall.trend === 'DECLINED' ? 'text-amber-200' : 'text-emerald-300')}>{overallTrend}</p> : null}
+          <p className="mt-5 max-w-2xl text-pretty text-sm leading-6 text-slate-300">{comparisonText(analysis)}</p>
         </div>
-        <div className="relative mx-auto hidden h-56 w-full max-w-64 overflow-hidden rounded-3xl bg-blue-50 lg:block" aria-hidden="true">
-          <img src="/assets/coach-lateral-raise.png" alt="" className="size-full object-contain object-bottom" />
-          <span className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/95 px-4 py-3 text-center text-sm font-semibold text-slate-700 shadow-sm">{report.overallScoreLabel}</span>
-        </div>
+        <dl className="grid content-center border-t border-white/10 bg-white/[0.04] sm:grid-cols-3 lg:grid-cols-1 lg:border-l lg:border-t-0">
+          <HeroFact icon={Target} label="完成动作" value={`${analysis.overall.completedExercises} / ${analysis.overall.totalExercises}`} />
+          <HeroFact icon={Clock3} label="训练时间" value={formatDuration(sessionDuration(session))} />
+          <HeroFact icon={CalendarDays} label="训练日期" value={formatDate(analysis.sessionStartedAt)} />
+        </dl>
       </div>
     </section>
   )
 }
 
-function SummaryMetric({ icon: Icon, label, value }: { icon: typeof Clock3; label: string; value: string }) {
+function HeroFact({ icon: Icon, label, value }: { icon: typeof Target; label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
-      <div className="flex items-center gap-2 text-sm text-slate-500"><Icon size={17} className="text-blue-500" />{label}</div>
-      <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">{value}</p>
+    <div className="flex items-center gap-3 border-b border-white/10 px-6 py-5 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 lg:border-b lg:border-r-0">
+      <Icon size={18} className="shrink-0 text-blue-300" aria-hidden="true" />
+      <div className="min-w-0"><dt className="text-xs font-medium text-slate-400">{label}</dt><dd className="mt-1 text-sm font-semibold tabular-nums text-white">{value}</dd></div>
     </div>
   )
 }
 
-export function CapabilitySection({ capabilities, completedScoredCount }: { capabilities: CapabilitySummaryItem[]; completedScoredCount: number }) {
+export function TrainingAnalysisSection({ analysis }: { analysis: TrainingAnalysis }) {
   return (
-    <section className="panel min-w-0 p-5 sm:p-6" aria-labelledby="capability-title" data-testid="report-capabilities">
-      <div className="flex items-center gap-3"><span className="grid size-9 place-items-center rounded-xl bg-blue-50 text-blue-600"><TrendingUp size={19} /></span><div><h2 id="capability-title" className="text-balance text-xl font-bold text-slate-900">能力维度汇总</h2><p className="text-pretty text-sm text-slate-500">仅汇总已完成计分动作中的可用指标</p></div></div>
-      {completedScoredCount >= 2 ? <CapabilityRadar capabilities={capabilities} /> : (
-        <div className="my-8 rounded-2xl bg-slate-50 p-6 text-center"><p className="font-semibold text-slate-800">完成更多动作后可查看能力分布</p><p className="mt-1 text-pretty text-sm text-slate-500">当前样本少于 2 个已完成计分动作。</p></div>
-      )}
-      <dl className="grid gap-2 sm:grid-cols-2">
-        {capabilities.map((item) => <div key={item.dimension} className="flex min-w-0 items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-2.5"><dt className="truncate text-sm font-medium text-slate-700">{item.label}</dt><dd className="shrink-0 text-sm font-bold tabular-nums text-slate-900">{item.value ?? '—'} <span className="font-normal text-slate-400">· {item.sampleCount}/{item.totalExerciseCount}</span></dd></div>)}
-      </dl>
-      <p className="mt-3 text-pretty text-xs text-slate-500">数值范围 0–100；每项标注可用动作样本数，缺失指标不会按 0 分处理。</p>
+    <section className="report-panel p-5 sm:p-7" aria-labelledby="analysis-summary-title" data-testid="report-analysis-summary">
+      <SectionHeading id="analysis-summary-title" icon={Activity} title="训练分析" description="依据本次有效动作与可比较历史，按证据顺序给出结论。" />
+      <ol className="mt-6 divide-y divide-slate-100">
+        {analysis.summary.map((sentence, index) => (
+          <li key={`${sentence.slot}-${index}`} className="flex gap-4 py-4 first:pt-0 last:pb-0">
+            <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-slate-950 text-xs font-bold text-white">{index + 1}</span>
+            <p className="max-w-4xl text-pretty text-[15px] leading-7 text-slate-700">{sentence.text}</p>
+          </li>
+        ))}
+      </ol>
     </section>
   )
 }
 
-export function ExerciseReportCard({ exercise }: { exercise: ExerciseReportSummary }) {
-  const guidance = exercise.evaluationMode === 'guidance'
+function priorityEvidence(issue: PriorityIssue) {
+  if (issue.kind === 'SIDE_PAIR') {
+    return issue.members.map((member) => ({
+      key: member.canonicalId,
+      label: member.side === 'left' ? '左侧' : '右侧',
+      value: ratioText(member.stats, member.unit),
+    }))
+  }
+  if (issue.kind === 'THEME') {
+    return issue.members.map((member) => ({
+      key: member.canonicalId,
+      label: EXERCISE_NAMES[member.exerciseId],
+      value: ratioText(member.stats, member.unit),
+    }))
+  }
+  const member = issue.members[0]
+  return member ? [{ key: member.canonicalId, label: '本次', value: ratioText(member.stats, member.unit) }] : []
+}
+
+export function PriorityIssuesSection({ analysis }: { analysis: TrainingAnalysis }) {
+  if (analysis.dataQuality.rulesSupport === 'UNSUPPORTED') return null
+  const emptySentence = analysis.summary.find((item) => item.slot === 'NO_PRIORITY' || item.slot === 'LIMITED_DATA')
   return (
-    <details className="panel group min-w-0 overflow-hidden" data-testid={`exercise-report-${exercise.exerciseId}`}>
-      <summary className="flex cursor-pointer list-none items-center gap-3 p-5 marker:content-none">
-        <span className={cn('grid size-10 shrink-0 place-items-center rounded-xl', guidance ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600')}><Dumbbell size={20} /></span>
-        <div className="min-w-0"><h3 className="truncate font-bold text-slate-900">{exercise.name}</h3><p className="text-sm text-slate-500">{progressText(exercise)}</p></div>
-        <div className="ml-auto shrink-0 text-right">
-          <p className="font-bold tabular-nums text-slate-900">{guidance ? (exercise.completion === 'completed' ? '引导完成' : '引导未完成') : exercise.score === null ? '—' : `${exercise.score} 分`}</p>
-          <p className="text-xs text-slate-500">{exercise.completion === 'completed' ? '已完成' : exercise.completion === 'unavailable' ? '暂无可展示的数据' : '未完成'}</p>
+    <section className="report-panel p-5 sm:p-7" aria-labelledby="priority-title" data-testid="report-top-issues">
+      <SectionHeading id="priority-title" icon={AlertTriangle} title="本次最需要关注" description="优先级已经综合问题频率、历史变化与动作内变化，最多展示三项。" />
+      {analysis.priorityIssues.length ? (
+        <ol className="mt-6 divide-y divide-slate-200">
+          {analysis.priorityIssues.map((issue) => {
+            const statuses = [...new Set(issue.members.map((member) => issueTrendText(member.trend)).filter((item): item is string => item !== null))]
+            return (
+              <li key={issue.id} className="grid gap-4 py-6 first:pt-0 last:pb-0 md:grid-cols-[44px_minmax(0,1fr)_minmax(220px,.55fr)]">
+                <span className="grid size-10 place-items-center rounded-xl bg-coral-50 text-base font-bold tabular-nums text-coral-600">{issue.rank}</span>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-balance text-lg font-bold text-slate-950">{issue.reportLabel}</h3>
+                    {statuses.map((status) => <span key={status} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{status}</span>)}
+                  </div>
+                  <p className="mt-3 text-pretty text-sm leading-6 text-slate-600">{issue.cue}。</p>
+                </div>
+                <dl className="grid content-start gap-2 rounded-xl bg-slate-50 p-3">
+                  {priorityEvidence(issue).map((item) => (
+                    <div key={item.key} className="flex items-center justify-between gap-3 text-sm"><dt className="text-slate-500">{item.label}</dt><dd className="font-semibold tabular-nums text-slate-900">{item.value}</dd></div>
+                  ))}
+                </dl>
+              </li>
+            )
+          })}
+        </ol>
+      ) : (
+        <div className="mt-6 rounded-xl bg-slate-50 p-5">
+          <p className="text-pretty text-sm font-semibold leading-6 text-slate-800">{emptySentence?.text}</p>
+        </div>
+      )}
+    </section>
+  )
+}
+
+function exerciseDelta(exercise: ExerciseAnalysis): string | null {
+  if (exercise.previousScore === null || exercise.scoreDelta === null || exercise.scoreTrend === null) return null
+  return scoreTrendText(exercise.scoreTrend, exercise.scoreDelta)
+}
+
+function tempoText(exercise: ExerciseAnalysis): string | null {
+  if (exercise.tempo.direction === 'TOO_FAST') return '动作偏快'
+  if (exercise.tempo.direction === 'TOO_SLOW') return '动作偏慢'
+  if (exercise.tempo.direction === 'APPROPRIATE') return '大部分在建议时间范围'
+  return null
+}
+
+function visibleExerciseIssues(exercise: ExerciseAnalysis): IssueAnalysis[] {
+  const valuableTrends = new Set(['NEW', 'RESOLVED', 'IMPROVED', 'PERSISTENT', 'WORSENED'])
+  return exercise.issues.filter((issue) => issue.significance === 'SIGNIFICANT'
+    || (issue.comparison?.trend !== null && valuableTrends.has(issue.comparison?.trend ?? '')))
+}
+
+export function ExerciseReportCard({ exercise }: { exercise: ExerciseAnalysis }) {
+  const delta = exerciseDelta(exercise)
+  const issues = visibleExerciseIssues(exercise)
+  const tempo = tempoText(exercise)
+  return (
+    <details className="group report-panel min-w-0 overflow-hidden" data-testid={`exercise-report-${exercise.exerciseId}`}>
+      <summary className="flex cursor-pointer list-none items-center gap-4 p-5 marker:content-none sm:p-6">
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700" aria-hidden="true"><Dumbbell size={19} /></span>
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate font-bold text-slate-950">{exercise.displayName}</h3>
+          <p className="mt-1 text-sm tabular-nums text-slate-500">{completionProgress(exercise.completion)}</p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="text-xl font-bold tabular-nums text-slate-950">{exercise.score === null ? '—' : exercise.score}</p>
+          <p className={cn('mt-1 max-w-32 text-xs font-medium', exercise.scoreTrend === 'DECLINED' ? 'text-amber-700' : 'text-slate-500')}>{delta ?? (exercise.completion.status === 'completed' ? '本次评分' : '数据未完整')}</p>
         </div>
         <ChevronDown size={18} className="shrink-0 text-slate-400 transition-transform duration-150 group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
       </summary>
-      <div className="border-t border-slate-100 px-5 pb-5 pt-4">
-        {guidance ? <div className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-800"><p className="font-semibold">{exercise.completion === 'completed' && exercise.target !== null ? `已完成 ${exercise.target} 秒有效运动引导目标` : '本次没有完整的有效运动引导记录'}</p><p className="mt-1 text-pretty">肩部环绕不显示或参与 0–100 数值总分；当前 Session 未保存的连续性、左右幅度和同步质量不会在报告中补算。</p></div> : (
-          <dl className="grid gap-2 sm:grid-cols-2">
-            {exercise.metrics.map((metric) => <div key={metric.key} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2"><dt className="text-sm text-slate-600">{metric.label}</dt><dd className="font-semibold tabular-nums text-slate-900">{metric.value ?? '—'}</dd></div>)}
-          </dl>
-        )}
-        <p className="mt-3 text-pretty text-sm text-slate-600">{exercise.summaryText}</p>
-        {exercise.topIssues[0] ? <p className="mt-2 text-sm font-medium text-coral-600">主要问题：{exercise.topIssues[0].reportLabel} · {exercise.topIssues[0].count} 次</p> : null}
+      <div className="border-t border-slate-100 px-5 pb-5 pt-4 sm:px-6 sm:pb-6">
+        <p className="text-pretty text-sm font-medium leading-6 text-slate-800">{exercise.takeaway ?? (exercise.completion.status === 'not_started' ? '本次未开始该动作。' : '当前没有可展示的动作结论。')}</p>
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <div>
+            <h4 className="text-sm font-bold text-slate-900">有效分析</h4>
+            <p className="mt-2 text-sm tabular-nums text-slate-600">有效分析 {exercise.reps.analyzed} / {exercise.reps.recorded} 次</p>
+            {exercise.reps.invalid > 0 ? <p className="mt-1 text-pretty text-xs leading-5 text-slate-500">另有 {exercise.reps.invalid} 次因识别质量不足未纳入分析。</p> : null}
+            {tempo ? <p className="mt-2 text-sm text-slate-600">动作速度：{tempo}</p> : null}
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-slate-900">需要关注的变化</h4>
+            {issues.length ? <ul className="mt-2 space-y-2">{issues.map((issue) => (
+              <li key={issue.canonicalId} className="text-sm leading-6 text-slate-600">
+                <span className="font-semibold text-slate-800">{issue.reportLabel}</span>
+                {issue.stats ? `，${ratioText(issue.stats, issue.unit)}` : ''}
+                {issueTrendText(issue.comparison?.trend ?? null) ? `，${issueTrendText(issue.comparison?.trend ?? null)}` : ''}
+              </li>
+            ))}</ul> : <p className="mt-2 text-sm text-slate-500">没有需要展开说明的问题变化。</p>}
+          </div>
+        </div>
+        {exercise.withinExerciseImprovement ? <p className="mt-5 rounded-xl bg-emerald-50 px-4 py-3 text-pretty text-sm leading-6 text-emerald-900">{exercise.withinExerciseImprovement.text}</p> : null}
       </div>
     </details>
   )
 }
 
-export function TopIssuesSection({ issues }: { issues: ReportIssue[] }) {
+function GuidanceCard({ analysis }: { analysis: TrainingAnalysis }) {
+  const status = analysis.guidance.status === 'completed' ? '已完成' : analysis.guidance.status === 'incomplete' ? '未完成' : '未开始'
   return (
-    <section className="panel p-5 sm:p-6" aria-labelledby="issues-title" data-testid="report-top-issues">
-      <div className="flex items-center gap-3"><span className="grid size-9 place-items-center rounded-xl bg-coral-50 text-coral-600"><MessageCircleWarning size={19} /></span><h2 id="issues-title" className="text-balance text-xl font-bold text-slate-900">本次最常见问题</h2></div>
-      {issues.length ? <ol className="mt-4 space-y-2">{issues.map((issue, index) => (
-        <li key={issue.id} className="flex min-w-0 items-center gap-3 rounded-2xl bg-coral-50/60 p-3.5"><span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-sm font-bold text-coral-600">{index + 1}</span><div className="min-w-0"><p className="text-pretty text-sm font-semibold text-slate-800">{issue.exerciseName} · {issue.reportLabel}</p><p className="text-xs text-slate-500">来自已确认纠错反馈</p></div><span className="ml-auto shrink-0 text-sm font-bold tabular-nums text-coral-600">{issue.count} 次</span></li>
-      ))}</ol> : <div className="mt-4 rounded-2xl bg-slate-50 p-5"><p className="font-semibold text-slate-800">本次训练没有记录到明显的重复纠错问题。</p><p className="mt-1 text-pretty text-sm text-slate-500">没有记录到纠错不等于动作全部标准。</p></div>}
+    <details className="group report-panel min-w-0 overflow-hidden" data-testid="exercise-report-shoulder_rotation">
+      <summary className="flex cursor-pointer list-none items-center gap-4 p-5 marker:content-none sm:p-6">
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-700" aria-hidden="true"><ShieldCheck size={19} /></span>
+        <div className="min-w-0 flex-1"><h3 className="font-bold text-slate-950">肩部环绕</h3><p className="mt-1 text-sm text-slate-500">热身引导</p></div>
+        <div className="shrink-0 text-right"><p className="font-bold text-slate-950">{status}</p><p className="mt-1 text-xs text-slate-500">不计分</p></div>
+        <ChevronDown size={18} className="shrink-0 text-slate-400 transition-transform duration-150 group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+      </summary>
+      <div className="border-t border-slate-100 px-5 pb-5 pt-4 sm:px-6 sm:pb-6">
+        <p className="text-pretty text-sm leading-6 text-slate-600">本动作主要用于热身和动作引导，不计入综合评分，也不进入五维能力。</p>
+      </div>
+    </details>
+  )
+}
+
+export function ExercisePerformanceSection({ analysis }: { analysis: TrainingAnalysis }) {
+  return (
+    <section aria-labelledby="exercise-performance-title" data-testid="report-exercises">
+      <SectionHeading id="exercise-performance-title" icon={Dumbbell} title="动作表现" description="先看每个动作的评分、完成度与一句话结论，需要时再展开证据。" />
+      <div className="mt-6 grid gap-3 lg:grid-cols-2">
+        <GuidanceCard analysis={analysis} />
+        {analysis.exercises.map((exercise) => <ExerciseReportCard key={exercise.exerciseId} exercise={exercise} />)}
+      </div>
     </section>
   )
 }
 
-export function RecommendationsSection({ recommendations }: { recommendations: ReportRecommendation[] }) {
-  return (
-    <section className="panel p-5 sm:p-6" aria-labelledby="recommendations-title" data-testid="report-recommendations">
-      <div className="flex items-center gap-3"><span className="grid size-9 place-items-center rounded-xl bg-amber-50 text-amber-600"><Sparkles size={19} /></span><div><h2 id="recommendations-title" className="text-balance text-xl font-bold text-slate-900">下一次训练建议</h2><p className="text-pretty text-sm text-slate-500">基于已保存结果的规则建议</p></div></div>
-      <ol className="mt-4 space-y-2">{recommendations.map((item, index) => <li key={item.id} className="flex gap-3 rounded-2xl bg-blue-50/70 p-4"><span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-sm font-bold text-blue-600">{index + 1}</span><p className="text-pretty text-sm leading-6 text-slate-700">{item.text}</p></li>)}</ol>
-    </section>
-  )
+function capabilityDisplayValue(dimension: CapabilityDimensionAnalysis): number | null {
+  return dimension.comparison?.current ?? dimension.value
 }
 
-export function TrainingReportView({ report }: { report: TrainingReportData }) {
-  const completedScoredCount = report.scoredExercises.filter((item) => item.completion === 'completed' && item.score !== null).length
+export function CapabilitySection({ analysis }: { analysis: TrainingAnalysis }) {
+  if (!analysis.capability.available) return null
+  const comparableRadar = analysis.capability.dimensions.length === 5 && analysis.capability.dimensions.every((item) => item.comparison !== null)
   return (
-    <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900">
-      <AppHeader />
-      <main className="mx-auto min-w-0 max-w-[1600px] px-4 py-5 lg:px-7">
-        <button type="button" onClick={() => window.location.assign('/')} className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white"><ArrowLeft size={17} />返回首页</button>
-        <ReportSummary report={report} />
-        <div className="mt-4 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,.85fr)_minmax(0,1.15fr)]">
-          <CapabilitySection capabilities={report.capabilitySummary} completedScoredCount={completedScoredCount} />
-          <section className="min-w-0" aria-labelledby="exercise-results-title" data-testid="report-exercises"><div className="mb-3 flex items-end justify-between gap-3"><div><h2 id="exercise-results-title" className="text-balance text-xl font-bold text-slate-900">各动作表现</h2><p className="text-pretty text-sm text-slate-500">展开查看已保存指标和主要问题</p></div><span className="text-sm tabular-nums text-slate-500">{report.exerciseSummaries.length} 项</span></div><div className="grid min-w-0 gap-3 sm:grid-cols-2">{report.exerciseSummaries.map((exercise) => <ExerciseReportCard key={exercise.exerciseId} exercise={exercise} />)}</div></section>
+    <section className="report-panel p-5 sm:p-7" aria-labelledby="capability-title" data-testid="report-capabilities">
+      <SectionHeading id="capability-title" icon={Gauge} title="能力表现" description="五项能力均来自已完成动作的有效贡献；缺失证据不会按 0 分处理。" />
+      <div className="mt-6 grid items-center gap-8 xl:grid-cols-[minmax(320px,.8fr)_minmax(0,1.2fr)]">
+        <div>
+          {analysis.capability.radarAvailable ? <CapabilityRadar dimensions={analysis.capability.dimensions} /> : (
+            <div className="rounded-xl bg-slate-50 p-6 text-center">
+              <p className="font-semibold text-slate-800">本次暂不绘制能力图</p>
+              <p className="mt-1 text-pretty text-sm leading-6 text-slate-500">五维数据尚未完整，下面仍会列出当前可用结果。</p>
+            </div>
+          )}
+          {analysis.capability.radarAvailable ? <div className="mt-2 flex flex-wrap justify-center gap-4 text-xs text-slate-600"><span className="inline-flex items-center gap-2"><i className="size-2.5 rounded-full bg-blue-600" />本次</span>{comparableRadar ? <span className="inline-flex items-center gap-2"><i className="size-2.5 rounded-full border-2 border-slate-400" />上次</span> : null}</div> : null}
         </div>
-        <div className="mt-4 grid min-w-0 gap-4 lg:grid-cols-2"><TopIssuesSection issues={report.topIssues} /><RecommendationsSection recommendations={report.recommendations} /></div>
-        <section className="mt-4 flex flex-col items-center justify-between gap-4 rounded-3xl bg-blue-600 p-5 text-white shadow-sm sm:flex-row sm:p-6" aria-label="报告操作">
-          <div><h2 className="text-balance text-xl font-bold">完成本次复盘</h2><p className="mt-1 text-pretty text-sm text-blue-100">报告仅基于本次已保存的训练数据。</p></div>
-          <div className="flex w-full gap-2 sm:w-auto"><button type="button" onClick={() => window.location.assign('/train')} className="flex-1 rounded-xl bg-white/15 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/20 sm:flex-none"><RefreshCw size={16} className="mr-2 inline" />重新训练</button><button type="button" onClick={() => window.location.assign('/')} className="flex-1 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-blue-700 shadow-sm sm:flex-none">返回首页</button></div>
-        </section>
+        <dl className="divide-y divide-slate-100">
+          {analysis.capability.dimensions.map((dimension) => {
+            const value = capabilityDisplayValue(dimension)
+            const delta = dimension.comparison ? scoreTrendText(dimension.comparison.trend, dimension.comparison.delta) : null
+            return (
+              <div key={dimension.dimension} className="grid gap-2 py-4 first:pt-0 last:pb-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center" data-testid={`capability-${dimension.dimension.toLowerCase()}`}>
+                <div><dt className="font-bold text-slate-900">{dimension.label}</dt><p className="mt-1 text-pretty text-xs leading-5 text-slate-500">{CAPABILITY_EXPLANATIONS[dimension.dimension]}</p></div>
+                <dd className="flex items-baseline gap-3 sm:justify-end"><span className="text-xl font-bold tabular-nums text-slate-950">{value ?? '—'}</span>{value === null ? <span className="text-xs text-slate-500">有效数据不足</span> : delta ? <span className={cn('text-xs font-semibold', dimension.comparison?.trend === 'DECLINED' ? 'text-amber-700' : 'text-slate-600')}>{delta}</span> : null}</dd>
+              </div>
+            )
+          })}
+        </dl>
+      </div>
+    </section>
+  )
+}
+
+function trendIssues(analysis: TrainingAnalysis): IssueAnalysis[] {
+  const allowed = new Set(['NEW', 'RESOLVED', 'IMPROVED', 'PERSISTENT', 'WORSENED'])
+  return analysis.exercises.flatMap((exercise) => exercise.issues).filter((issue) => allowed.has(issue.comparison?.trend ?? ''))
+}
+
+function countTrend(issues: readonly IssueAnalysis[], trend: string) {
+  return issues.filter((issue) => issue.comparison?.trend === trend).length
+}
+
+function strengthFindings(analysis: TrainingAnalysis): Finding[] {
+  return analysis.strengths.filter((finding) => ['EXERCISE_STRENGTH', 'CAPABILITY_STRENGTH', 'ISSUE_FREE_STRENGTH'].includes(finding.kind))
+}
+
+export function ProgressSection({ analysis }: { analysis: TrainingAnalysis }) {
+  if (analysis.comparison.level === 'NONE') return null
+  const changes = trendIssues(analysis)
+  const strengths = strengthFindings(analysis)
+  const scoreProgress = analysis.improvements.filter((finding) => finding.kind === 'HISTORICAL_SCORE_IMPROVED' || finding.kind === 'HISTORICAL_OVERALL_IMPROVED')
+  return (
+    <section className="report-panel p-5 sm:p-7" aria-labelledby="progress-title" data-testid="report-progress">
+      <SectionHeading id="progress-title" icon={History} title="相比上次" description={analysis.comparison.level === 'FULL' ? '使用完整课程范围进行比较。' : `仅比较双方共同完成的 ${analysis.comparison.commonExerciseIds.length} 个动作，不比较综合评分。`} />
+      <div className="mt-6 flex flex-wrap gap-2" aria-label="问题变化统计">
+        <ProgressChip label="已改善" count={countTrend(changes, 'IMPROVED')} tone="positive" />
+        <ProgressChip label="已解决" count={countTrend(changes, 'RESOLVED')} tone="positive" />
+        <ProgressChip label="新出现" count={countTrend(changes, 'NEW')} tone="attention" />
+        <ProgressChip label="持续存在" count={countTrend(changes, 'PERSISTENT')} tone="neutral" />
+      </div>
+      <div className="mt-6 grid gap-7 lg:grid-cols-2">
+        <div>
+          <h3 className="font-bold text-slate-950">变化明细</h3>
+          {changes.length ? <ul className="mt-3 divide-y divide-slate-100">{changes.map((issue) => {
+            const previous = issue.comparison?.previous
+            return (
+              <li key={issue.canonicalId} className="py-3 first:pt-0 last:pb-0">
+                <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-semibold text-slate-800">{EXERCISE_NAMES[issue.exerciseId]} · {issue.reportLabel}</p><span className="text-xs font-semibold text-slate-500">{issueTrendText(issue.comparison?.trend ?? null)}</span></div>
+                {previous && issue.stats ? <p className="mt-1 text-sm tabular-nums text-slate-500">{comparisonRatioText(previous, issue.stats, issue.unit)}</p> : null}
+              </li>
+            )
+          })}</ul> : <p className="mt-3 text-sm text-slate-500">共同范围内暂无需要列出的动作问题变化。</p>}
+          {scoreProgress.length ? <ul className="mt-4 space-y-2">{scoreProgress.map((finding) => <li key={finding.id} className="text-pretty text-sm leading-6 text-slate-600">{finding.text}</li>)}</ul> : null}
+        </div>
+        <div>
+          <h3 className="font-bold text-slate-950">本次表现较好的地方</h3>
+          {strengths.length ? <ul className="mt-3 space-y-3">{strengths.map((finding) => <li key={finding.id} className="rounded-xl bg-emerald-50 px-4 py-3 text-pretty text-sm leading-6 text-emerald-950">{finding.text}</li>)}</ul> : <p className="mt-3 text-sm leading-6 text-slate-500">当前证据没有形成独立的优势结论。</p>}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ProgressChip({ label, count, tone }: { label: string; count: number; tone: 'positive' | 'attention' | 'neutral' }) {
+  return <span className={cn('rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums', tone === 'positive' ? 'bg-emerald-50 text-emerald-800' : tone === 'attention' ? 'bg-amber-50 text-amber-800' : 'bg-slate-100 text-slate-700')}>{label} {count}</span>
+}
+
+function focusTitle(focus: FocusItem, analysis: TrainingAnalysis): string {
+  const priority = analysis.priorityIssues.find((item) => item.canonicalIds.some((id) => focus.canonicalIds.includes(id)))
+  if (priority) return priority.reportLabel
+  const issue = analysis.exercises.flatMap((exercise) => exercise.issues).find((item) => focus.canonicalIds.includes(item.canonicalId))
+  return issue ? `${EXERCISE_NAMES[issue.exerciseId]} · ${issue.reportLabel}` : focus.exerciseIds.map((id) => EXERCISE_NAMES[id]).join('、')
+}
+
+export function NextFocusSection({ analysis }: { analysis: TrainingAnalysis }) {
+  if (analysis.dataQuality.rulesSupport === 'UNSUPPORTED') return null
+  return (
+    <section className="report-panel p-5 sm:p-7" aria-labelledby="focus-title" data-testid="report-recommendations">
+      <SectionHeading id="focus-title" icon={Target} title="下次训练重点" description="把本次分析转成下一次可以直接执行的动作要求。" />
+      {analysis.nextFocus.length ? <ol className="mt-6 grid gap-3 lg:grid-cols-2">{analysis.nextFocus.map((focus) => (
+        <li key={`${focus.rank}-${focus.canonicalIds.join('-')}`} className="rounded-xl bg-blue-50 p-5">
+          <div className="flex items-center gap-3"><span className="grid size-8 place-items-center rounded-lg bg-blue-700 text-sm font-bold text-white">{focus.rank}</span><h3 className="text-balance font-bold text-slate-950">{focusTitle(focus, analysis)}</h3></div>
+          <p className="mt-4 text-pretty text-sm leading-6 text-slate-700">{focus.cue}。</p>
+          {focus.target ? <p className="mt-4 rounded-lg bg-white px-4 py-3 text-pretty text-sm font-bold leading-6 text-blue-800">{focus.target.text}</p> : null}
+        </li>
+      ))}</ol> : <div className="mt-6 rounded-xl bg-slate-50 p-5"><p className="text-sm font-semibold text-slate-800">本次没有需要优先纠正的问题。</p></div>}
+    </section>
+  )
+}
+
+function missingEvidenceNotes(analysis: TrainingAnalysis): string[] {
+  return analysis.dataQuality.missingEvidence.map((item) => {
+    const issue = analysis.exercises.flatMap((exercise) => exercise.issues).find((candidate) => candidate.canonicalId === item.canonicalId)
+    const evaluable = issue?.stats?.evaluable ?? 0
+    return evaluable > 0
+      ? `${EXERCISE_NAMES[item.exerciseId]}有 ${evaluable} 次手肘伸展可以可靠判断，当前证据不足，因此本次未给出该项结论。`
+      : `${EXERCISE_NAMES[item.exerciseId]}缺少可可靠判断的手肘伸展数据，因此本次未给出该项结论。`
+  })
+}
+
+export function DataNotesSection({ analysis }: { analysis: TrainingAnalysis }) {
+  const promptCount = analysis.dataQuality.poseQuality.outOfFramePrompts + analysis.dataQuality.poseQuality.lowConfidencePrompts
+  const notes = [...new Set([...analysis.dataQuality.notes, ...missingEvidenceNotes(analysis)])]
+  return (
+    <section aria-labelledby="data-notes-title" data-testid="report-data-notes">
+      <details className="group report-panel overflow-hidden">
+        <summary className="flex cursor-pointer list-none items-center gap-3 p-5 marker:content-none sm:p-6">
+          <span className="grid size-9 place-items-center rounded-xl bg-slate-100 text-slate-700" aria-hidden="true"><Info size={18} /></span>
+          <div className="min-w-0 flex-1"><h2 id="data-notes-title" className="text-balance text-lg font-bold text-slate-950">数据说明</h2><p className="mt-1 text-pretty text-sm text-slate-500">查看有效次数、识别质量与历史比较范围</p></div>
+          <ChevronDown size={18} className="text-slate-400 transition-transform duration-150 group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+        </summary>
+        <div className="border-t border-slate-100 px-5 pb-6 pt-5 sm:px-6">
+          <dl className="grid gap-3 sm:grid-cols-3">
+            <DataFact label="有效分析" value={`${analysis.dataQuality.reps.valid + analysis.dataQuality.reps.partial} 次`} />
+            <DataFact label="未纳入分析" value={`${analysis.dataQuality.reps.invalid} 次`} />
+            <DataFact label="识别质量提示" value={`${promptCount} 次`} />
+          </dl>
+          <ul className="mt-5 space-y-2 text-pretty text-sm leading-6 text-slate-600">
+            {analysis.dataQuality.rulesSupport === 'LEGACY_UNVERSIONED' ? <li>此记录来自旧版本，无法与当前训练可靠比较。</li> : null}
+            {analysis.dataQuality.rulesSupport === 'UNSUPPORTED' ? <li>此记录使用的评分规则与当前版本不同，本页只展示评分、完成度和数据说明。</li> : null}
+            {analysis.comparison.level === 'PARTIAL' ? <li>历史比较仅覆盖双方共同完成的 {analysis.comparison.commonExerciseIds.length} 个动作。</li> : null}
+            {analysis.dataQuality.limitedExercises.map((item) => <li key={item.exerciseId}>{EXERCISE_NAMES[item.exerciseId]}仅有 {item.analyzedReps} 次有效动作，本次分析范围有限。</li>)}
+            {notes.map((note) => <li key={note}>{note}</li>)}
+            <li>肩部环绕属于热身引导，不计入综合评分或五维能力。</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+  )
+}
+
+function DataFact({ label, value }: { label: string; value: string }) {
+  return <div className="rounded-xl bg-slate-50 px-4 py-3"><dt className="text-xs font-medium text-slate-500">{label}</dt><dd className="mt-1 font-bold tabular-nums text-slate-900">{value}</dd></div>
+}
+
+export function TrainingReportView({ analysis, session }: { analysis: TrainingAnalysis; session: TrainingSessionState }) {
+  return (
+    <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f5f7fa] text-slate-900">
+      <AppHeader />
+      <main className="mx-auto min-w-0 max-w-[1320px] px-4 pb-12 pt-5 sm:px-6 lg:px-8">
+        <button type="button" onClick={() => window.location.assign('/')} className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} />返回首页</button>
+        <div className="space-y-5 sm:space-y-6">
+          <ReportHero analysis={analysis} session={session} />
+          <TrainingAnalysisSection analysis={analysis} />
+          <PriorityIssuesSection analysis={analysis} />
+          <ExercisePerformanceSection analysis={analysis} />
+          <CapabilitySection analysis={analysis} />
+          <ProgressSection analysis={analysis} />
+          <NextFocusSection analysis={analysis} />
+          <DataNotesSection analysis={analysis} />
+          <section className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-blue-700 p-6 text-white sm:flex-row sm:items-center sm:p-7" aria-label="报告操作">
+            <div><h2 className="text-balance text-xl font-bold">带着重点，再练一次</h2><p className="mt-1 text-pretty text-sm text-blue-100">下一次训练会生成新的独立报告。</p></div>
+            <button type="button" onClick={() => window.location.assign('/train')} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-800 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:w-auto"><RefreshCw size={17} />再次训练</button>
+          </section>
+        </div>
       </main>
     </div>
   )
 }
 
-export function ReportNotFound() {
+function RecoveryLayout({ title, description, testId, showTrain = true }: { title: string; description: string; testId: string; showTrain?: boolean }) {
   return (
-    <div className="min-h-dvh bg-[#f6f9fc] text-slate-900"><AppHeader /><main className="mx-auto grid min-h-[70dvh] max-w-3xl place-items-center px-4 py-12"><section className="panel w-full p-8 text-center" data-testid="report-not-found"><span className="mx-auto grid size-12 place-items-center rounded-2xl bg-slate-100 text-slate-500"><MessageCircleWarning size={23} /></span><h1 className="mt-4 text-balance text-2xl font-bold">未找到本次训练记录</h1><p className="mx-auto mt-2 max-w-md text-pretty text-sm text-slate-500">记录可能已被清除，或报告链接中的 Session ID 无效。</p><button type="button" onClick={() => window.location.assign('/')} className="primary-button mt-6">返回首页</button></section></main></div>
+    <div className="min-h-dvh bg-[#f5f7fa] text-slate-900"><AppHeader /><main className="mx-auto grid min-h-[70dvh] max-w-3xl place-items-center px-4 py-12"><section className="report-panel w-full p-8 text-center" data-testid={testId}><span className="mx-auto grid size-12 place-items-center rounded-xl bg-slate-100 text-slate-600"><AlertTriangle size={22} /></span><h1 className="mt-4 text-balance text-2xl font-bold">{title}</h1><p className="mx-auto mt-2 max-w-md text-pretty text-sm leading-6 text-slate-600">{description}</p><div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row"><button type="button" onClick={() => window.location.assign('/')} className="secondary-button inline-flex items-center justify-center gap-2"><ArrowLeft size={16} />返回首页</button>{showTrain ? <button type="button" onClick={() => window.location.assign('/train')} className="primary-button inline-flex items-center justify-center gap-2">开始训练<TrendingUp size={16} /></button> : null}</div></section></main></div>
   )
 }
 
+export function ReportNotFound() {
+  return <RecoveryLayout title="没有找到这次训练记录" description="记录可能已被清除，或者报告链接已经失效。你可以返回首页或开始一次新的训练。" testId="report-not-found" />
+}
+
+export function ReportReadError() {
+  return <RecoveryLayout title="暂时无法读取训练报告" description="本地训练记录读取失败，请稍后重试。已有训练不会因此被重新计算。" testId="report-read-error" />
+}
+
 export function TrainingReportPage({ sessionId }: { sessionId: string }) {
-  const session = new LocalStorageTrainingSessionRepository().get(sessionId)
-  return session ? <TrainingReportView report={buildTrainingReport(session)} /> : <ReportNotFound />
+  const state = useTrainingReportAnalysis(sessionId)
+  if (state.status === 'not_found') return <ReportNotFound />
+  if (state.status === 'error') return <ReportReadError />
+  return <TrainingReportView analysis={state.analysis} session={state.session} />
 }
