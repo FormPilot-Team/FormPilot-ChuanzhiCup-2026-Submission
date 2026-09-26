@@ -72,7 +72,7 @@ test('Report V2 visual audit: desktop hierarchy holds at all target widths', asy
   for (const viewport of [{ width: 1920, height: 1080 }, { width: 1440, height: 900 }, { width: 1366, height: 768 }]) {
     await page.setViewportSize(viewport)
     await page.goto(`/report/${THEME_MERGE_AND_CAPS.id}`)
-    await expect(page.getByRole('heading', { name: '这次训练，重点已经清楚了' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: '热身训练报告' })).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     await page.screenshot({ path: `screenshots/phase8f2/report-${viewport.width}x${viewport.height}-top.png` })
   }

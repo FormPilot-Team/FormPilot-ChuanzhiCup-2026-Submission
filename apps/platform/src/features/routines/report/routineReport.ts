@@ -61,6 +61,19 @@ export interface RoutineComparison {
   syncTrend: DeltaTrend | null
 }
 
+/** One "下次练习重点" item: the sentence the report always gave, plus its value, reason and practice target. */
+export interface RoutineFocusItem {
+  kind: 'chapter' | 'region' | 'tempo' | 'coverage' | 'steady'
+  text: string
+  title: string
+  /** What to do next time, in user language (for a chapter: its own teaching cue). */
+  detail: string
+  value: string | null
+  reason: string | null
+  /** A numbered form that can be practised on its own. */
+  chapterId: string | null
+}
+
 export interface RoutineReport {
   record: RoutineSessionRecord
   program: RoutineProgram
@@ -79,6 +92,7 @@ export interface RoutineReport {
   strongestChapter: RoutineChapterReport | null
   weakestRegion: FollowAlongRegion | null
   focus: string[]
+  focusItems: RoutineFocusItem[]
   comparison: RoutineComparison
   notes: string[]
   headline: string
@@ -240,22 +254,43 @@ export function compareWithPrevious(record: RoutineSessionRecord, program: Routi
   }
 }
 
-function focusItems(report: Omit<RoutineReport, 'focus' | 'notes' | 'headline' | 'comparison'>, program: RoutineProgram): string[] {
-  const items: string[] = []
+function focusItems(report: Omit<RoutineReport, 'focus' | 'focusItems' | 'notes' | 'headline' | 'comparison'>, program: RoutineProgram): RoutineFocusItem[] {
+  const items: RoutineFocusItem[] = []
   const weakest = report.weakestChapter
   if (weakest && weakest.similarity !== null && report.similarity !== null && weakest.band !== 'high'
     && weakest.similarity <= report.similarity - 5) {
     const single = weakest.chapter.kind === 'form' ? `，可以在「${program.title}」页单独练习这一${program.formUnit}` : ''
-    items.push(`重点复习「${chapterDisplayName(weakest.chapter)}」：跟练相似度 ${weakest.similarity}%，低于本次平均${single}。`)
+    items.push({
+      kind: 'chapter',
+      text: `重点复习「${chapterDisplayName(weakest.chapter)}」：跟练相似度 ${weakest.similarity}%，低于本次平均${single}。`,
+      title: `重点复习「${chapterDisplayName(weakest.chapter)}」`,
+      detail: `动作要点：${weakest.chapter.cue}。`,
+      value: `相似度 ${weakest.similarity}%`,
+      reason: `本次各段中相似度最低，比全程平均（${report.similarity}%）低 ${report.similarity - weakest.similarity} 个百分点。`,
+      chapterId: weakest.chapter.kind === 'form' ? weakest.chapter.id : null,
+    })
   }
   const region = report.weakestRegion
   if (region && (report.regions[region] ?? 100) < ROUTINE_REPORT_CONFIG.focusRegionBelow) {
-    items.push(`注意${REGION_LABEL[region]}动作：该部位与示范差异最大（${report.regions[region]}%），对照视频调整幅度与方向。`)
+    items.push({
+      kind: 'region',
+      text: `注意${REGION_LABEL[region]}动作：该部位与示范差异最大（${report.regions[region]}%），对照视频调整幅度与方向。`,
+      title: `注意${REGION_LABEL[region]}动作`,
+      detail: `对照视频调整${REGION_LABEL[region]}动作的幅度与方向。`,
+      value: `${REGION_LABEL[region]} ${report.regions[region]}%`,
+      reason: `上肢、躯干、下肢中与示范差异最大，且低于 ${ROUTINE_REPORT_CONFIG.focusRegionBelow}%。`,
+      chapterId: null,
+    })
   }
-  if (report.tempo === 'behind') items.push('节奏常慢于视频：留意口令提示，动作与视频同步起落。')
-  if (report.tempo === 'ahead') items.push('节奏常快于视频：放慢动作，跟随口令完成每个定势。')
-  if (report.coverage < 0.9 && report.chapters.length > 1) items.push('有部分段落没有完整跟练，下次尽量从头到尾连续完成。')
-  if (!items.length && report.similarity !== null) items.push('整体跟练稳定，下次保持节奏，尝试把每个定势做得更舒展到位。')
+  const sync = report.syncShare === null ? null : `节奏同步 ${report.syncShare}%`
+  if (report.tempo === 'behind') items.push({ kind: 'tempo', text: '节奏常慢于视频：留意口令提示，动作与视频同步起落。', title: '跟上视频节奏', detail: '留意口令提示，动作与视频同步起落。', value: sync, reason: '跟练中较多时间慢于视频。', chapterId: null })
+  if (report.tempo === 'ahead') items.push({ kind: 'tempo', text: '节奏常快于视频：放慢动作，跟随口令完成每个定势。', title: '放慢动作节奏', detail: '放慢动作，跟随口令完成每个定势。', value: sync, reason: '跟练中较多时间快于视频。', chapterId: null })
+  if (report.coverage < 0.9 && report.chapters.length > 1) {
+    items.push({ kind: 'coverage', text: '有部分段落没有完整跟练，下次尽量从头到尾连续完成。', title: '完整跟练全套', detail: '下次尽量从头到尾连续完成。', value: `完成 ${percent(report.coverage)}%`, reason: '有部分段落没有完整跟练。', chapterId: null })
+  }
+  if (!items.length && report.similarity !== null) {
+    items.push({ kind: 'steady', text: '整体跟练稳定，下次保持节奏，尝试把每个定势做得更舒展到位。', title: '保持稳定，做得更舒展', detail: '下次保持节奏，尝试把每个定势做得更舒展到位。', value: `相似度 ${report.similarity}%`, reason: '本次没有明显低于平均的段落或部位。', chapterId: null })
+  }
   return items.slice(0, 3)
 }
 
@@ -311,9 +346,11 @@ export function buildRoutineReport(record: RoutineSessionRecord, history: readon
   const headline = similarity === null
     ? `${coverageText} · 暂无跟练相似度`
     : `${coverageText} · 跟练相似度 ${similarity}%（${SIMILARITY_BAND_LABEL[similarityBand(similarity)]}）`
+  const structuredFocus = focusItems(base, program)
   return {
     ...base,
-    focus: focusItems(base, program),
+    focus: structuredFocus.map((item) => item.text),
+    focusItems: structuredFocus,
     comparison: compareWithPrevious(record, program, history),
     notes,
     headline,

@@ -4,6 +4,7 @@ import type {
 } from '../../features/analysis'
 import type { ExerciseId } from '../../features/exercises/types'
 import { REPORT_EXERCISE_PRESENTATION } from '../../features/report/presentation'
+import type { ScoreTone } from './reportShell'
 
 export const EXERCISE_NAMES: Readonly<Record<ScoredExerciseId, string>> = {
   overhead_raise: '双臂上举',
@@ -94,6 +95,12 @@ export function freeTrainingSummary(analysis: TrainingAnalysis, exerciseId: Exer
     }
     return sentence
   })
+}
+
+/** Visual tone of a 0–100 value (ring and bar colour only; the report text never grades by it). */
+export function scoreTone(score: number | null): ScoreTone {
+  if (score === null) return 'none'
+  return score >= 80 ? 'good' : score >= 60 ? 'fair' : 'low'
 }
 
 export function scoreTrendText(trend: Trend | null, delta: number | null): string | null {
