@@ -1,14 +1,17 @@
 import type { CourseDefinition, CourseStep } from './CourseDefinition'
 
+/** What the controller needs from a course: its timings and its steps. Routines use it with their own step type. */
+export type CourseTimeline<TStep = CourseStep> = Pick<CourseDefinition, 'countdownSeconds' | 'transitionMs'> & { steps: ReadonlyArray<TStep> }
+
 export type CourseState = 'PREPARING' | 'COUNTDOWN' | 'ACTIVE' | 'PAUSED' | 'TRANSITION' | 'COURSE_COMPLETE' | 'COURSE_INCOMPLETE'
 export interface CourseSnapshot { state: CourseState; stepIndex: number; countdown: number; elapsedMs: number; transitionRemainingMs: number; previousState?: CourseState }
 
-export class CourseController {
+export class CourseController<TStep = CourseStep> {
   private snapshot: CourseSnapshot = { state: 'PREPARING', stepIndex: 0, countdown: 3, elapsedMs: 0, transitionRemainingMs: 0 }
   private stateStartedAt?: number; private activeStartedAt?: number; private pausedAt?: number
-  constructor(private readonly definition: CourseDefinition) { this.snapshot.countdown = definition.countdownSeconds }
+  constructor(private readonly definition: CourseTimeline<TStep>) { this.snapshot.countdown = definition.countdownSeconds }
   getSnapshot(): CourseSnapshot { return { ...this.snapshot } }
-  getStep(): CourseStep { return this.definition.steps[this.snapshot.stepIndex] }
+  getStep(): TStep { return this.definition.steps[this.snapshot.stepIndex] }
   update(now: number, input: { ready: boolean; progress: number; target: number }): CourseSnapshot {
     if (this.snapshot.state === 'PAUSED' || this.snapshot.state === 'COURSE_COMPLETE' || this.snapshot.state === 'COURSE_INCOMPLETE') return this.getSnapshot()
     if (this.snapshot.state === 'PREPARING' && input.ready) { this.snapshot.state = 'COUNTDOWN'; this.stateStartedAt = now }
