@@ -7,6 +7,11 @@ const TrainingReportPage = lazy(async () => {
   return { default: module.TrainingReportPage }
 })
 
+const TrainingHistoryPage = lazy(async () => {
+  const module = await import('../pages/History/TrainingHistoryPage')
+  return { default: module.TrainingHistoryPage }
+})
+
 export default function App() {
   const { pathname, search } = window.location
   const reportMatch = pathname.match(/^\/report\/([^/]+)$/)
@@ -15,6 +20,15 @@ export default function App() {
     return (
       <Suspense fallback={<div className="grid min-h-dvh place-items-center bg-[#f5f7fa] px-4 text-sm font-semibold text-slate-600" role="status">正在读取训练报告…</div>}>
         <TrainingReportPage sessionId={decodeURIComponent(reportMatch[1])} />
+      </Suspense>
+    )
+  }
+
+  if (pathname === '/history') {
+    document.title = 'FormPilot · 训练记录'
+    return (
+      <Suspense fallback={<div className="grid min-h-dvh place-items-center bg-[#f5f7fa] px-4 text-sm font-semibold text-slate-600" role="status">正在读取训练记录…</div>}>
+        <TrainingHistoryPage />
       </Suspense>
     )
   }

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { isStaleActiveSession, LocalStorageTrainingSessionRepository, parseStoredSessions } from '../src/features/training/LocalStorageTrainingSessionRepository'
+import { isStaleActiveSession, LocalStorageTrainingSessionRepository, parseStoredSessions, retainTrainingSessions } from '../src/features/training/LocalStorageTrainingSessionRepository'
 import { MemoryTrainingSessionRepository } from '../src/features/training/MemoryTrainingSessionRepository'
 import { TrainingSession } from '../src/features/training/TrainingSession'
 import type { TrainingSessionState } from '../src/features/training/types'
@@ -129,5 +129,17 @@ describe('session repository hardening', () => {
     const persistedRep = reloaded?.exercises[0]?.repetitions[0]
     expect(persistedRep?.rep).toMatchObject({ topElbowL: 127, topElbowR: 151 })
     expect(persistedRep?.metrics.elbow).toEqual({ value: 127, score: 0, valid: false })
+  })
+
+  it('evicts demo, synthetic, and fast records before older user training at the 20-session limit', () => {
+    const userSessions = Array.from({ length: 20 }, (_item, index) => ({ ...validSession(), id: `user-${index}`, startedAt: index + 1 }))
+    const disposable = [
+      { ...validSession(), id: 'demo', source: 'demo' as const, startedAt: 100 },
+      { ...validSession(), id: 'synthetic', source: 'synthetic' as const, startedAt: 101 },
+      { ...validSession(), id: 'fast', mode: 'fast' as const, startedAt: 102 },
+    ]
+    const retained = retainTrainingSessions([...userSessions, ...disposable])
+    expect(retained).toHaveLength(20)
+    expect(retained.map((item) => item.id)).toEqual(userSessions.map((item) => item.id))
   })
 })

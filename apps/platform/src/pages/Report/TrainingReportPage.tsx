@@ -431,7 +431,10 @@ export function TrainingReportView({ analysis, session }: { analysis: TrainingAn
           <DataNotesSection analysis={analysis} />
           <section className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-blue-700 p-6 text-white sm:flex-row sm:items-center sm:p-7" aria-label="报告操作">
             <div><h2 className="text-balance text-xl font-bold">带着重点，再练一次</h2><p className="mt-1 text-pretty text-sm text-blue-100">下一次训练会生成新的独立报告。</p></div>
-            <button type="button" onClick={() => window.location.assign('/train')} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-800 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:w-auto"><RefreshCw size={17} />再次训练</button>
+            <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
+              <a href="/history" className="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-300 px-5 py-3 text-sm font-bold text-white hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"><History size={17} />查看训练记录</a>
+              <button type="button" onClick={() => window.location.assign('/train')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-800 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"><RefreshCw size={17} />再次训练</button>
+            </div>
           </section>
         </div>
       </main>
