@@ -15,6 +15,8 @@ export interface WorkshopFrame {
   pose: NormalizedPoseFrame | null
   /** The filtered frame, for drawing. */
   raw: PoseFrame | null
+  /** The detector's own frame before filtering (gestures use a lighter filter of their own). */
+  detected: PoseFrame | null
   timestamp: number
   /** Width / height of the camera picture. */
   aspect: number
@@ -32,10 +34,12 @@ type FixtureWindow = typeof window & { __workshopFixtureMode?: FixtureMode }
  * normaliser with the workshop's own detector instance (see features/workshop/detector.ts). DEV builds can replace the
  * camera with a synthetic person (`?fixture=synthetic`) whose pose the page controls.
  */
-export function useWorkshopCamera({ synthetic, onFrame, fixture }: {
+export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = () => true }: {
   synthetic: boolean
   onFrame: (frame: WorkshopFrame) => void
   fixture?: () => WorkshopFixtureControl
+  /** Whether to draw the skeleton on this frame (training hides it while following, as the other modes do). */
+  showOverlay?: () => boolean
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const demoImageRef = useRef<HTMLImageElement>(null)
@@ -55,12 +59,14 @@ export function useWorkshopCamera({ synthetic, onFrame, fixture }: {
   const [errorKind, setErrorKind] = useState<CameraFailureKind>()
   const [modelVariant, setModelVariant] = useState<WorkshopModelVariant>()
 
+  const showOverlayRef = useRef(showOverlay)
+  showOverlayRef.current = showOverlay
   const deliver = useCallback((raw: PoseFrame | null, timestamp: number, aspect: number, mirrored: boolean, width: number, height: number) => {
     const filtered = raw ? (filterRef.current ??= new PoseFilter()).push(raw) : null
     const pose = filtered ? normalizePoseFrame(filtered) : null
-    if (filtered) overlayRef.current?.draw(filtered, [], { mirrored, sourceWidth: width, sourceHeight: height, fit: 'contain' })
+    if (filtered && showOverlayRef.current()) overlayRef.current?.draw(filtered, [], { mirrored, sourceWidth: width, sourceHeight: height, fit: 'contain' })
     else overlayRef.current?.clear()
-    onFrameRef.current({ pose, raw: filtered, timestamp, aspect })
+    onFrameRef.current({ pose, raw: filtered, detected: raw, timestamp, aspect })
   }, [])
 
   const stop = useCallback(() => {

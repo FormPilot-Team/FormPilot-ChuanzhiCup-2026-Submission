@@ -6,7 +6,7 @@ import { markOnboardingSeen } from './support/onboarding'
 const storedActions = (page: Page) => page.evaluate((key) => (JSON.parse(localStorage.getItem(key) ?? '{"actions":[]}') as { actions: CustomActionDefinition[] }).actions, CUSTOM_ACTION_STORAGE_KEY)
 
 /** Creates a lateral-raise action through the whole editor with the synthetic camera (DEV fixture). */
-async function createAction(page: Page, name: string, target = 5) {
+async function createAction(page: Page, name: string, target = 5, saveButton: 'editor-save' | 'editor-save-train' = 'editor-save') {
   await page.goto('/workshop/new?fixture=synthetic')
   await expect(page.getByRole('heading', { level: 1, name: '创建动作' })).toBeVisible()
   await page.getByLabel('动作名称').fill(name)
@@ -31,8 +31,8 @@ async function createAction(page: Page, name: string, target = 5) {
   await page.getByTestId('editor-next').click()
   await expect(page.getByTestId('save-summary')).toContainText(name)
   await expect(page.getByTestId('save-summary')).toContainText('已通过')
-  await page.getByTestId('editor-save').click()
-  await expect(page).toHaveURL(/\/workshop\?saved=custom-/)
+  await page.getByTestId(saveButton).click()
+  if (saveButton === 'editor-save') await expect(page).toHaveURL(/\/workshop\?saved=custom-/)
 }
 
 test.beforeEach(async ({ page }) => { await markOnboardingSeen(page) })
@@ -211,4 +211,19 @@ test('Workshop G: the workshop records with its own full pose model while the wa
   expect(models).toContain('/models/pose_landmarker_lite.task')
   expect(models).not.toContain('/models/pose_landmarker_full.task')
   expect(errors).toEqual([])
+})
+
+test('Workshop H: the closed loop — create, test, save and start training, then it counts, reports and shows on Home', async ({ page }) => {
+  test.setTimeout(150_000)
+  await createAction(page, '闭环动作', 3, 'editor-save-train')
+  await expect(page).toHaveURL(/\/workshop\/custom-[^/]+\/train$/)
+  await expect(page.getByRole('heading', { level: 1, name: '闭环动作' })).toBeVisible()
+  const [saved] = await storedActions(page)
+  await page.goto(`/workshop/${saved.id}/train?fixture=synthetic&fast=1`)
+  await expect(page.getByTestId('custom-complete-dialog')).toHaveAttribute('data-outcome', 'completed', { timeout: 60_000 })
+  await page.getByRole('button', { name: '查看训练报告' }).click()
+  await expect(page.getByRole('heading', { level: 1, name: '闭环动作训练报告' })).toBeVisible()
+  await expect(page.getByTestId('report-summary')).toContainText('本次完成了 3 / 3 次，其中 3 次识别重点都达标')
+  await page.goto('/')
+  await expect(page.getByTestId('home-my-actions').getByRole('link', { name: '开始训练 · 闭环动作' })).toHaveAttribute('href', `/workshop/${saved.id}/train`)
 })

@@ -133,8 +133,28 @@ export function resolveRecognition(definition: CustomActionDefinition): Recognit
   }
 }
 
-const GAP_ABORT_MS = 450
 const FRAME_MARGIN = 0.02
+
+/**
+ * Whether the landmarks an action needs are visible and inside the picture; a user-facing hint when not.
+ * Used by the recognizer while following and by the training page before it starts.
+ */
+export function framingHintFor(landmarks: ReadonlyArray<PoseLandmark>, setup: Pick<RecognitionSetup, 'bounds' | 'framingLabel'>): string | undefined {
+  let outVertically = false
+  let outSideways = false
+  let missing = false
+  for (const name of setup.bounds) {
+    const point = landmark(landmarks, name)
+    if (!isFinitePoint(point) || point.visibility < 0.35) { missing = true; continue }
+    if (point.y < FRAME_MARGIN || point.y > 1 - FRAME_MARGIN) outVertically = true
+    if (point.x < FRAME_MARGIN || point.x > 1 - FRAME_MARGIN) outSideways = true
+  }
+  if (outSideways) return `请向画面中间移动一些，让${setup.framingLabel}完整入镜`
+  if (outVertically || missing) return `请后退一些，让${setup.framingLabel}完整入镜`
+  return undefined
+}
+
+const GAP_ABORT_MS = 450
 const ORBIT_TRAVEL = 4.5
 const FLASH_MS = { success: 1600, warning: 2800 }
 
@@ -229,18 +249,7 @@ export class CustomActionRecognizer {
   }
 
   private framingHint(landmarks: ReadonlyArray<PoseLandmark>): string | undefined {
-    let outVertically = false
-    let outSideways = false
-    let missing = false
-    for (const name of this.setup.bounds) {
-      const point = landmark(landmarks, name)
-      if (!isFinitePoint(point) || point.visibility < 0.35) { missing = true; continue }
-      if (point.y < FRAME_MARGIN || point.y > 1 - FRAME_MARGIN) outVertically = true
-      if (point.x < FRAME_MARGIN || point.x > 1 - FRAME_MARGIN) outSideways = true
-    }
-    if (outSideways) return `请向画面中间移动一些，让${this.setup.framingLabel}完整入镜`
-    if (outVertically || missing) return `请后退一些，让${this.setup.framingLabel}完整入镜`
-    return undefined
+    return framingHintFor(landmarks, this.setup)
   }
 
   private read(frame: NormalizedPoseFrame, aspect: number): { progress: number | null; metrics: Record<string, number> } {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AlertTriangle, ArrowLeft, ArrowRight, Check, Save } from 'lucide-react'
-import { WORKSHOP_PATH } from '../../app/routes'
+import { AlertTriangle, ArrowLeft, ArrowRight, Check, Play, Save } from 'lucide-react'
+import { WORKSHOP_PATH, customTrainingPath } from '../../app/routes'
 import { CameraPanel } from '../../components/camera/CameraPanel'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { JOINT_LABEL } from '../../features/workshop/catalog'
@@ -197,7 +197,7 @@ export function ActionEditorPage({ actionId, repository = localRepository }: { a
     window.requestAnimationFrame(() => headingRef.current?.focus())
   }
 
-  const save = () => {
+  const save = (thenTrain = false) => {
     const problems = validateForSave(draft)
     if (readOnly) problems.push('本地的动作数据来自更新版本或无法读取，暂时不能保存。')
     setSaveProblems(problems)
@@ -209,7 +209,7 @@ export function ActionEditorPage({ actionId, repository = localRepository }: { a
       return
     }
     setDirty(false)
-    window.location.assign(`${WORKSHOP_PATH}?saved=${encodeURIComponent(toSave.id)}`)
+    window.location.assign(thenTrain ? customTrainingPath(toSave.id) : `${WORKSHOP_PATH}?saved=${encodeURIComponent(toSave.id)}`)
   }
 
   if (actionId && !existing) {
@@ -318,7 +318,10 @@ export function ActionEditorPage({ actionId, repository = localRepository }: { a
                 <button type="button" onClick={() => goTo(STEPS[stepIndex(step) - 1].id)} className="secondary-button inline-flex items-center gap-2"><ArrowLeft size={16} aria-hidden="true" />上一步</button>
               ) : <span />}
               {step === 'save' ? (
-                <button type="button" onClick={save} disabled={readOnly} className="primary-button inline-flex items-center gap-2 px-6 disabled:cursor-not-allowed disabled:opacity-50" data-testid="editor-save"><Save size={17} aria-hidden="true" />保存动作</button>
+                <span className="flex flex-wrap items-center gap-2">
+                  <button type="button" onClick={() => save(false)} disabled={readOnly} className="secondary-button inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50" data-testid="editor-save"><Save size={17} aria-hidden="true" />保存动作</button>
+                  <button type="button" onClick={() => save(true)} disabled={readOnly} className="primary-button inline-flex items-center gap-2 px-6 disabled:cursor-not-allowed disabled:opacity-50" data-testid="editor-save-train"><Play size={16} fill="currentColor" aria-hidden="true" />保存并开始训练</button>
+                </span>
               ) : (
                 <button type="button" onClick={() => goTo(STEPS[stepIndex(step) + 1].id)} className="primary-button inline-flex items-center gap-2" data-testid="editor-next">下一步：{STEPS[stepIndex(step) + 1].label}<ArrowRight size={16} aria-hidden="true" /></button>
               )}

@@ -10,23 +10,28 @@ import {
   type TrainingHistoryOverview, type TrainingTrendPoint,
 } from '../../features/history/TrainingHistory'
 import { loadRoutineHistory, mergeHistoryEntries, type HistoryEntry, type RoutineHistoryItem } from '../../features/history/routineHistory'
+import { loadCustomHistory, type CustomHistoryItem } from '../../features/history/customHistory'
+import { LocalStorageCustomSessionRepository, type CustomSessionRepository } from '../../features/workshop/session'
 import { LocalStorageRoutineSessionRepository, type RoutineSessionRepository } from '../../features/routines/session/RoutineSessionRepository'
 import { LocalStorageTrainingSessionRepository } from '../../features/training/LocalStorageTrainingSessionRepository'
 import type { TrainingSessionRepository } from '../../features/training/TrainingSessionRepository'
 import { freeTrainingLabel } from '../../features/training/trainingScope'
 import { cn } from '../../lib/cn'
 import { formatDate, formatDuration, formatShortDate } from '../Report/reportPresentation'
+import { CustomActionHistoryCard } from './CustomActionHistoryCard'
 import { RoutineHistoryCard } from './RoutineHistoryCard'
 
 const localRepository = new LocalStorageTrainingSessionRepository()
 const localRoutineRepository = new LocalStorageRoutineSessionRepository()
+const localCustomRepository = new LocalStorageCustomSessionRepository()
 
-type HistoryFilter = 'all' | 'smart' | 'routine'
+type HistoryFilter = 'all' | 'smart' | 'routine' | 'custom'
 
 const FILTERS: ReadonlyArray<{ id: HistoryFilter; label: string }> = [
   { id: 'all', label: '全部' },
   { id: 'smart', label: '热身训练' },
   { id: 'routine', label: '跟练课程' },
+  { id: 'custom', label: '我的动作' },
 ]
 
 function sessionDuration(item: TrainingHistoryItem): number | null {
@@ -143,28 +148,32 @@ function ProgressOverview({ overview }: { overview: TrainingHistoryOverview }) {
 }
 
 function HistoryEntryCard({ entry }: { entry: HistoryEntry }) {
+  if (entry.kind === 'custom') return <CustomActionHistoryCard item={entry.custom} />
   return entry.kind === 'smart' ? <HistoryCard item={entry.smart} /> : <RoutineHistoryCard item={entry.routine} />
 }
 
-export function TrainingHistoryView({ items, overview, routineItems = [], routineUnavailable = false }: {
+export function TrainingHistoryView({ items, overview, routineItems = [], routineUnavailable = false, customItems = [], customUnavailable = false }: {
   items: TrainingHistoryItem[]
   overview: TrainingHistoryOverview
   routineItems?: RoutineHistoryItem[]
   routineUnavailable?: boolean
+  customItems?: CustomHistoryItem[]
+  customUnavailable?: boolean
 }) {
   const [showIncomplete, setShowIncomplete] = useState(false)
   const [filter, setFilter] = useState<HistoryFilter>('all')
-  const entries = mergeHistoryEntries(items, routineItems).filter((entry) => filter === 'all' || entry.kind === filter)
+  const entries = mergeHistoryEntries(items, routineItems, customItems).filter((entry) => filter === 'all' || entry.kind === filter)
   const visibleEntries = showIncomplete ? entries : entries.filter((entry) => !entry.incomplete)
   const hiddenIncomplete = entries.filter((entry) => entry.incomplete).length
-  const empty = items.length === 0 && routineItems.length === 0
+  const empty = items.length === 0 && routineItems.length === 0 && customItems.length === 0
   return (
     <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900">
       <AppHeader />
       <main className="mx-auto min-w-0 max-w-[1200px] px-4 pb-12 pt-5 sm:px-6 lg:px-8">
         <a href="/" className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} aria-hidden="true" />返回首页</a>
-        <header className="mb-6 flex items-start gap-4 sm:mb-8"><span className="fp-energy-gradient grid size-12 shrink-0 place-items-center rounded-2xl text-white shadow-[0_8px_18px_-10px_rgb(14_165_233/0.9)]"><History size={23} aria-hidden="true" /></span><div><h1 className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">我的训练</h1><p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">查看每次训练的报告，了解热身训练与跟练课程的近期变化。</p></div></header>
+        <header className="mb-6 flex items-start gap-4 sm:mb-8"><span className="fp-energy-gradient grid size-12 shrink-0 place-items-center rounded-2xl text-white shadow-[0_8px_18px_-10px_rgb(14_165_233/0.9)]"><History size={23} aria-hidden="true" /></span><div><h1 className="text-balance text-3xl font-bold text-slate-950 sm:text-4xl">我的训练</h1><p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">查看每次训练的报告，了解热身训练、跟练课程和我的动作的近期变化。</p></div></header>
         {routineUnavailable ? <p className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900" role="status" data-testid="history-routine-unavailable">跟练课程记录暂时无法读取，其他训练记录不受影响。</p> : null}
+        {customUnavailable ? <p className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900" role="status" data-testid="history-custom-unavailable">我的动作训练记录暂时无法读取，其他训练记录不受影响。</p> : null}
 
         {empty ? (
           <section className="report-panel p-8 text-center sm:p-10" data-testid="history-empty"><CalendarDays className="mx-auto text-slate-400" size={34} aria-hidden="true" /><h2 className="mt-4 text-balance text-xl font-bold text-slate-950">还没有训练记录</h2><p className="mx-auto mt-2 max-w-md text-pretty text-sm leading-6 text-slate-600">完成一次训练后，报告会保存在这里。</p><a href={START_TRAINING_PATH} className="primary-button mt-6 inline-flex items-center justify-center gap-2">开始训练<ArrowRight size={16} aria-hidden="true" /></a></section>
@@ -198,12 +207,14 @@ export function TrainingHistoryError() {
   return <div className="min-h-dvh bg-[#f5f7fa] text-slate-900"><AppHeader /><main className="mx-auto grid min-h-[70dvh] max-w-3xl place-items-center px-4 py-12"><section className="report-panel w-full p-8 text-center" data-testid="history-read-error"><span className="mx-auto grid size-12 place-items-center rounded-xl bg-amber-50 text-amber-700"><AlertTriangle size={22} aria-hidden="true" /></span><h1 className="mt-4 text-balance text-2xl font-bold">暂时无法读取训练记录</h1><p className="mx-auto mt-2 max-w-md text-pretty text-sm leading-6 text-slate-600">本地记录读取失败，请稍后重新打开。已有训练不会因此被修改。</p><button type="button" onClick={() => window.location.reload()} className="secondary-button mt-6 inline-flex items-center justify-center gap-2"><RefreshCw size={16} aria-hidden="true" />重新读取</button></section></main></div>
 }
 
-export function TrainingHistoryPage({ repository = localRepository, routineRepository = localRoutineRepository }: {
+export function TrainingHistoryPage({ repository = localRepository, routineRepository = localRoutineRepository, customRepository = localCustomRepository }: {
   repository?: TrainingSessionRepository
   routineRepository?: RoutineSessionRepository
+  customRepository?: CustomSessionRepository
 }) {
   const state = useMemo(() => loadTrainingHistory(repository), [repository])
   const routine = useMemo(() => loadRoutineHistory(routineRepository), [routineRepository])
+  const custom = useMemo(() => loadCustomHistory(customRepository), [customRepository])
   if (state.status === 'error') return <TrainingHistoryError />
   return (
     <TrainingHistoryView
@@ -211,6 +222,8 @@ export function TrainingHistoryPage({ repository = localRepository, routineRepos
       overview={state.overview}
       routineItems={routine.status === 'ready' ? routine.items : []}
       routineUnavailable={routine.status === 'error'}
+      customItems={custom.status === 'ready' ? custom.items : []}
+      customUnavailable={custom.status === 'error'}
     />
   )
 }

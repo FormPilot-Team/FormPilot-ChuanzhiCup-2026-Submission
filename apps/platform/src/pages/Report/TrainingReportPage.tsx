@@ -19,7 +19,9 @@ import {
   scoreTone, scoreTrendText,
 } from './reportPresentation'
 import { FocusCard, FocusPanel, MiniBar, ReportActions, ReportLayout, ReportSummary, SectionHeading, type ReportTakeaway } from './reportShell'
+import { CustomActionReportView } from './CustomActionReportView'
 import { RoutineReportView } from './RoutineReportView'
+import { useCustomActionReport } from './useCustomActionReport'
 import { useRoutineReport } from './useRoutineReport'
 import { useTrainingReportAnalysis } from './useTrainingReportAnalysis'
 
@@ -511,12 +513,14 @@ export function ReportReadError() {
   return <RecoveryLayout title="暂时无法读取训练报告" description="本地训练记录读取失败，请稍后重试。已有训练不会因此被重新计算。" testId="report-read-error" />
 }
 
-/** One report route for every mode: a follow-along routine record opens its routine report, anything else the warm-up's. */
+/** One report route for every mode: follow-along and custom-action records open their own report, anything else the warm-up's. */
 export function TrainingReportPage({ sessionId }: { sessionId: string }) {
   const routine = useRoutineReport(sessionId)
+  const custom = useCustomActionReport(sessionId)
   const state = useTrainingReportAnalysis(sessionId)
   if (routine.status === 'ready') return <RoutineReportView report={routine.report} />
-  if (state.status === 'not_found') return routine.status === 'error' ? <ReportReadError /> : <ReportNotFound />
+  if (custom.status === 'ready') return <CustomActionReportView report={custom.report} actionExists={custom.actionExists} />
+  if (state.status === 'not_found') return routine.status === 'error' || custom.status === 'error' ? <ReportReadError /> : <ReportNotFound />
   if (state.status === 'error') return <ReportReadError />
   return <TrainingReportView analysis={state.analysis} session={state.session} />
 }

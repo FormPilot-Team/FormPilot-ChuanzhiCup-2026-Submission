@@ -20,7 +20,7 @@ const point = (x: number, y: number, visibility = 0.98): PoseLandmark => ({ x, y
 export function standingPose(armDegrees: number, aspect = FIXTURE_ASPECT): PoseLandmark[] {
   const cx = 0.5 * aspect
   const at = (x: number, y: number) => point(x / aspect, y)
-  const landmarks = Array.from({ length: 33 }, () => point(0.5, 0.45, 0.2))
+  const landmarks = Array.from({ length: 33 }, () => point(0.5, 0.45))
   const shoulders = { left: { x: cx + 0.105, y: 0.34 }, right: { x: cx - 0.105, y: 0.34 } }
   const radians = (armDegrees * Math.PI) / 180
   const arm = (shoulder: { x: number; y: number }, direction: 1 | -1) => {
@@ -32,12 +32,18 @@ export function standingPose(armDegrees: number, aspect = FIXTURE_ASPECT): PoseL
   const right = arm(shoulders.right, -1)
   const set = (index: number, value: PoseLandmark) => { landmarks[index] = value }
   set(0, at(cx, 0.17))
+  // Face points around the nose, hand points at the wrists, foot points at the ankles, as MediaPipe reports them.
+  for (let index = 1; index <= 10; index += 1) set(index, at(cx + (index % 2 ? 0.012 : -0.012) * Math.ceil(index / 2), 0.16 + (index > 8 ? 0.025 : 0)))
   set(11, at(shoulders.left.x, shoulders.left.y)); set(12, at(shoulders.right.x, shoulders.right.y))
   set(13, at(left.elbow.x, left.elbow.y)); set(14, at(right.elbow.x, right.elbow.y))
   set(15, at(left.wrist.x, left.wrist.y)); set(16, at(right.wrist.x, right.wrist.y))
+  for (const index of [17, 19, 21]) set(index, at(left.wrist.x, left.wrist.y))
+  for (const index of [18, 20, 22]) set(index, at(right.wrist.x, right.wrist.y))
   set(23, at(cx + 0.075, 0.58)); set(24, at(cx - 0.075, 0.58))
   set(25, at(cx + 0.08, 0.76)); set(26, at(cx - 0.08, 0.76))
   set(27, at(cx + 0.08, 0.94)); set(28, at(cx - 0.08, 0.94))
+  set(29, at(cx + 0.08, 0.955)); set(31, at(cx + 0.1, 0.96))
+  set(30, at(cx - 0.08, 0.955)); set(32, at(cx - 0.1, 0.96))
   return landmarks
 }
 

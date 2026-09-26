@@ -1,9 +1,9 @@
 import { useMemo, useRef, useState, type ChangeEvent } from 'react'
 import * as AlertDialog from '@radix-ui/react-alert-dialog'
 import {
-  AlertTriangle, ArrowLeft, Check, ChevronRight, CircleDashed, Download, FileUp, History, PencilLine, Plus, Trash2, WandSparkles,
+  AlertTriangle, ArrowLeft, Check, ChevronRight, CircleDashed, Download, FileUp, History, PencilLine, Play, Plus, Trash2, WandSparkles,
 } from 'lucide-react'
-import { HOME_PATH, WORKSHOP_NEW_PATH, workshopActionPath } from '../../app/routes'
+import { HOME_PATH, WORKSHOP_NEW_PATH, customTrainingPath, workshopActionPath } from '../../app/routes'
 import { WORKSHOP_FLOW } from '../../app/modeCatalog'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { PoseSketch } from '../../components/workshop/PoseSketch'
@@ -56,6 +56,7 @@ function ActionCard({ action, onExport, onDelete }: { action: CustomActionDefini
           <PoseSketch start={action.startPose.capture} finish={action.finishPose.capture} className="h-24 w-20 shrink-0" />
         </div>
         <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
+          <a href={customTrainingPath(action.id)} className="primary-button inline-flex items-center gap-1.5 px-3.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" aria-label={`开始训练 ${action.name}`} data-testid={`workshop-train-${action.id}`}><Play size={14} fill="currentColor" aria-hidden="true" />开始训练</a>
           <a href={workshopActionPath(action.id)} className="secondary-button inline-flex items-center gap-1.5 px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" aria-label={`编辑 ${action.name}`}><PencilLine size={15} aria-hidden="true" />编辑</a>
           <button type="button" onClick={onExport} className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100" aria-label={`导出 ${action.name}`}><Download size={15} aria-hidden="true" />导出</button>
           <AlertDialog.Root>
