@@ -1,41 +1,121 @@
-import type { TrainingSessionState } from '../training/types'
+import type { ExerciseId } from '../exercises/types'
+import type { ExerciseSessionResult } from '../training/types'
 import { ANALYSIS_CONFIG_V1 } from './config'
-import type { ComparisonSelection, DataQuality, RepetitionQualityCounts } from './types'
-import { assessRulesSupport, resolveAnalysisMode } from './rulesSupport'
-import { repetitionQuality } from './repetitionValidity'
+import { exerciseName } from './copy'
+import { hasPoseQualityError } from './repetitionValidity'
+import { sessionConditions, type SessionFacts } from './sessionFacts'
+import type {
+  CapabilityAnalysis, Comparison, ComparisonLimitation, DataQuality, ExerciseAnalysis, PoseQualityCounts, SessionFlag,
+} from './types'
 
-export function buildDataQuality(session: TrainingSessionState, comparison: ComparisonSelection): DataQuality {
-  const rules = assessRulesSupport(session)
-  const mode = resolveAnalysisMode(session)
-  const reps = session.exercises.map(repetitionQuality).reduce<RepetitionQualityCounts>((total, item) => ({
-    valid: total.valid + item.valid,
-    partial: total.partial + item.partial,
-    invalid: total.invalid + item.invalid,
-    total: total.total + item.total,
-  }), { valid: 0, partial: 0, invalid: 0, total: 0 })
-  const missingTopElbow = session.exercises.filter((item) => item.exerciseId === 'overhead_raise').flatMap((item) => item.repetitions)
-    .filter((item) => item.rep.exerciseId === 'overhead_raise' && (!Number.isFinite(item.rep.topElbowL) || !Number.isFinite(item.rep.topElbowR))).length
-  const poseCodes = new Set(['POSE_LOW_CONFIDENCE', 'BODY_OUT_OF_FRAME'])
-  const poseQualityEvents = session.exercises.reduce((sum, exercise) => sum
-    + exercise.feedbackEvents.filter((event) => event.code && poseCodes.has(event.code)).length
-    + exercise.repetitions.reduce((repSum, item) => repSum + item.errors.filter((code) => poseCodes.has(code)).length, 0), 0)
-  const poseThreshold = ANALYSIS_CONFIG_V1.dataQuality.poseQualityHintMinRate
-  const showEnvironmentHint = poseQualityEvents >= ANALYSIS_CONFIG_V1.dataQuality.poseQualityHintMinCount
-    && poseQualityEvents * poseThreshold.denominator >= Math.max(reps.total, 1) * poseThreshold.numerator
-  const notices: DataQuality['notices'] = []
-  if (rules.support === 'LEGACY_UNVERSIONED') notices.push({ code: 'LEGACY_RULES', severity: 'warning', count: null, text: '该记录缺少规则版本，可做静态分析但不能用于历史比较。' })
-  if (rules.support === 'UNSUPPORTED') notices.push({ code: 'UNSUPPORTED_RULES', severity: 'warning', count: null, text: '该记录的规则版本不受 analysis-v1 支持。' })
-  if (mode === 'unknown') notices.push({ code: 'MODE_UNKNOWN', severity: 'warning', count: null, text: '该记录缺少训练模式，不能用于历史比较。' })
-  if (mode === 'fast') notices.push({ code: 'FAST_MODE', severity: 'info', count: null, text: '快速模式记录不参与历史比较。' })
-  if (session.source !== 'live') notices.push({ code: 'NON_LIVE_SOURCE', severity: 'info', count: null, text: '非实时训练记录不参与历史比较。' })
-  if (reps.invalid > 0) notices.push({ code: 'INVALID_REPS', severity: 'warning', count: reps.invalid, text: '无效次数已排除，未按 0 分计入。' })
-  if (missingTopElbow > 0) notices.push({ code: 'MISSING_TOP_ELBOW', severity: 'warning', count: missingTopElbow, text: '部分双臂上举缺少 TOP 肘角证据，未使用其他字段回退。' })
-  if (poseQualityEvents > 0) notices.push({ code: 'POSE_QUALITY', severity: 'info', count: poseQualityEvents, text: '姿态质量事件只用于数据质量说明，未进入动作问题。' })
-  notices.push({ code: 'GUIDANCE_EXCLUDED', severity: 'info', count: 1, text: '肩部环绕为引导动作，不进入计分与能力聚合。' })
-  if (comparison.level !== 'FULL') notices.push({ code: 'COMPARISON_LIMITED', severity: 'info', count: null, text: comparison.level === 'PARTIAL' ? '仅比较双方共同的计分动作，不计算总分差。' : '本次没有可用的历史比较。' })
+const DQ = ANALYSIS_CONFIG_V1.dataQuality
+
+function poseCounts(record: ExerciseSessionResult | null): PoseQualityCounts {
+  const events = record && Array.isArray(record.feedbackEvents) ? record.feedbackEvents : []
+  const corrections = events.filter((event) => event?.kind === 'correction')
+  const invalid = record && Array.isArray(record.repetitions)
+    ? record.repetitions.filter((item) => item && hasPoseQualityError(item))
+    : []
   return {
-    rules, mode, source: session.source, reps, missingTopElbow, poseQualityEvents,
-    environmentHint: showEnvironmentHint ? '多次出现姿态质量事件，请检查光线、镜头距离与全身入镜情况。' : null,
-    guidanceExerciseIds: ['shoulder_rotation'], comparisonLimitation: comparison.unavailableReason, notices,
+    outOfFramePrompts: corrections.filter((event) => event.code === 'BODY_OUT_OF_FRAME').length,
+    lowConfidencePrompts: corrections.filter((event) => event.code === 'POSE_LOW_CONFIDENCE').length,
+    outOfFrameInvalidReps: invalid.filter((item) => item.errors.includes('BODY_OUT_OF_FRAME')).length,
+    lowConfidenceInvalidReps: invalid.filter((item) => item.errors.includes('POSE_LOW_CONFIDENCE')).length,
+  }
+}
+
+function sessionFlags(facts: SessionFacts): SessionFlag[] {
+  const session = facts.session
+  const conditions = sessionConditions(session)
+  const flags: SessionFlag[] = []
+  if (facts.rulesSupport === 'LEGACY_UNVERSIONED') flags.push('LEGACY_RULES_UNVERSIONED')
+  if (facts.rulesSupport === 'UNSUPPORTED') flags.push('RULES_UNSUPPORTED')
+  if (conditions.mode === 'unknown') flags.push('MODE_UNKNOWN')
+  if (conditions.mode === 'fast') flags.push('FAST_MODE')
+  // Heuristic hint only: a completed legacy course where some scored exercise never reached its stored target.
+  if (facts.rulesSupport === 'LEGACY_UNVERSIONED' && session.courseStatus === 'completed'
+    && facts.exercises.some((item) => item.completion.progress < item.completion.target)) flags.push('LEGACY_FAST_SUSPECTED')
+  if (conditions.source !== 'live') flags.push('NON_LIVE_SOURCE')
+  if (!conditions.courseFlow) flags.push('NOT_COURSE_FLOW')
+  if (!conditions.finalized) flags.push('NOT_FINALIZED')
+  return flags
+}
+
+export function buildDataQuality(input: {
+  facts: SessionFacts
+  exercises: readonly ExerciseAnalysis[]
+  comparison: Comparison
+  capability: CapabilityAnalysis
+}): DataQuality {
+  const { facts, exercises, comparison, capability } = input
+  const session = facts.session
+  const guidanceRecord = Array.isArray(session.exercises) ? session.exercises.find((item) => item?.exerciseId === 'shoulder_rotation') ?? null : null
+  const byExercise = [
+    { exerciseId: 'shoulder_rotation' as ExerciseId, ...poseCounts(guidanceRecord) },
+    ...facts.exercises.map((item) => ({ exerciseId: item.exerciseId as ExerciseId, ...poseCounts(item.record) })),
+  ]
+  const total = (key: keyof PoseQualityCounts) => byExercise.reduce((sum, item) => sum + item[key], 0)
+  const pose: PoseQualityCounts = {
+    outOfFramePrompts: total('outOfFramePrompts'),
+    lowConfidencePrompts: total('lowConfidencePrompts'),
+    outOfFrameInvalidReps: total('outOfFrameInvalidReps'),
+    lowConfidenceInvalidReps: total('lowConfidenceInvalidReps'),
+  }
+  const prompts = pose.outOfFramePrompts + pose.lowConfidencePrompts
+  const poseInvalidReps = facts.exercises.reduce((sum, item) => sum + (item.record?.repetitions ?? []).filter((rep) => rep && hasPoseQualityError(rep)).length, 0)
+  let environmentHint: DataQuality['poseQuality']['environmentHint'] = null
+  if (prompts >= DQ.environmentHintMinPrompts || poseInvalidReps >= DQ.environmentHintMinInvalidReps) {
+    // Prompts decide the hint; when there are no prompts, the invalid reps' own codes decide it.
+    const framing = prompts > 0 ? pose.outOfFramePrompts : pose.outOfFrameInvalidReps
+    const visibility = prompts > 0 ? pose.lowConfidencePrompts : pose.lowConfidenceInvalidReps
+    environmentHint = framing > visibility ? 'FRAMING' : 'VISIBILITY'
+  }
+
+  const missingEvidence: DataQuality['missingEvidence'] = exercises.flatMap((exercise) => exercise.issues
+    .filter((issue) => issue.missingEvidenceReps > 0)
+    .map((issue) => ({
+      exerciseId: exercise.exerciseId,
+      canonicalId: issue.canonicalId,
+      reps: issue.missingEvidenceReps,
+      reason: facts.rulesSupport === 'LEGACY_UNVERSIONED' ? 'LEGACY_SESSION_NO_TOP_ELBOW' as const : 'TOP_ELBOW_NOT_CAPTURED' as const,
+    })))
+
+  const limitedExercises = exercises
+    .filter((item) => item.completion.status !== 'not_started' && item.reps.analyzed < ANALYSIS_CONFIG_V1.issue.minEvaluableReps)
+    .map((item) => ({ exerciseId: item.exerciseId, analyzedReps: item.reps.analyzed }))
+
+  const limitations: ComparisonLimitation[] = []
+  if (comparison.level === 'PARTIAL') limitations.push('NO_OVERALL_DELTA_PARTIAL')
+  if (exercises.some((exercise) => exercise.issues.some((issue) => issue.comparison?.trend === 'INSUFFICIENT_DATA'))) limitations.push('ISSUE_PREVIOUS_INSUFFICIENT')
+  if (capability.dimensions.some((item) => item.comparisonUnavailableReason === 'COMMON_SCOPE_TOO_SMALL')) limitations.push('CAPABILITY_COMMON_SCOPE_TOO_SMALL')
+  if (comparison.level !== 'NONE' && comparison.commonExerciseIds.length < ANALYSIS_CONFIG_V1.scoredExerciseIds.length) limitations.push('EXERCISE_NOT_COMMON')
+
+  const notes: string[] = []
+  if (pose.outOfFramePrompts > 0) notes.push(`本次有 ${pose.outOfFramePrompts} 次身体未完整入镜提示。`)
+  if (pose.lowConfidencePrompts > 0) notes.push(`本次有 ${pose.lowConfidencePrompts} 次动作识别不清提示。`)
+  const invalid = exercises.reduce((sum, item) => sum + item.reps.invalid, 0)
+  if (invalid > 0) notes.push(`有 ${invalid} 次动作因识别无效未计入分析。`)
+  const missingByExercise = new Map<string, number>()
+  for (const item of missingEvidence) missingByExercise.set(item.exerciseId, Math.max(missingByExercise.get(item.exerciseId) ?? 0, item.reps))
+  for (const [exerciseId, reps] of missingByExercise) notes.push(`${exerciseName(exerciseId as ExerciseId)}有 ${reps} 次未能判断举到顶部时的手肘伸展。`)
+
+  return {
+    rulesSupport: facts.rulesSupport,
+    sessionFlags: sessionFlags(facts),
+    poseQuality: { ...pose, byExercise, environmentHint },
+    reps: {
+      recorded: exercises.reduce((sum, item) => sum + item.reps.recorded, 0),
+      valid: exercises.reduce((sum, item) => sum + item.reps.valid, 0),
+      partial: exercises.reduce((sum, item) => sum + item.reps.partial, 0),
+      invalid,
+      byExercise: exercises.map((item) => ({
+        exerciseId: item.exerciseId, recorded: item.reps.recorded, valid: item.reps.valid, partial: item.reps.partial, invalid: item.reps.invalid,
+      })),
+    },
+    missingEvidence,
+    limitedExercises,
+    guidance: { exerciseId: 'shoulder_rotation', status: facts.guidanceStatus, scored: false },
+    comparisonLimitations: limitations,
+    notes,
   }
 }

@@ -3,103 +3,184 @@ import { LATERAL_RAISE_V1 } from '../exercises/lateralRaise/config'
 import { OVERHEAD_RAISE_V1 } from '../exercises/overheadRaise/config'
 import { SQUAT_V1 } from '../exercises/squat/config'
 import { STEP_JACK_V1 } from '../exercises/stepJack/config'
-import type { ExerciseSessionResult, RepetitionResult } from '../training/types'
-import { analyzedRepetitions } from './repetitionValidity'
-import type { ReportIssueDefinition } from './issueTaxonomy'
-import type { Incidence } from './types'
+import type { KneeRaiseRepSummary, StepJackRepSummary } from '../exercises/types'
+import type { RepetitionResult } from '../training/types'
+import { finite } from './ratio'
+import type { ReportIssueDefinition } from './types'
 
-export interface IssueEvidenceResult {
-  incidence: Incidence
-  affectedSequence: boolean[]
-  evidenceRefs: string[]
-  missingEvidenceCount: number
-}
-function finite(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value)
+/** A VALID or PARTIAL repetition together with its position in `exercise.repetitions`. */
+export interface AnalyzedRep {
+  index: number
+  result: RepetitionResult
+  validity: 'VALID' | 'PARTIAL'
 }
 
-function repRef(exercise: ExerciseSessionResult, result: RepetitionResult): string {
-  return `rep:${exercise.exerciseId}:${result.rep.repIndex}`
+/** One evaluable unit: a repetition, or a left/right pair for knee_raise.height_gap. */
+export interface EvidenceUnit {
+  affected: boolean
+  repIndexes: number[]
 }
 
-function evaluate(definition: ReportIssueDefinition, result: RepetitionResult): boolean | null {
-  const rep = result.rep
-  switch (`${definition.exerciseId}:${definition.code}`) {
-    case 'overhead_raise:ARMS_TOO_LOW': return rep.exerciseId === 'overhead_raise' ? Math.min(rep.peakShoulderL, rep.peakShoulderR) < OVERHEAD_RAISE_V1.topMinAngle : null
-    case 'overhead_raise:ELBOW_TOO_BENT_L': return rep.exerciseId === 'overhead_raise' && finite(rep.topElbowL) ? rep.topElbowL < OVERHEAD_RAISE_V1.elbowCorrectionAngle : null
-    case 'overhead_raise:ELBOW_TOO_BENT_R': return rep.exerciseId === 'overhead_raise' && finite(rep.topElbowR) ? rep.topElbowR < OVERHEAD_RAISE_V1.elbowCorrectionAngle : null
-    case 'overhead_raise:ASYMMETRY': return rep.exerciseId === 'overhead_raise' ? rep.maxSymmetryDiff > OVERHEAD_RAISE_V1.symmetryMaxDiff : null
-    case 'overhead_raise:TORSO_LEAN': return rep.exerciseId === 'overhead_raise' ? rep.maxTorsoLean > OVERHEAD_RAISE_V1.torsoLeanMax : null
-    case 'overhead_raise:TOO_FAST': return rep.exerciseId === 'overhead_raise' ? rep.durationMs < OVERHEAD_RAISE_V1.repDurationMinMs : null
-
-    case 'lateral_raise:ARM_TOO_LOW_L': return rep.exerciseId === 'lateral_raise' ? rep.peakShoulderL < LATERAL_RAISE_V1.topMinAngle : null
-    case 'lateral_raise:ARM_TOO_LOW_R': return rep.exerciseId === 'lateral_raise' ? rep.peakShoulderR < LATERAL_RAISE_V1.topMinAngle : null
-    case 'lateral_raise:ELBOW_TOO_BENT_L': return rep.exerciseId === 'lateral_raise' ? rep.minElbowL < LATERAL_RAISE_V1.elbowMinAngle : null
-    case 'lateral_raise:ELBOW_TOO_BENT_R': return rep.exerciseId === 'lateral_raise' ? rep.minElbowR < LATERAL_RAISE_V1.elbowMinAngle : null
-    case 'lateral_raise:ASYMMETRY': return rep.exerciseId === 'lateral_raise' ? rep.maxSymmetryDiff > LATERAL_RAISE_V1.symmetryMaxDiff : null
-    case 'lateral_raise:TORSO_LEAN': return rep.exerciseId === 'lateral_raise' ? rep.maxTorsoLean > LATERAL_RAISE_V1.torsoLeanMax : null
-    case 'lateral_raise:TOO_FAST': return rep.exerciseId === 'lateral_raise' ? rep.durationMs < LATERAL_RAISE_V1.repDurationMinMs : null
-
-    case 'step_jack:STEP_TOO_SMALL': return rep.exerciseId === 'step_jack' ? rep.peakOpenRatio < STEP_JACK_V1.openMinRatio : null
-    case 'step_jack:ARM_LEG_UNSYNCED': return rep.exerciseId === 'step_jack' ? rep.syncGapMs > STEP_JACK_V1.syncAcceptableMs || rep.maxArmAngleDiff > STEP_JACK_V1.armSymmetryMaxDiff : null
-    case 'step_jack:ARM_TOO_LOW': return rep.exerciseId === 'step_jack' ? rep.peakMeanShoulderAngle < STEP_JACK_V1.armTopMinAngle : null
-    case 'step_jack:BODY_SWAY': return rep.exerciseId === 'step_jack' ? rep.maxTorsoLean > STEP_JACK_V1.torsoLeanMax : null
-    case 'step_jack:WRONG_SIDE_SEQUENCE': return rep.exerciseId === 'step_jack' && rep.repIndex > 1 ? rep.wrongSideSequence : null
-    case 'step_jack:TOO_FAST': return rep.exerciseId === 'step_jack' ? rep.durationMs < STEP_JACK_V1.repDurationMinMs : null
-
-    case 'squat:DEPTH_INSUFFICIENT': return rep.exerciseId === 'squat' ? rep.maxHipDrop < SQUAT_V1.validDepthHipDrop : null
-    case 'squat:KNEE_VALGUS': return rep.exerciseId === 'squat' ? rep.minKneeSpreadRatio < SQUAT_V1.kneeValgusMaxRatio : null
-    case 'squat:LEFT_RIGHT_ASYMMETRY': return rep.exerciseId === 'squat' ? rep.maxKneeHeightDiff > SQUAT_V1.kneeHeightDiffMax : null
-    case 'squat:TORSO_LATERAL_LEAN': return rep.exerciseId === 'squat' ? rep.maxTorsoLean > SQUAT_V1.torsoLeanMax : null
-    case 'squat:TOO_FAST': return rep.exerciseId === 'squat' ? rep.durationMs < SQUAT_V1.repDurationMinMs : null
-
-    case 'knee_raise:KNEE_TOO_LOW_L': return rep.exerciseId === 'knee_raise' && rep.side === 'left' ? rep.peakKneeHeight < KNEE_RAISE_V1.userTargetHeight : null
-    case 'knee_raise:KNEE_TOO_LOW_R': return rep.exerciseId === 'knee_raise' && rep.side === 'right' ? rep.peakKneeHeight < KNEE_RAISE_V1.userTargetHeight : null
-    case 'knee_raise:WRONG_SIDE_SEQUENCE': return rep.exerciseId === 'knee_raise' && rep.repIndex > 1 ? rep.wrongSideSequence : null
-    case 'knee_raise:BODY_SWAY': return rep.exerciseId === 'knee_raise' ? rep.hipShiftMax > KNEE_RAISE_V1.hipShiftMax || rep.maxTorsoLean > KNEE_RAISE_V1.torsoLeanMax : null
-    case 'knee_raise:TOO_FAST': return rep.exerciseId === 'knee_raise' ? rep.durationMs < KNEE_RAISE_V1.repDurationMinMs : null
-    default: return null
-  }
+export interface IssueEvidence {
+  units: EvidenceUnit[]
+  missingEvidenceReps: number
+  /** step_jack.step_width only (REP_SIDE_BREAKDOWN). */
+  sideUnits: { left: EvidenceUnit[]; right: EvidenceUnit[] } | null
 }
 
-function kneeHeightPairs(exercise: ExerciseSessionResult): Array<{ affected: boolean; refs: string[] }> {
-  const reps = analyzedRepetitions(exercise).filter((item) => item.rep.exerciseId === 'knee_raise')
-  const pairs: Array<{ affected: boolean; refs: string[] }> = []
-  for (let index = 1; index < reps.length; index += 1) {
-    const previous = reps[index - 1]
-    const current = reps[index]
-    if (previous.rep.exerciseId !== 'knee_raise' || current.rep.exerciseId !== 'knee_raise' || previous.rep.side === current.rep.side) continue
-    pairs.push({
-      affected: Math.abs(previous.rep.peakKneeHeight - current.rep.peakKneeHeight) > KNEE_RAISE_V1.peakHeightGapMax,
-      refs: [repRef(exercise, previous), repRef(exercise, current)],
-    })
+type Outcome = 'AFFECTED' | 'CLEAR' | 'NOT_EVALUABLE' | 'MISSING'
+
+function flag(value: boolean): Outcome {
+  return value ? 'AFFECTED' : 'CLEAR'
+}
+
+/**
+ * The runtime falls back to syncGapMs = durationMs when either the arms or the step never reached their threshold,
+ * so only reps that reached both thresholds say anything about limb synchronisation.
+ */
+export function stepJackSyncEvaluable(rep: StepJackRepSummary): boolean {
+  return rep.peakMeanShoulderAngle >= STEP_JACK_V1.armTopMinAngle && rep.peakOpenRatio >= STEP_JACK_V1.openMinRatio
+}
+
+/**
+ * 8F-1A §8 pairing: scan analyzed reps in order; two adjacent reps on different sides form one pair and are both
+ * consumed; a same-side neighbour only advances the window by one. Pairs never overlap.
+ */
+export function kneeRaisePairs(analyzed: readonly AnalyzedRep[]): Array<[AnalyzedRep, AnalyzedRep]> {
+  const pairs: Array<[AnalyzedRep, AnalyzedRep]> = []
+  let cursor = 0
+  while (cursor + 1 < analyzed.length) {
+    const first = analyzed[cursor].result.rep as KneeRaiseRepSummary
+    const second = analyzed[cursor + 1].result.rep as KneeRaiseRepSummary
+    if (first.side !== second.side) {
+      pairs.push([analyzed[cursor], analyzed[cursor + 1]])
+      cursor += 2
+    } else {
+      cursor += 1
+    }
   }
   return pairs
 }
 
-export function collectIssueEvidence(exercise: ExerciseSessionResult, definition: ReportIssueDefinition): IssueEvidenceResult {
-  if (definition.code === 'LEFT_RIGHT_HEIGHT_GAP' && definition.exerciseId === 'knee_raise') {
-    const pairs = kneeHeightPairs(exercise)
+export function kneeRaisePairGap(pair: readonly [AnalyzedRep, AnalyzedRep]): number {
+  return Math.abs((pair[0].result.rep as KneeRaiseRepSummary).peakKneeHeight - (pair[1].result.rep as KneeRaiseRepSummary).peakKneeHeight)
+}
+
+function evaluateRep(definition: ReportIssueDefinition, item: AnalyzedRep, legacy: boolean): Outcome {
+  const rep = item.result.rep
+  const firstRecorded = item.index === 0
+  switch (definition.canonicalId) {
+    case 'overhead_raise.arm_height':
+      return rep.exerciseId === 'overhead_raise' ? flag(Math.min(rep.peakShoulderL, rep.peakShoulderR) < OVERHEAD_RAISE_V1.topMinAngle) : 'NOT_EVALUABLE'
+    case 'overhead_raise.elbow_extension.left':
+    case 'overhead_raise.elbow_extension.right': {
+      if (rep.exerciseId !== 'overhead_raise') return 'NOT_EVALUABLE'
+      // TOP-phase elbow only. Never fall back to minElbow, rep.errors or feedback events.
+      const top = definition.side === 'left' ? rep.topElbowL : rep.topElbowR
+      if (legacy || !finite(top)) return 'MISSING'
+      return flag(top < OVERHEAD_RAISE_V1.elbowCorrectionAngle)
+    }
+    case 'overhead_raise.arm_symmetry':
+      return rep.exerciseId === 'overhead_raise' ? flag(rep.maxSymmetryDiff > OVERHEAD_RAISE_V1.symmetryMaxDiff) : 'NOT_EVALUABLE'
+    case 'overhead_raise.torso_lean':
+      return rep.exerciseId === 'overhead_raise' ? flag(rep.maxTorsoLean > OVERHEAD_RAISE_V1.torsoLeanMax) : 'NOT_EVALUABLE'
+    case 'overhead_raise.too_fast':
+      return rep.exerciseId === 'overhead_raise' ? flag(rep.durationMs < OVERHEAD_RAISE_V1.repDurationMinMs) : 'NOT_EVALUABLE'
+
+    case 'lateral_raise.arm_height.left':
+      return rep.exerciseId === 'lateral_raise' ? flag(rep.peakShoulderL < LATERAL_RAISE_V1.topMinAngle) : 'NOT_EVALUABLE'
+    case 'lateral_raise.arm_height.right':
+      return rep.exerciseId === 'lateral_raise' ? flag(rep.peakShoulderR < LATERAL_RAISE_V1.topMinAngle) : 'NOT_EVALUABLE'
+    case 'lateral_raise.elbow_extension.left':
+      return rep.exerciseId === 'lateral_raise' ? flag(rep.minElbowL < LATERAL_RAISE_V1.elbowMinAngle) : 'NOT_EVALUABLE'
+    case 'lateral_raise.elbow_extension.right':
+      return rep.exerciseId === 'lateral_raise' ? flag(rep.minElbowR < LATERAL_RAISE_V1.elbowMinAngle) : 'NOT_EVALUABLE'
+    case 'lateral_raise.arm_symmetry':
+      return rep.exerciseId === 'lateral_raise' ? flag(rep.maxSymmetryDiff > LATERAL_RAISE_V1.symmetryMaxDiff) : 'NOT_EVALUABLE'
+    case 'lateral_raise.torso_lean':
+      return rep.exerciseId === 'lateral_raise' ? flag(rep.maxTorsoLean > LATERAL_RAISE_V1.torsoLeanMax) : 'NOT_EVALUABLE'
+    case 'lateral_raise.too_fast':
+      return rep.exerciseId === 'lateral_raise' ? flag(rep.durationMs < LATERAL_RAISE_V1.repDurationMinMs) : 'NOT_EVALUABLE'
+
+    case 'step_jack.step_width':
+      return rep.exerciseId === 'step_jack' ? flag(rep.peakOpenRatio < STEP_JACK_V1.openMinRatio) : 'NOT_EVALUABLE'
+    case 'step_jack.arm_height':
+      return rep.exerciseId === 'step_jack' ? flag(rep.peakMeanShoulderAngle < STEP_JACK_V1.armTopMinAngle) : 'NOT_EVALUABLE'
+    case 'step_jack.limb_sync':
+      if (rep.exerciseId !== 'step_jack' || !stepJackSyncEvaluable(rep)) return 'NOT_EVALUABLE'
+      return flag(rep.syncGapMs > STEP_JACK_V1.syncAcceptableMs)
+    case 'step_jack.arm_symmetry':
+      return rep.exerciseId === 'step_jack' ? flag(rep.maxArmAngleDiff > STEP_JACK_V1.armSymmetryMaxDiff) : 'NOT_EVALUABLE'
+    case 'step_jack.alternation':
+      // The first recorded rep's flag only encodes the "expect left first" convention, not alternation.
+      return rep.exerciseId === 'step_jack' && !firstRecorded ? flag(rep.wrongSideSequence) : 'NOT_EVALUABLE'
+    case 'step_jack.body_sway':
+      return rep.exerciseId === 'step_jack' ? flag(rep.maxTorsoLean > STEP_JACK_V1.torsoLeanMax) : 'NOT_EVALUABLE'
+    case 'step_jack.too_fast':
+      return rep.exerciseId === 'step_jack' ? flag(rep.durationMs < STEP_JACK_V1.repDurationMinMs) : 'NOT_EVALUABLE'
+
+    case 'squat.depth':
+      return rep.exerciseId === 'squat' ? flag(rep.maxHipDrop < SQUAT_V1.validDepthHipDrop) : 'NOT_EVALUABLE'
+    case 'squat.knee_alignment':
+      return rep.exerciseId === 'squat' ? flag(rep.minKneeSpreadRatio < SQUAT_V1.kneeValgusMaxRatio) : 'NOT_EVALUABLE'
+    case 'squat.lateral_balance':
+      return rep.exerciseId === 'squat' ? flag(rep.maxKneeHeightDiff > SQUAT_V1.kneeHeightDiffMax) : 'NOT_EVALUABLE'
+    case 'squat.torso_lean':
+      return rep.exerciseId === 'squat' ? flag(rep.maxTorsoLean > SQUAT_V1.torsoLeanMax) : 'NOT_EVALUABLE'
+    case 'squat.too_fast':
+      return rep.exerciseId === 'squat' ? flag(rep.durationMs < SQUAT_V1.repDurationMinMs) : 'NOT_EVALUABLE'
+
+    case 'knee_raise.knee_height.left':
+    case 'knee_raise.knee_height.right':
+      return rep.exerciseId === 'knee_raise' && rep.side === definition.side ? flag(rep.peakKneeHeight < KNEE_RAISE_V1.userTargetHeight) : 'NOT_EVALUABLE'
+    case 'knee_raise.body_sway':
+      return rep.exerciseId === 'knee_raise'
+        ? flag(rep.hipShiftMax > KNEE_RAISE_V1.hipShiftMax || rep.maxTorsoLean > KNEE_RAISE_V1.torsoLeanMax)
+        : 'NOT_EVALUABLE'
+    case 'knee_raise.alternation':
+      // The first recorded rep is always false at runtime; it cannot express alternation.
+      return rep.exerciseId === 'knee_raise' && !firstRecorded ? flag(rep.wrongSideSequence) : 'NOT_EVALUABLE'
+    case 'knee_raise.return_to_center':
+      return rep.exerciseId === 'knee_raise' ? flag(rep.incompleteReturn) : 'NOT_EVALUABLE'
+    case 'knee_raise.too_fast':
+      return rep.exerciseId === 'knee_raise' ? flag(rep.durationMs < KNEE_RAISE_V1.repDurationMinMs) : 'NOT_EVALUABLE'
+    default:
+      return 'NOT_EVALUABLE'
+  }
+}
+
+export function collectIssueEvidence(
+  definition: ReportIssueDefinition,
+  analyzed: readonly AnalyzedRep[],
+  options: { legacy: boolean },
+): IssueEvidence {
+  if (definition.canonicalId === 'knee_raise.height_gap') {
     return {
-      incidence: { affected: pairs.filter((item) => item.affected).length, evaluable: pairs.length },
-      affectedSequence: pairs.map((item) => item.affected),
-      evidenceRefs: pairs.filter((item) => item.affected).flatMap((item) => item.refs),
-      missingEvidenceCount: 0,
+      units: kneeRaisePairs(analyzed).map((pair) => ({
+        affected: kneeRaisePairGap(pair) > KNEE_RAISE_V1.peakHeightGapMax,
+        repIndexes: [pair[0].index, pair[1].index],
+      })),
+      missingEvidenceReps: 0,
+      sideUnits: null,
     }
   }
-  let missingEvidenceCount = 0
-  const units = analyzedRepetitions(exercise).flatMap((result) => {
-    const affected = evaluate(definition, result)
-    if (affected === null) {
-      if (definition.exerciseId === 'overhead_raise' && (definition.code === 'ELBOW_TOO_BENT_L' || definition.code === 'ELBOW_TOO_BENT_R')) missingEvidenceCount += 1
-      return []
+  const units: EvidenceUnit[] = []
+  const left: EvidenceUnit[] = []
+  const right: EvidenceUnit[] = []
+  let missingEvidenceReps = 0
+  for (const item of analyzed) {
+    const outcome = evaluateRep(definition, item, options.legacy)
+    if (outcome === 'MISSING') missingEvidenceReps += 1
+    if (outcome !== 'AFFECTED' && outcome !== 'CLEAR') continue
+    const unit = { affected: outcome === 'AFFECTED', repIndexes: [item.index] }
+    units.push(unit)
+    if (definition.sideModel === 'REP_SIDE_BREAKDOWN' && item.result.rep.exerciseId === 'step_jack') {
+      ;(item.result.rep.side === 'left' ? left : right).push(unit)
     }
-    return [{ affected, ref: repRef(exercise, result) }]
-  })
+  }
   return {
-    incidence: { affected: units.filter((item) => item.affected).length, evaluable: units.length },
-    affectedSequence: units.map((item) => item.affected),
-    evidenceRefs: units.filter((item) => item.affected).map((item) => item.ref),
-    missingEvidenceCount,
+    units,
+    missingEvidenceReps,
+    sideUnits: definition.sideModel === 'REP_SIDE_BREAKDOWN' ? { left, right } : null,
   }
 }
