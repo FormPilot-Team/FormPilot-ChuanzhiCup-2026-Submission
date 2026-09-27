@@ -30,7 +30,7 @@ LARGE_POCKET = 2500              # enclosed background this large is background 
 JOBS = [
     # output, Family A source, crop box (x0, y0, x1, y1), output width (None = source pixels)
     ('coach-welcome.webp', 'coach-shoulder-rotation.png', (160, 36, 925, 780), None),  # raised open palms, hands to hips
-    ('coach-avatar.webp', 'overhead-raise-demo-start.png', (363, 36, 703, 376), 192),  # identity baseline, head crop
+    ('coach-avatar.webp', 'overhead-raise-demo-start.png', (343, 40, 723, 420), 256),  # identity baseline, head and shoulders
 ]
 
 

@@ -4,6 +4,10 @@ import type { CoachDockState } from '../../features/coach/coachDockState'
 import { cn } from '../../lib/cn'
 import { PrimaryFeedback } from './PrimaryFeedback'
 
+/**
+ * The full standing coach for the warm-up dock's large portrait slot only. Small round avatars use
+ * COACH_AVATAR_ASSET through CoachAvatar (coachIdentity.ts).
+ */
 export const STATIC_AI_COACH_ASSET = '/assets/overhead-raise-demo-start.png'
 
 const statusTone: Record<CoachDockState['severity'], string> = {

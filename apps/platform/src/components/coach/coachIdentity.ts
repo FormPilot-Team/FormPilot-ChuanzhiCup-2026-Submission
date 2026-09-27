@@ -6,8 +6,9 @@
  * - COACH_WELCOME_FAMILY_A: `coach-shoulder-rotation.png` (sha256 dacaacc7…), raised open palms, crop 160,36–925,780
  *   (hands to hips), 765 × 744 WebP with alpha. The closest existing greeting gesture; a dedicated welcome pose is
  *   still missing.
- * - COACH_AVATAR_ASSET: `overhead-raise-demo-start.png` (the identity baseline, sha256 e533f3fd…), head crop
- *   363,36–703,376, 192 px WebP with alpha, shown on a soft disc by `CoachAvatar`.
+ * - COACH_AVATAR_ASSET: `overhead-raise-demo-start.png` (the identity baseline, sha256 e533f3fd…), head-and-shoulders
+ *   crop 343,40–723,420 (the whole bun to the shoulder tops; the head fills about two thirds of the circle), 256 px WebP
+ *   with alpha, shown on a soft disc by `CoachAvatar`.
  *
  * The cut-outs are tuned for FormPilot's light surfaces.
  */
@@ -56,5 +57,23 @@ export const COACH_WELCOME_ASSET: CoachImageAsset = COACH_WELCOME_FAMILY_A
 /** Shown when COACH_WELCOME_ASSET cannot be loaded. */
 export const COACH_WELCOME_FALLBACK: CoachImageAsset = COACH_WELCOME_FAMILY_A
 
-export const COACH_AVATAR_ASSET = '/assets/coach/coach-avatar.webp'
+/** A square, transparent bust of the coach for round avatars. */
+export interface CoachAvatarAsset {
+  src: string
+  width: number
+  height: number
+  background: 'transparent'
+}
+
+/**
+ * Every small round coach picture (32–64 px: realtime feedback, the 问 AI 教练 button and panel, reports, the workshop)
+ * shows this bust through `CoachAvatar`. Never put a full-body picture in a round avatar, and never crop one per page.
+ */
+export const COACH_AVATAR_ASSET: CoachAvatarAsset = Object.freeze({
+  src: '/assets/coach/coach-avatar.webp',
+  width: 256,
+  height: 256,
+  background: 'transparent',
+})
+
 export const COACH_NAME = 'FormPilot 教练'

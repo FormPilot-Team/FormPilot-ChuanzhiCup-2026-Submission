@@ -1,5 +1,5 @@
 import { Gauge } from 'lucide-react'
-import { STATIC_AI_COACH_ASSET } from '../coach/AICoachDock'
+import { CoachAvatar } from '../coach/CoachAvatar'
 import type { RoutineFeedbackTone } from '../../features/routines/followAlong/feedbackPolicy'
 import type { FollowAlongMatch, FollowAlongRegion } from '../../features/routines/followAlong/matcher'
 import { REGION_LABEL, SIMILARITY_BAND_LABEL, similarityBand } from '../../features/routines/report/routineReport'
@@ -58,7 +58,7 @@ export function RoutineFeedbackPanel({ chapter, match, trackingState, coachMessa
       </div>
 
       <div className={cn('flex min-w-0 items-start gap-3 rounded-2xl border p-3', MESSAGE_TONE[coachTone])} data-testid="routine-coach-entry" data-coach-tone={coachTone}>
-        <img src={STATIC_AI_COACH_ASSET} alt="" aria-hidden="true" className="size-10 shrink-0 rounded-full bg-slate-100 object-cover object-top" draggable={false} />
+        <CoachAvatar className="size-10" />
         <div className="min-w-0">
           <p className="text-xs font-semibold text-blue-700">AI 教练</p>
           <p className="mt-0.5 text-pretty text-sm font-semibold leading-6 text-slate-900" role="status" aria-live="polite" aria-atomic="true" data-testid="routine-coach-message">{coachMessage}</p>
