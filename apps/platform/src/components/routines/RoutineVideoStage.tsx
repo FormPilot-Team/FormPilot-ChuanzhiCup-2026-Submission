@@ -1,9 +1,11 @@
 import type { RefObject } from 'react'
-import { CircleAlert, Clapperboard, LoaderCircle, Pause, Play, Volume2, VolumeX } from 'lucide-react'
+import { CircleAlert, Clapperboard, LoaderCircle, Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react'
 import type { CourseSnapshot } from '../../features/course/CourseController'
+import { VIDEO_FAILURE_TEXT, videoDiagnosticsRows, type VideoDiagnosticsReport } from '../../features/diagnostics/videoDiagnostics'
 import { chapterDisplayName, formatClock } from '../../features/routines/scope'
 import type { RoutineChapter, RoutineProgram } from '../../features/routines/types'
 import { cn } from '../../lib/cn'
+import { DiagnosticsDetails } from '../diagnostics/DiagnosticsDetails'
 import { ROUTINE_ACCENT } from './routineTheme'
 
 interface RoutineVideoStageProps {
@@ -11,6 +13,10 @@ interface RoutineVideoStageProps {
   chapter: RoutineChapter
   stageRef: RefObject<HTMLVideoElement | null>
   stageStatus: 'loading' | 'ready' | 'error'
+  /** Still loading well past the normal time. */
+  stageSlow?: boolean
+  /** Collected after an error (or a slow load); null until then. */
+  diagnostics?: VideoDiagnosticsReport
   stageTime: number
   course: CourseSnapshot
   manuallyPaused: boolean
@@ -18,6 +24,7 @@ interface RoutineVideoStageProps {
   onToggleSound: () => void
   onMetadata: () => void
   onError: () => void
+  onReload?: () => void
 }
 
 function playbackLabel(course: CourseSnapshot, manuallyPaused: boolean): string {
@@ -34,7 +41,7 @@ function playbackLabel(course: CourseSnapshot, manuallyPaused: boolean): string 
  * 16:9) is shown at its picture's aspect with only the black bars cropped; nothing is stretched.
  */
 export function RoutineVideoStage({
-  program, chapter, stageRef, stageStatus, stageTime, course, manuallyPaused, videoMuted, onToggleSound, onMetadata, onError,
+  program, chapter, stageRef, stageStatus, stageSlow = false, diagnostics, stageTime, course, manuallyPaused, videoMuted, onToggleSound, onMetadata, onError, onReload,
 }: RoutineVideoStageProps) {
   const accent = ROUTINE_ACCENT[program.accent]
   const frameAspect = program.video.width / program.video.height
@@ -42,6 +49,7 @@ export function RoutineVideoStage({
   const chapterLength = chapter.endSeconds - chapter.startSeconds
   const chapterElapsed = Math.min(chapterLength, Math.max(0, stageTime - chapter.startSeconds))
   const playing = course.state === 'ACTIVE'
+  const stageProblem = stageStatus === 'error' || (stageStatus === 'loading' && stageSlow)
   return (
     <section
       className="panel flex min-w-0 flex-col overflow-hidden p-3"
@@ -80,17 +88,29 @@ export function RoutineVideoStage({
         />
 
         {stageStatus === 'loading' ? (
-          <div className="absolute inset-0 grid place-items-center bg-slate-950/70 text-center text-white" role="status">
-            <div><LoaderCircle className="mx-auto animate-spin motion-reduce:animate-none" aria-hidden="true" /><p className="mt-3 text-sm">正在加载标准示范…</p></div>
+          <div className="absolute inset-0 overflow-y-auto bg-slate-950/70 p-4 text-center text-white" role="status" data-testid="routine-stage-loading" data-stage-slow={stageSlow ? 'true' : 'false'}>
+            <div className="flex min-h-full flex-col items-center justify-center">
+              <LoaderCircle className="animate-spin motion-reduce:animate-none" aria-hidden="true" />
+              <p className="mt-3 text-sm">{stageSlow ? '标准示范视频加载时间较长…' : '正在加载标准示范…'}</p>
+              {stageSlow ? (
+                <div className="mt-3 w-full max-w-md rounded-2xl bg-white/95 p-3 text-slate-700">
+                  <p className="text-pretty text-xs">可以继续等待，或点“重新加载”；仍然不行时把诊断信息发给我们。</p>
+                  {onReload ? <button type="button" onClick={onReload} className="secondary-button mt-2 inline-flex items-center gap-1.5 text-sm"><RotateCcw size={15} aria-hidden="true" />重新加载</button> : null}
+                  <DiagnosticsDetails className="mt-2" title="FormPilot 视频诊断" rows={diagnostics ? videoDiagnosticsRows(diagnostics) : null} testId="routine-stage-diagnostics" />
+                </div>
+              ) : null}
+            </div>
           </div>
         ) : null}
 
         {stageStatus === 'error' ? (
-          <div className="absolute inset-0 grid place-items-center bg-slate-100 p-6 text-center" role="alert" data-testid="routine-stage-error">
-            <div>
-              <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-white text-coral-600 shadow-sm"><CircleAlert size={22} aria-hidden="true" /></span>
-              <p className="mt-3 font-semibold text-slate-800">标准示范视频无法播放</p>
-              <p className="mt-1 text-pretty text-sm text-slate-500">请刷新页面重试；视频不可用时无法开始跟练。</p>
+          <div className="absolute inset-0 overflow-y-auto bg-slate-100 p-4 text-center sm:p-6" role="alert" data-testid="routine-stage-error" data-video-failure={diagnostics?.category ?? 'pending'}>
+            <div className="flex min-h-full flex-col items-center justify-center">
+              <span className="grid size-12 place-items-center rounded-2xl bg-white text-coral-600 shadow-sm"><CircleAlert size={22} aria-hidden="true" /></span>
+              <p className="mt-3 font-semibold text-slate-800">标准示范视频暂时无法播放</p>
+              <p className="mt-1 text-pretty text-sm text-slate-600">{diagnostics ? VIDEO_FAILURE_TEXT[diagnostics.category].reason : '视频没有加载成功。'}可以点“重新加载”再试一次；仍然不行时，点“查看诊断信息”并把内容发给我们。</p>
+              {onReload ? <button type="button" onClick={onReload} className="primary-button mt-3 inline-flex items-center gap-1.5"><RotateCcw size={16} aria-hidden="true" />重新加载</button> : null}
+              <DiagnosticsDetails className="mt-3 max-w-xl" title="FormPilot 视频诊断" rows={diagnostics ? videoDiagnosticsRows(diagnostics) : null} testId="routine-stage-diagnostics" />
             </div>
           </div>
         ) : null}
@@ -109,10 +129,13 @@ export function RoutineVideoStage({
           </div>
         ) : null}
 
-        <span className={cn('absolute left-3 top-3 max-w-[70%] truncate rounded-lg px-2.5 py-1 text-xs font-semibold shadow-sm', accent.chip)} data-testid="routine-stage-chapter">
-          {chapterDisplayName(chapter)}
-        </span>
-        <button
+        {/* A failed or stuck video shows its own message; the chapter chip and sound button would only cover it. */}
+        {stageProblem ? null : (
+          <span className={cn('absolute left-3 top-3 max-w-[70%] truncate rounded-lg px-2.5 py-1 text-xs font-semibold shadow-sm', accent.chip)} data-testid="routine-stage-chapter">
+            {chapterDisplayName(chapter)}
+          </span>
+        )}
+        {stageProblem ? null : <button
           type="button"
           onClick={onToggleSound}
           aria-pressed={!videoMuted}
@@ -121,7 +144,7 @@ export function RoutineVideoStage({
           data-testid="routine-video-sound"
         >
           {videoMuted ? <VolumeX size={18} aria-hidden="true" /> : <Volume2 size={18} aria-hidden="true" />}
-        </button>
+        </button>}
       </div>
 
       <div className="mt-3 flex min-w-0 items-center gap-3 px-2 text-xs text-slate-500">

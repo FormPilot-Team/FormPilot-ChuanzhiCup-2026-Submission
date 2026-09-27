@@ -25,7 +25,8 @@ export function buildChapters(sources: ReadonlyArray<RoutineChapterSource>, dura
   })
 }
 
-function video(id: RoutineId, width: number, height: number, durationSeconds: number, contentAspect = width / height): RoutineVideo {
+/** `codecs` is what the shipped file really contains (tests/routine-video-files.test.ts reads the MP4 to check). */
+function video(id: RoutineId, width: number, height: number, durationSeconds: number, codecs: string, contentAspect = width / height): RoutineVideo {
   return {
     src: `/assets/routines/${id}-standard.mp4`,
     poseTrackSrc: `/assets/routines/${id}-standard.pose.json`,
@@ -34,12 +35,13 @@ function video(id: RoutineId, width: number, height: number, durationSeconds: nu
     height,
     contentAspect,
     durationSeconds,
+    codecs,
   }
 }
 
 const CAPTION_TIMING = '章节起点取自标准视频内的动作字幕（2026-09-26 逐帧检测字幕出现与切换时刻）；字幕间的过渡空白计入前一段。'
 
-const BADUANJIN_VIDEO = video('baduanjin', 640, 360, 728.3)
+const BADUANJIN_VIDEO = video('baduanjin', 640, 360, 728.3, 'avc1.64001E, mp4a.40.5')
 const BADUANJIN: RoutineProgram = {
   id: 'baduanjin',
   version: '1.0.0',
@@ -92,7 +94,7 @@ const TAIJIQUAN_FORMS: ReadonlyArray<readonly [string, number, string]> = [
 ]
 
 // 4:3 footage pillarboxed in a 640×360 frame (picture spans x 78–555).
-const TAIJIQUAN_VIDEO = video('taijiquan', 640, 360, 340.3, 4 / 3)
+const TAIJIQUAN_VIDEO = video('taijiquan', 640, 360, 340.3, 'avc1.640033, mp4a.40.5', 4 / 3)
 const TAIJIQUAN: RoutineProgram = {
   id: 'taijiquan',
   version: '1.0.0',
@@ -114,7 +116,7 @@ const TAIJIQUAN: RoutineProgram = {
   })), TAIJIQUAN_VIDEO.durationSeconds),
 }
 
-const WUQINXI_VIDEO = video('wuqinxi', 640, 360, 822.5)
+const WUQINXI_VIDEO = video('wuqinxi', 640, 360, 822.5, 'avc1.64001E, mp4a.40.2')
 const WUQINXI: RoutineProgram = {
   id: 'wuqinxi',
   version: '1.0.0',
@@ -156,7 +158,7 @@ const YIJINJING_FORMS: ReadonlyArray<readonly [string, number, string]> = [
   ['掉尾势', 614.5, '两手交叉俯身，抬头摇尾左右摆动'],
 ]
 
-const YIJINJING_VIDEO = video('yijinjing', 640, 360, 765.5)
+const YIJINJING_VIDEO = video('yijinjing', 640, 360, 765.5, 'avc1.64001E, mp4a.40.5')
 const YIJINJING: RoutineProgram = {
   id: 'yijinjing',
   version: '1.0.0',

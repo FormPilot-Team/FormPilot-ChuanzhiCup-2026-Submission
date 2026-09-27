@@ -7,7 +7,9 @@ import { buildRecentReports } from '../../features/coachContext/recentReports'
 import { buildRoutineCoachContext } from '../../features/coachContext/routineCoachContext'
 import type { RecentReportSummary } from '../../features/coachContext/types'
 import { CourseController, type CourseSnapshot } from '../../features/course/CourseController'
+import { logDiagnostics } from '../../features/diagnostics/desktopBridge'
 import { PerformanceTracker } from '../../features/diagnostics/PerformanceTracker'
+import { collectVideoDiagnostics, videoDiagnosticsLog, type VideoDiagnosticsReport } from '../../features/diagnostics/videoDiagnostics'
 import { GestureRuntimeController, type GestureAction } from '../../features/gesture/GestureRuntimeController'
 import { buildTrainingHistoryItems } from '../../features/history/TrainingHistory'
 import { buildRoutineHistoryItems } from '../../features/history/routineHistory'
@@ -51,6 +53,8 @@ const POSE_LOSS_PAUSE_MS = 2000
 const EVALUATION_INTERVAL_MS = 100
 const UI_INTERVAL_MS = 100
 const PERSIST_INTERVAL_MS = 10_000
+/** A standard video still without metadata after this long is reported (with diagnostics) instead of spinning forever. */
+const STAGE_SLOW_MS = 20_000
 
 function framingHint(frame: NormalizedPoseFrame): string {
   const at = (index: number) => frame.landmarks[index]
@@ -149,6 +153,9 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   const [courseSnapshot, setCourseSnapshot] = useState<CourseSnapshot>(() => courseRef.current.getSnapshot())
   const [sessionStatus, setSessionStatus] = useState<RoutineSessionStatus>('ready')
   const [stageStatus, setStageStatus] = useState<StageStatus>('loading')
+  const [stageSlow, setStageSlow] = useState(false)
+  const [stageDiagnostics, setStageDiagnostics] = useState<VideoDiagnosticsReport>()
+  const stageDiagnosticsTokenRef = useRef(0)
   const [stageTime, setStageTime] = useState(step.startSeconds)
   const [videoMuted, setVideoMuted] = useState(synthetic)
   const [trackStatus, setTrackStatus] = useState<ReferenceTrackStatus>('loading')
@@ -487,10 +494,56 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     setStageTime(stage.currentTime)
   }, [step.endSeconds, step.startSeconds])
 
+  const expectedVideo = useMemo(() => ({
+    src: program.video.src,
+    codecs: program.video.codecs,
+    width: program.video.width,
+    height: program.video.height,
+    durationSeconds: program.video.durationSeconds,
+  }), [program.video])
+
+  /** Media error, HTTP/Range answers and codec support, shown under 查看诊断信息 and written to the diagnostics log. */
+  const diagnoseStage = useCallback((reason: 'error' | 'slow') => {
+    const token = ++stageDiagnosticsTokenRef.current
+    setStageDiagnostics(undefined)
+    void collectVideoDiagnostics(stageRef.current, expectedVideo, reason).then((report) => {
+      if (token !== stageDiagnosticsTokenRef.current) return
+      setStageDiagnostics(report)
+      logDiagnostics(reason === 'error' ? 'video-error' : 'video-slow', videoDiagnosticsLog(report))
+    })
+  }, [expectedVideo])
+
   const onStageError = useCallback(() => {
+    if (stageStatusRef.current === 'error') return
     stageStatusRef.current = 'error'
     setStageStatus('error')
+    diagnoseStage('error')
+  }, [diagnoseStage])
+
+  /** 重新加载: the same source again from the start of its resource selection. */
+  const reloadStage = useCallback(() => {
+    const stage = stageRef.current
+    if (!stage || completedRef.current) return
+    stageDiagnosticsTokenRef.current += 1
+    stageStatusRef.current = 'loading'
+    setStageStatus('loading')
+    setStageSlow(false)
+    setStageDiagnostics(undefined)
+    stage.load()
   }, [])
+
+  useEffect(() => {
+    if (stageStatus !== 'loading') {
+      setStageSlow(false)
+      return
+    }
+    const timer = window.setTimeout(() => {
+      if (stageStatusRef.current !== 'loading') return
+      setStageSlow(true)
+      diagnoseStage('slow')
+    }, STAGE_SLOW_MS)
+    return () => window.clearTimeout(timer)
+  }, [diagnoseStage, stageStatus])
 
   useEffect(() => {
     const stage = stageRef.current
@@ -723,6 +776,8 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     courseSnapshot,
     sessionStatus,
     stageStatus,
+    stageSlow,
+    stageDiagnostics,
     stageTime,
     videoMuted,
     trackStatus,
@@ -749,6 +804,8 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     finish,
     onStageMetadata,
     onStageError,
+    reloadStage,
+    diagnoseStage,
     debugData: [
       { label: 'Course state', value: courseSnapshot.state },
       { label: 'Session', value: sessionStatus },

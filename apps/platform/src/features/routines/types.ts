@@ -41,6 +41,8 @@ export interface RoutineVideo {
    */
   contentAspect: number
   durationSeconds: number
+  /** RFC 6381 codecs of the shipped file, e.g. `avc1.64001E, mp4a.40.2` (checked against the MP4 by a unit test). */
+  codecs: string
 }
 
 export interface RoutineProgram {

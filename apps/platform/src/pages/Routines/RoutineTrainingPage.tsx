@@ -98,6 +98,8 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
             chapter={chapter}
             stageRef={runtime.stageRef}
             stageStatus={runtime.stageStatus}
+            stageSlow={runtime.stageSlow}
+            diagnostics={runtime.stageDiagnostics}
             stageTime={runtime.stageTime}
             course={courseSnapshot}
             manuallyPaused={runtime.sessionStatus === 'paused'}
@@ -105,6 +107,7 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
             onToggleSound={runtime.toggleVideoSound}
             onMetadata={runtime.onStageMetadata}
             onError={runtime.onStageError}
+            onReload={runtime.reloadStage}
           />
           </div>
           <div className="grid min-w-0 items-start gap-3 md:grid-cols-2 xl:flex xl:flex-col xl:items-stretch">
