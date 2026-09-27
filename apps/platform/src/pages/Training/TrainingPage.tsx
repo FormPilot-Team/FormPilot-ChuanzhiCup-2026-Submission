@@ -99,8 +99,7 @@ export function TrainingPage() {
             demoImageRef={runtime.demoImageRef}
             overlayRef={runtime.overlayRef}
             mode={runtime.cameraMode}
-            errorMessage={runtime.cameraError}
-            errorKind={runtime.cameraFailureKind}
+            failure={runtime.cameraFailure}
             errors={runtime.result.errors}
             feedback={runtime.feedback}
             demoAsset={definition.presentation.cameraDemo}

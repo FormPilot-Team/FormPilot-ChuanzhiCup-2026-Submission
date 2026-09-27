@@ -92,16 +92,16 @@ test('camera permission and device failures use actionable Chinese states withou
   await expect(page.getByText('正在加载姿态识别模型…')).toHaveCount(0)
 
   for (const [name, message] of [
-    ['NotAllowedError', '未获得摄像头权限，请允许访问摄像头后重试。'],
-    ['NotFoundError', '未检测到可用摄像头，请连接设备后重试。'],
-    ['NotReadableError', '摄像头暂时无法使用，请关闭其他占用摄像头的应用后重试。'],
-    ['OverconstrainedError', '当前摄像头不支持推荐的视频参数，请尝试重新连接摄像头。'],
+    ['NotAllowedError', '摄像头权限未开启。请在浏览器的网站权限中允许摄像头，然后重新尝试。'],
+    ['NotFoundError', '未检测到可用摄像头，请确认设备已连接。'],
+    ['NotReadableError', '摄像头当前无法读取，可能正在被其他应用占用。'],
+    ['OverconstrainedError', '当前摄像头不支持所需的视频参数，FormPilot 已尝试兼容设置，仍无法打开。'],
   ]) {
     await page.goto('/train')
     await page.evaluate((failure) => { (window as typeof window & { __cameraFailure?: string }).__cameraFailure = failure }, name)
     await page.getByRole('button', { name: '启用摄像头' }).click()
     await expect(page.getByText(message)).toBeVisible()
-    await expect(page.getByRole('button', { name: '重新尝试' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '重新检测' })).toBeVisible()
     await expect(page.getByText('internal browser detail')).toHaveCount(0)
   }
   await expect(page.getByText('Step Jack', { exact: true })).toHaveCount(0)
@@ -121,7 +121,11 @@ test('model initialization failure clears the rejected cache and Retry initializ
       return canvas.captureStream(30)
     } })
   })
-  await page.route('**/models/pose_landmarker_lite.task', (route) => route.abort('failed'))
+  // The failure arrives after a moment, as a slow network would, so the loading state is observable first.
+  await page.route('**/models/pose_landmarker_lite.task', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 800))
+    await route.abort('failed')
+  })
   await page.goto('/train?debug=1')
   await page.getByRole('button', { name: '启用摄像头' }).click()
   await expect(page.getByText('正在加载姿态识别模型…')).toBeVisible()

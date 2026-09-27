@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { PoseOverlayDrawOptions, PoseOverlayHandle } from '../../components/pose/PoseOverlay'
 import { getCoachAnimationFrame, PlaceholderCoachAnimationAdapter } from '../../adapters/coachAnimation/PlaceholderCoachAnimationAdapter'
-import { BrowserCameraAdapter, cameraErrorPresentation, type CameraFailureKind } from '../../adapters/camera/BrowserCameraAdapter'
+import { BrowserCameraAdapter } from '../../adapters/camera/BrowserCameraAdapter'
+import { useCameraFailure } from '../../features/camera/useCameraFailure'
 import { BrowserSpeechAdapter, type VoicePlaybackState } from '../../adapters/speech/BrowserSpeechAdapter'
 import { PoseDetector } from '../../features/pose/PoseDetector'
 import { PoseFilter } from '../../features/pose/PoseFilter'
@@ -198,8 +199,7 @@ export function useTrainingRuntime() {
   const [definition, setDefinition] = useState(initialDefinition)
   const [exerciseState, setExerciseState] = useState<ExerciseState>(() => initialState(initialDefinition))
   const [cameraMode, setCameraMode] = useState<CameraMode>(demo ? 'demo' : 'idle')
-  const [cameraError, setCameraError] = useState<string>()
-  const [cameraFailureKind, setCameraFailureKind] = useState<CameraFailureKind>()
+  const { failure: cameraFailure, report: reportCameraFailure, clear: clearCameraFailure } = useCameraFailure()
   const [result, setResult] = useState(() => initialResult(initialDefinition))
   const [features, setFeatures] = useState<BaseMotionFeatures>()
   const [feedback, setFeedback] = useState<FeedbackEvent>()
@@ -668,14 +668,13 @@ export function useTrainingRuntime() {
       } catch (error) {
         if (disposed) return
         setCameraMode('error')
-        setCameraFailureKind('model_error')
-        setCameraError('姿态识别模型加载失败，请重试。')
+        reportCameraFailure(error, 'model')
         if (debug) console.error('Pose model initialization failed', error)
       }
     }
     void start()
     return () => { disposed = true; cancelAnimationFrame(rafRef.current) }
-  }, [coachFixture, courseEnabled, debug, demo, dispatchCourseVoice, manualGestureFixture, syntheticFixture])
+  }, [coachFixture, courseEnabled, debug, demo, dispatchCourseVoice, manualGestureFixture, reportCameraFailure, syntheticFixture])
 
   useEffect(() => speechRef.current.onAvailabilityChange(setVoiceAvailable), [])
 
@@ -702,8 +701,7 @@ export function useTrainingRuntime() {
     const generation = cameraLoopGenerationRef.current
     cancelAnimationFrame(rafRef.current)
     setCameraMode('requesting_permission')
-    setCameraError(undefined)
-    setCameraFailureKind(undefined)
+    clearCameraFailure()
     let cameraReady = false
     try {
       const stream = await cameraRef.current.start(video)
@@ -722,7 +720,6 @@ export function useTrainingRuntime() {
       performanceRef.current.markCameraFrame(performance.now(), settings?.width, settings?.height)
       setPerformanceData(performanceRef.current.snapshot())
       setCameraMode('live')
-      setCameraFailureKind(undefined)
       dispatchCourseVoice(undefined, courseRef.current.getSnapshot(), performance.now())
       const loop = () => {
         if (completedRef.current || generation !== cameraLoopGenerationRef.current) return
@@ -749,15 +746,8 @@ export function useTrainingRuntime() {
     } catch (error) {
       if (generation !== cameraLoopGenerationRef.current) return
       setCameraMode('error')
-      if (cameraReady) {
-        setCameraFailureKind('model_error')
-        setCameraError('姿态识别模型加载失败，请重试。')
-        if (debug) console.error('Pose model initialization failed', error)
-      } else {
-        const presentation = cameraErrorPresentation(error)
-        setCameraFailureKind(presentation.kind)
-        setCameraError(presentation.message)
-      }
+      reportCameraFailure(error, cameraReady ? 'model' : 'camera')
+      if (cameraReady && debug) console.error('Pose model initialization failed', error)
       cameraRef.current.stop(video)
     }
   }
@@ -859,8 +849,7 @@ export function useTrainingRuntime() {
     definition,
     exerciseState,
     cameraMode,
-    cameraError,
-    cameraFailureKind,
+    cameraFailure,
     poseUnavailable,
     result,
     features,

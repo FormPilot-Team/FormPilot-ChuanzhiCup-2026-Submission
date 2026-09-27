@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { BrowserCameraAdapter, cameraErrorPresentation, type CameraFailureKind } from '../../adapters/camera/BrowserCameraAdapter'
+import { BrowserCameraAdapter } from '../../adapters/camera/BrowserCameraAdapter'
 import type { PoseOverlayHandle } from '../../components/pose/PoseOverlay'
+import { useCameraFailure } from '../../features/camera/useCameraFailure'
 import { normalizePoseFrame, type NormalizedPoseFrame } from '../../features/pose/PoseNormalizer'
 import { PoseFilter } from '../../features/pose/PoseFilter'
 import type { PoseFrame } from '../../features/pose/types'
@@ -55,8 +56,7 @@ export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = (
   const fixtureRef = useRef(fixture)
   fixtureRef.current = fixture
   const [mode, setMode] = useState<WorkshopCameraMode>('idle')
-  const [error, setError] = useState<string>()
-  const [errorKind, setErrorKind] = useState<CameraFailureKind>()
+  const { failure, report: reportFailure, clear: clearFailure } = useCameraFailure()
   const [modelVariant, setModelVariant] = useState<WorkshopModelVariant>()
 
   const showOverlayRef = useRef(showOverlay)
@@ -105,8 +105,7 @@ export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = (
     const generation = generationRef.current
     cancelAnimationFrame(rafRef.current)
     setMode('requesting_permission')
-    setError(undefined)
-    setErrorKind(undefined)
+    clearFailure()
     const camera = (cameraRef.current ??= new BrowserCameraAdapter())
     let cameraReady = false
     try {
@@ -134,17 +133,10 @@ export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = (
     } catch (caught) {
       if (generation !== generationRef.current) return
       setMode('error')
-      if (cameraReady) {
-        setErrorKind('model_error')
-        setError('姿态识别模型加载失败，请重试。')
-      } else {
-        const presentation = cameraErrorPresentation(caught)
-        setErrorKind(presentation.kind)
-        setError(presentation.message)
-      }
+      reportFailure(caught, cameraReady ? 'model' : 'camera')
       camera.stop(video)
     }
-  }, [deliver, startSynthetic, synthetic])
+  }, [clearFailure, deliver, reportFailure, startSynthetic, synthetic])
 
   useEffect(() => () => {
     generationRef.current += 1
@@ -155,5 +147,5 @@ export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = (
     if (detector) window.setTimeout(() => detector.close(), 0)
   }, [])
 
-  return { videoRef, demoImageRef, overlayRef, mode, error, errorKind, modelVariant, start, stop, capturing: mode === 'live' || mode === 'demo' }
+  return { videoRef, demoImageRef, overlayRef, mode, failure, modelVariant, start, stop, capturing: mode === 'live' || mode === 'demo' }
 }

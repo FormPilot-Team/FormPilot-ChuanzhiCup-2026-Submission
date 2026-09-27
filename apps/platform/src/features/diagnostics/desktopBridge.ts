@@ -23,9 +23,21 @@ export interface DesktopInfo {
   gpu: DesktopGpuSummary
 }
 
+export type WindowsConsent = 'allow' | 'deny' | 'unset' | 'unknown'
+
+export interface SystemCameraAccess {
+  /** Electron's systemPreferences.getMediaAccessStatus('camera'): Windows' desktop-app camera consent. */
+  electronStatus: string
+  windows: { device: WindowsConsent; apps: WindowsConsent; desktopApps: WindowsConsent; policy: string } | null
+  verdict: 'allowed' | 'blocked' | 'unknown'
+  blockedBy: ReadonlyArray<'policy' | 'device' | 'apps' | 'desktopApps' | 'system'>
+}
+
 interface DesktopBridge {
   info(): Promise<DesktopInfo | null>
   log(kind: string, entry: Record<string, unknown>): void
+  cameraAccess(): Promise<SystemCameraAccess | null>
+  openCameraSettings(): Promise<boolean>
 }
 
 type BridgeWindow = typeof window & { formpilotDesktop?: DesktopBridge; __formpilotDiagnostics?: DiagnosticsLogEntry[] }
@@ -52,6 +64,27 @@ export function desktopInfo(): Promise<DesktopInfo | null> {
   if (!desktop) return Promise.resolve(null)
   infoPromise ??= desktop.info().catch(() => null)
   return infoPromise
+}
+
+export async function systemCameraAccess(): Promise<SystemCameraAccess | null> {
+  const desktop = bridge()
+  if (!desktop) return null
+  try {
+    return await desktop.cameraAccess()
+  } catch {
+    return null
+  }
+}
+
+/** Opens Windows Settings → 隐私和安全性 → 相机. False outside the desktop app. */
+export async function openCameraPrivacySettings(): Promise<boolean> {
+  const desktop = bridge()
+  if (!desktop) return false
+  try {
+    return await desktop.openCameraSettings()
+  } catch {
+    return false
+  }
 }
 
 const RECENT_LIMIT = 30

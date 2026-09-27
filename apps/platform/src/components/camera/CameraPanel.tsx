@@ -1,18 +1,22 @@
 import { Camera, LoaderCircle, ScanLine } from 'lucide-react'
 import type { RefObject } from 'react'
 import type { CameraFailureKind } from '../../adapters/camera/BrowserCameraAdapter'
+import type { CameraFailureReport } from '../../features/camera/cameraDiagnostics'
+import { isDesktopApp } from '../../features/diagnostics/desktopBridge'
 import type { MotionError } from '../../features/exercises/types'
 import type { FeedbackEvent } from '../../features/feedback/types'
+import { cn } from '../../lib/cn'
 import type { PoseOverlayHandle } from '../pose/PoseOverlay'
 import { PoseOverlay } from '../pose/PoseOverlay'
+import { CameraFailureNotice } from './CameraFailureNotice'
 
 interface CameraPanelProps {
   videoRef: RefObject<HTMLVideoElement | null>
   demoImageRef: RefObject<HTMLImageElement | null>
   overlayRef: RefObject<PoseOverlayHandle | null>
   mode: 'idle' | 'requesting_permission' | 'model_loading' | 'live' | 'demo' | 'error'
-  errorMessage?: string
-  errorKind?: CameraFailureKind
+  /** Why the camera or the pose model did not start (mode 'error'). */
+  failure?: CameraFailureReport
   errors: ReadonlyArray<MotionError>
   feedback?: FeedbackEvent
   demoAsset: { portraitSrc: string; landscapeSrc: string; alt: string; fit?: 'cover' | 'contain' }
@@ -28,10 +32,22 @@ interface CameraPanelProps {
   onStart: () => void
 }
 
-export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMessage, errorKind, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, variant = 'default', onStart }: CameraPanelProps) {
+/** The short header status for each failure, instead of one "连接异常" for everything. */
+const FAILURE_STATUS: Readonly<Record<CameraFailureKind, string>> = {
+  permission_denied: '摄像头权限未开启',
+  not_found: '未检测到摄像头',
+  in_use: '摄像头无法读取',
+  constraint_failed: '摄像头参数不兼容',
+  security: '摄像头被阻止',
+  unsupported: '不支持摄像头',
+  unknown_error: '摄像头无法启动',
+  model_error: '识别模型加载失败',
+}
+
+export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, variant = 'default', onStart }: CameraPanelProps) {
   const compact = variant === 'compact'
   const promptText = compact ? 'text-base' : 'text-lg sm:text-xl'
-  const status = mode === 'demo' ? '演示模式' : mode === 'live' ? '摄像头已连接 · AI 实时分析中' : mode === 'requesting_permission' ? '等待摄像头授权' : mode === 'model_loading' ? '正在加载识别模型' : mode === 'error' ? '连接异常' : '等待连接摄像头'
+  const status = mode === 'demo' ? '演示模式' : mode === 'live' ? '摄像头已连接 · AI 实时分析中' : mode === 'requesting_permission' ? '等待摄像头授权' : mode === 'model_loading' ? '正在加载识别模型' : mode === 'error' ? (failure ? FAILURE_STATUS[failure.kind] : '摄像头无法启动') : '等待连接摄像头'
   const blocking = ['idle', 'error', 'requesting_permission', 'model_loading'].includes(mode)
   const loading = mode === 'requesting_permission' || mode === 'model_loading'
   const title = mode === 'requesting_permission' ? '正在等待摄像头授权…' : mode === 'model_loading' ? '正在加载姿态识别模型…' : mode === 'error' ? '暂时无法开始识别' : '准备开始实时动作检测'
@@ -42,7 +58,8 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMes
         <h2 id="camera-title" className="font-bold text-slate-900">实时动作检测</h2>
         <span className="ml-auto hidden items-center gap-1.5 text-xs text-slate-500 sm:inline-flex"><i className={mode === 'live' || mode === 'demo' ? 'size-2 rounded-full bg-emerald-400' : mode === 'error' ? 'size-2 rounded-full bg-coral-500' : loading ? 'size-2 rounded-full bg-amber-400' : 'size-2 rounded-full bg-slate-300'} />{status}</span>
       </div>
-      <div className={compact ? 'relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-100' : 'camera-stage relative min-h-[380px] flex-1 overflow-hidden rounded-2xl bg-slate-100'}>
+      {/* A compact stage keeps the camera's 16:9 picture; with no picture to show (a failure) it grows to fit the notice. */}
+      <div className={compact ? cn('relative w-full overflow-hidden rounded-2xl bg-slate-100', mode === 'error' ? 'min-h-[400px]' : 'aspect-video') : 'camera-stage relative min-h-[380px] flex-1 overflow-hidden rounded-2xl bg-slate-100'}>
         {mode === 'demo' ? (
           demoFrameSrc ? (
             <img ref={demoImageRef} src={demoFrameSrc} alt={demoAsset.alt} className={demoAsset.fit === 'contain' ? 'size-full object-contain object-center' : 'size-full object-cover object-center'} data-demo-source="real-image-sequence" />
@@ -79,13 +96,22 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, errorMes
           </div>
         ) : null}
         {blocking ? (
-          <div className="absolute inset-0 grid place-items-center bg-slate-50/92 p-6 text-center">
-            <div>
-              <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-blue-50 text-blue-600">{loading ? <LoaderCircle className="animate-spin motion-reduce:animate-none" /> : <Camera />}</span>
+          <div className={cn('absolute inset-0 overflow-y-auto bg-slate-50/92 text-center', compact ? 'p-4' : 'p-6')}>
+            <div className="flex min-h-full flex-col items-center justify-center">
+              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-blue-50 text-blue-600">{loading ? <LoaderCircle className="animate-spin motion-reduce:animate-none" /> : <Camera />}</span>
               <p className="mt-4 font-semibold text-slate-800">{title}</p>
-              <p className="mt-1 text-pretty text-sm text-slate-500">{mode === 'requesting_permission' ? '请在浏览器提示中允许访问摄像头。' : mode === 'model_loading' ? '首次加载可能需要几秒钟。' : errorKind === 'permission_denied' ? '如已拒绝授权，请在地址栏的网站权限中重新允许摄像头。' : '请站在摄像头前，按提示调整距离。'}</p>
-              {errorMessage ? <p className="mt-3 text-sm text-coral-600">{errorMessage}</p> : null}
-              {mode === 'idle' || mode === 'error' ? <button type="button" onClick={onStart} className="primary-button mt-5">{mode === 'error' ? '重新尝试' : '启用摄像头'}</button> : null}
+              {mode === 'error' ? (
+                failure ? (
+                  <div className="mt-2 w-full"><CameraFailureNotice failure={failure} onRetry={onStart} /></div>
+                ) : (
+                  <button type="button" onClick={onStart} className="primary-button mt-5">重新检测</button>
+                )
+              ) : (
+                <>
+                  <p className="mt-1 text-pretty text-sm text-slate-500">{mode === 'requesting_permission' ? (isDesktopApp() ? '正在打开摄像头，请稍候。' : '请在浏览器提示中允许访问摄像头。') : mode === 'model_loading' ? '首次加载可能需要几秒钟。' : '请站在摄像头前，按提示调整距离。'}</p>
+                  {mode === 'idle' ? <button type="button" onClick={onStart} className="primary-button mt-5">启用摄像头</button> : null}
+                </>
+              )}
             </div>
           </div>
         ) : null}

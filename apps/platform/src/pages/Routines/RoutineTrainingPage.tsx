@@ -117,8 +117,7 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
               demoImageRef={runtime.demoImageRef}
               overlayRef={runtime.overlayRef}
               mode={runtime.cameraMode}
-              errorMessage={runtime.cameraError}
-              errorKind={runtime.cameraFailureKind}
+              failure={runtime.cameraFailure}
               errors={outOfFrame ? [{ code: 'BODY_OUT_OF_FRAME', severity: 1, message: runtime.framing.hint ?? '' }] : []}
               demoAsset={{ portraitSrc: program.video.posterSrc, landscapeSrc: program.video.posterSrc, alt: `${program.title}测试画面`, fit: 'contain' }}
               preparationMessage={runtime.preparationMessage}

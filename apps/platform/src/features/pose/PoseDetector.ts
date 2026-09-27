@@ -1,3 +1,5 @@
+import { logDiagnostics } from '../diagnostics/desktopBridge'
+import { errorText } from '../diagnostics/diagnosticsReport'
 import type { PoseFrame, PoseLandmark } from './types'
 
 export interface PoseDetectorConfig {
@@ -14,6 +16,26 @@ export interface PoseDetectorLike {
 
 export type PoseImageSource = HTMLVideoElement | HTMLImageElement | HTMLCanvasElement
 
+export type PoseDelegate = 'GPU' | 'CPU'
+
+/** Why the pose model did not start, for the diagnostics panel. */
+export interface PoseModelFailure {
+  stage: 'model-fetch' | 'landmarker'
+  modelAssetPath: string
+  /** HTTP status of the model file (null: the request itself failed). */
+  modelStatus: number | null
+  modelBytes: number | null
+  gpuError: string | null
+  cpuError: string | null
+}
+
+export class PoseModelError extends Error {
+  constructor(message: string, readonly details: PoseModelFailure) {
+    super(message)
+    this.name = 'PoseModelError'
+  }
+}
+
 const DEFAULT_CONFIG: PoseDetectorConfig = {
   wasmRoot: '/wasm',
   modelAssetPath: '/models/pose_landmarker_lite.task',
@@ -29,6 +51,10 @@ export class PoseDetector implements PoseDetectorLike {
 
   initializeCalls = 0
   initializationCount = 0
+  /** The delegate the running landmarker uses; CPU only when the GPU delegate could not start on this machine. */
+  delegate?: PoseDelegate
+  /** Why the GPU delegate failed, when it did. */
+  gpuError?: string
 
   async initialize(): Promise<void> {
     this.initializeCalls += 1
@@ -78,12 +104,32 @@ export class PoseDetector implements PoseDetectorLike {
     }
   }
 
+  /** The model file itself, so a missing or unreadable file is told apart from a delegate that cannot start. */
+  private async fetchModel(): Promise<Uint8Array> {
+    const failure = (modelStatus: number | null, message: string): PoseModelError => new PoseModelError(message, {
+      stage: 'model-fetch', modelAssetPath: this.config.modelAssetPath, modelStatus, modelBytes: null, gpuError: null, cpuError: null,
+    })
+    let response: Response
+    try {
+      response = await fetch(this.config.modelAssetPath)
+    } catch (error) {
+      throw failure(null, `Pose model request failed: ${errorText(error)}`)
+    }
+    if (!response.ok) throw failure(response.status, `Pose model answered HTTP ${response.status}`)
+    try {
+      return new Uint8Array(await response.arrayBuffer())
+    } catch (error) {
+      throw failure(response.status, `Pose model download broke off: ${errorText(error)}`)
+    }
+  }
+
   private async createLandmarker() {
     this.initializationCount += 1
     const { FilesetResolver, PoseLandmarker } = await import('@mediapipe/tasks-vision')
+    const model = await this.fetchModel()
     const vision = await FilesetResolver.forVisionTasks(this.config.wasmRoot)
-    return PoseLandmarker.createFromOptions(vision, {
-      baseOptions: { modelAssetPath: this.config.modelAssetPath, delegate: 'GPU' },
+    const create = (delegate: PoseDelegate) => PoseLandmarker.createFromOptions(vision, {
+      baseOptions: { modelAssetBuffer: model, delegate },
       runningMode: 'VIDEO',
       numPoses: 1,
       minPoseDetectionConfidence: this.config.minConfidence,
@@ -91,5 +137,24 @@ export class PoseDetector implements PoseDetectorLike {
       minTrackingConfidence: this.config.minConfidence,
       outputSegmentationMasks: false,
     })
+    try {
+      const landmarker = await create('GPU')
+      this.delegate = 'GPU'
+      this.gpuError = undefined
+      return landmarker
+    } catch (gpuFailure) {
+      // Some GPUs / drivers cannot run the GPU delegate; the CPU delegate gives the same landmarks, only slower.
+      this.gpuError = errorText(gpuFailure)
+      try {
+        const landmarker = await create('CPU')
+        this.delegate = 'CPU'
+        logDiagnostics('model-fallback', { modelAssetPath: this.config.modelAssetPath, gpuError: this.gpuError })
+        return landmarker
+      } catch (cpuFailure) {
+        throw new PoseModelError('Pose landmarker could not start on GPU or CPU', {
+          stage: 'landmarker', modelAssetPath: this.config.modelAssetPath, modelStatus: 200, modelBytes: model.byteLength, gpuError: this.gpuError, cpuError: errorText(cpuFailure),
+        })
+      }
+    }
   }
 }

@@ -50,7 +50,7 @@ test('captures the Phase 6C final demo evidence set', async ({ page }) => {
   await page.goto('/train')
   await page.evaluate(() => { (window as typeof window & { __cameraFailure?: string }).__cameraFailure = 'NotAllowedError' })
   await page.getByRole('button', { name: '启用摄像头' }).click()
-  await expect(page.getByText('未获得摄像头权限，请允许访问摄像头后重试。')).toBeVisible()
+  await expect(page.getByText('摄像头权限未开启。请在浏览器的网站权限中允许摄像头，然后重新尝试。')).toBeVisible()
   await shot(page, 'camera-error')
 
   await page.goto('/train?demo=1&course=1&fast=1&fixture=synthetic')

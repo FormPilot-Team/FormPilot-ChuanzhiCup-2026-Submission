@@ -170,8 +170,7 @@ function CustomTrainingView({ action }: { action: CustomActionDefinition }) {
             demoImageRef={runtime.camera.demoImageRef}
             overlayRef={runtime.camera.overlayRef}
             mode={runtime.camera.mode}
-            errorMessage={runtime.camera.error}
-            errorKind={runtime.camera.errorKind}
+            failure={runtime.camera.failure}
             errors={outOfFrame ? [{ code: 'BODY_OUT_OF_FRAME', severity: 1, message: runtime.framing.hint ?? '' }] : []}
             demoAsset={SYNTHETIC_BACKDROP}
             preparationMessage={runtime.preparationMessage}

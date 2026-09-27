@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BrowserCameraAdapter, cameraErrorPresentation, type CameraFailureKind } from '../../adapters/camera/BrowserCameraAdapter'
+import { BrowserCameraAdapter } from '../../adapters/camera/BrowserCameraAdapter'
 import { BrowserSpeechAdapter, type VoicePlaybackState } from '../../adapters/speech/BrowserSpeechAdapter'
 import type { PoseOverlayDrawOptions, PoseOverlayHandle } from '../../components/pose/PoseOverlay'
 import { createGestureDemoPoseFrame } from '../../data/demoPose'
+import { useCameraFailure } from '../../features/camera/useCameraFailure'
 import { buildRecentReports } from '../../features/coachContext/recentReports'
 import { buildRoutineCoachContext } from '../../features/coachContext/routineCoachContext'
 import type { RecentReportSummary } from '../../features/coachContext/types'
@@ -148,8 +149,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   const tickRef = useRef<(now: number) => void>(() => undefined)
 
   const [cameraMode, setCameraMode] = useState<RoutineCameraMode>(synthetic ? 'demo' : 'idle')
-  const [cameraError, setCameraError] = useState<string>()
-  const [cameraFailureKind, setCameraFailureKind] = useState<CameraFailureKind>()
+  const { failure: cameraFailure, report: reportCameraFailure, clear: clearCameraFailure } = useCameraFailure()
   const [courseSnapshot, setCourseSnapshot] = useState<CourseSnapshot>(() => courseRef.current.getSnapshot())
   const [sessionStatus, setSessionStatus] = useState<RoutineSessionStatus>('ready')
   const [stageStatus, setStageStatus] = useState<StageStatus>('loading')
@@ -662,8 +662,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     const generation = generationRef.current
     cancelAnimationFrame(rafRef.current)
     setCameraMode('requesting_permission')
-    setCameraError(undefined)
-    setCameraFailureKind(undefined)
+    clearCameraFailure()
     let cameraReady = false
     try {
       await cameraRef.current.start(video)
@@ -686,18 +685,11 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     } catch (error) {
       if (generation !== generationRef.current) return
       setCameraMode('error')
-      if (cameraReady) {
-        setCameraFailureKind('model_error')
-        setCameraError('姿态识别模型加载失败，请重试。')
-        if (debug) console.error('Pose model initialization failed', error)
-      } else {
-        const presentation = cameraErrorPresentation(error)
-        setCameraFailureKind(presentation.kind)
-        setCameraError(presentation.message)
-      }
+      reportCameraFailure(error, cameraReady ? 'model' : 'camera')
+      if (cameraReady && debug) console.error('Pose model initialization failed', error)
       cameraRef.current.stop(video)
     }
-  }, [beginLoop, debug])
+  }, [beginLoop, clearCameraFailure, debug, reportCameraFailure])
 
   // Synthetic fixture: starts by itself and feeds the reference pose (DEV only).
   useEffect(() => {
@@ -771,8 +763,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     demoImageRef,
     overlayRef,
     cameraMode,
-    cameraError,
-    cameraFailureKind,
+    cameraFailure,
     courseSnapshot,
     sessionStatus,
     stageStatus,
