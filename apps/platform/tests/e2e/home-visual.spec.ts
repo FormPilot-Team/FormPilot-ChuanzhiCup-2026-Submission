@@ -129,3 +129,46 @@ test('Home E: the AI coach wears the same face, and cards do not move under redu
   await page.waitForTimeout(250)
   expect(await card.evaluate((element) => getComputedStyle(element).transform)).toBe('none')
 })
+
+test('Home F: 动作工坊 sits beside 我的训练 as an equal card, with a light five-step path and a clear way in', async ({ page }) => {
+  for (const viewport of [{ width: 1920, height: 1080 }, { width: 1440, height: 900 }, { width: 1366, height: 768 }, { width: 390, height: 844 }]) {
+    const phone = viewport.width < 640
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+    const workshop = page.getByTestId('home-workshop')
+    const training = page.getByTestId('home-training-history')
+    await workshop.scrollIntoViewIfNeeded()
+    const card = await box(workshop)
+    const other = await box(training)
+    // The same card family as 我的训练: same frame, and on wide screens the same row, width and height.
+    const frame = (element: Element) => { const style = getComputedStyle(element); return [style.borderTopColor, style.borderTopWidth, style.borderRadius].join(' ') }
+    expect(await workshop.evaluate(frame), `${viewport.width}: frame`).toBe(await training.evaluate(frame))
+    if (!phone) {
+      expect(Math.abs(card.y - other.y), `${viewport.width}: row`).toBeLessThan(1)
+      expect(Math.abs(card.width - other.width), `${viewport.width}: width`).toBeLessThan(1)
+      expect(Math.abs(card.height - other.height), `${viewport.width}: height`).toBeLessThan(1)
+    }
+    // Five steps in one light path: every label readable, none touching the next, all inside the card.
+    const steps = await Promise.all((await page.getByTestId('home-workshop-flow').getByRole('listitem').all()).map(box))
+    expect(steps).toHaveLength(5)
+    for (const [index, step] of steps.entries()) {
+      expect(step.x, `${viewport.width}: step ${index + 1} left`).toBeGreaterThanOrEqual(card.x)
+      expect(step.x + step.width, `${viewport.width}: step ${index + 1} right`).toBeLessThanOrEqual(card.x + card.width)
+      const next = steps[index + 1]
+      if (next && Math.abs(next.y - step.y) < 1) expect(next.x - (step.x + step.width), `${viewport.width}: gap after step ${index + 1}`).toBeGreaterThanOrEqual(6)
+    }
+    if (!phone) expect(new Set(steps.map((step) => Math.round(step.y))).size, `${viewport.width}: one row`).toBe(1)
+    // The recognition sketch is a small side panel on wide cards and steps aside on phones.
+    await expect(page.getByTestId('home-workshop-illustration')).toBeVisible({ visible: !phone })
+    const cta = page.getByTestId('home-workshop-link')
+    await expect(cta).toBeVisible()
+    await expect(cta).toHaveAccessibleName('进入动作工坊')
+    const link = await box(cta)
+    expect(link.y + link.height, `${viewport.width}: cta`).toBeLessThanOrEqual(card.y + card.height)
+    // The AI coach stays on top of the page, never covered by the card.
+    const coach = await box(page.getByTestId('ai-coach-trigger'))
+    expect(await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest('[data-testid="ai-coach-trigger"]') !== null, { x: coach.x + coach.width / 2, y: coach.y + coach.height / 2 }), `${viewport.width}: coach`).toBe(true)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${viewport.width}: scroll`).toBe(true)
+    await page.screenshot({ path: `test-results/home-workshop-${viewport.width}x${viewport.height}.png` })
+  }
+})
