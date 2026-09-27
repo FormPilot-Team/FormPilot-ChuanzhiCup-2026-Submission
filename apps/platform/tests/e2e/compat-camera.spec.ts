@@ -11,9 +11,12 @@ type CameraTestWindow = typeof window & {
   __formpilotDiagnostics?: Array<{ kind: string; entry: Record<string, unknown> }>
 }
 
-/** A scripted camera: each getUserMedia call takes the next outcome ('ok' or an error name); enumerateDevices is faked too. */
-async function scriptedCamera(page: Page, script: string[], videoInputs = 1) {
-  await page.addInitScript(({ outcomes, inputs }) => {
+/**
+ * A scripted camera: each getUserMedia call takes the next outcome ('ok' or an error name); enumerateDevices is faked
+ * too, optionally slow (the device check then finishes well after the failure is shown).
+ */
+async function scriptedCamera(page: Page, script: string[], videoInputs = 1, enumerateDelayMs = 0) {
+  await page.addInitScript(({ outcomes, inputs, delay }) => {
     const test = window as CameraTestWindow
     test.__cameraScript = [...outcomes]
     test.__videoInputs = inputs
@@ -32,9 +35,12 @@ async function scriptedCamera(page: Page, script: string[], videoInputs = 1) {
     })
     Object.defineProperty(navigator.mediaDevices, 'enumerateDevices', {
       configurable: true,
-      value: async () => Array.from({ length: test.__videoInputs ?? 1 }, () => ({ kind: 'videoinput', label: '', deviceId: '', groupId: '' })),
+      value: async () => {
+        if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay))
+        return Array.from({ length: test.__videoInputs ?? 1 }, () => ({ kind: 'videoinput', label: '', deviceId: '', groupId: '' }))
+      },
     })
-  }, { outcomes: script, inputs: videoInputs })
+  }, { outcomes: script, inputs: videoInputs, delay: enumerateDelayMs })
 }
 
 const cameraWindow = (page: Page) => page.evaluate(() => {
@@ -153,4 +159,17 @@ test('Camera E: the follow-along page keeps the failure readable inside its comp
     await expect(retry).toBeInViewport()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${viewport.width}`).toBe(true)
   }
+})
+
+test('Camera F: a failure retried before its device check finishes is still written to the diagnostics log', async ({ page }) => {
+  await scriptedCamera(page, ['NotReadableError', 'NotReadableError', 'NotFoundError'], 1, 1000)
+  await page.goto('/train')
+  await page.getByRole('button', { name: '启用摄像头' }).click()
+  const failure = page.getByTestId('camera-failure')
+  await expect(failure).toHaveAttribute('data-camera-failure', 'in_use')
+  await expect(failure).toHaveAttribute('data-failure-complete', 'false')
+  await failure.getByRole('button', { name: '重新检测' }).click()
+  await expect(failure).toHaveAttribute('data-camera-failure', 'not_found')
+  await expect(failure).toHaveAttribute('data-failure-complete', 'true', { timeout: 5_000 })
+  await expect.poll(async () => (await cameraWindow(page)).diagnostics.filter((item) => item.kind === 'camera-error').map((item) => item.entry.failure)).toEqual(['in_use', 'not_found'])
 })

@@ -19,9 +19,9 @@ export function useCameraFailure() {
     const token = ++tokenRef.current
     setFailure(initialCameraFailure(error, stage))
     void completeCameraFailure(error, stage).then((complete) => {
-      if (token !== tokenRef.current) return
-      setFailure(complete)
+      // Every failure is logged, even one the reviewer already retried; only the current one stays on screen.
       logDiagnostics(stage === 'model' ? 'model-error' : 'camera-error', cameraFailureLog(complete))
+      if (token === tokenRef.current) setFailure(complete)
     })
   }, [])
 
