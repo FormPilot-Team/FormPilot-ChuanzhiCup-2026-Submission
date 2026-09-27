@@ -156,5 +156,8 @@ describe('AI Coach component', () => {
     expect(html).toContain('aria-expanded="false"')
     expect(html).toContain('/assets/coach/coach-avatar.webp')
     expect(html).not.toContain('role="dialog"')
+    // The same Family A face as Home: a transparent cut-out on the shared avatar disc, never multiplied into the page.
+    expect(html).toContain('fp-coach-avatar')
+    expect(html).not.toContain('mix-blend-multiply')
   })
 })

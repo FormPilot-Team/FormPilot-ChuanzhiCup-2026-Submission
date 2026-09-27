@@ -9,8 +9,11 @@ export type ModeStatus = 'available' | 'coming_soon'
 /** Decorative motion motif of a mode card: one visual system, a different movement signature per mode. */
 export type ModeMotif = 'pulse' | 'lift' | 'orbit' | 'leap' | 'stretch'
 
-/** Accent family: tints and motif strokes only. Actions, focus rings and links stay FormPilot blue. */
-export type ModeAccent = 'brand' | 'emerald' | 'indigo' | 'amber' | 'violet'
+/**
+ * Accent family: a low-saturation card tint, the silhouette and the motion trail only. Actions, focus rings and links
+ * stay FormPilot blue. 热身训练 blue, 八段锦 warm orange, 太极拳 lavender, 五禽戏 mint, 易筋经 rose.
+ */
+export type ModeAccent = 'brand' | 'orange' | 'violet' | 'emerald' | 'rose'
 
 /**
  * One training mode or tool on Home. Integrating a mode means giving it a `route` and switching `status` to
@@ -25,6 +28,10 @@ export interface ModeHubEntry {
   cta?: string
   /** One short line of facts (length, number of forms …). */
   meta?: string
+  /** A few words of character for the card (the full description stays available to screen readers). */
+  summary?: string
+  /** A faint calligraphic character on the card of a classical form (锦, 太极 …). */
+  mark?: string
   /** Light emphasis only (e.g. 推荐); never a larger card. */
   badge?: string
   icon: LucideIcon
@@ -49,17 +56,19 @@ export const WARM_UP_MODE: ModeHubEntry = Object.freeze({
   route: SMART_TRAINING_PATH,
   cta: '开始训练',
   meta: '6 个动作 · 完整或单项练习',
+  summary: '实时纠正 · 全程语音指导',
   badge: '推荐',
   icon: Flame,
   motif: 'pulse',
   accent: 'brand',
 } satisfies ModeHubEntry)
 
-const ROUTINE_LOOK: Readonly<Record<RoutineId, { icon: LucideIcon; motif: ModeMotif }>> = {
-  baduanjin: { icon: Leaf, motif: 'lift' },
-  taijiquan: { icon: Orbit, motif: 'orbit' },
-  wuqinxi: { icon: PawPrint, motif: 'leap' },
-  yijinjing: { icon: Mountain, motif: 'stretch' },
+/** Card look of each follow-along course; the summaries are taken from the programs' own descriptions and cues. */
+const ROUTINE_LOOK: Readonly<Record<RoutineId, { icon: LucideIcon; motif: ModeMotif; summary: string; mark: string }>> = {
+  baduanjin: { icon: Leaf, motif: 'lift', summary: '动作舒缓 · 视频含呼吸口令', mark: '锦' },
+  taijiquan: { icon: Orbit, motif: 'orbit', summary: '起势到收势 · 连贯演练', mark: '太极' },
+  wuqinxi: { icon: PawPrint, motif: 'leap', summary: '仿虎鹿熊猿鸟 · 含呼吸口令', mark: '禽' },
+  yijinjing: { icon: Mountain, motif: 'stretch', summary: '动作舒展 · 拔伸筋骨', mark: '经' },
 }
 
 /** Follow-along courses (internally: routines); each opens its own entry page. */
@@ -71,6 +80,8 @@ export const ROUTINE_MODES: readonly ModeHubEntry[] = Object.freeze(ROUTINE_PROG
   route: routinePath(program.id),
   cta: '开始跟练',
   meta: `全套 ${formatClock(program.video.durationSeconds)} · ${formCount(program)} ${program.formUnit}`,
+  summary: ROUTINE_LOOK[program.id].summary,
+  mark: ROUTINE_LOOK[program.id].mark,
   icon: ROUTINE_LOOK[program.id].icon,
   motif: ROUTINE_LOOK[program.id].motif,
   accent: program.accent,

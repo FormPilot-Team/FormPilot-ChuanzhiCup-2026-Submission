@@ -3,7 +3,8 @@ import { ArrowRight, MessageCircle, Send, X } from 'lucide-react'
 import { INTENTS, answerIntent, greeting, reply, suggestedIntents, type CoachIntentId } from '../../features/aiCoach/intents'
 import type { CoachAnswer, CoachPageContext } from '../../features/aiCoach/types'
 import { cn } from '../../lib/cn'
-import { COACH_AVATAR_ASSET, COACH_NAME } from '../coach/coachIdentity'
+import { CoachAvatar } from '../coach/CoachAvatar'
+import { COACH_NAME } from '../coach/coachIdentity'
 
 interface Message {
   id: number
@@ -20,14 +21,10 @@ const PAGE_LABEL: Readonly<Record<CoachPageContext['page'], string>> = {
   workshop: '动作工坊',
 }
 
-function Avatar({ className }: { className?: string }) {
-  return <img src={COACH_AVATAR_ASSET} alt="" aria-hidden="true" draggable={false} className={cn('shrink-0 rounded-full bg-sky-50 object-cover mix-blend-multiply', className)} />
-}
-
 function CoachBubble({ answer, text }: { answer?: CoachAnswer; text: string }) {
   return (
     <div className="flex min-w-0 items-start gap-2">
-      <Avatar className="mt-0.5 size-7" />
+      <CoachAvatar className="mt-0.5 size-7" />
       <div className="min-w-0 rounded-2xl rounded-tl-md bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-800 ring-1 ring-slate-100">
         <p className="text-pretty">{text}</p>
         {answer?.facts?.length ? (
@@ -125,7 +122,7 @@ export function AICoach({ context, variant = 'floating' }: { context: CoachPageC
         )}
         data-testid="ai-coach-trigger"
       >
-        <Avatar className={floating ? 'size-10' : 'size-8'} />
+        <CoachAvatar className={floating ? 'size-10' : 'size-8'} />
         <span className={cn(floating && 'hidden sm:inline')}>问 AI 教练</span>
         {floating ? null : <MessageCircle size={15} className="text-blue-600" aria-hidden="true" />}
       </button>
@@ -144,7 +141,7 @@ export function AICoach({ context, variant = 'floating' }: { context: CoachPageC
           data-page={context.page}
         >
           <div className="fp-hero flex items-center gap-3 px-4 py-3">
-            <Avatar className="size-10 ring-2 ring-white" />
+            <CoachAvatar className="size-10 ring-2 ring-white" />
             <div className="min-w-0 flex-1">
               <h2 id={titleId} className="truncate font-bold text-slate-950">{COACH_NAME}</h2>
               <p className="truncate text-xs text-slate-600">{PAGE_LABEL[context.page]} · 根据你的训练数据回答</p>

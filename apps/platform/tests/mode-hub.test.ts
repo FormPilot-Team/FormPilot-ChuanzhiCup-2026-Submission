@@ -10,6 +10,10 @@ import { buildRoutineHistoryItems } from '../src/features/history/routineHistory
 import type { TrainingSessionRepository } from '../src/features/training/TrainingSessionRepository'
 import type { TrainingSessionState } from '../src/features/training/types'
 import { HomePage } from '../src/pages/Home/HomePage'
+import { COACH_WELCOME_ASSET, COACH_WELCOME_FALLBACK, COACH_WELCOME_FAMILY_A } from '../src/components/coach/coachIdentity'
+import { MODE_ACCENT } from '../src/components/home/modeAccent'
+import { MODE_FIGURES } from '../src/components/home/modeFigures'
+import { ROUTINE_PROGRAMS } from '../src/features/routines/programs'
 import { MemoryRoutineSessionRepository } from '../src/features/routines/session/RoutineSessionRepository'
 import { FIRST_SESSION, PARTIAL_SESSION, at, makeSession } from './analysis-fixtures'
 import { routineRecord } from './helpers/routineFixtures'
@@ -86,13 +90,28 @@ describe('training mode catalog', () => {
 })
 
 describe('Home', () => {
-  it('opens with a compact FormPilot hero and the coach welcome, not the pose-skeleton illustration', () => {
+  it('opens with the FormPilot hero: positioning, the coach welcoming you, light capability hints', () => {
     const html = home()
     expect(html).toContain('<h1')
     expect(html).toContain('FormPilot')
     const hero = card(html, 'home-hero')
-    expect(hero).toContain('/assets/coach/coach-welcome.webp')
-    expect(hero).toContain('今天想练什么？我会陪你完成训练。')
+    expect(hero).toContain('你的专属动作教练')
+    expect(hero).toContain('实时动作识别 · 动作纠正 · 训练复盘')
+    // The coach picture comes from the single replacement point, with its own aspect ratio and framing.
+    expect(hero).toContain(`src="${COACH_WELCOME_ASSET.src}"`)
+    expect(hero).toContain(`aspect-ratio:${COACH_WELCOME_ASSET.width} / ${COACH_WELCOME_ASSET.height}`)
+    expect(hero).toContain(`object-position:${COACH_WELCOME_ASSET.focus}`)
+    expect(hero.match(/<img /g)).toHaveLength(1)
+    // A short welcome of at most three lines, not a chat window.
+    const welcome = card(hero, 'home-coach-welcome')
+    expect(welcome.match(/class="block/g)).toHaveLength(3)
+    for (const line of ['你好！', '今天想练什么？', '我会陪你一起完成训练。']) expect(welcome).toContain(line)
+    expect(welcome).not.toMatch(/<input|<textarea|<button/)
+    // Three light hints, only on wide screens.
+    const hints = card(hero, 'home-hero-capabilities')
+    expect(hints).toMatch(/^<ul class="[^"]*\bhidden\b[^"]*\bxl:flex\b/)
+    expect(hints.match(/<li /g)).toHaveLength(3)
+    for (const title of ['实时动作识别', '动作纠正', '训练复盘']) expect(hints).toContain(title)
     // The old pixel-skeleton card art is gone from the page itself (the first-run guide keeps its own diagrams).
     expect(mainContent(html)).not.toMatch(/示意图|<circle cx="120" cy="36"/)
     expect(html).not.toMatch(/智能训练|功法跟练|工具与记录|最近训练/)
@@ -116,9 +135,47 @@ describe('Home', () => {
     }
     expect(card(section, 'mode-card-smart-training')).toContain('推荐')
     expect(section.match(/推荐/g)).toHaveLength(2) // one badge per layout (phone row, card top)
-    // 3 + 2 on wide screens: the first three span two of six columns, the last two span three.
-    expect(section.match(/md:col-span-2/g)).toHaveLength(3)
-    expect(section.match(/md:col-span-3/g)).toHaveLength(2)
+    // One row of five on wide screens; 3 + 2 on tablets (the first three span two of six columns, the last two three).
+    expect(card(section, 'home-training-modes')).toMatch(/^<ul class="[^"]*md:grid-cols-6[^"]*xl:grid-cols-5/)
+    expect(section.match(/md:col-span-2 xl:col-span-1/g)).toHaveLength(3)
+    expect(section.match(/md:col-span-3 xl:col-span-1/g)).toHaveLength(2)
+  })
+
+  it('gives every mode card its own pale tint, pose silhouette and short lines, in one shared structure', () => {
+    const section = card(home(), 'home-start-training')
+    expect(TRAINING_MODES.map((mode) => mode.accent)).toEqual(['brand', 'orange', 'violet', 'emerald', 'rose'])
+    expect(ROUTINE_PROGRAMS.map((program) => program.accent)).toEqual(['orange', 'violet', 'emerald', 'rose'])
+    for (const mode of TRAINING_MODES) {
+      const markup = card(section, `mode-card-${mode.id}`)
+      expect(markup, mode.id).toContain(`data-mode-accent="${mode.accent}"`)
+      expect(markup, mode.id).toContain(`data-figure="${mode.motif}"`)
+      expect(markup, mode.id).toContain(`url(#mode-figure-${mode.id})`)
+      // The summary shows as two short lines; the full description stays for screen readers.
+      expect(mode.summary?.split(' · '), mode.id).toHaveLength(2)
+      for (const part of mode.summary?.split(' · ') ?? []) expect(part.length, part).toBeLessThanOrEqual(7)
+      expect(markup, mode.id).toContain(`id="mode-${mode.id}-description" class="sr-only">${mode.description}`)
+    }
+    // A faint character only on the classical forms.
+    expect(TRAINING_MODES.map((mode) => mode.mark ?? null)).toEqual([null, '锦', '太极', '禽', '经'])
+    // Tints stay pale: the card surfaces use -50-level colours or lighter, never saturated fills.
+    for (const accent of Object.values(MODE_ACCENT)) expect(accent.surface).not.toMatch(/-(?:[3-9]00)\b/)
+    // Only the warm-up's button is filled, as its light emphasis.
+    expect(card(section, 'mode-card-smart-training')).toContain('md:bg-blue-600')
+    expect(section.match(/md:bg-blue-600/g)).toHaveLength(1)
+  })
+
+  it('draws the silhouettes from real landmarks, inside the figure box', () => {
+    expect(Object.keys(MODE_FIGURES).sort()).toEqual(TRAINING_MODES.map((mode) => mode.motif).sort())
+    for (const [motif, figure] of Object.entries(MODE_FIGURES)) {
+      expect(figure.source, motif).toMatch(/^\/assets\/.+\.pose\.json/)
+      const [cx, cy, r] = figure.head
+      expect(cx - r).toBeGreaterThanOrEqual(0)
+      expect(cy - r).toBeGreaterThanOrEqual(0)
+      for (const [x1, y1, x2, y2, width] of figure.segments) {
+        for (const value of [x1 - width / 2, y1 - width / 2, x2 - width / 2, y2 - width / 2]) expect(value, motif).toBeGreaterThanOrEqual(-0.1)
+        for (const value of [x1 + width / 2, y1 + width / 2, x2 + width / 2, y2 + width / 2]) expect(value, motif).toBeLessThanOrEqual(100.1)
+      }
+    }
   })
 
   it('shows 动作工坊 as its own product section with its flow and one way in', () => {
@@ -192,6 +249,22 @@ describe('Home', () => {
     expect(nav.indexOf('开始训练')).toBeLessThan(nav.indexOf('动作工坊'))
     expect(nav.indexOf('动作工坊')).toBeLessThan(nav.indexOf('我的训练'))
     expect(nav).not.toMatch(/智能训练|功法跟练|训练记录/)
+  })
+})
+
+describe('coach welcome asset', () => {
+  it('is one replacement point: a described picture with a Family A fallback', () => {
+    expect(COACH_WELCOME_FALLBACK).toBe(COACH_WELCOME_FAMILY_A)
+    expect(COACH_WELCOME_FAMILY_A).toMatchObject({ src: '/assets/coach/coach-welcome.webp', width: 765, height: 744, background: 'transparent', fadeBottom: true })
+    for (const asset of [COACH_WELCOME_ASSET, COACH_WELCOME_FALLBACK]) {
+      expect(asset.src).toMatch(/^\/assets\/coach\/.+\.(?:webp|png)$/)
+      expect(asset.width).toBeGreaterThan(0)
+      expect(asset.height).toBeGreaterThan(0)
+      expect(['transparent', 'light']).toContain(asset.background)
+      expect(asset.focus).toMatch(/^\d+% \d+%$/)
+      expect(asset.bubble.right).toMatch(/^\d+%$/)
+      expect(asset.bubble.top).toMatch(/^\d+%$/)
+    }
   })
 })
 

@@ -3,7 +3,7 @@ import { AlertTriangle, ArrowLeft, Pause, PencilLine, Play, Square, Volume2, Vol
 import { useState } from 'react'
 import { WORKSHOP_PATH, customTrainingPath, reportPath, workshopActionPath } from '../../app/routes'
 import { CameraPanel } from '../../components/camera/CameraPanel'
-import { COACH_AVATAR_ASSET } from '../../components/coach/coachIdentity'
+import { CoachAvatar } from '../../components/coach/CoachAvatar'
 import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { buildCustomCoachContext, customGuide } from '../../features/coachContext/liveCoachContexts'
@@ -185,7 +185,7 @@ function CustomTrainingView({ action }: { action: CustomActionDefinition }) {
           <section className="panel flex min-w-0 flex-col gap-3 p-4" aria-labelledby="custom-feedback-title" data-testid="custom-feedback">
             <h2 id="custom-feedback-title" className="font-bold text-slate-900">实时反馈</h2>
             <div className={cn('flex min-w-0 items-start gap-3 rounded-2xl border p-3', TONE[coach.tone])} data-testid="custom-coach-entry" data-coach-tone={coach.tone}>
-              <img src={COACH_AVATAR_ASSET} alt="" aria-hidden="true" className="size-10 shrink-0 rounded-full bg-slate-100 object-cover mix-blend-multiply" draggable={false} />
+              <CoachAvatar className="size-10" />
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-blue-700">AI 教练</p>
                 <p className="mt-0.5 text-pretty text-sm font-semibold leading-6 text-slate-900" role="status" aria-live="polite" aria-atomic="true" data-testid="custom-coach-message">{coach.message}</p>

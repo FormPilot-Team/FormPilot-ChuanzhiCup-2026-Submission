@@ -5,7 +5,7 @@ export type RoutineId = 'baduanjin' | 'taijiquan' | 'wuqinxi' | 'yijinjing'
 export type RoutineChapterKind = 'opening' | 'form' | 'closing'
 
 /** Accent family used sparingly for mode identity (chips, ribbon highlight). Primary actions stay FormPilot blue. */
-export type RoutineAccent = 'emerald' | 'indigo' | 'amber' | 'violet'
+export type RoutineAccent = 'orange' | 'violet' | 'emerald' | 'rose'
 
 export interface RoutineChapterSource {
   id: string

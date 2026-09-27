@@ -91,27 +91,31 @@ export function HomePage({ repository = localRepository, routineRepository = loc
   return (
     <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900">
       <AppHeader />
-      <main className="mx-auto max-w-[1200px] px-4 pb-24 pt-5 sm:px-6 sm:pt-7 lg:px-8">
+      <main className="min-w-0 pb-24">
         <HomeHero onOpenGuide={() => setOnboardingOpen(true)} />
 
-        <section id={START_TRAINING_ANCHOR} className="mt-8 scroll-mt-4 sm:mt-10" aria-labelledby="start-training-title" data-testid="home-start-training">
-          <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
-            <h2 id="start-training-title" ref={trainingHeadingRef} tabIndex={-1} className="fp-section-title focus:outline-none">开始训练</h2>
-            <p className="text-pretty text-sm text-slate-500">选一种训练，FormPilot 会实时识别你的动作</p>
-          </div>
-          <ul className="mt-4 grid gap-3 md:grid-cols-6 md:gap-4" aria-label="训练模式" data-testid="home-training-modes">
-            {TRAINING_MODES.map((mode, index) => (
-              <li key={mode.id} className={index < 3 ? 'min-w-0 md:col-span-2' : 'min-w-0 md:col-span-3'}>
-                <TrainingModeCard mode={mode} />
-              </li>
-            ))}
-          </ul>
-          <MyActionsStrip actions={myActions.shown} total={myActions.total} />
-        </section>
+        {/* The hero band is full width; everything below lines up with its content. */}
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+          <section id={START_TRAINING_ANCHOR} className="mt-6 scroll-mt-4 sm:mt-8" aria-labelledby="start-training-title" data-testid="home-start-training">
+            <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
+              <h2 id="start-training-title" ref={trainingHeadingRef} tabIndex={-1} className="fp-section-title focus:outline-none">开始训练</h2>
+              <p className="text-pretty text-sm text-slate-500">选一种训练，FormPilot 会实时识别你的动作</p>
+            </div>
+            {/* Five equal cards: one row on wide screens, 3 + 2 on tablets, one column on phones. */}
+            <ul className="mt-4 grid gap-3 md:grid-cols-6 md:gap-4 xl:grid-cols-5" aria-label="训练模式" data-testid="home-training-modes">
+              {TRAINING_MODES.map((mode, index) => (
+                <li key={mode.id} className={index < 3 ? 'min-w-0 md:col-span-2 xl:col-span-1' : 'min-w-0 md:col-span-3 xl:col-span-1'}>
+                  <TrainingModeCard mode={mode} />
+                </li>
+              ))}
+            </ul>
+            <MyActionsStrip actions={myActions.shown} total={myActions.total} />
+          </section>
 
-        <div className="mt-8 grid min-w-0 gap-4 sm:mt-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-5">
-          <WorkshopTeaser entry={WORKSHOP_ENTRY} />
-          <MyTrainingSummary summary={history.summary} unavailable={history.unavailable} />
+          <div className="mt-8 grid min-w-0 gap-4 sm:mt-10 lg:grid-cols-2 lg:gap-5">
+            <WorkshopTeaser entry={WORKSHOP_ENTRY} />
+            <MyTrainingSummary summary={history.summary} unavailable={history.unavailable} />
+          </div>
         </div>
       </main>
       <AICoach context={coachContext} />

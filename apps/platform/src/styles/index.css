@@ -54,9 +54,40 @@ button:focus-visible { outline: 3px solid rgb(147 197 253 / 0.7); outline-offset
   }
   .fp-card { @apply rounded-2xl border border-slate-200/70 bg-white shadow-[0_1px_2px_rgb(15_23_42/0.04),0_12px_30px_-20px_rgb(30_64_175/0.25)]; }
   .fp-card-link { @apply transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_18px_36px_-20px_rgb(37_99_235/0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:hover:translate-y-0; }
-  .fp-brand-gradient { background-image: linear-gradient(100deg, #1d4ed8 0%, #2563eb 38%, #0891b2 100%); }
   .fp-energy-gradient { background-image: linear-gradient(100deg, #2563eb 0%, #0ea5e9 60%, #14b8a6 100%); }
   .fp-section-title { @apply text-balance text-xl font-bold tracking-tight text-slate-950 sm:text-2xl; }
+
+  /*
+   * Phase III Home: an open hero band that fades into the page (no box around the coach), a deep-navy wordmark, the
+   * coach's halo and faded lower edge, and the avatar disc shared by every AI coach entry.
+   */
+  .fp-home-hero {
+    background:
+      radial-gradient(56% 78% at 70% 48%, rgb(186 230 253 / 0.55), transparent 70%),
+      radial-gradient(40% 70% at 6% 10%, rgb(219 234 254 / 0.85), transparent 72%),
+      linear-gradient(180deg, #e9f2ff 0%, #f1f7ff 64%, rgb(245 248 252 / 0) 100%);
+  }
+  .fp-wordmark {
+    background-image: linear-gradient(100deg, #0b1f4d 0%, #16338c 50%, #1d4ed8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .fp-coach-halo { background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(224 242 254 / 0.8) 60%, rgb(186 230 253 / 0) 100%); }
+  .fp-fade-bottom {
+    -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 99%);
+    mask-image: linear-gradient(to bottom, #000 72%, transparent 99%);
+  }
+  .fp-coach-avatar { background: radial-gradient(circle at 50% 38%, #ffffff 0%, #e6f2ff 55%, #cfe3fb 100%); }
+  /* The faint character on a classical form's card; KaiTi ships with Chinese Windows, other systems fall back to serif. */
+  .fp-mode-mark {
+    font-family: "KaiTi", "STKaiti", "Kaiti SC", "BiauKai", serif;
+    font-size: 2.75rem;
+    line-height: 1;
+    writing-mode: vertical-rl;
+    pointer-events: none;
+    user-select: none;
+  }
 }
 
 @media (max-width: 1279px) {

@@ -47,7 +47,7 @@ const BADUANJIN: RoutineProgram = {
   subtitle: '健身气功 · 八式',
   description: '跟随标准视频完成预备势、八式与收势，视频含呼吸口令。训练中实时比对跟练相似度与节奏。',
   formUnit: '式',
-  accent: 'emerald',
+  accent: 'orange',
   video: BADUANJIN_VIDEO,
   timingSource: CAPTION_TIMING,
   chapters: buildChapters([
@@ -100,7 +100,7 @@ const TAIJIQUAN: RoutineProgram = {
   subtitle: '二十四式',
   description: '跟随标准视频完成二十四式太极拳，从起势到收势连贯演练。训练中实时比对跟练相似度与节奏。',
   formUnit: '式',
-  accent: 'indigo',
+  accent: 'violet',
   video: TAIJIQUAN_VIDEO,
   // Captions mark each form's start slightly after the movement begins; starts are taken 1 s before the caption.
   timingSource: `${CAPTION_TIMING} 太极拳字幕在动作开始后约 1 秒出现，因此起点取字幕前 1 秒；原片在收势开始约 3 秒后结束。`,
@@ -122,7 +122,7 @@ const WUQINXI: RoutineProgram = {
   subtitle: '健身气功 · 五戏十动',
   description: '跟随标准视频完成虎、鹿、熊、猿、鸟五戏十个动作，视频含呼吸口令。训练中实时比对跟练相似度与节奏。',
   formUnit: '动',
-  accent: 'amber',
+  accent: 'emerald',
   video: WUQINXI_VIDEO,
   timingSource: CAPTION_TIMING,
   chapters: buildChapters([
@@ -164,7 +164,7 @@ const YIJINJING: RoutineProgram = {
   subtitle: '健身气功 · 十二势',
   description: '跟随标准视频完成预备势、十二势与收势，动作舒展、拔伸筋骨。训练中实时比对跟练相似度与节奏。',
   formUnit: '势',
-  accent: 'violet',
+  accent: 'rose',
   video: YIJINJING_VIDEO,
   timingSource: CAPTION_TIMING,
   chapters: buildChapters([
