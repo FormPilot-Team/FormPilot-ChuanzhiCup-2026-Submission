@@ -77,7 +77,7 @@ test('Camera A: a busy camera says so and what to do; 检查设备 and the folde
   await expect(details).toContainText('浏览器版')
   const logged = (await cameraWindow(page)).diagnostics.filter((item) => item.kind === 'camera-error').map((item) => item.entry)
   expect(logged).toHaveLength(1)
-  expect(logged[0]).toMatchObject({ kind: 'in_use', errorName: 'NotReadableError', videoInputs: 1 })
+  expect(logged[0]).toMatchObject({ failure: 'in_use', errorName: 'NotReadableError', videoInputs: 1 })
   expect(JSON.stringify(logged)).not.toContain('deviceId')
 
   // 重新检测 runs the whole start again: now the camera answers.

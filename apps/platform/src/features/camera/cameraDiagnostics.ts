@@ -202,7 +202,7 @@ export function cameraFailureRows(report: CameraFailureReport): DiagnosticsRow[]
 export function cameraFailureLog(report: CameraFailureReport): Record<string, unknown> {
   return {
     route: typeof window === 'undefined' ? '' : window.location.pathname,
-    kind: report.kind,
+    failure: report.kind,
     errorName: report.errorName,
     errorMessage: report.errorMessage,
     cameraStage: report.cameraStage,

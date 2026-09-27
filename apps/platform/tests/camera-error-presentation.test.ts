@@ -144,7 +144,7 @@ describe('camera failure report', () => {
     expect(rows['设备名称']).toBe('可读取（已授权）')
     expect(rows['应用版本']).toContain('1.0.6')
     const log = cameraFailureLog(complete())
-    expect(log).toMatchObject({ kind: 'in_use', errorName: 'NotReadableError', videoInputs: 1, labelsAvailable: true, permission: 'granted' })
+    expect(log).toMatchObject({ failure: 'in_use', errorName: 'NotReadableError', videoInputs: 1, labelsAvailable: true, permission: 'granted' })
     expect(JSON.stringify(log)).not.toMatch(/deviceId|groupId|"label"/)
   })
 })
