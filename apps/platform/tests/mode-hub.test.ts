@@ -13,6 +13,7 @@ import { HomePage } from '../src/pages/Home/HomePage'
 import { COACH_WELCOME_ASSET, COACH_WELCOME_FALLBACK, COACH_WELCOME_FAMILY_A } from '../src/components/coach/coachIdentity'
 import { MODE_ACCENT } from '../src/components/home/modeAccent'
 import { MODE_FIGURES } from '../src/components/home/modeFigures'
+import { WORKSHOP_TEASER_FIGURES } from '../src/components/home/workshopTeaserFigures'
 import { ROUTINE_PROGRAMS } from '../src/features/routines/programs'
 import { MemoryRoutineSessionRepository } from '../src/features/routines/session/RoutineSessionRepository'
 import { FIRST_SESSION, PARTIAL_SESSION, at, makeSession } from './analysis-fixtures'
@@ -186,6 +187,29 @@ describe('Home', () => {
     expect(workshop.match(/href="/g)).toHaveLength(1)
     expect(workshop).toContain(`href="${WORKSHOP_PATH}"`)
     expect(workshop).toContain('进入动作工坊')
+  })
+
+  it('illustrates 动作工坊 with start → finish silhouettes, never the landmark skeleton of the debug views', () => {
+    const workshop = card(home(), 'home-workshop')
+    expect(workshop).not.toContain('data-testid="pose-sketch"')
+    expect(workshop).toContain('data-figure="workshop-start"')
+    expect(workshop).toContain('data-figure="workshop-finish"')
+    for (const text of ['开始姿势', '完成姿势', '手臂保持伸直', '双手抬到肩部以上', '完成一次完整往返']) expect(workshop).toContain(text)
+    const { width, start, finish, spans } = WORKSHOP_TEASER_FIGURES
+    // Real landmarks from the 八段锦 reference track, both at one scale, side by side with a gap for the arrow.
+    expect(start.source).toMatch(/^\/assets\/routines\/baduanjin-standard\.pose\.json @ /)
+    expect(finish.source).toMatch(/^\/assets\/routines\/baduanjin-standard\.pose\.json @ /)
+    expect(spans[1][0] - spans[0][1]).toBeGreaterThanOrEqual(20)
+    for (const [key, figure] of [['start', start], ['finish', finish]] as const) {
+      for (const [x1, y1, x2, y2, stroke] of figure.segments) {
+        for (const value of [x1 - stroke / 2, x2 - stroke / 2]) expect(value, key).toBeGreaterThanOrEqual(-0.1)
+        for (const value of [x1 + stroke / 2, x2 + stroke / 2]) expect(value, key).toBeLessThanOrEqual(width + 0.1)
+        for (const value of [y1 - stroke / 2, y2 - stroke / 2]) expect(value, key).toBeGreaterThanOrEqual(-0.1)
+        for (const value of [y1 + stroke / 2, y2 + stroke / 2]) expect(value, key).toBeLessThanOrEqual(100.1)
+      }
+    }
+    // The finish pose really has the hands above the head: its highest segment end is above the head circle.
+    expect(Math.min(...finish.segments.flatMap(([, y1, , y2]) => [y1, y2]))).toBeLessThan(finish.head[1] - finish.head[2])
   })
 
   it('keeps 使用说明 as a small utility button next to the hero', () => {

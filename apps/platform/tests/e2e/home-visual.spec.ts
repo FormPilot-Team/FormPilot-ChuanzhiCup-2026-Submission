@@ -160,6 +160,9 @@ test('Home F: 动作工坊 sits beside 我的训练 as an equal card, with a lig
     if (!phone) expect(new Set(steps.map((step) => Math.round(step.y))).size, `${viewport.width}: one row`).toBe(1)
     // The recognition sketch is a small side panel on wide cards and steps aside on phones.
     await expect(page.getByTestId('home-workshop-illustration')).toBeVisible({ visible: !phone })
+    // It shows a start and a finish pose as silhouettes, never the landmark skeleton of the workshop's debug views.
+    await expect(workshop.getByTestId('pose-sketch')).toHaveCount(0)
+    if (!phone) for (const figure of ['workshop-start', 'workshop-finish']) await expect(workshop.locator(`[data-figure="${figure}"]`)).toBeVisible()
     const cta = page.getByTestId('home-workshop-link')
     await expect(cta).toBeVisible()
     await expect(cta).toHaveAccessibleName('进入动作工坊')
