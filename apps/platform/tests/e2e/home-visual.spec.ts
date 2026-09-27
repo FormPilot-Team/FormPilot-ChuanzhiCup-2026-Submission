@@ -160,9 +160,23 @@ test('Home F: 动作工坊 sits beside 我的训练 as an equal card, with a lig
     if (!phone) expect(new Set(steps.map((step) => Math.round(step.y))).size, `${viewport.width}: one row`).toBe(1)
     // The recognition sketch is a small side panel on wide cards and steps aside on phones.
     await expect(page.getByTestId('home-workshop-illustration')).toBeVisible({ visible: !phone })
-    // It shows a start and a finish pose as silhouettes, never the landmark skeleton of the workshop's debug views.
+    // It shows teaching FormPilot any action (record → learn → checks → tested), never the landmark skeleton of the
+    // workshop's debug views or one training's start → finish poses; every part stays inside the panel.
     await expect(workshop.getByTestId('pose-sketch')).toHaveCount(0)
-    if (!phone) for (const figure of ['workshop-start', 'workshop-finish']) await expect(workshop.locator(`[data-figure="${figure}"]`)).toBeVisible()
+    await expect(workshop.locator('[data-figure="workshop-start"], [data-figure="workshop-finish"]')).toHaveCount(0)
+    if (!phone) {
+      const illustration = page.getByTestId('home-workshop-illustration')
+      const panel = await box(illustration)
+      expect(panel.y + panel.height, `${viewport.width}: illustration bottom`).toBeLessThanOrEqual(card.y + card.height)
+      expect(panel.x + panel.width, `${viewport.width}: illustration right`).toBeLessThanOrEqual(card.x + card.width)
+      for (const part of ['workshop-record', 'workshop-learn', 'workshop-requirements', 'workshop-tested']) {
+        const piece = illustration.locator(`[data-part="${part}"]`)
+        await expect(piece, `${viewport.width}: ${part}`).toBeVisible()
+        const inner = await box(piece)
+        expect(inner.x >= panel.x && inner.x + inner.width <= panel.x + panel.width && inner.y + inner.height <= panel.y + panel.height, `${viewport.width}: ${part} inside`).toBe(true)
+      }
+      await expect(illustration.locator('[data-figure="workshop-neutral"]')).toBeVisible()
+    }
     const cta = page.getByTestId('home-workshop-link')
     await expect(cta).toBeVisible()
     await expect(cta).toHaveAccessibleName('进入动作工坊')

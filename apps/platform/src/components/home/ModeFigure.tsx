@@ -15,8 +15,11 @@ export function FigureGradient({ id, top, bottom }: { id: string; top: string; b
   )
 }
 
+/** The drawable part of a figure, whatever it was made from. */
+export type SilhouetteShape = Pick<ModeFigureShape, 'head' | 'segments' | 'torso' | 'torsoRound'>
+
 /** One silhouette (torso, round-capped limbs, head) painted by a single paint, so overlapping limbs never darken each other. */
-export function FigureSilhouette({ figure, paint, className }: { figure: ModeFigureShape; paint: string; className?: string }) {
+export function FigureSilhouette({ figure, paint, className }: { figure: SilhouetteShape; paint: string; className?: string }) {
   return (
     <g fill={paint} stroke={paint} strokeLinecap="round" strokeLinejoin="round" className={className}>
       <path d={figure.torso} strokeWidth={figure.torsoRound} />

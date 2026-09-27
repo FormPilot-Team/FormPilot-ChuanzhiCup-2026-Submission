@@ -13,7 +13,8 @@ import { HomePage } from '../src/pages/Home/HomePage'
 import { COACH_WELCOME_ASSET, COACH_WELCOME_FALLBACK, COACH_WELCOME_FAMILY_A } from '../src/components/coach/coachIdentity'
 import { MODE_ACCENT } from '../src/components/home/modeAccent'
 import { MODE_FIGURES } from '../src/components/home/modeFigures'
-import { WORKSHOP_TEASER_FIGURES } from '../src/components/home/workshopTeaserFigures'
+import { WORKSHOP_NEUTRAL_FIGURE } from '../src/components/home/workshopTeaserArt'
+import { REQUIREMENTS } from '../src/features/workshop/catalog'
 import { ROUTINE_PROGRAMS } from '../src/features/routines/programs'
 import { MemoryRoutineSessionRepository } from '../src/features/routines/session/RoutineSessionRepository'
 import { FIRST_SESSION, PARTIAL_SESSION, at, makeSession } from './analysis-fixtures'
@@ -189,27 +190,26 @@ describe('Home', () => {
     expect(workshop).toContain('进入动作工坊')
   })
 
-  it('illustrates 动作工坊 with start → finish silhouettes, never the landmark skeleton of the debug views', () => {
+  it('illustrates 动作工坊 as teaching FormPilot any action — record, learn, check, test — never one named move', () => {
     const workshop = card(home(), 'home-workshop')
+    const illustration = card(workshop, 'home-workshop-illustration')
+    for (const part of ['workshop-record', 'workshop-learn', 'workshop-requirements', 'workshop-tested']) expect(illustration).toContain(`data-part="${part}"`)
+    for (const text of ['记录动作', '理解动作', '姿态', '动作范围', '完成条件', '测试通过']) expect(illustration).toContain(text)
+    // Nothing that shows or names one particular action: no training, no start → finish pair, no action-specific
+    // requirement, no mode-card pose and no landmark skeleton.
     expect(workshop).not.toContain('data-testid="pose-sketch"')
-    expect(workshop).toContain('data-figure="workshop-start"')
-    expect(workshop).toContain('data-figure="workshop-finish"')
-    for (const text of ['开始姿势', '完成姿势', '手臂保持伸直', '双手抬到肩部以上', '完成一次完整往返']) expect(workshop).toContain(text)
-    const { width, start, finish, spans } = WORKSHOP_TEASER_FIGURES
-    // Real landmarks from the 八段锦 reference track, both at one scale, side by side with a gap for the arrow.
-    expect(start.source).toMatch(/^\/assets\/routines\/baduanjin-standard\.pose\.json @ /)
-    expect(finish.source).toMatch(/^\/assets\/routines\/baduanjin-standard\.pose\.json @ /)
-    expect(spans[1][0] - spans[0][1]).toBeGreaterThanOrEqual(20)
-    for (const [key, figure] of [['start', start], ['finish', finish]] as const) {
-      for (const [x1, y1, x2, y2, stroke] of figure.segments) {
-        for (const value of [x1 - stroke / 2, x2 - stroke / 2]) expect(value, key).toBeGreaterThanOrEqual(-0.1)
-        for (const value of [x1 + stroke / 2, x2 + stroke / 2]) expect(value, key).toBeLessThanOrEqual(width + 0.1)
-        for (const value of [y1 - stroke / 2, y2 - stroke / 2]) expect(value, key).toBeGreaterThanOrEqual(-0.1)
-        for (const value of [y1 + stroke / 2, y2 + stroke / 2]) expect(value, key).toBeLessThanOrEqual(100.1)
-      }
-    }
-    // The finish pose really has the hands above the head: its highest segment end is above the head circle.
-    expect(Math.min(...finish.segments.flatMap(([, y1, , y2]) => [y1, y2]))).toBeLessThan(finish.head[1] - finish.head[2])
+    const named = ['八段锦', '太极拳', '五禽戏', '易筋经', '热身', '开始姿势', '完成姿势', ...Object.values(REQUIREMENTS).map((requirement) => requirement.label)]
+    for (const text of named) expect(illustration, text).not.toContain(text)
+    for (const motif of Object.keys(MODE_FIGURES)) expect(illustration, motif).not.toContain(`data-figure="${motif}"`)
+    expect(illustration).toContain('data-figure="workshop-neutral"')
+    // The person in front of the camera stands at ease: nothing but the head above the shoulders, and mirror-symmetric.
+    const { axis, shoulderY, segments } = WORKSHOP_NEUTRAL_FIGURE
+    const limbs = segments.filter(([x1, , x2]) => x1 !== axis || x2 !== axis)
+    expect(limbs).toHaveLength(8)
+    for (const [, y1, , y2] of limbs) expect(Math.min(y1, y2)).toBeGreaterThanOrEqual(shoulderY)
+    const key = (x1: number, y1: number, x2: number, y2: number, width: number) => [x1, y1, x2, y2, width].map((value) => value.toFixed(1)).join(' ')
+    const mirrored = new Set(limbs.map(([x1, y1, x2, y2, width]) => key(2 * axis - x1, y1, 2 * axis - x2, y2, width)))
+    expect(mirrored).toEqual(new Set(limbs.map(([x1, y1, x2, y2, width]) => key(x1, y1, x2, y2, width))))
   })
 
   it('keeps 使用说明 as a small utility button next to the hero', () => {
