@@ -33,13 +33,13 @@ describe('Scoring v2 warm-up: the explanation decomposes the score the report sh
   }
 
   it('names the biggest deduction with the repetition, the measured value, the target and the basis', () => {
-    const session = makeSession({ id: 'bent', startedAt: at(3), exercises: { overhead_raise: { raw: () => ({ minElbowL: 118, minElbowR: 124 }) } } })
+    const session = makeSession({ id: 'bent', startedAt: at(3), exercises: { overhead_raise: { raw: () => ({ minElbowL: 90, minElbowR: 95, topElbowL: 118, topElbowR: 124 }) } } })
     const overhead = explainWarmUpExercise(session, 'overhead_raise')
     const top = overhead.deductions[0]
     expect(top.criterion.id).toBe('wu.overhead_raise.elbow')
     expect(top.score).toBe(20)
     expect(top.lostPoints).toBe(20)
-    expect(top.worst[0]).toMatchObject({ repNumber: 1, observedText: '118°', targetText: '≥ 150°', phase: '全程' })
+    expect(top.worst[0]).toMatchObject({ repNumber: 1, observedText: '118°', targetText: '≥ 150°', phase: '顶部 / 近顶部' })
     expect(top.criterion.thresholdBasis).toContain('engineering-v1')
   })
 
@@ -75,7 +75,8 @@ describe('Scoring v2 warm-up: the explanation decomposes the score the report sh
     expect(squat.references.map((item) => item.name)).toEqual(['腰背挺直、骨盆中立', '脚尖略外开（不超过 30°）', '收紧核心'])
     expect(squat.references.every((item) => item.observable === 'NOT_OBSERVABLE' && item.weight === 0)).toBe(true)
     expect(squat.officialSources).toEqual(['《深蹲并非越“深”越好》', '《下蹲动作加强肌肉力量》'])
-    expect(squat.components.find((item) => item.criterion.id === 'wu.squat.knee_track')?.criterion.limitations[0]).toContain('对称性')
+    expect(squat.components.find((item) => item.criterion.id === 'wu.squat.knee_track')?.criterion.name).toBe('膝部轨迹')
+    expect(squat.components.find((item) => item.criterion.id === 'wu.squat.knee_track')?.criterion.description).toContain('没有明显向内偏移')
   })
 
   it('reports the lateral-raise elbow check without weighting it', () => {
@@ -103,12 +104,12 @@ describe('Scoring v2 AI Coach: “为什么是这个分数？” is answered fro
   })
 
   it('explains a warm-up score by its components, the deduction evidence and the basis', () => {
-    const session = makeSession({ id: 'coach-bent', startedAt: at(5), exercises: { overhead_raise: { raw: () => ({ minElbowL: 118, minElbowR: 124 }) } } })
+    const session = makeSession({ id: 'coach-bent', startedAt: at(5), exercises: { overhead_raise: { raw: () => ({ minElbowL: 90, minElbowR: 95, topElbowL: 118, topElbowR: 124 }) } } })
     const analysis = analyzeTraining(session, [])
     const answer = answerIntent('why-score', { page: 'report', digest: warmUpDigest(analysis, session) })
     expect(answer.text).toContain(`综合评分 ${analysis.overall.score} 分`)
     expect(answer.text).toContain('主要扣分在「双臂上举 · 上举时手肘弯曲」')
-    expect(answer.text).toContain('最小肘角（全程） 118°，满分要求 ≥ 150°')
+    expect(answer.text).toContain('顶部有效帧肘角（较低侧） 118°，满分要求 ≥ 150°')
     expect(answer.text).toContain('识别到的关节角度和位置')
     expect(answer.text).toContain('FormPilot 工程标定')
     expect(answer.text).not.toContain('继续努力')
@@ -132,6 +133,6 @@ describe('Scoring v2 AI Coach: “为什么是这个分数？” is answered fro
       live: buildWarmUpCoachContext({ definition, position: { index: 4, total: 6 }, freeTraining: false, courseState: 'ACTIVE', progress: 2, target: 6, targetUnit: '次', score: 80, feedback: { id: 'f', timestamp: 0, kind: 'correction', exerciseId: 'squat', code: 'KNEE_VALGUS', message: '注意膝盖方向，不要向内夹', severity: 0.5 } }),
       guide: warmUpGuide(definition, '次'),
     }
-    expect(answerIntent('why-corrected', context).text).toContain('对应检查项「膝部轨迹（不内扣）」')
+    expect(answerIntent('why-corrected', context).text).toContain('对应检查项「膝部轨迹」')
   })
 })

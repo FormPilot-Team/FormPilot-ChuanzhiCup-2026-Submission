@@ -78,9 +78,11 @@ function overheadRep(index: number, startedAt: number, raw: RawOverrides['overhe
     peakShoulderL: 156, peakShoulderR: 153, minElbowL: 140, minElbowR: 143, topElbowL: 158, topElbowR: 161,
     maxSymmetryDiff: 7, maxTorsoLean: 5 + jitterLean(index), ...raw,
   }
-  const components = calculateOverheadRaiseScoreComponents(values.peakShoulderL, values.peakShoulderR, values.minElbowL, values.minElbowR,
+  const topElbowL = raw.omitTopElbow ? 110 : values.topElbowL
+  const topElbowR = raw.omitTopElbow ? 110 : values.topElbowR
+  const components = calculateOverheadRaiseScoreComponents(values.peakShoulderL, values.peakShoulderR, topElbowL, topElbowR,
     values.maxSymmetryDiff, values.maxTorsoLean, durationMs)
-  const elbow = Math.min(values.minElbowL, values.minElbowR)
+  const elbow = Math.min(topElbowL, topElbowR)
   const metrics: RuleMetrics = {
     amplitude: metricScore((values.peakShoulderL + values.peakShoulderR) / 2, components.amplitude, '°'),
     elbow: metricScore(elbow, components.elbow, '°'),

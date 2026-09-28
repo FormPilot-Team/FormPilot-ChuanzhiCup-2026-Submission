@@ -12,7 +12,7 @@ import type { PhaseWindowSpec } from './routine/phaseWindows'
  * A numeric threshold is FORMPILOT_CALIBRATED unless a source states that number; it is never presented as a
  * national standard.
  */
-export const SCORING_VERSION = 'scoring-v2.0' as const
+export const SCORING_VERSION = 'scoring-v2.1' as const
 
 export type SourceType =
   | 'OFFICIAL_STANDARD'
@@ -44,11 +44,12 @@ export type Observability = 'OBSERVABLE' | 'PROXY' | 'NOT_OBSERVABLE'
 export type ScoringRole = 'SCORED' | 'ADVISORY' | 'REFERENCE_ONLY'
 
 /**
- * VERIFIED_ONLINE: the page was found on the publisher's site and its title, publisher and date checked
- * (`contentChecked` says whether the relevant text itself was read).
- * PROJECT_PROVIDED: named by the FormPilot project brief; not yet checked against the original.
+ * VERIFIED_FULL_TEXT: the official full text was obtained and the relevant passages were read.
+ * VERIFIED_METADATA: an official publisher/catalogue page confirms the item, but its full text was not read.
+ * SECONDARY_ONLY: only a search result or secondary source confirms the item.
+ * PENDING: the original source still needs a manual check.
  */
-export type SourceVerification = 'VERIFIED_ONLINE' | 'PROJECT_PROVIDED'
+export type SourceVerification = 'VERIFIED_FULL_TEXT' | 'VERIFIED_METADATA' | 'SECONDARY_ONLY' | 'PENDING'
 
 export interface ScoringSource {
   id: string
@@ -61,7 +62,14 @@ export interface ScoringSource {
   identifier: string | null
   url: string | null
   verification: SourceVerification
-  contentChecked: boolean
+  /** Whether an official publisher/catalogue page confirmed the bibliographic metadata. */
+  metadataVerified: boolean
+  /** Whether the official full text was obtained and its relevant passages were actually read. */
+  fullTextVerified: boolean
+  /** ISO calendar date of the latest verification, or null while pending. */
+  verifiedAt: string | null
+  /** Human-readable audit note. It must not imply more access than the flags above. */
+  verificationNote: string
   /** What FormPilot takes from this source. */
   usedFor: string
 }

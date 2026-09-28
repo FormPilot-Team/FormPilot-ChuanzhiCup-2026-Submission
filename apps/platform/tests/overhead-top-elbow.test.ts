@@ -46,9 +46,15 @@ function completeRep(
 }
 
 describe('Overhead Raise TOP elbow analytics evidence', () => {
-  it('records the lowest qualified elbow angle observed in TOP', () => {
-    const rep = completeRep([{ left: 168, right: 169 }, { left: 152, right: 155 }])
-    expect(rep).toMatchObject({ topElbowL: 152, topElbowR: 155 })
+  it('uses the lower quartile of qualified TOP frames instead of one noisy minimum', () => {
+    const rep = completeRep([
+      { left: 90, right: 92 },
+      { left: 160, right: 162 },
+      { left: 160, right: 162 },
+      { left: 160, right: 162 },
+      { left: 160, right: 162 },
+    ])
+    expect(rep).toMatchObject({ topElbowL: 160, topElbowR: 162 })
   })
 
   it('does not let naturally bent raising elbows contaminate TOP evidence', () => {
@@ -63,7 +69,8 @@ describe('Overhead Raise TOP elbow analytics evidence', () => {
 
   it('tracks left and right TOP evidence independently', () => {
     const rep = completeRep([{ left: 120, right: 170 }, { left: 160, right: 145 }])
-    expect(rep).toMatchObject({ topElbowL: 120, topElbowR: 145 })
+    expect(rep.topElbowL).toBe(130)
+    expect(rep.topElbowR).toBeCloseTo(151.25)
   })
 
   it('omits TOP elbow evidence when every TOP measurement is below confidence threshold', () => {
@@ -73,11 +80,18 @@ describe('Overhead Raise TOP elbow analytics evidence', () => {
     expect(JSON.stringify(rep)).not.toContain('topElbow')
   })
 
-  it('keeps legacy whole-repetition elbow scoring unchanged', () => {
+  it('does not deduct elbow extension for naturally bent transition frames', () => {
     const rep = completeRep([{ left: 170, right: 170 }], { left: 100, right: 100 })
     expect(rep.topElbowL).toBe(170)
     expect(rep.minElbowL).toBe(70)
-    expect(rep.elbowScore).toBe(0)
+    expect(rep.elbowScore).toBe(100)
+    expect(rep.errors).not.toContain('ELBOW_TOO_BENT_L')
+  })
+
+  it('deducts elbow extension when the TOP window remains bent', () => {
+    const rep = completeRep(Array.from({ length: 5 }, () => ({ left: 120, right: 122 })))
+    expect(rep.elbowScore).toBe(25)
     expect(rep.errors).toContain('ELBOW_TOO_BENT_L')
+    expect(rep.errors).toContain('ELBOW_TOO_BENT_R')
   })
 })

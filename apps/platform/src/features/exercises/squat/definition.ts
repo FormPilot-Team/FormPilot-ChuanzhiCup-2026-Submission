@@ -33,7 +33,7 @@ export const squatDefinition: ExerciseDefinition<SquatFeatures, SquatStateSnapsh
     metrics: [
       { key: 'amplitude', label: '深度', note: `目标髋部下沉 ≥${SQUAT_V1.validDepthHipDrop.toFixed(2)}×躯干长`, icon: 'amplitude', tone: 'blue' },
       { key: 'stability', label: '稳定性', note: `左右膝高差 ≤${SQUAT_V1.kneeHeightDiffMax.toFixed(2)}×躯干长`, icon: 'stability', tone: 'green' },
-      { key: 'symmetry', label: '对称性', note: `膝间距比 ≥${SQUAT_V1.kneeValgusMaxRatio.toFixed(2)}，避免内收`, icon: 'symmetry', tone: 'green' },
+      { key: 'symmetry', label: '膝部轨迹', note: `膝间距比 ≥${SQUAT_V1.kneeValgusMaxRatio.toFixed(2)}，避免向内偏移`, icon: 'symmetry', tone: 'green' },
       { key: 'tempo', label: '节奏', note: `推荐 ${SQUAT_V1.repDurationMinMs / 1000}–${SQUAT_V1.repDurationMaxMs / 1000} 秒 / 次`, icon: 'tempo', tone: 'blue' },
     ],
     phaseLabels: {

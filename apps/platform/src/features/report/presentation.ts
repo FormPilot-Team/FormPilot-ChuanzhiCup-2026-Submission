@@ -11,7 +11,7 @@ export const REPORT_COURSE_NAME = 'AI 电子教练 · 全身训练'
 export const REPORT_EXERCISE_PRESENTATION: Record<ExerciseId, ReportExercisePresentation> = {
   shoulder_rotation: { name: '肩部环绕', metricKeys: [] },
   overhead_raise: { name: '双臂上举', metricKeys: [
-    { key: 'amplitude', label: '幅度' }, { key: 'elbow', label: '肘部伸展' },
+    { key: 'amplitude', label: '幅度' }, { key: 'elbow', label: '顶部肘部伸展' },
     { key: 'synchronization', label: '双臂同步' }, { key: 'stability', label: '稳定性' }, { key: 'tempo', label: '节奏' },
   ] },
   lateral_raise: { name: '侧平举', metricKeys: [
@@ -24,7 +24,7 @@ export const REPORT_EXERCISE_PRESENTATION: Record<ExerciseId, ReportExercisePres
   ] },
   squat: { name: '徒手深蹲', metricKeys: [
     { key: 'amplitude', label: '深度' }, { key: 'stability', label: '稳定性' },
-    { key: 'symmetry', label: '对称性' }, { key: 'completion', label: '完成度' }, { key: 'tempo', label: '节奏' },
+    { key: 'symmetry', label: '膝部轨迹' }, { key: 'completion', label: '完成度' }, { key: 'tempo', label: '节奏' },
   ] },
   knee_raise: { name: '交替提膝', metricKeys: [
     { key: 'amplitude', label: '幅度' }, { key: 'stability', label: '稳定性' },

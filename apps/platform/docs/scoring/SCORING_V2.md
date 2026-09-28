@@ -1,10 +1,19 @@
-# FormPilot Scoring v2 — Evidence-based & Explainable Evaluation
+# FormPilot Scoring v2.1 — Evidence-based & Explainable Evaluation
 
-版本：`scoring-v2.0`（2026-09-28）　代码：`src/features/scoring/`　测试：`tests/scoring-v2-*.test.ts`、`tests/e2e/scoring-v2.spec.ts`
+版本：`scoring-v2.1`（2026-09-28）　代码：`src/features/scoring/`　测试：`tests/scoring-v2-*.test.ts`、`tests/e2e/scoring-v2.spec.ts`
 
 本轮目标：让每个分数都能回答“查的是什么、为什么查、在哪个动作阶段、测到多少、要求多少、依据是谁”。本轮**没有**修改任何实时纠错阈值、热身评分公式或权重；新增的是评分依据体系、跟练的动作规范检查，以及报告与 AI 教练的解释。
 
 > 本体系是动作表现与跟练质量的参考，不是医学、康复或专业裁判评价；在没有真人与专家标注数据之前，不宣称达到专业裁判精度。
+
+## v2.1 changes
+
+- **Source verification model**：每条来源明确记录 `metadataVerified`、`fullTextVerified`、`verifiedAt`、`verificationNote`，并以 `VERIFIED_FULL_TEXT` / `VERIFIED_METADATA` / `SECONDARY_ONLY` / `PENDING` 区分“读到官方正文”“只核对官方元数据”“仅二级来源”“待核实”。
+- **八段锦标准**：官方标准信息页与中华中医药学会正式附件已核对。正式标准为 `T/CACM 1676—2026 / T/CHQA 0001—2026《八段锦》`，由中华中医药学会、中国健身气功协会发布，2026-05-28 发布并实施，状态为现行；本轮取得并阅读正式 51 页正文，标记为 `VERIFIED_FULL_TEXT`。
+- **Overhead Raise TOP scoring window**：双臂上举“顶部阶段肘部伸展程度”只使用 TOP / near-TOP 有效帧。单侧取下四分位数，再取左右较低侧；上升/下降阶段自然屈肘不再扣除此项。TOP 实时纠错阈值与持续时间逻辑未改。
+- **Squat metric rename**：深蹲原 `symmetry` 工程 key、权重和阈值保持不变，用户可见名称统一为“膝部轨迹”，解释为“下蹲和起立过程中，双膝是否保持稳定，没有明显向内偏移”。
+
+> 所有具体数值阈值仍为 FormPilot calibrated，尚未经过专家/真人正式标定。
 
 ---
 
@@ -23,11 +32,13 @@
 统一登记于 `src/features/scoring/sources.ts`，每个检查项通过 `sourceId` 引用，报告只显示“来源名称 · 机构 · 日期/编号”。
 
 核对状态：
-- `VERIFIED_ONLINE`：2026-09-28 在发布方网站找到页面，核对了标题、机构、日期；“已读原文”表示相关文字也已逐条读过（例如八段锦习惯性错误的全部条目）。
-- `PROJECT_PROVIDED`：由项目任务书给出，尚未对照原文；**答辩、软著、论文引用前必须核对原文与页码**。
+- `VERIFIED_FULL_TEXT`：官方正文已经取得，相关条文已实际阅读。
+- `VERIFIED_METADATA`：官方页面确认文献/标准真实存在及其元数据，但本轮未读取全文。
+- `SECONDARY_ONLY`：仅通过检索结果或二级来源确认，不得据此归因具体条文。
+- `PENDING`：仍需人工定位并核实原始来源；**答辩、软著、论文引用前必须补齐原文与页码**。
 
 完整表格见附录 A。要点：
-- 八段锦：国家体育总局健身气功管理中心《健身气功•八段锦习惯性错误及纠正方法》（2018-01-10，已读原文）是八段锦机器检查项的主要来源；T/CACM 1676—2026《八段锦》团体标准（2026-05-28，项目提供，发布机构按代号推定为中华中医药学会，待核对）作为总依据。
+- 八段锦：国家体育总局健身气功管理中心《健身气功•八段锦习惯性错误及纠正方法》（2018-01-10，已读原文）是八段锦机器检查项的主要来源；正式团体标准 `T/CACM 1676—2026 / T/CHQA 0001—2026《八段锦》`（中华中医药学会、中国健身气功协会，2026-05-28 发布实施，现行）已核对官方元数据与完整正文。
 - 五禽戏：《健身气功•五禽戏的基本功练习及易犯错误》（中国健身气功协会，2012-12-24，已读原文）；《五禽戏的习练要求》《五禽戏习惯性错误及纠正方法》为项目提供、待核对（线上未检索到原文）。
 - 易筋经：《健身气功·易筋经习练中肩、髋关节常见错误动作解析》（健身气功管理中心，2018-02-26，已读原文）；《易筋经常见习惯性错误及纠正方法》项目提供、待核对（线上未检索到原文）。
 - 太极拳：二十四式简化太极拳审定套路；《传统武术套路竞赛规则》（中国武术协会审定，2012-08，只借鉴“动作质量 / 演练水平”分开评价的思路）；吕章闻等《面向“虚实转换”的太极拳动作质量评估方法》（广东工业大学学报 2026 第 43 卷，doi:10.12052/gdutxb.250224，已读摘要）。
@@ -74,10 +85,10 @@
 | 动作 | 检查（计分分项 · 权重） | 官方支持的部分 | FormPilot 标定的部分 |
 |---|---|---|---|
 | 肩部环绕（引导，不计分） | 活动幅度、双臂同步、动作连续、躯干稳定 | “热身应各关节全幅度活动、低强度”（热身运动你做对了吗，B） | 全部阈值（35°、0.55、0.55、10°） |
-| 双臂上举 | 上举幅度 35%、手肘伸展 25%、双臂同步 20%、躯干稳定 10%、节奏 10% | 全幅度活动（B）、身体直立（侧平举指导的一般原则，B） | 90°→150° 曲线、110°→150° 肘角、4°/28°、3°/20°、2–4 秒 |
+| 双臂上举 | 上举幅度 35%、顶部阶段肘部伸展程度 25%、双臂同步 20%、躯干稳定 10%、节奏 10% | 全幅度活动（B）、身体直立（侧平举指导的一般原则，B） | 90°→150° 曲线、TOP 有效帧肘角 110°→150°、4°/28°、3°/20°、2–4 秒 |
 | 侧平举 | 侧举高度 35%、左右对称 25%、躯干稳定 20%、节奏 10%、完整完成 10%；手肘微屈（提示） | 身体直立、腰腹收紧（A）；手肘微屈（A，因此只把 <150° 视为明显屈肘）；侧举做法（B）；不耸肩（A，暂作参考） | 80–100° 带宽、5°/35°、3°/20°、2–4 秒 + 顶部停留 |
 | 侧步开合 | 手脚协调 30%、开合幅度 25%、节奏 20%、身体稳定 15%、回到中间 10%；左右交替（提示） | 无直接国内动作标准（全民健身指南仅作强度与安全背景） | 全部阈值 |
-| 徒手深蹲 | 下蹲幅度 30%、左右均衡与躯干 25%、膝部轨迹（不内扣）20%、完整起立 15%、节奏 10% | 大腿接近与地面平行、并非越深越好（A）；膝盖不内扣、与脚尖方向一致（A）；重心在两腿中间（B） | 髋部下降曲线（0.35 封顶，更深不加分）、膝距/髋宽 0.92/0.55、膝高差 0.03/0.16、3–5 秒 |
+| 徒手深蹲 | 下蹲幅度 30%、左右均衡与躯干 25%、膝部轨迹 20%、完整起立 15%、节奏 10% | 大腿接近与地面平行、并非越深越好（A）；膝盖不内扣、与脚尖方向一致（A）；重心在两腿中间（B） | 髋部下降曲线（0.35 封顶，更深不加分）、膝距/髋宽 0.92/0.55、膝高差 0.03/0.16、3–5 秒 |
 | 交替提膝 | 提膝高度 30%、支撑稳定 25%、左右交替 20%、左右对称 15%、节奏 10% | 无（不声称任何官方绝对高度） | 全部阈值 |
 
 深蹲的“腰背挺直、骨盆中立”“脚尖外开不超过 30°”“收紧核心”为 NOT_OBSERVABLE（正面 2D 看不到前后方向与脚尖朝向）。
@@ -142,13 +153,13 @@ PROXY（间接估计）检查项在 limitations 中写明局限，例如“前�
 - 标定规则：跟练阈值必须让标准示范自身在全部窗口得满分（单测逐套验证），再按“明显偏离才扣分”留出余量；涉及下蹲/马步/提膝的阈值只要求“明显做到”，不奖励更低更深。
 - 官方给出数字的地方（八段锦第四式“约 45°”）也不直接作为阈值：二维测量口径不同，按示范实测改为区间并在 basis 中说明。
 
-### 现有评分规则的判断（本轮只判断，不改动）
+### v2.1 评分语义收口
 
 | 规则 | 结论 |
 |---|---|
 | 深蹲膝内扣（膝距/髋宽）、下蹲幅度（封顶）、侧平举躯干直立 | 有官方依据，保留；阈值待真人标定 |
-| 双臂上举“手肘伸展”分项 | 有依据但口径需重新标定：分项取整次最小肘角，而实时纠错与报告问题只看顶点肘角（<135°，已真人修正） |
-| 深蹲“对称性”分项 | 有依据但命名不准：实际是膝内扣代理指标，建议下个版本把报告标签改为“膝部方向” |
+| 双臂上举“顶部阶段肘部伸展程度”分项 | 已改为 TOP / near-TOP 有效帧下四分位数；过渡阶段屈肘不计入。实时纠错仍只看 TOP 当前肘角，阈值与确认/恢复时间未改。 |
+| 深蹲“膝部轨迹”分项 | 工程 key 仍为 `symmetry` 以保持存储兼容，但 Report、AI Coach、Scoring Registry 和训练页均不再把膝内扣代理指标称为“对称性”。 |
 | 侧平举手肘 | 与官方“手肘微屈”一致（只提示 <150°），保留为不计分提示 |
 | 侧步开合、交替提膝全部阈值、各动作节奏区间 | 工程经验（证据 C），保留，待真人数据校准 |
 | 应删除的规则 | 本轮未发现必须删除的规则；八段锦“臀部高度不变”的二维候选指标在设计阶段因示范者自身不达标而未启用 |
@@ -174,25 +185,25 @@ PROXY（间接估计）检查项在 limitations 中写明局限，例如“前�
 
 | id | 类型 | 标题 | 机构 | 日期 / 编号 | 核对状态 | 用途 |
 |---|---|---|---|---|---|---|
-| `tcacm-1676-2026-baduanjin` | OFFICIAL_STANDARD | 《八段锦》团体标准 | 中华中医药学会（按标准代号 T/CACM 推定，待核对） | 2026-05-28 发布 / 实施；T/CACM 1676—2026 | PROJECT_PROVIDED | 站桩、技术规范（各式动作过程与定势）、功理功用、学练建议与安全提示；FormPilot 以其为八段锦动作规范的总依据。 |
-| `gsqc-bdj-errors-2018` | OFFICIAL_GUIDANCE | 《健身气功•八段锦习惯性错误及纠正方法》 | 国家体育总局健身气功管理中心 | 2018-01-10 | VERIFIED_ONLINE（已读原文） | 预备势、八式与收势的习惯性错误及纠正方法；八段锦机器检查项优先由这些错误转化而来。 |
-| `gsqc-wqx-requirements` | OFFICIAL_GUIDANCE | 《健身气功·五禽戏的习练要求》 | 国家体育总局健身气功管理中心 | — | PROJECT_PROVIDED | 五禽戏动作规范、精神劲力与呼吸配合要求。 |
-| `gsqc-wqx-errors` | OFFICIAL_GUIDANCE | 《健身气功·五禽戏习惯性错误及纠正方法》 | 国家体育总局健身气功管理中心 | — | PROJECT_PROVIDED | 五禽戏各动作的易犯错误与纠正方法。 |
-| `chqa-wqx-basics-2012` | OFFICIAL_GUIDANCE | 《健身气功•五禽戏的基本功练习及易犯错误》 | 中国健身气功协会（国家体育总局健身气功管理中心网站发布） | 2012-12-24 | VERIFIED_ONLINE（已读原文） | 上肢、躯干（熊运“相对固定腰胯”）、桩功（尾闾中正）、步法与提踵平衡的要求及易犯错误。 |
-| `gsqc-yjj-errors` | OFFICIAL_GUIDANCE | 《健身气功·易筋经常见习惯性错误及纠正方法》 | 国家体育总局健身气功管理中心 | — | PROJECT_PROVIDED | 易筋经十二势的常见习惯性错误（如上托时避免屈肘）。 |
-| `gsqc-yjj-shoulder-hip-2018` | OFFICIAL_GUIDANCE | 《健身气功·易筋经习练中肩、髋关节常见错误动作解析》 | 国家体育总局健身气功管理中心 | 2018-02-26 | VERIFIED_ONLINE（已读原文） | 韦驮献杵第一、二势的肩部错误，三盘落地的下蹲与两膝方向，屈膝下蹲时髋部中正、重心不偏移。 |
-| `taiji-24-routine` | OFFICIAL_GUIDANCE | 二十四式简化太极拳（审定套路） | 原国家体委（运动司）组织编定；中国武术协会推广 | 1956 | PROJECT_PROVIDED | 二十四式的动作名称、顺序与规格（立身中正、屈膝步型等）。 |
-| `cwa-traditional-rules-2012` | COMPETITION_RULE | 《传统武术套路竞赛规则》 | 中国武术协会审定 | 2012-08 | PROJECT_PROVIDED | 只借鉴其“动作质量（是否符合规格）”与“演练水平（连贯、协调、节奏）”分开评价的思路，不照搬竞赛扣分与总分。 |
-| `gdut-taiji-quality-2026` | ACADEMIC_EVIDENCE | 吕章闻, 朱雨荷, 战荫伟, 等.《面向“虚实转换”的太极拳动作质量评估方法》 | 广东工业大学学报 | 2026（第 43 卷，网络首发 2026-06-02）；doi:10.12052/gdutxb.250224 | VERIFIED_ONLINE（已读原文） | Scoring v2 架构依据：重心转移、关节角度变化、时序连续性等指标与专家模板、时序对齐的思路；FormPilot 不采用其 3D / MotionBERT 模型。 |
-| `sgas-fitness-guide-2017` | OFFICIAL_GUIDANCE | 《全民健身指南》 | 国家体育总局 | 2017-08 | VERIFIED_ONLINE | 科学健身原则、运动强度与安全背景；不用于任何动作的数值阈值。 |
-| `sgas-warmup-2020` | OFFICIAL_GUIDANCE | 《热身运动你做对了吗》 | 国家体育总局网站 | 2020-07 | VERIFIED_ONLINE（已读原文） | 热身目的与原则：低强度、各关节（含肩、髋、膝）全幅度活动。 |
-| `cstn-squat-2022` | OFFICIAL_GUIDANCE | 《下蹲动作加强肌肉力量》 | 中国体育报（国家体育总局网站转载） | 2022-10-19 | VERIFIED_ONLINE（已读原文） | 下蹲：两脚与肩同宽、膝盖不要内扣、重心落在两腿正中间、大腿与地面平行、耳肩髋几乎成一条直线。 |
-| `cstn-squat-2023` | OFFICIAL_GUIDANCE | 《深蹲并非越“深”越好》 | 中国体育报（国家体育总局网站转载） | 2023-07-26 | VERIFIED_ONLINE（已读原文） | 深蹲：蹲到大腿与地面平行为佳（不是越深越好）、脚尖略外开不超过 30°、收紧核心、腰背挺直、骨盆中立。 |
-| `cstn-shoulder-2023` | OFFICIAL_GUIDANCE | 《小动作练出优美体形》 | 中国体育报（国家体育总局网站转载） | 2023-08-23 | VERIFIED_ONLINE（已读原文） | 侧平举：抬起手肘和大臂、手肘微屈、肩部下沉不要耸肩、身体直立、腰腹收紧。 |
-| `pose-fitness-eval` | ACADEMIC_EVIDENCE | 《基于人体姿态估计的健身运动评估系统》 | 国内期刊论文（刊名、年份待核对） | — | PROJECT_PROVIDED | 以 MediaPipe 关键点为输入、按运动学设计关节角度、对称性、轨迹与流畅性评价，与 FormPilot 技术路线一致。 |
-| `sjtu-rehab-segmentation-2023` | ACADEMIC_EVIDENCE | 《连续康复训练动作分割与评估》 | 上海交通大学学报 | 2023；第 57 卷第 5 期，第 533 页起 | VERIFIED_ONLINE | 关节运动特征、局部与整体评价、多特征融合、DTW 时序评估；本轮只用于动作阶段划分与接口设计（temporalAlignmentScore 预留）。 |
-| `fp-reference-demo` | FORMPILOT_CALIBRATED | FormPilot 标准示范数据 | FormPilot | 2026-09；public/assets/routines/*-standard.pose.json；热身示范素材 | VERIFIED_ONLINE（已读原文） | 跟练标准视频的离线姿态轨迹：用于划分动作阶段，并按示范者在各阶段的实测值标定阈值。 |
-| `fp-engineering-v1` | FORMPILOT_CALIBRATED | FormPilot 热身工程阈值 engineering-v1 | FormPilot | 2026-09；exercise-rules-v1.0 / engineering-v1 | VERIFIED_ONLINE（已读原文） | 热身 6 动作的阈值、评分曲线与权重（经多轮真人测试修正），尚未经过专家标注数据校准。 |
+| `tcacm-1676-2026-baduanjin` | OFFICIAL_STANDARD | 《八段锦》团体标准 | 中华中医药学会、中国健身气功协会 | 2026-05-28 发布 / 实施；T/CACM 1676—2026 / T/CHQA 0001—2026 | VERIFIED_FULL_TEXT | 官方信息页与正式 51 页正文已核对；只引用正文动作要求，不把 FormPilot 阈值归因于标准。 |
+| `gsqc-bdj-errors-2018` | OFFICIAL_GUIDANCE | 《健身气功•八段锦习惯性错误及纠正方法》 | 国家体育总局健身气功管理中心 | 2018-01-10 | VERIFIED_FULL_TEXT | 预备势、八式与收势的习惯性错误及纠正方法；八段锦机器检查项优先由这些错误转化而来。 |
+| `gsqc-wqx-requirements` | OFFICIAL_GUIDANCE | 《健身气功·五禽戏的习练要求》 | 国家体育总局健身气功管理中心 | — | PENDING | 五禽戏动作规范、精神劲力与呼吸配合要求。 |
+| `gsqc-wqx-errors` | OFFICIAL_GUIDANCE | 《健身气功·五禽戏习惯性错误及纠正方法》 | 国家体育总局健身气功管理中心 | — | PENDING | 五禽戏各动作的易犯错误与纠正方法。 |
+| `chqa-wqx-basics-2012` | OFFICIAL_GUIDANCE | 《健身气功•五禽戏的基本功练习及易犯错误》 | 中国健身气功协会（国家体育总局健身气功管理中心网站发布） | 2012-12-24 | VERIFIED_FULL_TEXT | 上肢、躯干（熊运“相对固定腰胯”）、桩功（尾闾中正）、步法与提踵平衡的要求及易犯错误。 |
+| `gsqc-yjj-errors` | OFFICIAL_GUIDANCE | 《健身气功·易筋经常见习惯性错误及纠正方法》 | 国家体育总局健身气功管理中心 | — | PENDING | 易筋经十二势的常见习惯性错误（如上托时避免屈肘）。 |
+| `gsqc-yjj-shoulder-hip-2018` | OFFICIAL_GUIDANCE | 《健身气功·易筋经习练中肩、髋关节常见错误动作解析》 | 国家体育总局健身气功管理中心 | 2018-02-26 | VERIFIED_FULL_TEXT | 韦驮献杵第一、二势的肩部错误，三盘落地的下蹲与两膝方向，屈膝下蹲时髋部中正、重心不偏移。 |
+| `taiji-24-routine` | OFFICIAL_GUIDANCE | 二十四式简化太极拳（审定套路） | 原国家体委（运动司）组织编定；中国武术协会推广 | 1956 | PENDING | 二十四式的动作名称、顺序与规格（立身中正、屈膝步型等）。 |
+| `cwa-traditional-rules-2012` | COMPETITION_RULE | 《传统武术套路竞赛规则》 | 中国武术协会审定 | 2012-08 | PENDING | 只借鉴其“动作质量（是否符合规格）”与“演练水平（连贯、协调、节奏）”分开评价的思路，不照搬竞赛扣分与总分。 |
+| `gdut-taiji-quality-2026` | ACADEMIC_EVIDENCE | 吕章闻, 朱雨荷, 战荫伟, 等.《面向“虚实转换”的太极拳动作质量评估方法》 | 广东工业大学学报 | 2026（第 43 卷，网络首发 2026-06-02）；doi:10.12052/gdutxb.250224 | VERIFIED_FULL_TEXT | Scoring v2 架构依据：重心转移、关节角度变化、时序连续性等指标与专家模板、时序对齐的思路；FormPilot 不采用其 3D / MotionBERT 模型。 |
+| `sgas-fitness-guide-2017` | OFFICIAL_GUIDANCE | 《全民健身指南》 | 国家体育总局 | 2017-08 | VERIFIED_METADATA | 科学健身原则、运动强度与安全背景；不用于任何动作的数值阈值。 |
+| `sgas-warmup-2020` | OFFICIAL_GUIDANCE | 《热身运动你做对了吗》 | 国家体育总局网站 | 2020-07 | VERIFIED_FULL_TEXT | 热身目的与原则：低强度、各关节（含肩、髋、膝）全幅度活动。 |
+| `cstn-squat-2022` | OFFICIAL_GUIDANCE | 《下蹲动作加强肌肉力量》 | 中国体育报（国家体育总局网站转载） | 2022-10-19 | VERIFIED_FULL_TEXT | 下蹲：两脚与肩同宽、膝盖不要内扣、重心落在两腿正中间、大腿与地面平行、耳肩髋几乎成一条直线。 |
+| `cstn-squat-2023` | OFFICIAL_GUIDANCE | 《深蹲并非越“深”越好》 | 中国体育报（国家体育总局网站转载） | 2023-07-26 | VERIFIED_FULL_TEXT | 深蹲：蹲到大腿与地面平行为佳（不是越深越好）、脚尖略外开不超过 30°、收紧核心、腰背挺直、骨盆中立。 |
+| `cstn-shoulder-2023` | OFFICIAL_GUIDANCE | 《小动作练出优美体形》 | 中国体育报（国家体育总局网站转载） | 2023-08-23 | VERIFIED_FULL_TEXT | 侧平举：抬起手肘和大臂、手肘微屈、肩部下沉不要耸肩、身体直立、腰腹收紧。 |
+| `pose-fitness-eval` | ACADEMIC_EVIDENCE | 《基于人体姿态估计的健身运动评估系统》 | 国内期刊论文（刊名、年份待核对） | — | PENDING | 以 MediaPipe 关键点为输入、按运动学设计关节角度、对称性、轨迹与流畅性评价，与 FormPilot 技术路线一致。 |
+| `sjtu-rehab-segmentation-2023` | ACADEMIC_EVIDENCE | 《连续康复训练动作分割与评估》 | 上海交通大学学报 | 2023；第 57 卷第 5 期，第 533 页起 | VERIFIED_METADATA | 关节运动特征、局部与整体评价、多特征融合、DTW 时序评估；本轮只用于动作阶段划分与接口设计（temporalAlignmentScore 预留）。 |
+| `fp-reference-demo` | FORMPILOT_CALIBRATED | FormPilot 标准示范数据 | FormPilot | 2026-09；public/assets/routines/*-standard.pose.json；热身示范素材 | VERIFIED_FULL_TEXT | 跟练标准视频的离线姿态轨迹：用于划分动作阶段，并按示范者在各阶段的实测值标定阈值。 |
+| `fp-engineering-v1` | FORMPILOT_CALIBRATED | FormPilot 热身工程阈值 engineering-v1 | FormPilot | 2026-09；exercise-rules-v1.0 / engineering-v1 | VERIFIED_FULL_TEXT | 热身 6 动作的阈值、评分曲线与权重（经多轮真人测试修正），尚未经过专家标注数据校准。 |
 
 ## 附录 B · 检查项全表（由 registry 生成）
 
@@ -207,7 +218,7 @@ PROXY（间接估计）检查项在 limitations 中写明局限，例如“前�
 | shoulder_rotation | 动作连续<br>`wu.shoulder_rotation.continuity` | 连续、平稳地环绕，不中途停顿。 | `fp-reference-demo` · C | 可测 | 提示 | 运动时间占比 · 环绕中 | ≥ 0.55（0 分：容差 0.55） | — |
 | shoulder_rotation | 躯干稳定<br>`wu.shoulder_rotation.torso` | 躯干保持直立，不借身体侧倾带动手臂。 | `fp-reference-demo` · C | 可测 | 提示 | 躯干侧倾角 · 环绕中 | ≤ 10°（0 分：容差 10） | — |
 | overhead_raise | 上举幅度<br>`wu.overhead_raise.arm_height` | 双臂举过头顶，肩关节充分屈曲。 | `sgas-warmup-2020` · B | 可测 | 计分 | 肩关节最大角（左右平均） · 顶点 | ≥ 150°（0 分：容差 60） | 0.35 |
-| overhead_raise | 手肘伸展<br>`wu.overhead_raise.elbow` | 上举时手臂伸直，不屈肘上举。 | `fp-reference-demo` · C | 可测 | 计分 | 最小肘角（全程） · 全程 | ≥ 150°（0 分：容差 40） | 0.25 |
+| overhead_raise | 顶部阶段肘部伸展程度<br>`wu.overhead_raise.elbow` | 举到头顶时手臂伸展；上升和下降过渡中的自然屈肘不计入本项。 | `fp-reference-demo` · C | 可测 | 计分 | 顶部有效帧肘角（较低侧） · 顶部 / 近顶部 | ≥ 150°（0 分：容差 40） | 0.25 |
 | overhead_raise | 双臂同步<br>`wu.overhead_raise.sync` | 两臂同时上举，保持同一高度。 | `fp-reference-demo` · C | 可测 | 计分 | 左右肩角最大差 · 全程 | ≤ 4°（0 分：容差 24） | 0.2 |
 | overhead_raise | 躯干稳定<br>`wu.overhead_raise.torso` | 身体直立、腰腹收紧，不靠侧倾或后仰借力。 | `cstn-shoulder-2023` · B | 间接 | 计分 | 最大躯干侧倾 · 全程 | ≤ 3°（0 分：容差 17） | 0.1 |
 | overhead_raise | 动作节奏<br>`wu.overhead_raise.tempo` | 有控制地抬起与回落，不甩臂。 | `fp-reference-demo` · C | 可测 | 计分 | 单次用时 · 全程 | 2–4 秒（0 分：容差 1.5） | 0.1 |
@@ -225,7 +236,7 @@ PROXY（间接估计）检查项在 limitations 中写明局限，例如“前�
 | step_jack | 回到中间<br>`wu.step_jack.completion` | 先回到中间位置再做下一次。 | `fp-reference-demo` · C | 可测 | 计分 | 完整完成 · 回收 | ≥ 1（0 分：容差 1） | 0.1 |
 | step_jack | 左右交替<br>`wu.step_jack.alternation` | 左右两侧交替进行。 | `fp-reference-demo` · C | 可测 | 提示 | 开步顺序 · 打开 | — | — |
 | squat | 下蹲幅度<br>`wu.squat.depth` | 蹲到大腿与地面接近平行为佳，深蹲并非越深越好；在自己能控制的范围内完成。 | `cstn-squat-2023` · A | 间接 | 计分 | 髋部下降 · 底部 | ≥ 0.35 躯干长（0 分：容差 0.35） | 0.3 |
-| squat | 膝部轨迹（不内扣）<br>`wu.squat.knee_track` | 膝盖不要内扣，膝盖方向与脚尖方向一致。 | `cstn-squat-2022` · A | 间接 | 计分 | 两膝间距 / 髋宽（最小） · 下蹲—底部 | ≥ 0.92 倍（0 分：容差 0.37） | 0.2 |
+| squat | 膝部轨迹<br>`wu.squat.knee_track` | 下蹲和起立过程中，双膝保持稳定，没有明显向内偏移。 | `cstn-squat-2022` · A | 间接 | 计分 | 两膝间距 / 髋宽（最小） · 下蹲—底部 | ≥ 0.92 倍（0 分：容差 0.37） | 0.2 |
 | squat | 左右均衡与躯干稳定<br>`wu.squat.balance` | 重心落在两腿正中间，左右髋膝动作一致，身体不向一侧倾斜。 | `cstn-squat-2022` · B | 间接 | 计分 | 左右膝高度差 · 全程 | ≤ 0.03 躯干长（0 分：容差 0.13） | 0.25 |
 | squat | 完整起立<br>`wu.squat.completion` | 每次回到完整站立位再开始下一次。 | `fp-reference-demo` · C | 可测 | 计分 | 完整完成 · 起立 | ≥ 1（0 分：容差 1） | 0.15 |
 | squat | 控制节奏<br>`wu.squat.tempo` | 下蹲与起身有控制，不猛起猛落。 | `fp-reference-demo` · C | 可测 | 计分 | 单次用时 · 全程 | 3–5 秒（0 分：容差 1.5） | 0.1 |
@@ -349,4 +360,3 @@ PROXY（间接估计）检查项在 limitations 中写明局限，例如“前�
 | 全套 | 手型（掌、拳、勾）<br>`tjq.all.hand_shapes` | 掌、拳、勾手型规范。 | `taiji-24-routine` · A | NOT_OBSERVABLE | 参考 | — | — | — |
 | 全套 | 眼神（眼随手走）<br>`tjq.all.gaze` | 眼神随主要动作的手，神态自然。 | `taiji-24-routine` · A | NOT_OBSERVABLE | 参考 | — | — | — |
 | 全套 | 呼吸自然<br>`tjq.all.breathing` | 呼吸自然，与动作开合相配合。 | `taiji-24-routine` · A | NOT_OBSERVABLE | 参考 | — | — | — |
-

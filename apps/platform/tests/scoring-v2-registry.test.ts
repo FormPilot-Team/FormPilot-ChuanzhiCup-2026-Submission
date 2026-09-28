@@ -99,13 +99,22 @@ describe('Scoring v2 registry: Gate C honesty', () => {
     for (const criterion of CRITERIA.filter((item) => item.measurement.kind === 'pose-window')) expect(criterion.thresholdBasis, criterion.id).toContain('示范')
   })
 
-  it('marks every source as verified online or as provided by the project', () => {
+  it('records metadata and full-text verification without overstating source access', () => {
     for (const source of SCORING_SOURCES) {
-      expect(['VERIFIED_ONLINE', 'PROJECT_PROVIDED']).toContain(source.verification)
-      if (source.verification === 'PROJECT_PROVIDED') expect(source.contentChecked, source.id).toBe(false)
+      expect(['VERIFIED_FULL_TEXT', 'VERIFIED_METADATA', 'SECONDARY_ONLY', 'PENDING']).toContain(source.verification)
+      expect(source.fullTextVerified, source.id).toBe(source.verification === 'VERIFIED_FULL_TEXT')
+      if (source.fullTextVerified) expect(source.metadataVerified, source.id).toBe(true)
+      if (source.verification === 'PENDING') expect(source.verifiedAt, source.id).toBeNull()
+      else expect(source.verifiedAt, source.id).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+      expect(source.verificationNote.trim().length, source.id).toBeGreaterThan(0)
     }
-    expect(getScoringSource('gsqc-bdj-errors-2018')).toMatchObject({ verification: 'VERIFIED_ONLINE', contentChecked: true, published: '2018-01-10' })
-    expect(getScoringSource('tcacm-1676-2026-baduanjin')).toMatchObject({ identifier: 'T/CACM 1676—2026', verification: 'PROJECT_PROVIDED' })
+    expect(getScoringSource('gsqc-bdj-errors-2018')).toMatchObject({ verification: 'VERIFIED_FULL_TEXT', fullTextVerified: true, published: '2018-01-10' })
+    expect(getScoringSource('tcacm-1676-2026-baduanjin')).toMatchObject({
+      identifier: 'T/CACM 1676—2026 / T/CHQA 0001—2026',
+      organization: '中华中医药学会、中国健身气功协会',
+      published: '2026-05-28 发布 / 2026-05-28 实施',
+      verification: 'VERIFIED_FULL_TEXT', metadataVerified: true, fullTextVerified: true, verifiedAt: '2026-09-28',
+    })
   })
 })
 

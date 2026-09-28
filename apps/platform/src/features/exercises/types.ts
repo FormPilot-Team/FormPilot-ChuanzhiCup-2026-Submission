@@ -151,9 +151,9 @@ export interface OverheadRaiseRepSummary extends BaseRepSummary {
   peakShoulderR: number
   minElbowL: number
   minElbowR: number
-  /** Lowest qualified elbow angle observed while the state machine is in TOP. */
+  /** Lower-quartile elbow angle across qualified TOP frames. */
   topElbowL?: number
-  /** Lowest qualified elbow angle observed while the state machine is in TOP. */
+  /** Lower-quartile elbow angle across qualified TOP frames. */
   topElbowR?: number
   maxSymmetryDiff: number
   amplitudeScore: number

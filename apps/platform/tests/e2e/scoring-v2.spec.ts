@@ -18,7 +18,7 @@ function warmUpSession(): TrainingSessionState {
     id: 'scoring-v2-warmup',
     startedAt: at(40),
     exercises: {
-      overhead_raise: { raw: (index) => (index % 2 === 0 ? { minElbowL: 128, minElbowR: 136 } : undefined) },
+      overhead_raise: { raw: (index) => (index % 2 === 0 ? { minElbowL: 90, minElbowR: 96, topElbowL: 128, topElbowR: 136 } : undefined) },
       squat: { raw: (index) => (index >= 3 ? { minKneeSpreadRatio: 0.68 } : undefined) },
     },
   })
@@ -58,12 +58,12 @@ test('Scoring v2 A: a warm-up report explains each exercise score by its parts, 
   await section.locator('summary').first().click()
   await expect(section).toContainText('没有统一的“国家六动作评分标准”')
   const overhead = page.getByTestId('score-explanation-overhead_raise')
-  await expect(overhead.getByTestId('score-component-wu.overhead_raise.elbow')).toContainText('手肘伸展')
+  await expect(overhead.getByTestId('score-component-wu.overhead_raise.elbow')).toContainText('顶部阶段肘部伸展程度')
   await expect(overhead.getByTestId('score-deduction').first()).toContainText('上举时手肘弯曲')
-  await expect(overhead.getByTestId('score-deduction').first()).toContainText('最小肘角（全程） 128°，满分要求 ≥ 150°')
+  await expect(overhead.getByTestId('score-deduction').first()).toContainText('顶部有效帧肘角（较低侧） 128°，满分要求 ≥ 150°')
   await expect(overhead.getByTestId('score-basis').first()).toContainText('FormPilot 工程标定')
   const squat = page.getByTestId('score-explanation-squat')
-  await expect(squat).toContainText('膝部轨迹（不内扣）')
+  await expect(squat).toContainText('膝部轨迹')
   await expect(squat.getByTestId('score-basis').first()).toContainText('国家体育总局网站转载')
   await expect(squat.getByTestId('score-references')).toContainText('腰背挺直、骨盆中立')
   await expect(squat.getByTestId('score-references')).toContainText('本项需要人工观察')
@@ -118,7 +118,7 @@ test('Scoring v2 D: a followed form saves technique evidence and its report scor
   const dialog = page.getByTestId('routine-complete-dialog')
   await expect(dialog).toHaveAttribute('data-outcome', 'completed', { timeout: 60_000 })
   const [record] = await page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? '[]') as RoutineSessionRecord[], ROUTINE_SESSION_STORAGE_KEY)
-  expect(record.technique?.version).toBe('scoring-v2.0')
+  expect(record.technique?.version).toBe('scoring-v2.1')
   const elbow = record.technique?.criteria.find((item) => item.criterionId === 'bdj.1.elbow_extension')
   expect(elbow?.chapterId).toBe('bdj-1')
   expect(elbow?.windows).toHaveLength(6)

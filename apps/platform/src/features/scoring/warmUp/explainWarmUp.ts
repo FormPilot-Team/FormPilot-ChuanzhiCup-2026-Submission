@@ -98,7 +98,7 @@ const seconds = (rep: RepSummary) => (Number.isFinite(rep.durationMs) ? rep.dura
 /** The raw value each criterion stands for, read from the saved repetition (the value its score used). */
 const OBSERVERS: Readonly<Record<string, Observer>> = {
   'wu.overhead_raise.arm_height': (rep) => mean2(field(rep, 'peakShoulderL'), field(rep, 'peakShoulderR')),
-  'wu.overhead_raise.elbow': (rep) => min2(field(rep, 'minElbowL'), field(rep, 'minElbowR')),
+  'wu.overhead_raise.elbow': (rep) => min2(field(rep, 'topElbowL'), field(rep, 'topElbowR')),
   'wu.overhead_raise.sync': (rep) => field(rep, 'maxSymmetryDiff'),
   'wu.overhead_raise.torso': (rep) => field(rep, 'maxTorsoLean'),
   'wu.overhead_raise.tempo': seconds,
@@ -252,7 +252,7 @@ export function explainWarmUpExercise(session: TrainingSessionState, exerciseId:
   }
 }
 
-/** “第 4 次（开始后 12.3 秒）最小肘角（全程）137°，满分要求 ≥ 150°”. */
+/** “第 4 次（开始后 12.3 秒）顶部有效帧肘角（较低侧）137°，满分要求 ≥ 150°”. */
 export function repEvidenceSentence(criterion: EvaluationCriterion, item: RepEvidence): string {
   const metric = criterion.metric?.label ?? criterion.name
   return `第 ${item.repNumber} 次（开始后 ${item.atSeconds} 秒）${metric} ${item.observedText}，满分要求 ${item.targetText}`

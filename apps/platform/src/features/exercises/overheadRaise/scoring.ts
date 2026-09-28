@@ -16,15 +16,15 @@ export interface OverheadRaiseScoreComponents {
 export function calculateOverheadRaiseScoreComponents(
   peakShoulderL: number,
   peakShoulderR: number,
-  minElbowL: number,
-  minElbowR: number,
+  topElbowL: number,
+  topElbowR: number,
   maxSymmetryDiff: number,
   maxTorsoLean: number,
   durationMs: number,
   config: OverheadRaiseConfig = OVERHEAD_RAISE_V1,
 ): OverheadRaiseScoreComponents {
   const amplitude = Math.min(100, Math.max(0, ((peakShoulderL + peakShoulderR) / 2 - 90) / 60 * 100))
-  const elbow = Math.min(100, Math.max(0, (Math.min(minElbowL, minElbowR) - 110) / 40 * 100))
+  const elbow = Math.min(100, Math.max(0, (Math.min(topElbowL, topElbowR) - 110) / 40 * 100))
   const synchronization = lowerIsBetterScore(maxSymmetryDiff, 4, 28)
   const stability = lowerIsBetterScore(maxTorsoLean, 3, 20)
   const tempo = durationMs ? bandScore(durationMs, config.repDurationMinMs, config.repDurationMaxMs, 1500) : 65
@@ -38,14 +38,17 @@ export function overheadMetrics(features: OverheadRaiseFeatures, state: Overhead
   const rep = state.completedRep
   const peakL = rep?.peakShoulderL ?? Math.max(state.peakShoulderL, features.shoulderAngleL)
   const peakR = rep?.peakShoulderR ?? Math.max(state.peakShoulderR, features.shoulderAngleR)
-  const elbow = Math.min(rep?.minElbowL ?? state.minElbowL, rep?.minElbowR ?? state.minElbowR)
+  const topElbowL = rep?.topElbowL ?? state.topElbowL
+  const topElbowR = rep?.topElbowR ?? state.topElbowR
+  const elbow = topElbowL !== undefined && topElbowR !== undefined ? Math.min(topElbowL, topElbowR) : 0
+  const elbowValid = valid && topElbowL !== undefined && topElbowR !== undefined
   const symmetry = rep?.maxSymmetryDiff ?? Math.max(state.maxSymmetryDiff, features.symmetryDiff)
   const lean = rep?.maxTorsoLean ?? Math.max(state.maxTorsoLean, features.torsoLean)
   const duration = rep?.durationMs ?? (state.repStartedAt !== undefined ? features.timestamp - state.repStartedAt : 0)
   const scores = calculateOverheadRaiseScoreComponents(peakL, peakR, elbow, elbow, symmetry, lean, duration, config)
   return {
     amplitude: metricScore((peakL + peakR) / 2, scores.amplitude, '°', valid),
-    elbow: metricScore(elbow, scores.elbow, '°', valid),
+    elbow: metricScore(elbow, scores.elbow, '°', elbowValid),
     synchronization: metricScore(symmetry, scores.synchronization, '°', valid),
     stability: metricScore(lean, scores.stability, '°', valid),
     tempo: metricScore(duration / 1000, scores.tempo, 's', valid),
