@@ -43,7 +43,7 @@ test('upper-body crop starts the first three exercises but full-body Step Jack w
   await expect(page.getByRole('heading', { name: '今日训练 · 双臂上举专项' })).toBeVisible({ timeout: 12_000 })
   await expect(page.getByRole('heading', { name: '今日训练 · 侧平举专项' })).toBeVisible({ timeout: 12_000 })
   await expect(page.getByRole('heading', { name: '今日训练 · 侧步开合专项' })).toBeVisible({ timeout: 12_000 })
-  await expect(page.getByTestId('preparation-state')).toContainText('请后退一些，确保全身完整入镜')
+  await expect(page.getByTestId('preparation-state')).toContainText(/请后退一点，让膝盖和脚部进入画面|请后退一些，确保全身完整入镜/)
   await page.waitForTimeout(800)
   await expect(page.getByTestId('course-state')).toContainText('请进入准备姿势')
 })

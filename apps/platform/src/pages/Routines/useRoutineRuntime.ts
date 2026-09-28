@@ -12,14 +12,15 @@ import { logDiagnostics } from '../../features/diagnostics/desktopBridge'
 import { PerformanceTracker } from '../../features/diagnostics/PerformanceTracker'
 import { collectVideoDiagnostics, videoDiagnosticsLog, type VideoDiagnosticsReport } from '../../features/diagnostics/videoDiagnostics'
 import { GestureRuntimeController, type GestureAction } from '../../features/gesture/GestureRuntimeController'
+import { FramingAssistController, initialFramingAssistState } from '../../features/framing/FramingAssist'
 import { buildTrainingHistoryItems } from '../../features/history/TrainingHistory'
 import { buildRoutineHistoryItems } from '../../features/history/routineHistory'
 import { extractPoseQuality } from '../../features/motion/sharedFeatures'
 import { PoseDetector } from '../../features/pose/PoseDetector'
 import { PoseFilter } from '../../features/pose/PoseFilter'
-import { normalizePoseFrame, type NormalizedPoseFrame } from '../../features/pose/PoseNormalizer'
+import { normalizePoseFrame } from '../../features/pose/PoseNormalizer'
 import { shouldShowPoseOverlay } from '../../features/pose/poseOverlayVisibility'
-import { FULL_BODY_BOUNDS, LANDMARK_INDEX, SQUAT_REQUIRED, type PoseFrame } from '../../features/pose/types'
+import { FULL_BODY_BOUNDS, SQUAT_REQUIRED, type PoseFrame } from '../../features/pose/types'
 import { RoutineFeedbackPolicy, type RoutineFeedback } from '../../features/routines/followAlong/feedbackPolicy'
 import { FOLLOW_ALONG_CONFIG, FollowAlongMatcher, type FollowAlongMatch } from '../../features/routines/followAlong/matcher'
 import { loadReferenceTrack, type ReferenceTrack } from '../../features/routines/followAlong/referenceTrack'
@@ -58,20 +59,6 @@ const PERSIST_INTERVAL_MS = 10_000
 /** A standard video still without metadata after this long is reported (with diagnostics) instead of spinning forever. */
 const STAGE_SLOW_MS = 20_000
 
-function framingHint(frame: NormalizedPoseFrame): string {
-  const at = (index: number) => frame.landmarks[index]
-  const head = at(LANDMARK_INDEX.nose)
-  const feet = [at(LANDMARK_INDEX.leftAnkle), at(LANDMARK_INDEX.rightAnkle)]
-  const outVertically = !head || head.y < FRAME_MARGIN
-    || feet.some((point) => !point || point.visibility < FRAMING_CONFIDENCE || point.y > 1 - FRAME_MARGIN)
-  if (outVertically) return '请后退一些，确保头部和双脚都在画面内'
-  const outSideways = FULL_BODY_BOUNDS.some((name) => {
-    const point = at(LANDMARK_INDEX[name])
-    return point && (point.x < FRAME_MARGIN || point.x > 1 - FRAME_MARGIN)
-  })
-  return outSideways ? '请向画面中间移动一些，保持全身在画面内' : '请后退一些，确保全身完整入镜'
-}
-
 type GestureTestWindow = typeof window & { __gestureTestPose?: 'start' | 'pause' | 'none'; __forceNoPose?: boolean }
 
 export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) {
@@ -109,6 +96,8 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   gestureFilterRef.current ??= new PoseFilter({ medianWindow: 3, emaAlpha: 0.5 })
   const gestureControllerRef = useRef(null as unknown as GestureRuntimeController)
   gestureControllerRef.current ??= new GestureRuntimeController()
+  const framingAssistRef = useRef(null as unknown as FramingAssistController)
+  framingAssistRef.current ??= new FramingAssistController()
   const matcherRef = useRef<FollowAlongMatcher | undefined>(undefined)
   const trackRef = useRef<ReferenceTrack | undefined>(undefined)
   // Scoring v2: technique checks per phase window, separate from the similarity matcher.
@@ -166,6 +155,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   const [match, setMatch] = useState<FollowAlongMatch>()
   const [feedback, setFeedback] = useState<RoutineFeedback>()
   const [framing, setFraming] = useState<{ valid: boolean; hint?: string }>({ valid: false })
+  const [framingAssist, setFramingAssist] = useState(() => initialFramingAssistState('FULL_BODY'))
   const [poseUnavailable, setPoseUnavailable] = useState(false)
   const [gestureStatus, setGestureStatus] = useState<{ action?: GestureAction; progress: number }>({ progress: 0 })
   const [voiceEnabled, setVoiceEnabled] = useState(true)
@@ -368,6 +358,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     const normalized = normalizePoseFrame(filtered)
     if (!normalized || !gesturePose) return
     const quality = extractPoseQuality(normalized, REQUIRED_LANDMARKS, FRAME_MARGIN, FULL_BODY_BOUNDS)
+    const assist = framingAssistRef.current.update('FULL_BODY', normalized, now)
     // Starting needs the whole body clearly visible. While following, limbs are often hidden by the body itself
     // (side-facing forms), so only leaving the frame counts as a framing problem.
     const framingValid = quality.confidence >= FRAMING_CONFIDENCE && quality.bodyInFrame
@@ -410,7 +401,8 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     }
     const following = courseRef.current.getSnapshot().state === 'ACTIVE'
     const shownValid = following ? inFrame : framingValid
-    showFraming({ valid: shownValid, hint: shownValid ? undefined : framingHint(normalized) })
+    showFraming({ valid: shownValid && assist.isReady, hint: assist.primaryHint })
+    setFramingAssist((current) => current.status === assist.status && current.primaryHint === assist.primaryHint ? current : assist)
   }, [applyCourse, dispatchPoseAvailability, dispatchVoiceEvent, program, showFraming, showGesture])
   processFrameRef.current = processFrame
 
@@ -782,6 +774,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     match,
     feedback,
     framing,
+    framingAssist,
     poseUnavailable,
     gesturePrompt,
     gestureProgress: gesturePrompt ? gestureStatus.progress : 0,

@@ -28,6 +28,7 @@ import type { CourseTargetType } from '../../features/course/CourseDefinition'
 import { CoachCardStateResolver } from '../../features/coach/CoachCardStateResolver'
 import type { CoachCardResolverInput, CoachExerciseInput } from '../../features/coach/types'
 import { getFramingProfile } from '../../features/framing/framingProfiles'
+import { FramingAssistController, initialFramingAssistState } from '../../features/framing/FramingAssist'
 import { deriveCourseVoiceEvents, VoiceGuidePolicy, type VoiceGuideCommand, type VoiceGuideEvent } from '../../features/voice/VoiceGuidePolicy'
 import { EncouragementPolicy } from '../../features/voice/EncouragementPolicy'
 import { GestureRuntimeController, type GestureAction } from '../../features/gesture/GestureRuntimeController'
@@ -142,6 +143,7 @@ export function useTrainingRuntime() {
   const filterRef = useRef(new PoseFilter())
   const gestureFilterRef = useRef(new PoseFilter({ medianWindow: 3, emaAlpha: 0.5 }))
   const gestureControllerRef = useRef(new GestureRuntimeController())
+  const framingAssistRef = useRef(new FramingAssistController(undefined, getFramingProfile(initialExerciseId).id))
   const runtimeRef = useRef<ExerciseRuntime>(createExerciseRuntime(initialDefinition))
   const coachRef = useRef(new PlaceholderCoachAnimationAdapter())
   const coachResolverRef = useRef(new CoachCardStateResolver())
@@ -217,6 +219,7 @@ export function useTrainingRuntime() {
   const [voiceAvailable, setVoiceAvailable] = useState(() => speechRef.current.isAvailable())
   const [voicePlayback, setVoicePlayback] = useState<VoicePlaybackState>({ isSpeaking: false })
   const [gestureStatus, setGestureStatus] = useState<{ action?: GestureAction; progress: number }>({ progress: 0 })
+  const [framingAssist, setFramingAssist] = useState(() => initialFramingAssistState(getFramingProfile(initialExerciseId).id))
   const initialCoachInputRef = useRef<CoachCardResolverInput>({
     now: performance.now(),
     courseSnapshot: courseEnabled ? courseRef.current.getSnapshot() : { state: demo ? 'ACTIVE' : 'PREPARING', countdown: 0 },
@@ -309,6 +312,7 @@ export function useTrainingRuntime() {
     setResult(initialResult(next))
     setFeatures(undefined)
     setGestureStatus({ progress: 0 })
+    setFramingAssist(framingAssistRef.current.reset(getFramingProfile(next.id).id))
     setFeedback(undefined)
     setRemainingSeconds(next.presentation.durationSeconds)
     setCoachFrame(coachRef.current.getFrame())
@@ -399,6 +403,7 @@ export function useTrainingRuntime() {
     const filtered = filterRef.current.push(exerciseFrame)
     const normalized = normalizePoseFrame(filtered)
     if (!normalized || !runtimeRef.current.definition.isPoseCompatible(normalized)) return
+    const assist = framingAssistRef.current.update(getFramingProfile(runtimeRef.current.definition.id).id, normalized, rawFrame.timestamp)
     const courseBefore = courseRef.current.getSnapshot()
     const shouldProcessRep = !courseEnabled || courseBefore.state === 'ACTIVE'
     const extracted = runtimeRef.current.extract(normalized)
@@ -514,6 +519,7 @@ export function useTrainingRuntime() {
       exerciseFrameStartedAtRef.current ??= output.features.timestamp
       const elapsedSeconds = Math.floor((output.features.timestamp - exerciseFrameStartedAtRef.current) / 1000)
       setFeatures(output.features)
+      setFramingAssist(assist)
       setResult(output.result)
       setExerciseState(output.state)
       setRemainingSeconds(courseEnabled && course.steps[courseAfter.stepIndex].target.type === 'duration'
@@ -866,6 +872,7 @@ export function useTrainingRuntime() {
     demoImageRef,
     demoFrameSrc: demoFrame?.src,
     framingProfile,
+    framingAssist,
     voiceEnabled,
     voiceAvailable,
     voicePlayback,
@@ -874,6 +881,8 @@ export function useTrainingRuntime() {
     gestureHolding: Boolean(gesturePrompt && gestureStatus.progress > 0),
     preparationMessage: courseEnabled && courseSnapshot.state === 'PAUSED' ? undefined
       : poseUnavailable ? framingProfile.poseLost
+      : courseEnabled && ['PREPARING', 'COUNTDOWN'].includes(courseSnapshot.state) && framingAssist.status !== 'READY'
+      ? framingAssist.primaryHint
       : courseEnabled && ['PREPARING', 'COUNTDOWN'].includes(courseSnapshot.state) && features && !features.bodyInFrame
       ? framingProfile.notInFrame
       : definition.id === 'knee_raise' && (!features || !('baselineReady' in features) || !features.baselineReady)

@@ -122,6 +122,7 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
               gestureHolding={runtime.gestureHolding}
               outOfFrameMessage={runtime.framing.hint ?? '请后退一些，确保全身完整入镜'}
               showPoseOverlay={shouldShowPoseOverlay(courseSnapshot.state)}
+              framingAssist={runtime.poseUnavailable ? undefined : runtime.framingAssist}
               onStart={runtime.startCamera}
             />
           </div>

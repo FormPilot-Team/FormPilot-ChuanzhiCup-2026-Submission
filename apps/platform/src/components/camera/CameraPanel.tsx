@@ -5,6 +5,7 @@ import type { CameraFailureReport } from '../../features/camera/cameraDiagnostic
 import { isDesktopApp } from '../../features/diagnostics/desktopBridge'
 import type { MotionError } from '../../features/exercises/types'
 import type { FeedbackEvent } from '../../features/feedback/types'
+import type { FramingAssistState } from '../../features/framing/FramingAssist'
 import { cn } from '../../lib/cn'
 import type { PoseOverlayHandle } from '../pose/PoseOverlay'
 import { PoseOverlay } from '../pose/PoseOverlay'
@@ -27,6 +28,7 @@ interface CameraPanelProps {
   gestureHolding?: boolean
   outOfFrameMessage: string
   showPoseOverlay?: boolean
+  framingAssist?: FramingAssistState
   /** `compact` sizes the stage to the camera's native 16:9 viewport without changing the recognition input. */
   variant?: 'default' | 'compact'
   /** Visible panel heading; routine training uses “我的画面” while other training modes keep the default. */
@@ -46,7 +48,7 @@ const FAILURE_STATUS: Readonly<Record<CameraFailureKind, string>> = {
   model_error: '识别模型加载失败',
 }
 
-export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, variant = 'default', title: panelTitle = '实时动作检测', onStart }: CameraPanelProps) {
+export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, framingAssist, variant = 'default', title: panelTitle = '实时动作检测', onStart }: CameraPanelProps) {
   const compact = variant === 'compact'
   const promptText = compact ? 'text-base' : 'text-lg sm:text-xl'
   const status = mode === 'demo' ? '演示模式' : mode === 'live' ? '摄像头已连接 · AI 实时分析中' : mode === 'requesting_permission' ? '等待摄像头授权' : mode === 'model_loading' ? '正在加载识别模型' : mode === 'error' ? (failure ? FAILURE_STATUS[failure.kind] : '摄像头无法启动') : '等待连接摄像头'
@@ -75,7 +77,29 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure,
           <video ref={videoRef} muted playsInline className="size-full scale-x-[-1] object-contain" />
         )}
         <PoseOverlay ref={overlayRef} visible={showPoseOverlay} />
+        {framingAssist && (mode === 'live' || mode === 'demo') ? (
+          <div
+            className={cn('pointer-events-none absolute inset-[3%] rounded-xl border', framingAssist.status === 'READY' || framingAssist.status === 'TOO_FAR' ? 'border-cyan-300/35' : 'border-cyan-300/80')}
+            aria-hidden="true"
+            data-testid="framing-safe-zone"
+            data-framing-status={framingAssist.status}
+          >
+            {(['left-0 top-0 border-l-2 border-t-2', 'right-0 top-0 border-r-2 border-t-2', 'bottom-0 left-0 border-b-2 border-l-2', 'bottom-0 right-0 border-b-2 border-r-2'] as const).map((classes) => (
+              <span key={classes} className={cn('absolute size-5 rounded-[3px] border-cyan-300/90', classes)} />
+            ))}
+          </div>
+        ) : null}
         {mode === 'live' || mode === 'demo' ? <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-xl bg-slate-900/65 px-3 py-2 text-xs font-medium text-white"><ScanLine size={15} />AI 识别中</span> : null}
+        {framingAssist && (mode === 'live' || mode === 'demo') ? (
+          <span
+            className={cn('absolute right-4 top-4 max-w-[58%] truncate rounded-xl px-3 py-2 text-xs font-semibold shadow-sm', framingAssist.status === 'READY' ? 'bg-emerald-50/95 text-emerald-700' : framingAssist.status === 'TOO_FAR' ? 'bg-white/95 text-blue-700' : 'bg-amber-50/95 text-amber-800')}
+            role="status"
+            data-testid="framing-status"
+            data-framing-profile={framingAssist.profile}
+          >
+            {framingAssist.primaryHint}
+          </span>
+        ) : null}
         {preparationMessage && (mode === 'demo' || mode === 'live') ? (
           <div className={`absolute inset-x-4 ${compact ? 'top-12' : 'top-16'} rounded-xl bg-white/95 px-4 py-3 text-center text-pretty ${promptText} font-bold text-blue-700 shadow-sm`} role="status" data-testid="preparation-state">
             {preparationMessage}
