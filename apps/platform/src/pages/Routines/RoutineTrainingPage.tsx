@@ -1,4 +1,3 @@
-import { ArrowLeft } from 'lucide-react'
 import { routinePath } from '../../app/routes'
 import { CameraPanel } from '../../components/camera/CameraPanel'
 import { AICoach } from '../../components/aiCoach/AICoach'
@@ -7,6 +6,8 @@ import { routineGuide } from '../../features/coachContext/liveCoachContexts'
 import { RoutineFeedbackPanel, type RoutineTrackingState } from '../../components/routines/RoutineFeedbackPanel'
 import { RoutineFooter } from '../../components/routines/RoutineFooter'
 import { RoutineVideoStage } from '../../components/routines/RoutineVideoStage'
+import { TrainingExitControl } from '../../components/training/TrainingExitControl'
+import { routineExitPhase } from '../../features/training/trainingExit'
 import { ROUTINE_ACCENT } from '../../components/routines/routineTheme'
 import { shouldShowPoseOverlay } from '../../features/pose/poseOverlayVisibility'
 import type { RoutineFeedbackTone } from '../../features/routines/followAlong/feedbackPolicy'
@@ -68,7 +69,7 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
       <main className="mx-auto min-w-0 max-w-[1600px] px-4 py-5 lg:px-7">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">
-            <a href={routinePath(program.id)} className="mb-1 inline-flex items-center gap-1.5 rounded-lg px-1 py-0.5 text-sm font-semibold text-slate-500 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={15} aria-hidden="true" />{program.title}</a>
+            <TrainingExitControl href={routinePath(program.id)} label={`返回${program.title}`} phase={routineExitPhase({ sessionStatus: runtime.sessionStatus, courseState: courseSnapshot.state })} />
             <h1 className="text-balance text-2xl font-bold text-slate-950 lg:text-3xl">{heading}</h1>
             <p className="mt-1 flex flex-wrap items-center gap-2 text-pretty text-sm text-slate-500">
               <span className={cn('rounded-md px-2 py-0.5 text-xs font-semibold', accent.chip)}>{program.subtitle}</span>

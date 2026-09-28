@@ -5,12 +5,15 @@ import { CameraPanel } from '../../components/camera/CameraPanel'
 import { DemonstrationVideo } from '../../components/demo/DemonstrationVideo'
 import { MetricsPanel } from '../../components/metrics/MetricsPanel'
 import { AICoachFeedbackDock } from '../../components/training/AICoachFeedbackDock'
+import { TrainingExitControl } from '../../components/training/TrainingExitControl'
 import { TrainingFooter } from '../../components/training/TrainingFooter'
 import { DebugPanel } from '../../components/feedback/DebugPanel'
 import { SessionCompleteDialog } from './SessionCompleteDialog'
 import { useTrainingRuntime } from './useTrainingRuntime'
 import { resolveCoachDockFeedback, resolveCoachDockState } from '../../features/coach/coachDockState'
 import { shouldShowPoseOverlay } from '../../features/pose/poseOverlayVisibility'
+import { warmUpExitPhase } from '../../features/training/trainingExit'
+import { SMART_TRAINING_PATH } from '../../app/routes'
 
 type TrainingRuntime = ReturnType<typeof useTrainingRuntime>
 
@@ -79,7 +82,12 @@ export function TrainingPage() {
       <AppHeader />
       <main className="mx-auto min-w-0 max-w-[1600px] px-4 py-5 lg:px-7">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-          <div>
+          <div className="min-w-0">
+            <TrainingExitControl
+              href={SMART_TRAINING_PATH}
+              label="返回热身训练"
+              phase={warmUpExitPhase({ sessionStatus: runtime.session.status, courseState: demonstrationSnapshot.state, exerciseIndex: runtime.exerciseIndex })}
+            />
             <h1 className="text-balance text-2xl font-bold text-slate-950 lg:text-3xl">{freeTraining ? '自由训练' : '今日训练'} · {definition.presentation.subtitle}</h1>
             <p className="mt-1 text-pretty text-sm text-slate-500">{freeTraining ? '单个动作' : `第 ${runtime.exerciseIndex + 1} / ${runtime.exerciseNames.length} 项`} · 实时姿态识别与动作纠正</p>
           </div>
