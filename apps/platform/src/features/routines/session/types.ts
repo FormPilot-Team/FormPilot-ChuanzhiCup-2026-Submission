@@ -1,3 +1,4 @@
+import { isRoutineTechniqueRecord, type RoutineTechniqueRecord } from '../../scoring/routine/techniqueRecord'
 import type { FollowAlongRegion } from '../followAlong/matcher'
 import type { RoutineId, RoutineScope } from '../types'
 
@@ -48,6 +49,11 @@ export interface RoutineSessionRecord {
   activeMs: number
   outcome: RoutineSessionOutcome
   chapters: RoutineChapterResult[]
+  /**
+   * Scoring v2 technique evidence (optional; records saved before it have none). Kept apart from the similarity
+   * data above: it says whether specific movement requirements were met, not how close the pose was to the video.
+   */
+  technique?: RoutineTechniqueRecord
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -96,6 +102,7 @@ export function isRoutineSessionRecord(value: unknown): value is RoutineSessionR
     && isFiniteNumber(value.activeMs)
     && (value.outcome === 'in_progress' || value.outcome === 'completed' || value.outcome === 'incomplete')
     && Array.isArray(value.chapters) && value.chapters.every(isChapterResult)
+    && (value.technique === undefined || isRoutineTechniqueRecord(value.technique))
 }
 
 export function createRoutineSessionId(now: number): string {

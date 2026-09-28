@@ -39,7 +39,7 @@ describe('AI Coach Lite: questions depend on the page', () => {
   it('offers training, report, history and workshop questions in user language', () => {
     expect(questions(warmUpTraining())).toEqual(['这个动作怎么做？', '为什么刚才提示我动作不标准？', '我现在做得怎么样？', '我应该注意哪里？'])
     const digest = warmUpDigest(analyzeTraining(FIRST_SESSION, []), FIRST_SESSION)
-    expect(questions({ page: 'report', digest })).toEqual(['我这次表现怎么样？', '最大的问题是什么？', '和上次相比有进步吗？', '下次应该重点练什么？'])
+    expect(questions({ page: 'report', digest })).toEqual(['我这次表现怎么样？', '为什么是这个分数？', '最大的问题是什么？', '和上次相比有进步吗？', '下次应该重点练什么？'])
     expect(questions({ page: 'home', recent: [], latest: null, week: null })).toEqual(['我最近训练怎么样？', '上次练了什么？', '今天可以继续练什么？'])
     expect(questions({ page: 'history', recent: [], latest: null, week: null })).toEqual(['我最近训练怎么样？', '上次练了什么？', '今天可以继续练什么？'])
     expect(questions({ page: 'workshop' })).toHaveLength(3)

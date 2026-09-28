@@ -23,6 +23,7 @@ import {
 import { FocusCard, FocusPanel, MiniBar, ReportActions, ReportLayout, ReportSummary, SectionHeading, type ReportTakeaway } from './reportShell'
 import { CustomActionReportView } from './CustomActionReportView'
 import { RoutineReportView } from './RoutineReportView'
+import { WarmUpScoreExplanationSection } from './scoreExplanation'
 import { useCustomActionReport } from './useCustomActionReport'
 import { useRoutineReport } from './useRoutineReport'
 import { useTrainingReportAnalysis } from './useTrainingReportAnalysis'
@@ -489,6 +490,7 @@ export function TrainingReportView({ analysis: analyzed, session }: { analysis: 
       {/* The five-dimension view needs several exercises; a one-exercise session can never fill it. */}
       {scope.kind === 'free_training' ? null : <CapabilitySection analysis={analysis} />}
       <ProgressSection analysis={analysis} />
+      <WarmUpScoreExplanationSection session={session} scope={scope} scores={Object.fromEntries(analysis.exercises.map((exercise) => [exercise.exerciseId, exercise.score]))} />
       <DataNotesSection analysis={analysis} scope={scope} />
       <ReportActions
         title="带着重点，再练一次"

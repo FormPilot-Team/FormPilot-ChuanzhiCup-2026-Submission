@@ -9,6 +9,7 @@ import { chapterDisplayName, formatClock, scopeTitle } from '../../features/rout
 import { cn } from '../../lib/cn'
 import { formatDate, formatDuration, formatShortDate, scoreTone } from './reportPresentation'
 import { FocusCard, FocusPanel, MiniBar, ReportActions, ReportLayout, ReportSummary, SectionHeading, type ReportTakeaway } from './reportShell'
+import { RoutineTechniqueSection } from './scoreExplanation'
 
 const REGIONS: ReadonlyArray<FollowAlongRegion> = ['arms', 'torso', 'legs']
 
@@ -122,7 +123,7 @@ function RoutineFocusSection({ report }: { report: RoutineReport }) {
 function OverviewSection({ report }: { report: RoutineReport }) {
   return (
     <section className="report-panel p-5 sm:p-6" aria-labelledby="routine-overview-title" data-testid="routine-report-overview">
-      <SectionHeading id="routine-overview-title" icon={Activity} title="核心表现" description="比较你与标准视频在同一时刻的身体姿态与节奏；数值只来自识别可靠的时刻。" />
+      <SectionHeading id="routine-overview-title" icon={Activity} title="核心表现" description="跟练相似度：你与标准视频在同一时刻的身体姿态与节奏的视觉接近程度，不等于动作规范评价；数值只来自识别可靠的时刻。" />
       <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="rounded-xl bg-slate-50 p-3.5">
           <dt className="text-xs text-slate-500">跟练相似度</dt>
@@ -238,6 +239,7 @@ export function RoutineReportView({ report }: { report: RoutineReport }) {
       <RoutineReportHero report={report} />
       <RoutineFocusSection report={report} />
       <OverviewSection report={report} />
+      <RoutineTechniqueSection report={report} />
       <ChaptersSection report={report} />
       <ProgressSection report={report} />
       <NotesSection report={report} />

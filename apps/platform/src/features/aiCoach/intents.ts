@@ -1,12 +1,14 @@
 import { SMART_TRAINING_PATH, START_TRAINING_PATH } from '../../app/routes'
 import type { RecentReportSummary } from '../coachContext/types'
+import { isRegisteredExerciseId } from '../exercises/registry'
+import { warmUpCriterionForCode } from '../scoring'
 import { REQUIREMENTS } from '../workshop/catalog'
 import type { RequirementId } from '../workshop/types'
 import type { CoachAnswer, CoachPage, CoachPageContext, ReportDigest } from './types'
 
 export type CoachIntentId =
   | 'how-to-do' | 'why-corrected' | 'how-am-i-doing' | 'what-to-watch'
-  | 'report-overview' | 'biggest-issue' | 'vs-last' | 'next-focus'
+  | 'report-overview' | 'why-score' | 'biggest-issue' | 'vs-last' | 'next-focus'
   | 'recent-summary' | 'last-training' | 'what-next'
   | 'workshop-how' | 'workshop-requirements' | 'workshop-test'
 
@@ -24,6 +26,7 @@ export const INTENTS: Readonly<Record<CoachIntentId, IntentSpec>> = Object.freez
   'how-am-i-doing': { question: '我现在做得怎么样？', anchors: ['做得', '进度', '几次', '多少次', '练得'], boosters: ['怎么样', '现在'] },
   'what-to-watch': { question: '我应该注意哪里？', anchors: ['注意', '留意', '小心', '关键'], boosters: ['哪里'] },
   'report-overview': { question: '我这次表现怎么样？', anchors: ['表现', '总结', '分数', '评分', '成绩', '结果'], boosters: ['怎么样', '这次'] },
+  'why-score': { question: '为什么是这个分数？', anchors: ['为什么', '扣分', '只有', '怎么算', '评分依据', '依据', '哪里扣', '分数低'] },
   'biggest-issue': { question: '最大的问题是什么？', anchors: ['问题', '不足', '毛病', '不好', '缺点'], boosters: ['最大'] },
   'vs-last': { question: '和上次相比有进步吗？', anchors: ['进步', '对比', '比较', '退步', '提高', '变化'], boosters: ['上次'] },
   'next-focus': { question: '下次应该重点练什么？', anchors: ['下次', '重点', '接下来', '练什么', '改进', '怎么提高'] },
@@ -37,7 +40,7 @@ export const INTENTS: Readonly<Record<CoachIntentId, IntentSpec>> = Object.freez
 
 const PAGE_INTENTS: Readonly<Record<CoachPage, ReadonlyArray<CoachIntentId>>> = Object.freeze({
   training: ['how-to-do', 'why-corrected', 'how-am-i-doing', 'what-to-watch'],
-  report: ['report-overview', 'biggest-issue', 'vs-last', 'next-focus'],
+  report: ['report-overview', 'why-score', 'biggest-issue', 'vs-last', 'next-focus'],
   home: ['recent-summary', 'last-training', 'what-next'],
   history: ['recent-summary', 'last-training', 'what-next'],
   workshop: ['workshop-how', 'workshop-requirements', 'workshop-test'],
@@ -114,6 +117,14 @@ function explainFeedback(code: string, kind: string): string {
   return WARM_UP_EXPLANATION.find(([pattern]) => pattern.test(code))?.[1] ?? '这是根据摄像头识别到的关节位置判断的。'
 }
 
+/** Scoring v2: which checked requirement a correction belongs to, and what kind of signal it is. */
+function criterionNote(code: string, kind: string, exerciseId: string | undefined): string {
+  if (kind === 'routine') return '这是跟练相似度提示（与示范视频的视觉差异），不是动作规范扣分。'
+  if (kind !== 'smart-training' || !exerciseId || !isRegisteredExerciseId(exerciseId)) return ''
+  const criterion = warmUpCriterionForCode(exerciseId, code)
+  return criterion ? `对应检查项「${criterion.name}」：${criterion.requirement}` : ''
+}
+
 function trainingAnswer(id: CoachIntentId, context: Extract<CoachPageContext, { page: 'training' }>): CoachAnswer {
   const { live, guide } = context
   const exercise = live.currentExercise
@@ -133,7 +144,7 @@ function trainingAnswer(id: CoachIntentId, context: Extract<CoachPageContext, { 
       if (!feedback || feedback.tone !== 'warning') {
         return { text: '刚才没有需要纠正的提示，保持现在的节奏就好。出现提示时，我会解释它的原因。', basis: '依据：当前的实时反馈' }
       }
-      return { text: `刚才提示「${feedback.message}」。${explainFeedback(feedback.code, kind)}${TWO_D_NOTE}`, basis: '依据：当前的实时反馈' }
+      return { text: `刚才提示「${feedback.message}」。${explainFeedback(feedback.code, kind)}${criterionNote(feedback.code, kind, exercise?.id)}${TWO_D_NOTE}`, basis: '依据：当前的实时反馈' }
     }
     case 'how-am-i-doing': {
       if (state === 'PREPARING' || state === 'COUNTDOWN') return { text: '还没有开始。站好后双手在胸前合拢，开始训练，我再告诉你进展。', basis: '依据：当前训练状态' }
@@ -187,6 +198,26 @@ function reportAnswer(id: CoachIntentId, digest: ReportDigest): CoachAnswer {
       if (digest.result) parts.push(`${digest.result.label} ${digest.result.value}`)
       const text = `${parts.join('，')}。${digest.comparison ? `${digest.comparison.text}。` : ''}${digest.strengths[0] ? `做得好的地方：${digest.strengths[0]}` : ''}`
       return { text, basis }
+    }
+    case 'why-score': {
+      const explanation = digest.scoreExplanation
+      if (!explanation) {
+        return {
+          text: digest.kind === 'custom'
+            ? '“我的动作”不打分，只记录每次是否做到你设置的识别重点，所以没有扣分说明。'
+            : '这次报告没有足够的计分数据，暂时无法解释分数。',
+          basis,
+        }
+      }
+      const [main, second] = explanation.deductions
+      const deduction = main
+        ? `主要扣分在「${main.title}」：${main.evidence}。纠正方法：${main.cue}。${second ? `其次是「${second.title}」。` : ''}`
+        : '已检查的各项基本达标，没有明显扣分。'
+      return {
+        text: `${explanation.summary}。${deduction}这些判断来自本次识别到的关节角度和位置与动作要求的比较。${main ? `评价依据：${main.basis}。` : `${explanation.source}。`}`,
+        facts: explanation.parts.slice(0, 5),
+        basis,
+      }
     }
     case 'biggest-issue':
       return digest.biggestIssue

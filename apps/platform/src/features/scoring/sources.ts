@@ -1,0 +1,265 @@
+import type { ScoringSource } from './types'
+
+/**
+ * Source registry: every requirement and every threshold in Scoring v2 points at one of these ids.
+ * VERIFIED_ONLINE entries were checked on 2026-09-28 against the publisher's page (see docs/scoring/SCORING_V2.md);
+ * PROJECT_PROVIDED entries come from the project brief and still need a check against the original text before
+ * they are cited in a defence, a software-copyright filing or a paper.
+ */
+export const SCORING_SOURCES: ReadonlyArray<ScoringSource> = Object.freeze([
+  // ---- 八段锦 ----------------------------------------------------------------------------------------------------
+  {
+    id: 'tcacm-1676-2026-baduanjin',
+    type: 'OFFICIAL_STANDARD',
+    title: '《八段锦》团体标准',
+    organization: '中华中医药学会（按标准代号 T/CACM 推定，待核对）',
+    published: '2026-05-28 发布 / 实施',
+    identifier: 'T/CACM 1676—2026',
+    url: null,
+    verification: 'PROJECT_PROVIDED',
+    contentChecked: false,
+    usedFor: '站桩、技术规范（各式动作过程与定势）、功理功用、学练建议与安全提示；FormPilot 以其为八段锦动作规范的总依据。',
+  },
+  {
+    id: 'gsqc-bdj-errors-2018',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《健身气功•八段锦习惯性错误及纠正方法》',
+    organization: '国家体育总局健身气功管理中心',
+    published: '2018-01-10',
+    identifier: null,
+    url: 'https://www.sport.gov.cn/qgzx/n5407/c843016/content.html',
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: true,
+    usedFor: '预备势、八式与收势的习惯性错误及纠正方法；八段锦机器检查项优先由这些错误转化而来。',
+  },
+  // ---- 五禽戏 ----------------------------------------------------------------------------------------------------
+  {
+    id: 'gsqc-wqx-requirements',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《健身气功·五禽戏的习练要求》',
+    organization: '国家体育总局健身气功管理中心',
+    published: null,
+    identifier: null,
+    url: null,
+    verification: 'PROJECT_PROVIDED',
+    contentChecked: false,
+    usedFor: '五禽戏动作规范、精神劲力与呼吸配合要求。',
+  },
+  {
+    id: 'gsqc-wqx-errors',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《健身气功·五禽戏习惯性错误及纠正方法》',
+    organization: '国家体育总局健身气功管理中心',
+    published: null,
+    identifier: null,
+    url: null,
+    verification: 'PROJECT_PROVIDED',
+    contentChecked: false,
+    usedFor: '五禽戏各动作的易犯错误与纠正方法。',
+  },
+  {
+    id: 'chqa-wqx-basics-2012',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《健身气功•五禽戏的基本功练习及易犯错误》',
+    organization: '中国健身气功协会（国家体育总局健身气功管理中心网站发布）',
+    published: '2012-12-24',
+    identifier: null,
+    url: 'https://www.sport.gov.cn/qgzx/n5407/c670044/content.html',
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: true,
+    usedFor: '上肢、躯干（熊运“相对固定腰胯”）、桩功（尾闾中正）、步法与提踵平衡的要求及易犯错误。',
+  },
+  // ---- 易筋经 ----------------------------------------------------------------------------------------------------
+  {
+    id: 'gsqc-yjj-errors',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《健身气功·易筋经常见习惯性错误及纠正方法》',
+    organization: '国家体育总局健身气功管理中心',
+    published: null,
+    identifier: null,
+    url: null,
+    verification: 'PROJECT_PROVIDED',
+    contentChecked: false,
+    usedFor: '易筋经十二势的常见习惯性错误（如上托时避免屈肘）。',
+  },
+  {
+    id: 'gsqc-yjj-shoulder-hip-2018',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《健身气功·易筋经习练中肩、髋关节常见错误动作解析》',
+    organization: '国家体育总局健身气功管理中心',
+    published: '2018-02-26',
+    identifier: null,
+    url: 'https://www.sport.gov.cn/qgzx/n5407/c848740/content.html',
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: true,
+    usedFor: '韦驮献杵第一、二势的肩部错误，三盘落地的下蹲与两膝方向，屈膝下蹲时髋部中正、重心不偏移。',
+  },
+  // ---- 太极拳 ----------------------------------------------------------------------------------------------------
+  {
+    id: 'taiji-24-routine',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '二十四式简化太极拳（审定套路）',
+    organization: '原国家体委（运动司）组织编定；中国武术协会推广',
+    published: '1956',
+    identifier: null,
+    url: null,
+    verification: 'PROJECT_PROVIDED',
+    contentChecked: false,
+    usedFor: '二十四式的动作名称、顺序与规格（立身中正、屈膝步型等）。',
+  },
+  {
+    id: 'cwa-traditional-rules-2012',
+    type: 'COMPETITION_RULE',
+    title: '《传统武术套路竞赛规则》',
+    organization: '中国武术协会审定',
+    published: '2012-08',
+    identifier: null,
+    url: null,
+    verification: 'PROJECT_PROVIDED',
+    contentChecked: false,
+    usedFor: '只借鉴其“动作质量（是否符合规格）”与“演练水平（连贯、协调、节奏）”分开评价的思路，不照搬竞赛扣分与总分。',
+  },
+  {
+    id: 'gdut-taiji-quality-2026',
+    type: 'ACADEMIC_EVIDENCE',
+    title: '吕章闻, 朱雨荷, 战荫伟, 等.《面向“虚实转换”的太极拳动作质量评估方法》',
+    organization: '广东工业大学学报',
+    published: '2026（第 43 卷，网络首发 2026-06-02）',
+    identifier: 'doi:10.12052/gdutxb.250224',
+    url: 'https://xbzrb.gdut.edu.cn/cn/article/pdf/preview/10.12052/gdutxb.250224.pdf',
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: true,
+    usedFor: 'Scoring v2 架构依据：重心转移、关节角度变化、时序连续性等指标与专家模板、时序对齐的思路；FormPilot 不采用其 3D / MotionBERT 模型。',
+  },
+  // ---- 热身训练 --------------------------------------------------------------------------------------------------
+  {
+    id: 'sgas-fitness-guide-2017',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《全民健身指南》',
+    organization: '国家体育总局',
+    published: '2017-08',
+    identifier: null,
+    url: 'https://www.sport.gov.cn/n315/n20067006/c20324479/content.html',
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: false,
+    usedFor: '科学健身原则、运动强度与安全背景；不用于任何动作的数值阈值。',
+  },
+  {
+    id: 'sgas-warmup-2020',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《热身运动你做对了吗》',
+    organization: '国家体育总局网站',
+    published: '2020-07',
+    identifier: null,
+    url: 'https://www.sport.gov.cn/n20001280/n20001265/n20066978/c20282143/content.html',
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: true,
+    usedFor: '热身目的与原则：低强度、各关节（含肩、髋、膝）全幅度活动。',
+  },
+  {
+    id: 'cstn-squat-2022',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《下蹲动作加强肌肉力量》',
+    organization: '中国体育报（国家体育总局网站转载）',
+    published: '2022-10-19',
+    identifier: null,
+    url: 'https://www.sport.gov.cn/n20001280/n20001265/n20066978/c24834687/content.html',
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: true,
+    usedFor: '下蹲：两脚与肩同宽、膝盖不要内扣、重心落在两腿正中间、大腿与地面平行、耳肩髋几乎成一条直线。',
+  },
+  {
+    id: 'cstn-squat-2023',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《深蹲并非越“深”越好》',
+    organization: '中国体育报（国家体育总局网站转载）',
+    published: '2023-07-26',
+    identifier: null,
+    url: 'https://www.sport.gov.cn/n20001280/n20001265/n20066978/c25828639/content.html',
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: true,
+    usedFor: '深蹲：蹲到大腿与地面平行为佳（不是越深越好）、脚尖略外开不超过 30°、收紧核心、腰背挺直、骨盆中立。',
+  },
+  {
+    id: 'cstn-shoulder-2023',
+    type: 'OFFICIAL_GUIDANCE',
+    title: '《小动作练出优美体形》',
+    organization: '中国体育报（国家体育总局网站转载）',
+    published: '2023-08-23',
+    identifier: null,
+    url: 'https://www.sport.gov.cn/n20001280/n20001265/n20066978/c25921637/content.html',
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: true,
+    usedFor: '侧平举：抬起手肘和大臂、手肘微屈、肩部下沉不要耸肩、身体直立、腰腹收紧。',
+  },
+  // ---- 算法层 ----------------------------------------------------------------------------------------------------
+  {
+    id: 'pose-fitness-eval',
+    type: 'ACADEMIC_EVIDENCE',
+    title: '《基于人体姿态估计的健身运动评估系统》',
+    organization: '国内期刊论文（刊名、年份待核对）',
+    published: null,
+    identifier: null,
+    url: null,
+    verification: 'PROJECT_PROVIDED',
+    contentChecked: false,
+    usedFor: '以 MediaPipe 关键点为输入、按运动学设计关节角度、对称性、轨迹与流畅性评价，与 FormPilot 技术路线一致。',
+  },
+  {
+    id: 'sjtu-rehab-segmentation-2023',
+    type: 'ACADEMIC_EVIDENCE',
+    title: '《连续康复训练动作分割与评估》',
+    organization: '上海交通大学学报',
+    published: '2023',
+    identifier: '第 57 卷第 5 期，第 533 页起',
+    url: 'https://xuebao.sjtu.edu.cn/article/2023/1006-2467/1006-2467-57-5-533.shtml',
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: false,
+    usedFor: '关节运动特征、局部与整体评价、多特征融合、DTW 时序评估；本轮只用于动作阶段划分与接口设计（temporalAlignmentScore 预留）。',
+  },
+  // ---- FormPilot 自身 --------------------------------------------------------------------------------------------
+  {
+    id: 'fp-reference-demo',
+    type: 'FORMPILOT_CALIBRATED',
+    title: 'FormPilot 标准示范数据',
+    organization: 'FormPilot',
+    published: '2026-09',
+    identifier: 'public/assets/routines/*-standard.pose.json；热身示范素材',
+    url: null,
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: true,
+    usedFor: '跟练标准视频的离线姿态轨迹：用于划分动作阶段，并按示范者在各阶段的实测值标定阈值。',
+  },
+  {
+    id: 'fp-engineering-v1',
+    type: 'FORMPILOT_CALIBRATED',
+    title: 'FormPilot 热身工程阈值 engineering-v1',
+    organization: 'FormPilot',
+    published: '2026-09',
+    identifier: 'exercise-rules-v1.0 / engineering-v1',
+    url: null,
+    verification: 'VERIFIED_ONLINE',
+    contentChecked: true,
+    usedFor: '热身 6 动作的阈值、评分曲线与权重（经多轮真人测试修正），尚未经过专家标注数据校准。',
+  },
+])
+
+const BY_ID: ReadonlyMap<string, ScoringSource> = new Map(SCORING_SOURCES.map((source) => [source.id, source]))
+
+export function getScoringSource(id: string): ScoringSource {
+  const source = BY_ID.get(id)
+  if (!source) throw new Error(`Unknown scoring source: ${id}`)
+  return source
+}
+
+export function findScoringSource(id: string): ScoringSource | undefined {
+  return BY_ID.get(id)
+}
+
+/** “来源名称 · 机构 · 年份/编号” for the report; never a long citation. */
+export function sourceCitation(source: ScoringSource): string {
+  const identifier = source.type === 'FORMPILOT_CALIBRATED' ? null : source.identifier
+  const detail = [identifier, source.published].filter(Boolean).join('，')
+  const head = source.type === 'ACADEMIC_EVIDENCE' ? `${source.title}，${source.organization}` : `${source.organization}${source.title}`
+  return `${head}${detail ? `（${detail}）` : ''}`
+}

@@ -17,6 +17,17 @@ export interface RepetitionResult {
   errors: MotionErrorCode[]
 }
 
+/**
+ * What a guidance exercise (肩部环绕, no repetitions) looked like while it was performed: means of each live metric
+ * over the frames with a reliable pose, and on how many frames each correction condition held. Added by Scoring v2
+ * so the report can explain the guidance exercise; it never enters any score.
+ */
+export interface GuidanceMetricSummary {
+  samples: number
+  metrics: Record<string, { value: number; score: number }>
+  errorFrames: Partial<Record<MotionErrorCode, number>>
+}
+
 export interface ExerciseSessionResult {
   exerciseId: ExerciseId
   startedAt: number
@@ -30,6 +41,7 @@ export interface ExerciseSessionResult {
   targetType?: CourseTargetType
   targetValue?: number
   completed?: boolean
+  guidanceSummary?: GuidanceMetricSummary
 }
 
 export interface TrainingSessionState {

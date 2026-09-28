@@ -3,7 +3,7 @@ import type { ExerciseId, ExerciseState, MotionErrorCode, RuleResult } from '../
 import { EXERCISE_ORDER } from '../exercises/order'
 import { MemoryTrainingSessionRepository } from './MemoryTrainingSessionRepository'
 import type { TrainingSessionRepository } from './TrainingSessionRepository'
-import type { ExerciseSessionResult, TrainingCaptureSource, TrainingSessionState } from './types'
+import type { ExerciseSessionResult, GuidanceMetricSummary, TrainingCaptureSource, TrainingSessionState } from './types'
 import { ELECTRONIC_COACH_COURSE_V1 } from '../course/CourseDefinition'
 import { ENGINEERING_THRESHOLD_VERSION, EXERCISE_SPEC_VERSION } from '../exercises/thresholdVersioning'
 import type { TrainingMode } from './types'
@@ -28,9 +28,18 @@ function createSessionId(now: number): string {
   return `session-${now}-${Math.random().toString(36).slice(2, 10)}`
 }
 
+interface GuidanceAccumulator {
+  samples: number
+  sums: Map<string, { value: number; score: number }>
+  errorFrames: Map<MotionErrorCode, number>
+}
+
+const POSE_QUALITY_CODES = new Set<MotionErrorCode>(['BODY_OUT_OF_FRAME', 'POSE_LOW_CONFIDENCE'])
+
 export class TrainingSession {
   private state: TrainingSessionState
   private lastPersistOk = true
+  private readonly guidance = new Map<ExerciseId, GuidanceAccumulator>()
 
   constructor(
     now = Date.now(),
@@ -88,6 +97,7 @@ export class TrainingSession {
   record(result: RuleResult, snapshot: ExerciseState, feedback?: FeedbackEvent): void {
     const exercise = this.exercise(result.exerciseId)
     if (feedback) exercise.feedbackEvents.push(feedback)
+    if (exercise.evaluationMode === 'guidance') this.sampleGuidance(exercise, result)
     if (snapshot.completedRep && !exercise.repetitions.some((item) => item.rep.repIndex === snapshot.completedRep?.repIndex)) {
       exercise.repetitions.push({
         rep: snapshot.completedRep,
@@ -143,6 +153,31 @@ export class TrainingSession {
     const created = createExercise(exerciseId, Date.now())
     this.state.exercises.push(created)
     return created
+  }
+
+  /** Guidance exercises have no repetitions; keep running means of their live metrics for the report. */
+  private sampleGuidance(exercise: ExerciseSessionResult, result: RuleResult): void {
+    const metrics = Object.entries(result.metrics)
+    if (result.phase === 'READY' || !metrics.length || !metrics.every(([, metric]) => metric.valid)) return
+    if (result.errors.some((error) => POSE_QUALITY_CODES.has(error.code))) return
+    let accumulator = this.guidance.get(exercise.exerciseId)
+    if (!accumulator) {
+      accumulator = { samples: 0, sums: new Map(), errorFrames: new Map() }
+      this.guidance.set(exercise.exerciseId, accumulator)
+    }
+    accumulator.samples += 1
+    for (const [key, metric] of metrics) {
+      const sum = accumulator.sums.get(key) ?? { value: 0, score: 0 }
+      accumulator.sums.set(key, { value: sum.value + metric.value, score: sum.score + metric.score })
+    }
+    for (const code of new Set(result.errors.map((error) => error.code))) accumulator.errorFrames.set(code, (accumulator.errorFrames.get(code) ?? 0) + 1)
+    const samples = accumulator.samples
+    const summary: GuidanceMetricSummary = {
+      samples,
+      metrics: Object.fromEntries([...accumulator.sums].map(([key, sum]) => [key, { value: sum.value / samples, score: sum.score / samples }])),
+      errorFrames: Object.fromEntries(accumulator.errorFrames),
+    }
+    exercise.guidanceSummary = summary
   }
 
   private updateAggregates(exercise: ExerciseSessionResult): void {

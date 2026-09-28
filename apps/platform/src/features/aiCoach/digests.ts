@@ -5,13 +5,80 @@ import type { HistoryEntry } from '../history/historyEntries'
 import { isTrainingIncomplete } from '../history/TrainingHistory'
 import { REGION_LABEL, SIMILARITY_BAND_LABEL, type RoutineReport } from '../routines/report/routineReport'
 import { chapterDisplayName, scopeTitle } from '../routines/scope'
+import { criterionBasisText, evidenceSentence, explainWarmUpSession, getScoringSource, repEvidenceSentence } from '../scoring'
 import { freeTrainingLabel, resolveTrainingScope } from '../training/trainingScope'
 import type { TrainingSessionState } from '../training/types'
 import { REQUIREMENTS } from '../workshop/catalog'
 import type { CustomActionReport } from '../workshop/report'
-import type { ReportDigest } from './types'
+import type { ReportDigest, ScoreExplanationDigest } from './types'
 
 const WARM_UP_TITLE = '热身训练 · 完整训练'
+
+function basisText(criterion: Parameters<typeof criterionBasisText>[0]): string {
+  const basis = criterionBasisText(criterion)
+  return basis.threshold ? `${basis.requirement}；${basis.threshold}` : basis.requirement
+}
+
+/** Scoring v2 for 热身训练: exercise scores, the biggest component deductions with rep evidence, and their sources. */
+function warmUpScoreExplanation(analysis: TrainingAnalysis, session: TrainingSessionState): ScoreExplanationDigest | null {
+  const scope = resolveTrainingScope(session)
+  const free = scope.kind === 'free_training' ? scope.exerciseId : null
+  const shown = new Map<string, number | null>(analysis.exercises.map((exercise) => [exercise.exerciseId, exercise.score]))
+  const exercises = explainWarmUpSession(session).exercises
+    .filter((item) => item.evaluationMode === 'scored' && (!free || item.exerciseId === free) && (shown.get(item.exerciseId) ?? null) !== null)
+  if (!exercises.length) return null
+  const deductions = exercises
+    .flatMap((item) => item.deductions.map((component) => ({ item, component })))
+    .sort((left, right) => (right.component.lostPoints ?? 0) - (left.component.lostPoints ?? 0))
+    .slice(0, 2)
+    .map(({ item, component }) => ({
+      title: `${item.name} · ${component.criterion.feedback.issue}`,
+      evidence: `${component.criterion.name} ${component.score} 分，使该动作少了 ${component.lostPoints} 分${component.worst[0] ? `；${repEvidenceSentence(component.criterion, component.worst[0])}` : ''}`,
+      cue: component.criterion.feedback.cue,
+      basis: basisText(component.criterion),
+    }))
+  const single = free ? exercises[0] : null
+  const overall = analysis.overall.score
+  return {
+    summary: single
+      ? `${single.name} ${shown.get(single.exerciseId)} 分，由各分项得分按权重合成`
+      : overall !== null
+        ? `综合评分 ${overall} 分，是 ${exercises.length} 个计分动作分数的平均；每个动作的分数由各分项按权重合成`
+        : `已完成的 ${exercises.length} 个计分动作各自有分数，本次不给综合评分`,
+    parts: single
+      ? single.components.map((component) => ({ label: `${component.criterion.name}（权重 ${Math.round(component.weight * 100)}%）`, value: component.score === null ? '—' : `${component.score}` }))
+      : exercises.map((item) => ({ label: item.name, value: `${shown.get(item.exerciseId)} 分` })),
+    deductions,
+    source: '动作要求参考国家体育总局公开的科学健身指导与运动学原则；所有数值阈值是 FormPilot 工程标定，不是国家标准',
+  }
+}
+
+/** Scoring v2 for 跟练: technique evaluation kept apart from similarity, with phase evidence. */
+function routineScoreExplanation(report: RoutineReport): ScoreExplanationDigest | null {
+  const technique = report.technique
+  if (technique.score === null && report.similarity === null) return null
+  const officialTitles = [...new Set(technique.chapters.flatMap((item) => item.measured)
+    .map((result) => getScoringSource(result.criterion.sourceId))
+    .filter((source) => source.type !== 'FORMPILOT_CALIBRATED')
+    .map((source) => source.title))].slice(0, 2)
+  return {
+    summary: technique.score !== null
+      ? `动作规范评价 ${technique.score}，跟练相似度 ${report.similarity === null ? '暂无' : `${report.similarity}%`}；两者分开计算：相似度只反映与示范视频的视觉接近程度，动作规范评价按动作要求逐项检查关键阶段`
+      : `本次只有跟练相似度 ${report.similarity}%（与示范视频的视觉接近程度）。${technique.reason ?? '没有可以自动检查的动作阶段。'}`,
+    parts: technique.chapters
+      .filter((item) => item.score !== null)
+      .sort((left, right) => (left.score as number) - (right.score as number))
+      .slice(0, 3)
+      .map((item) => ({ label: chapterDisplayName(item.chapter), value: `${item.score}` })),
+    deductions: technique.deductions.slice(0, 2).map(({ result, chapter }) => ({
+      title: `${chapterDisplayName(chapter)} · ${result.criterion.feedback.issue}`,
+      evidence: result.failures[0] ? evidenceSentence(result, result.failures[0]) : `${result.criterion.name} ${result.score} 分`,
+      cue: result.criterion.feedback.cue,
+      basis: basisText(result.criterion),
+    })),
+    source: `${officialTitles.length ? `动作要求来自${officialTitles.join('、')}等资料` : '动作要求来自官方资料与标准示范'}；动作阶段由标准视频的姿态数据划分，数值阈值由 FormPilot 按示范实测值标定`,
+  }
+}
 
 function ratio(stats: { affected: number; evaluable: number }, unit: string): string {
   return `${stats.evaluable} ${unit}中 ${stats.affected} ${unit}`
@@ -58,6 +125,7 @@ export function warmUpDigest(analysis: TrainingAnalysis, session: TrainingSessio
       : analysis.comparison.reasonText ?? '当前没有可以对比的历史记录。',
     strengths: analysis.strengths.slice(0, 2).map((finding) => finding.text),
     reportPath: reportPath(session.id),
+    scoreExplanation: warmUpScoreExplanation(analysis, session),
   }
 }
 
@@ -89,6 +157,7 @@ export function routineDigest(report: RoutineReport): ReportDigest {
     comparisonReason: comparison.available ? null : comparison.reason,
     strengths: strongest && strongest.similarity !== null && strongest.band === 'high' ? [`「${chapterDisplayName(strongest.chapter)}」跟得最好，相似度 ${strongest.similarity}%。`] : [],
     reportPath: reportPath(record.id),
+    scoreExplanation: routineScoreExplanation(report),
   }
 }
 
@@ -116,6 +185,7 @@ export function customDigest(report: CustomActionReport): ReportDigest {
     comparisonReason: comparison.available ? null : comparison.reason,
     strengths: report.requirements.filter((row) => row.rate === 100 && row.checked >= 2).map((row) => `「${REQUIREMENTS[row.id].label}」每${unit}都做到了。`).slice(0, 2),
     reportPath: reportPath(record.id),
+    scoreExplanation: null,
   }
 }
 

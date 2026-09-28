@@ -1,3 +1,4 @@
+import { buildRoutineTechniqueReport, type RoutineTechniqueReport } from '../../scoring/routine/techniqueReport'
 import type { FollowAlongRegion } from '../followAlong/matcher'
 import { findRoutineProgram } from '../programs'
 import { chapterDisplayName, scopeChapters } from '../scope'
@@ -96,6 +97,11 @@ export interface RoutineReport {
   comparison: RoutineComparison
   notes: string[]
   headline: string
+  /**
+   * Scoring v2 动作规范评价: sourced technique checks per phase. Deliberately separate from `similarity`
+   * (visual closeness to the video); the two are never combined into one number.
+   */
+  technique: RoutineTechniqueReport
 }
 
 const REGIONS: ReadonlyArray<FollowAlongRegion> = ['arms', 'torso', 'legs']
@@ -254,7 +260,7 @@ export function compareWithPrevious(record: RoutineSessionRecord, program: Routi
   }
 }
 
-function focusItems(report: Omit<RoutineReport, 'focus' | 'focusItems' | 'notes' | 'headline' | 'comparison'>, program: RoutineProgram): RoutineFocusItem[] {
+function focusItems(report: Omit<RoutineReport, 'focus' | 'focusItems' | 'notes' | 'headline' | 'comparison' | 'technique'>, program: RoutineProgram): RoutineFocusItem[] {
   const items: RoutineFocusItem[] = []
   const weakest = report.weakestChapter
   if (weakest && weakest.similarity !== null && report.similarity !== null && weakest.band !== 'high'
@@ -340,6 +346,7 @@ export function buildRoutineReport(record: RoutineSessionRecord, history: readon
   if (totals.samples && totals.mirroredSamples / totals.samples >= ROUTINE_REPORT_CONFIG.mirroredNoteShare) {
     notes.push('你多数时间以镜像方式跟练（与示范左右相反），系统已按镜像比对，不影响结果。')
   }
+  notes.push('动作规范评价按官方动作要求逐项检查关键阶段的关节角度与位置，与跟练相似度分开计算，两者不合成一个分数。')
   notes.push('跟练相似度比较你与标准视频在同一时刻的身体姿态，只反映二维姿态，不评估呼吸、手型与眼神。')
 
   const coverageText = base.complete && base.coverage >= 0.9 ? '完整跟练' : `跟练完成 ${percent(base.coverage)}%`
@@ -354,5 +361,6 @@ export function buildRoutineReport(record: RoutineSessionRecord, history: readon
     comparison: compareWithPrevious(record, program, history),
     notes,
     headline,
+    technique: buildRoutineTechniqueReport(program, record.scope, record.technique, record.matcher.available),
   }
 }

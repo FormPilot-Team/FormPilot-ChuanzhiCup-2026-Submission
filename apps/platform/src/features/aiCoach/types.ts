@@ -26,6 +26,20 @@ export interface ReportDigest {
   comparisonReason: string | null
   strengths: string[]
   reportPath: string
+  /**
+   * Scoring v2: why the result is what it is — score parts, the biggest deductions with the measured value and
+   * phase, and where each requirement / number comes from. Null when the report has no score (我的动作).
+   */
+  scoreExplanation: ScoreExplanationDigest | null
+}
+
+export interface ScoreExplanationDigest {
+  /** e.g. 综合评分 82 分 = 5 个计分动作的平均 / 动作规范评价 86（与跟练相似度分开计算）. */
+  summary: string
+  parts: Array<{ label: string; value: string }>
+  deductions: Array<{ title: string; evidence: string; cue: string; basis: string }>
+  /** Which parts are official movement requirements and which are FormPilot's numbers. */
+  source: string
 }
 
 /** How to perform the current exercise, from its definition (never generated). */

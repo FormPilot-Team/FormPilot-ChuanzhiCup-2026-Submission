@@ -68,7 +68,7 @@ test('AI Coach C: on a report the questions and answers switch to that report', 
   await page.goto(`/report/${FIRST_SESSION.id}`)
   await trigger(page).click()
   await expect(panel(page)).toHaveAttribute('data-page', 'report')
-  await expect(panel(page).getByRole('group', { name: '你可以问：' }).getByRole('button')).toHaveText(['我这次表现怎么样？', '最大的问题是什么？', '和上次相比有进步吗？', '下次应该重点练什么？'])
+  await expect(panel(page).getByRole('group', { name: '你可以问：' }).getByRole('button')).toHaveText(['我这次表现怎么样？', '为什么是这个分数？', '最大的问题是什么？', '和上次相比有进步吗？', '下次应该重点练什么？'])
   await panel(page).getByRole('button', { name: '我这次表现怎么样？' }).click()
   await expect(log(page)).toContainText('综合评分')
   await panel(page).getByRole('button', { name: '和上次相比有进步吗？' }).click()

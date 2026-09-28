@@ -30,6 +30,7 @@ import { RoutineProgressRecorder } from '../../features/routines/session/Routine
 import { LocalStorageRoutineSessionRepository } from '../../features/routines/session/RoutineSessionRepository'
 import { createRoutineSessionId, type RoutineSessionRecord } from '../../features/routines/session/types'
 import type { RoutineProgram, RoutineScope } from '../../features/routines/types'
+import { RoutineTechniqueEvaluator } from '../../features/scoring/routine/RoutineTechniqueEvaluator'
 import { LocalStorageTrainingSessionRepository } from '../../features/training/LocalStorageTrainingSessionRepository'
 import { resolveTrainingMode } from '../../features/training/trainingMode'
 import { VoiceGuidePolicy, type VoiceGuideCommand, type VoiceGuideEvent } from '../../features/voice/VoiceGuidePolicy'
@@ -110,6 +111,8 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   gestureControllerRef.current ??= new GestureRuntimeController()
   const matcherRef = useRef<FollowAlongMatcher | undefined>(undefined)
   const trackRef = useRef<ReferenceTrack | undefined>(undefined)
+  // Scoring v2: technique checks per phase window, separate from the similarity matcher.
+  const techniqueRef = useRef<RoutineTechniqueEvaluator | undefined>(undefined)
   const recorderRef = useRef(null as unknown as RoutineProgressRecorder)
   recorderRef.current ??= new RoutineProgressRecorder(program, scope)
   const feedbackPolicyRef = useRef(null as unknown as RoutineFeedbackPolicy)
@@ -232,6 +235,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     const record = recordRef.current
     if (!record) return false
     record.chapters = recorderRef.current.snapshot()
+    if (techniqueRef.current) record.technique = techniqueRef.current.snapshot()
     record.matcher = { version: FOLLOW_ALONG_CONFIG.version, available: record.matcher.available || Boolean(matcherRef.current) }
     if (outcome) record.outcome = outcome
     if (endedAt !== undefined) record.endedAt = endedAt
@@ -256,6 +260,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
       activeMs: 0,
       outcome: 'in_progress',
       chapters: recorderRef.current.snapshot(),
+      technique: techniqueRef.current?.snapshot(),
     }
     persist()
   }, [persist, program, scope, synthetic, trainingMode])
@@ -395,6 +400,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
         const result = matcher.evaluate({ landmarks: normalized.landmarks, confidence: normalized.confidence, aspect: options.aspect }, stage.currentTime, now)
         matchRef.current = result
         recorderRef.current.recordComparison(stage.currentTime, result)
+        techniqueRef.current?.observe(stage.currentTime, { landmarks: normalized.landmarks, confidence: normalized.confidence, aspect: options.aspect })
         const chapter = chapterAt(program, stage.currentTime)
         const update = feedbackPolicyRef.current.update(result, now, chapter.cue)
         setMatch(result)
@@ -583,10 +589,11 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
       }
       trackRef.current = track
       matcherRef.current = new FollowAlongMatcher(track)
+      techniqueRef.current = new RoutineTechniqueEvaluator(program, scope, track)
       setTrackStatus('ready')
     })
     return () => { disposed = true }
-  }, [program.video.poseTrackSrc])
+  }, [program, scope])
 
   useEffect(() => speechRef.current.onAvailabilityChange(setVoiceAvailable), [])
   useEffect(() => speechRef.current.onPlaybackStateChange(setVoicePlayback), [])
