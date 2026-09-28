@@ -80,6 +80,16 @@ export const UPPER_BODY_WITH_HIPS_BOUNDS: ReadonlyArray<LandmarkName> = [
   ...LATERAL_RAISE_REQUIRED,
 ]
 
+export const UPPER_BODY_BOUNDS: ReadonlyArray<LandmarkName> = [
+  'nose',
+  'leftShoulder',
+  'rightShoulder',
+  'leftElbow',
+  'rightElbow',
+  'leftWrist',
+  'rightWrist',
+]
+
 export const FULL_BODY_BOUNDS: ReadonlyArray<LandmarkName> = [
   'nose',
   ...LATERAL_RAISE_REQUIRED,

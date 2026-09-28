@@ -59,7 +59,7 @@ describe('exercise-specific framing profiles', () => {
   it('maps exactly six exercises to exactly two threshold-free profiles', () => {
     expect(Object.keys(EXERCISE_FRAMING)).toHaveLength(6)
     expect(new Set(Object.values(EXERCISE_FRAMING))).toEqual(new Set(['UPPER_BODY_WITH_HIPS', 'FULL_BODY']))
-    expect(Object.keys(FRAMING_PROFILES)).toEqual(['UPPER_BODY_WITH_HIPS', 'FULL_BODY'])
+    expect(Object.keys(FRAMING_PROFILES)).toEqual(['UPPER_BODY', 'UPPER_BODY_WITH_HIPS', 'FULL_BODY'])
     for (const profile of Object.values(FRAMING_PROFILES)) {
       expect(Object.keys(profile)).not.toContain('frameMargin')
       expect(Object.keys(profile)).not.toContain('visibilityThreshold')
