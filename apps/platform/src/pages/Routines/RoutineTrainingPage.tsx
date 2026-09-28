@@ -46,15 +46,6 @@ function coachLine(runtime: RoutineRuntime): { message: string; tone: RoutineFee
   return { message: '站好了！双手在胸前合拢并保持，开始跟练。', tone: 'info' }
 }
 
-/**
- * Landscape media layout profile: the standard video is the main stage and the column split follows the picture's
- * aspect, so a 16:9 and a 4:3 video both fill their stage at about the height of the camera + feedback column.
- */
-const LANDSCAPE_COLUMNS = {
-  wide: 'xl:grid-cols-[minmax(0,2fr)_minmax(340px,1fr)]',
-  standard: 'xl:grid-cols-[minmax(0,1.4fr)_minmax(340px,1fr)]',
-} as const
-
 function trackingState(runtime: RoutineRuntime): RoutineTrackingState {
   if (runtime.sessionStatus === 'completed') return 'done'
   if (runtime.sessionStatus === 'paused') return 'paused'
@@ -91,28 +82,33 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
           </div>
         </div>
 
-        <div className={cn('grid min-w-0 gap-3', program.video.contentAspect >= 1.6 ? LANDSCAPE_COLUMNS.wide : LANDSCAPE_COLUMNS.standard)} data-testid="routine-training-layout" data-layout="landscape-coach">
-          <div className="min-w-0 self-start">
-          <RoutineVideoStage
-            program={program}
-            chapter={chapter}
-            stageRef={runtime.stageRef}
-            stageStatus={runtime.stageStatus}
-            stageSlow={runtime.stageSlow}
-            diagnostics={runtime.stageDiagnostics}
-            stageTime={runtime.stageTime}
-            course={courseSnapshot}
-            manuallyPaused={runtime.sessionStatus === 'paused'}
-            videoMuted={runtime.videoMuted}
-            onToggleSound={runtime.toggleVideoSound}
-            onMetadata={runtime.onStageMetadata}
-            onError={runtime.onStageError}
-            onReload={runtime.reloadStage}
-          />
+        <div
+          className="grid min-w-0 items-start gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)_minmax(280px,.64fr)]"
+          data-testid="routine-training-layout"
+          data-layout="camera-centered"
+        >
+          <div className="min-w-0 self-start" data-layout-region="demonstration">
+            <RoutineVideoStage
+              program={program}
+              chapter={chapter}
+              stageRef={runtime.stageRef}
+              stageStatus={runtime.stageStatus}
+              stageSlow={runtime.stageSlow}
+              diagnostics={runtime.stageDiagnostics}
+              stageTime={runtime.stageTime}
+              course={courseSnapshot}
+              manuallyPaused={runtime.sessionStatus === 'paused'}
+              videoMuted={runtime.videoMuted}
+              onToggleSound={runtime.toggleVideoSound}
+              onMetadata={runtime.onStageMetadata}
+              onError={runtime.onStageError}
+              onReload={runtime.reloadStage}
+            />
           </div>
-          <div className="grid min-w-0 items-start gap-3 md:grid-cols-2 xl:flex xl:flex-col xl:items-stretch">
+          <div className="min-w-0 self-start" data-layout-region="camera">
             <CameraPanel
               variant="compact"
+              title="我的画面"
               videoRef={runtime.cameraVideoRef}
               demoImageRef={runtime.demoImageRef}
               overlayRef={runtime.overlayRef}
@@ -128,6 +124,8 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
               showPoseOverlay={shouldShowPoseOverlay(courseSnapshot.state)}
               onStart={runtime.startCamera}
             />
+          </div>
+          <div className="min-w-0 self-start md:col-span-2 xl:col-span-1" data-layout-region="feedback">
             <RoutineFeedbackPanel
               chapter={chapter}
               match={runtime.match}

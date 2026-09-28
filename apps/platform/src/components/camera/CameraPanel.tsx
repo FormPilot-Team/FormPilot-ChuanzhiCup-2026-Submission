@@ -27,8 +27,10 @@ interface CameraPanelProps {
   gestureHolding?: boolean
   outOfFrameMessage: string
   showPoseOverlay?: boolean
-  /** `compact` sizes the stage to the camera's 16:9 picture for layouts where the camera is not the main stage. */
+  /** `compact` sizes the stage to the camera's native 16:9 viewport without changing the recognition input. */
   variant?: 'default' | 'compact'
+  /** Visible panel heading; routine training uses “我的画面” while other training modes keep the default. */
+  title?: string
   onStart: () => void
 }
 
@@ -44,7 +46,7 @@ const FAILURE_STATUS: Readonly<Record<CameraFailureKind, string>> = {
   model_error: '识别模型加载失败',
 }
 
-export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, variant = 'default', onStart }: CameraPanelProps) {
+export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, variant = 'default', title: panelTitle = '实时动作检测', onStart }: CameraPanelProps) {
   const compact = variant === 'compact'
   const promptText = compact ? 'text-base' : 'text-lg sm:text-xl'
   const status = mode === 'demo' ? '演示模式' : mode === 'live' ? '摄像头已连接 · AI 实时分析中' : mode === 'requesting_permission' ? '等待摄像头授权' : mode === 'model_loading' ? '正在加载识别模型' : mode === 'error' ? (failure ? FAILURE_STATUS[failure.kind] : '摄像头无法启动') : '等待连接摄像头'
@@ -54,12 +56,12 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure,
   return (
     <section className="panel flex min-h-0 min-w-0 flex-col p-3" aria-labelledby="camera-title" data-testid="camera-panel" data-variant={variant}>
       <div className={compact ? 'flex h-10 items-center gap-2 px-1 pb-1' : 'flex h-12 items-center gap-2 px-2'}>
-        <span className="grid size-8 place-items-center rounded-xl bg-blue-50 text-blue-600"><ScanLine size={19} /></span>
-        <h2 id="camera-title" className="font-bold text-slate-900">实时动作检测</h2>
+        <span className="grid size-8 place-items-center rounded-xl bg-blue-50 text-blue-600"><ScanLine size={19} aria-hidden="true" /></span>
+        <h2 id="camera-title" className="font-bold text-slate-900">{panelTitle}</h2>
         <span className="ml-auto hidden items-center gap-1.5 text-xs text-slate-500 sm:inline-flex"><i className={mode === 'live' || mode === 'demo' ? 'size-2 rounded-full bg-emerald-400' : mode === 'error' ? 'size-2 rounded-full bg-coral-500' : loading ? 'size-2 rounded-full bg-amber-400' : 'size-2 rounded-full bg-slate-300'} />{status}</span>
       </div>
       {/* A compact stage keeps the camera's 16:9 picture; with no picture to show (a failure) it grows to fit the notice. */}
-      <div className={compact ? cn('relative w-full overflow-hidden rounded-2xl bg-slate-100', mode === 'error' ? 'min-h-[400px]' : 'aspect-video') : 'camera-stage relative min-h-[380px] flex-1 overflow-hidden rounded-2xl bg-slate-100'}>
+      <div className={compact ? cn('relative w-full overflow-hidden rounded-2xl bg-slate-100', mode === 'error' ? 'min-h-[400px]' : 'aspect-video') : 'camera-stage relative min-h-[380px] flex-1 overflow-hidden rounded-2xl bg-slate-100'} data-testid="camera-stage">
         {mode === 'demo' ? (
           demoFrameSrc ? (
             <img ref={demoImageRef} src={demoFrameSrc} alt={demoAsset.alt} className={demoAsset.fit === 'contain' ? 'size-full object-contain object-center' : 'size-full object-cover object-center'} data-demo-source="real-image-sequence" />
