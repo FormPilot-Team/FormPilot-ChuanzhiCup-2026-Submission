@@ -1,6 +1,7 @@
-import { Bot, ChartLine, Dumbbell, House, type LucideIcon, WandSparkles } from 'lucide-react'
+import { ChartLine, Dumbbell, House, type LucideIcon, WandSparkles } from 'lucide-react'
 import { HISTORY_PATH, HOME_PATH, SMART_TRAINING_PATH, START_TRAINING_PATH, WORKSHOP_PATH, isTrainingRoute, parseRoutineRoute, parseWorkshopRoute } from '../../app/routes'
 import { cn } from '../../lib/cn'
+import { FormPilotMark } from './FormPilotMark'
 
 type NavKey = 'home' | 'training' | 'workshop' | 'history'
 
@@ -28,7 +29,7 @@ export function AppHeader() {
     <header className="border-b border-slate-200/70 bg-white/85">
       <div className="mx-auto flex h-18 min-w-0 max-w-[1600px] items-center gap-2 px-4 sm:gap-4 lg:px-8">
         <a href={HOME_PATH} className="flex min-w-0 shrink-0 items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
-          <span className="fp-energy-gradient grid size-10 place-items-center rounded-2xl text-white shadow-[0_8px_18px_-10px_rgb(14_165_233/0.9)]"><Bot size={23} aria-hidden="true" /></span>
+          <FormPilotMark className="size-10 shrink-0 rounded-[10px] shadow-[0_8px_18px_-10px_rgb(37_99_235/0.9)]" />
           {/* Phones need the width for the navigation items; the wordmark stays the link's accessible name. */}
           <div className="sr-only sm:not-sr-only">
             <p className="text-lg font-bold tracking-tight text-slate-900">FormPilot</p>
