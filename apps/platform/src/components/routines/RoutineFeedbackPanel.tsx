@@ -1,16 +1,20 @@
-import { Gauge } from 'lucide-react'
+import { Gauge, ShieldCheck } from 'lucide-react'
 import { CoachAvatar } from '../coach/CoachAvatar'
 import type { RoutineFeedbackTone } from '../../features/routines/followAlong/feedbackPolicy'
+import { LIVE_CHECK_LABEL, type LiveCheck, type LiveCheckStatus } from '../../features/routines/followAlong/liveChecks'
 import type { FollowAlongMatch, FollowAlongRegion } from '../../features/routines/followAlong/matcher'
 import { REGION_LABEL, SIMILARITY_BAND_LABEL, similarityBand } from '../../features/routines/report/routineReport'
-import type { RoutineChapter } from '../../features/routines/types'
+import type { RoutineAccent } from '../../features/routines/types'
 import { cn } from '../../lib/cn'
+import { ROUTINE_ACCENT } from './routineTheme'
 
 export type RoutineTrackingState = 'preparing' | 'normal' | 'adjust' | 'paused' | 'done'
 
 interface RoutineFeedbackPanelProps {
-  chapter: RoutineChapter
+  accent: RoutineAccent
   match?: FollowAlongMatch
+  /** 动作规范检查: the chapter's measured requirements (Scoring v2.1) and rhythm, as they stand right now. */
+  checks: ReadonlyArray<LiveCheck>
   trackingState: RoutineTrackingState
   coachMessage: string
   coachTone: RoutineFeedbackTone
@@ -43,14 +47,26 @@ function rhythmText(match?: FollowAlongMatch): string {
 
 const REGIONS: ReadonlyArray<FollowAlongRegion> = ['arms', 'torso', 'legs']
 
-/** Live follow-along feedback: the AI Coach line, similarity to the standard video, rhythm and body regions. */
-export function RoutineFeedbackPanel({ chapter, match, trackingState, coachMessage, coachTone, comparisonAvailable }: RoutineFeedbackPanelProps) {
+const CHECK_TONE: Readonly<Record<LiveCheckStatus, string>> = {
+  idle: 'bg-slate-100 text-slate-500',
+  observing: 'bg-blue-50 text-blue-700',
+  met: 'bg-emerald-50 text-emerald-700',
+  attention: 'bg-amber-50 text-amber-800',
+  unstable: 'bg-slate-100 text-slate-600',
+}
+
+/**
+ * Live follow-along feedback: the AI Coach line, the chapter's 动作规范检查, similarity to the standard video, rhythm
+ * and body regions. Technique checks and similarity stay separate, as in the report.
+ */
+export function RoutineFeedbackPanel({ accent, match, checks, trackingState, coachMessage, coachTone, comparisonAvailable }: RoutineFeedbackPanelProps) {
   const measured = match && match.status !== 'insufficient'
   const similarity = measured ? Math.round(match.similarity * 100) : null
   const band = similarity === null ? null : similarityBand(similarity)
   const tracking = TRACKING[trackingState]
+  const accentClasses = ROUTINE_ACCENT[accent]
   return (
-    <section className="panel flex min-h-0 min-w-0 flex-col gap-3 p-4 xl:flex-1" aria-labelledby="routine-feedback-title" data-testid="routine-feedback">
+    <section className="panel flex min-h-0 min-w-0 flex-col gap-2.5 p-4 xl:flex-1" aria-labelledby="routine-feedback-title" data-testid="routine-feedback">
       <div className="flex min-w-0 items-center gap-2">
         <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"><Gauge size={18} aria-hidden="true" /></span>
         <h2 id="routine-feedback-title" className="min-w-0 truncate font-bold text-slate-900">实时反馈</h2>
@@ -62,8 +78,26 @@ export function RoutineFeedbackPanel({ chapter, match, trackingState, coachMessa
         <div className="min-w-0">
           <p className="text-xs font-semibold text-blue-700">AI 教练</p>
           <p className="mt-0.5 text-pretty text-sm font-semibold leading-6 text-slate-900" role="status" aria-live="polite" aria-atomic="true" data-testid="routine-coach-message">{coachMessage}</p>
-          {coachMessage !== chapter.cue ? <p className="mt-1 line-clamp-2 text-pretty text-xs leading-5 text-slate-600" data-testid="routine-cue">要点：{chapter.cue}</p> : null}
         </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-100 bg-white p-3" data-testid="routine-checks">
+        <div className="flex items-center gap-1.5">
+          <ShieldCheck size={15} className={accentClasses.text} aria-hidden="true" />
+          <h3 className="text-sm font-bold text-slate-900">动作规范检查</h3>
+          <span className="ml-auto text-xs text-slate-400">当前关注点</span>
+        </div>
+        <ul className="mt-2 grid gap-1.5">
+          {checks.map((check) => (
+            <li key={check.id} className="min-w-0 rounded-xl bg-slate-50 px-2.5 py-1.5" data-testid="routine-check" data-check-id={check.id} data-check-status={check.status}>
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800" title={check.name}>{check.name}</span>
+                <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-semibold', CHECK_TONE[check.status])}>{LIVE_CHECK_LABEL[check.status]}</span>
+              </div>
+              {check.hint ? <p className="mt-0.5 line-clamp-1 text-xs text-slate-500" title={check.hint}>{check.hint}</p> : null}
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div
@@ -74,7 +108,7 @@ export function RoutineFeedbackPanel({ chapter, match, trackingState, coachMessa
         data-match-mirrored={match?.mirrored ? 'true' : 'false'}
       >
         <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-          <strong className="text-3xl font-bold tabular-nums leading-9 text-slate-950">{similarity === null ? '—' : `${similarity}%`}</strong>
+          <strong className="text-2xl font-bold tabular-nums leading-8 text-slate-950">{similarity === null ? '—' : `${similarity}%`}</strong>
           <span className="text-xs text-slate-500">跟练相似度</span>
           {band ? <span className={cn('rounded-md px-2 py-0.5 text-xs font-semibold', band === 'high' ? 'bg-emerald-50 text-emerald-700' : band === 'fair' ? 'bg-blue-50 text-blue-700' : 'bg-coral-50 text-coral-600')}>{SIMILARITY_BAND_LABEL[band]}</span> : null}
           <span className="ml-auto text-xs font-semibold text-slate-700" data-testid="routine-rhythm">节奏：{comparisonAvailable ? rhythmText(match) : '暂不可比对'}</span>

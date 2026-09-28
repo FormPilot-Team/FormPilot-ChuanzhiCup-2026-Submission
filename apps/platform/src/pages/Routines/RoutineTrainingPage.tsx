@@ -3,6 +3,8 @@ import { CameraPanel } from '../../components/camera/CameraPanel'
 import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { routineGuide } from '../../features/coachContext/liveCoachContexts'
+import { RoutineCameraStatus } from '../../components/routines/RoutineCameraStatus'
+import { RoutineChapterPoints } from '../../components/routines/RoutineChapterPoints'
 import { RoutineFeedbackPanel, type RoutineTrackingState } from '../../components/routines/RoutineFeedbackPanel'
 import { RoutineFooter } from '../../components/routines/RoutineFooter'
 import { RoutineVideoStage } from '../../components/routines/RoutineVideoStage'
@@ -11,6 +13,7 @@ import { routineExitPhase } from '../../features/training/trainingExit'
 import { ROUTINE_ACCENT } from '../../components/routines/routineTheme'
 import { shouldShowPoseOverlay } from '../../features/pose/poseOverlayVisibility'
 import type { RoutineFeedbackTone } from '../../features/routines/followAlong/feedbackPolicy'
+import { liveChecks } from '../../features/routines/followAlong/liveChecks'
 import { chapterDisplayName, scopeChapters } from '../../features/routines/scope'
 import type { RoutineProgram, RoutineScope } from '../../features/routines/types'
 import { cn } from '../../lib/cn'
@@ -63,6 +66,16 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
   const heading = scope.kind === 'full' ? `${program.title} · 整套跟练` : `${program.title} · ${chapterDisplayName(scopeChapters(program, scope)[0])}`
   const capturing = runtime.cameraMode === 'live' || runtime.cameraMode === 'demo'
   const outOfFrame = capturing && courseSnapshot.state === 'ACTIVE' && !runtime.framing.valid && !runtime.poseUnavailable
+  const finished = runtime.sessionStatus === 'completed' || courseSnapshot.state === 'TRANSITION' || courseSnapshot.state === 'COURSE_COMPLETE'
+  const checks = liveChecks({
+    routine: program.id,
+    chapter,
+    record: runtime.techniqueRecord,
+    videoSeconds: runtime.stageTime,
+    match: runtime.match,
+    following: capturing && courseSnapshot.state === 'ACTIVE' && runtime.sessionStatus === 'active',
+    comparisonAvailable: runtime.trackStatus !== 'unavailable',
+  })
   return (
     <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900" data-routine={program.id}>
       <AppHeader />
@@ -84,11 +97,11 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
         </div>
 
         <div
-          className="grid min-w-0 items-start gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)_minmax(280px,.64fr)]"
+          className="grid min-w-0 items-start gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)_minmax(280px,.64fr)] xl:items-stretch"
           data-testid="routine-training-layout"
           data-layout="camera-centered"
         >
-          <div className="min-w-0 self-start" data-layout-region="demonstration">
+          <div className="flex min-w-0 flex-col gap-3 self-start xl:self-stretch" data-layout-region="demonstration">
             <RoutineVideoStage
               program={program}
               chapter={chapter}
@@ -105,8 +118,9 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
               onError={runtime.onStageError}
               onReload={runtime.reloadStage}
             />
+            <RoutineChapterPoints program={program} chapter={chapter} />
           </div>
-          <div className="min-w-0 self-start" data-layout-region="camera">
+          <div className="flex min-w-0 flex-col self-start xl:self-stretch [&>section]:xl:flex-1" data-layout-region="camera">
             <CameraPanel
               variant="compact"
               title="我的画面"
@@ -124,13 +138,15 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
               outOfFrameMessage={runtime.framing.hint ?? '请后退一些，确保全身完整入镜'}
               showPoseOverlay={shouldShowPoseOverlay(courseSnapshot.state)}
               framingAssist={runtime.poseUnavailable ? undefined : runtime.framingAssist}
+              footer={<RoutineCameraStatus cameraMode={runtime.cameraMode} framingAssist={runtime.framingAssist} poseUnavailable={runtime.poseUnavailable} paused={runtime.sessionStatus === 'paused'} />}
               onStart={runtime.startCamera}
             />
           </div>
-          <div className="min-w-0 self-start md:col-span-2 xl:col-span-1" data-layout-region="feedback">
+          <div className="flex min-w-0 flex-col self-start md:col-span-2 xl:col-span-1 xl:self-stretch" data-layout-region="feedback">
             <RoutineFeedbackPanel
-              chapter={chapter}
+              accent={program.accent}
               match={runtime.match}
+              checks={checks}
               trackingState={trackingState(runtime)}
               coachMessage={coach.message}
               coachTone={coach.tone}
@@ -149,6 +165,7 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
             paused={runtime.sessionStatus === 'paused'}
             canControl={runtime.sessionStatus === 'active' || runtime.sessionStatus === 'paused'}
             canJump={scope.kind === 'full' && runtime.sessionStatus !== 'completed' && runtime.stageStatus === 'ready'}
+            finished={finished}
             voiceEnabled={runtime.voiceEnabled}
             voiceAvailable={runtime.voiceAvailable}
             onSelectChapter={runtime.selectChapter}

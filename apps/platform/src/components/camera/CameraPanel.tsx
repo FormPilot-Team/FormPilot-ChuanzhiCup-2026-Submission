@@ -1,5 +1,5 @@
 import { Camera, LoaderCircle, ScanLine } from 'lucide-react'
-import type { RefObject } from 'react'
+import type { ReactNode, RefObject } from 'react'
 import type { CameraFailureKind } from '../../adapters/camera/BrowserCameraAdapter'
 import type { CameraFailureReport } from '../../features/camera/cameraDiagnostics'
 import { isDesktopApp } from '../../features/diagnostics/desktopBridge'
@@ -33,6 +33,8 @@ interface CameraPanelProps {
   variant?: 'default' | 'compact'
   /** Visible panel heading; routine training uses “我的画面” while other training modes keep the default. */
   title?: string
+  /** Shown under the stage (routine training: framing requirement and recognition status). */
+  footer?: ReactNode
   onStart: () => void
 }
 
@@ -48,7 +50,7 @@ const FAILURE_STATUS: Readonly<Record<CameraFailureKind, string>> = {
   model_error: '识别模型加载失败',
 }
 
-export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, framingAssist, variant = 'default', title: panelTitle = '实时动作检测', onStart }: CameraPanelProps) {
+export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, framingAssist, variant = 'default', title: panelTitle = '实时动作检测', footer, onStart }: CameraPanelProps) {
   const compact = variant === 'compact'
   const promptText = compact ? 'text-base' : 'text-lg sm:text-xl'
   const status = mode === 'demo' ? '演示模式' : mode === 'live' ? '摄像头已连接 · AI 实时分析中' : mode === 'requesting_permission' ? '等待摄像头授权' : mode === 'model_loading' ? '正在加载识别模型' : mode === 'error' ? (failure ? FAILURE_STATUS[failure.kind] : '摄像头无法启动') : '等待连接摄像头'
@@ -145,6 +147,7 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure,
           <div className={`absolute inset-x-4 bottom-4 rounded-xl bg-white/95 px-4 py-3 text-center ${promptText} font-bold text-coral-600 shadow-sm`}>{outOfFrameMessage}</div>
         ) : null}
       </div>
+      {footer}
     </section>
   )
 }

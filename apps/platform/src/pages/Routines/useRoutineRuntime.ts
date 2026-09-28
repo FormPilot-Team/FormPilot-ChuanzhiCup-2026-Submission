@@ -32,6 +32,7 @@ import { LocalStorageRoutineSessionRepository } from '../../features/routines/se
 import { createRoutineSessionId, type RoutineSessionRecord } from '../../features/routines/session/types'
 import type { RoutineProgram, RoutineScope } from '../../features/routines/types'
 import { RoutineTechniqueEvaluator } from '../../features/scoring/routine/RoutineTechniqueEvaluator'
+import type { RoutineTechniqueRecord } from '../../features/scoring/routine/techniqueRecord'
 import { LocalStorageTrainingSessionRepository } from '../../features/training/LocalStorageTrainingSessionRepository'
 import { resolveTrainingMode } from '../../features/training/trainingMode'
 import { VoiceGuidePolicy, type VoiceGuideCommand, type VoiceGuideEvent } from '../../features/voice/VoiceGuidePolicy'
@@ -54,6 +55,8 @@ const FRAMING_CONFIDENCE = 0.65
 /** Losing the pose for this long pauses the video; shorter losses (deep bends, low stances) are tolerated. */
 const POSE_LOSS_PAUSE_MS = 2000
 const EVALUATION_INTERVAL_MS = 100
+/** The training page's 动作规范检查 reads the technique snapshot at this rate; the report reads it once at the end. */
+const TECHNIQUE_VIEW_INTERVAL_MS = 500
 const UI_INTERVAL_MS = 100
 const PERSIST_INTERVAL_MS = 10_000
 /** A standard video still without metadata after this long is reported (with diagnostics) instead of spinning forever. */
@@ -128,6 +131,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   const lastStageTimeRef = useRef(step.startSeconds)
   const lastTickAtRef = useRef<number | undefined>(undefined)
   const lastEvaluationAtRef = useRef(0)
+  const lastTechniqueViewAtRef = useRef(0)
   const lastUiAtRef = useRef(0)
   const lastPersistAtRef = useRef(0)
   const noPoseStartedAtRef = useRef<number | undefined>(undefined)
@@ -153,6 +157,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   const [trackStatus, setTrackStatus] = useState<ReferenceTrackStatus>('loading')
   const [chapterId, setChapterId] = useState(chapters[0].id)
   const [match, setMatch] = useState<FollowAlongMatch>()
+  const [techniqueRecord, setTechniqueRecord] = useState<RoutineTechniqueRecord>()
   const [feedback, setFeedback] = useState<RoutineFeedback>()
   const [framing, setFraming] = useState<{ valid: boolean; hint?: string }>({ valid: false })
   const [framingAssist, setFramingAssist] = useState(() => initialFramingAssistState('FULL_BODY'))
@@ -392,6 +397,10 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
         matchRef.current = result
         recorderRef.current.recordComparison(stage.currentTime, result)
         techniqueRef.current?.observe(stage.currentTime, { landmarks: normalized.landmarks, confidence: normalized.confidence, aspect: options.aspect })
+        if (techniqueRef.current && now - lastTechniqueViewAtRef.current >= TECHNIQUE_VIEW_INTERVAL_MS) {
+          lastTechniqueViewAtRef.current = now
+          setTechniqueRecord(techniqueRef.current.snapshot())
+        }
         const chapter = chapterAt(program, stage.currentTime)
         const update = feedbackPolicyRef.current.update(result, now, chapter.cue)
         setMatch(result)
@@ -582,6 +591,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
       trackRef.current = track
       matcherRef.current = new FollowAlongMatcher(track)
       techniqueRef.current = new RoutineTechniqueEvaluator(program, scope, track)
+      setTechniqueRecord(techniqueRef.current.snapshot())
       setTrackStatus('ready')
     })
     return () => { disposed = true }
@@ -772,6 +782,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     videoMuted,
     trackStatus,
     match,
+    techniqueRecord,
     feedback,
     framing,
     framingAssist,

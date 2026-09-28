@@ -1,5 +1,5 @@
 import * as AlertDialog from '@radix-ui/react-alert-dialog'
-import { Check, Pause, Play, Square, Volume2, VolumeX } from 'lucide-react'
+import { Check, Pause, Play, SkipForward, Square, Volume2, VolumeX } from 'lucide-react'
 import { chapterDisplayName, formatClock } from '../../features/routines/scope'
 import type { RoutineChapter, RoutineProgram } from '../../features/routines/types'
 import { cn } from '../../lib/cn'
@@ -14,6 +14,8 @@ interface RoutineFooterProps {
   paused: boolean
   canControl: boolean
   canJump: boolean
+  /** The routine played to its end: every chapter counts as done. */
+  finished?: boolean
   voiceEnabled: boolean
   voiceAvailable: boolean
   onSelectChapter: (chapterId: string) => void
@@ -30,14 +32,16 @@ function stepMark(chapter: RoutineChapter): string {
 
 /** Progress through the routine, the chapter ribbon, and the same pause / voice / end controls as Smart Training. */
 export function RoutineFooter({
-  program, chapters, chapter, elapsedSeconds, totalSeconds, paused, canControl, canJump, voiceEnabled, voiceAvailable,
+  program, chapters, chapter, elapsedSeconds, totalSeconds, paused, canControl, canJump, finished = false, voiceEnabled, voiceAvailable,
   onSelectChapter, onPause, onToggleVoice, onEnd,
 }: RoutineFooterProps) {
   const accent = ROUTINE_ACCENT[program.accent]
   const progress = totalSeconds > 0 ? Math.min(1, Math.max(0, elapsedSeconds / totalSeconds)) : 0
   const currentIndex = chapters.indexOf(chapter)
+  const next = currentIndex >= 0 && !finished ? chapters[currentIndex + 1] : undefined
+  const done = finished ? chapters.length : Math.max(0, currentIndex)
   return (
-    <section className="panel grid min-w-0 gap-4 overflow-hidden p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center" aria-label="训练控制" data-testid="routine-footer">
+    <section className="panel grid min-w-0 gap-4 overflow-hidden p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,250px)_auto] lg:items-center" aria-label="训练控制" data-testid="routine-footer">
       <div className="min-w-0">
         <div className="flex min-w-0 items-center justify-between gap-3">
           <p className="min-w-0 truncate text-sm font-semibold text-slate-800">跟练进度 · <span data-testid="routine-current-chapter">{chapterDisplayName(chapter)}</span></p>
@@ -72,6 +76,15 @@ export function RoutineFooter({
             )
           })}
         </ol>
+      </div>
+
+      <div className="flex min-w-0 items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3" data-testid="routine-next-chapter">
+        <span className={cn('grid size-10 shrink-0 place-items-center rounded-xl', accent.soft, accent.text)}><SkipForward size={20} aria-hidden="true" /></span>
+        <div className="min-w-0">
+          <p className="text-xs text-slate-500">{next ? '下一段' : '本次跟练'}</p>
+          <p className="truncate font-bold text-slate-900" title={next ? chapterDisplayName(next) : undefined}>{next ? chapterDisplayName(next) : finished ? '全部段落已完成' : chapters.length === 1 ? '单独练习本段' : '这是最后一段'}</p>
+          <p className="text-xs tabular-nums text-slate-500" data-testid="routine-chapters-done">已完成 {done} / {chapters.length} 段</p>
+        </div>
       </div>
 
       <div className="flex items-center justify-center gap-4">

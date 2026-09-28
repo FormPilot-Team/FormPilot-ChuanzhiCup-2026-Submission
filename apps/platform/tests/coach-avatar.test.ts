@@ -36,7 +36,8 @@ describe('coach avatar asset', () => {
   it('is what the realtime feedback card shows, never the full-body picture', () => {
     const program = getRoutineProgram('baduanjin')
     const html = renderToStaticMarkup(createElement(RoutineFeedbackPanel, {
-      chapter: program.chapters[1],
+      accent: program.accent,
+      checks: [],
       trackingState: 'normal',
       coachMessage: '十指交叉上托',
       coachTone: 'neutral',
