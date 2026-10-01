@@ -68,7 +68,16 @@ def figure(pts):
     else:
         head_c = (pts[0][0], pts[0][1] - unit * 0.1)
         head_r = unit * 0.21
-    neck_top = lerp(head_c, sh, 0.55)
+    # Keep the head a neck's length above the shoulder line: the landmark-derived centre can sit far off (a turned or
+    # tilted head), and a head floating over a thin stub is what made the figures look odd. Direction is kept.
+    reach = dist(head_c, sh)
+    clamped = min(max(reach, head_r + unit * 0.06), head_r + unit * 0.18)
+    if reach > 0:
+        head_c = lerp(sh, head_c, clamped / reach)
+    up = ((head_c[0] - sh[0]) / clamped, (head_c[1] - sh[1]) / clamped)
+    # The neck runs from inside the torso to inside the head, so the round caps fuse it with both.
+    neck_base = (sh[0] - up[0] * unit * 0.08, sh[1] - up[1] * unit * 0.08)
+    neck_top = (head_c[0] - up[0] * head_r * 0.35, head_c[1] - up[1] * head_r * 0.35)
 
     def hand(side):
         elbow, wrist = (pts[13], pts[15]) if side == 'L' else (pts[14], pts[16])
@@ -79,7 +88,7 @@ def figure(pts):
 
     # (from, to, width in torso lengths); round caps join the segments into one silhouette.
     segs = [
-        (sh, neck_top, 0.14),
+        (neck_base, neck_top, 0.2),
         (pts[11], pts[13], 0.17), (pts[13], pts[15], 0.135), (pts[15], hand('L'), 0.11),
         (pts[12], pts[14], 0.17), (pts[14], pts[16], 0.135), (pts[16], hand('R'), 0.11),
         (pts[23], pts[25], 0.235), (pts[25], pts[27], 0.17),
@@ -96,7 +105,12 @@ def figure(pts):
     def waist(s, h):
         return lerp(lerp(s, h, 0.62), lerp(sh, hp, 0.62), 0.12 * min(1.0, shoulder_width / unit))
 
-    torso = [pts[11], pts[12], waist(pts[12], pts[24]), pts[24], pts[23], waist(pts[11], pts[23])]
+    def trapezius(s):
+        # A sloped shoulder line from the neck out to the shoulder instead of a flat bar.
+        base = lerp(sh, s, 0.36)
+        return (base[0] + up[0] * unit * 0.09, base[1] + up[1] * unit * 0.09)
+
+    torso = [pts[11], trapezius(pts[11]), trapezius(pts[12]), pts[12], waist(pts[12], pts[24]), pts[24], pts[23], waist(pts[11], pts[23])]
     return {'head': (head_c, head_r), 'segs': segs, 'torso': torso, 'unit': unit}
 
 

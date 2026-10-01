@@ -140,7 +140,7 @@ test.describe('8G Mode Hub and smart-training entry', () => {
     for (const [id, title] of [['baduanjin', '八段锦'], ['taijiquan', '太极拳'], ['wuqinxi', '五禽戏'], ['yijinjing', '易筋经']]) {
       const card = page.getByTestId(`mode-card-${id}`)
       await expect(card, id).toHaveAttribute('href', `/routines/${id}`)
-      await expect(card, id).toHaveAccessibleName(`开始跟练 · ${title}`)
+      await expect(card, id).toHaveAccessibleName(`开始训练 · ${title}`)
       await expect(card, id).not.toContainText('即将开放')
       await card.click()
       await expect(page).toHaveURL(new RegExp(`/routines/${id}$`))

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { START_TRAINING_ANCHOR } from '../../app/routes'
 import { TRAINING_MODES, WORKSHOP_ENTRY } from '../../app/modeCatalog'
 import { HomeHero } from '../../components/home/HomeHero'
+import { ScoringBasisDialog } from '../../components/home/ScoringBasisDialog'
 import { MyActionsStrip } from '../../components/home/MyActionsStrip'
 import { MyTrainingSummary } from '../../components/home/MyTrainingSummary'
 import { TrainingModeCard } from '../../components/home/TrainingModeCard'
@@ -44,6 +45,7 @@ interface HomePageProps {
  */
 export function HomePage({ repository = localRepository, routineRepository = localRoutineRepository, customRepository = localCustomRepository, actionRepository = localActionRepository, now }: HomePageProps) {
   const [onboardingOpen, setOnboardingOpen] = useState(() => shouldAutoOpenOnboarding())
+  const [scoringBasisOpen, setScoringBasisOpen] = useState(false)
   const trainingHeadingRef = useRef<HTMLHeadingElement>(null)
   const history = useMemo(() => {
     const smart = loadTrainingHistory(repository)
@@ -92,7 +94,7 @@ export function HomePage({ repository = localRepository, routineRepository = loc
     <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900">
       <AppHeader />
       <main className="min-w-0 pb-24">
-        <HomeHero onOpenGuide={() => setOnboardingOpen(true)} />
+        <HomeHero onOpenGuide={() => setOnboardingOpen(true)} onOpenScoringBasis={() => setScoringBasisOpen(true)} />
 
         {/* The hero band is full width; everything below lines up with its content. */}
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
@@ -120,6 +122,7 @@ export function HomePage({ repository = localRepository, routineRepository = loc
       </main>
       <AICoach context={coachContext} />
       <OnboardingDialog open={onboardingOpen} onClose={closeOnboarding} />
+      <ScoringBasisDialog open={scoringBasisOpen} onClose={() => setScoringBasisOpen(false)} />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { AudioLines, BookOpen, ChartLine, ScanLine, type LucideIcon } from 'lucide-react'
+import { AudioLines, BookOpen, ChartLine, ScanLine, ShieldCheck, type LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '../../lib/cn'
 import { COACH_NAME, COACH_WELCOME_ASSET, COACH_WELCOME_FALLBACK, type CoachImageAsset } from '../coach/coachIdentity'
@@ -35,11 +35,16 @@ function CoachWelcome() {
           data-asset={asset.src}
         />
       ) : null}
+      {/* A speech bubble, not a card: rounded, light, with a tail curling up towards her. One drop shadow covers the
+          bubble and the tail together, so they read as one shape. */}
       <p
         style={frame.bubble}
-        className="absolute z-10 w-max max-w-[11.5rem] rounded-2xl rounded-tr-md bg-white/95 px-3.5 py-2.5 text-[13px] leading-5 text-slate-700 shadow-[0_14px_30px_-16px_rgb(30_64_175/0.55)] ring-1 ring-white sm:max-w-none sm:px-4 sm:py-3 sm:text-sm sm:leading-6"
+        className="fp-speech-bubble absolute z-10 w-max max-w-[11.5rem] rounded-[1.35rem] bg-white px-3.5 py-2.5 text-[13px] leading-5 text-slate-700 sm:max-w-none sm:px-4 sm:py-3 sm:text-sm sm:leading-6"
         data-testid="home-coach-welcome"
       >
+        <svg viewBox="0 0 22 20" aria-hidden="true" focusable="false" className="absolute -right-[15px] top-1 h-5 w-[22px] fill-white" data-part="bubble-tail">
+          <path d="M0 9C7 8.5 15 6 22 0C19 8 13 14 1 19Z" />
+        </svg>
         <span className="sr-only">{COACH_NAME}：</span>
         <span className="block font-bold text-slate-900">你好！</span>
         <span className="block">今天想练什么？</span>
@@ -74,11 +79,14 @@ function MotionTrails() {
   )
 }
 
+const UTILITY_BUTTON = 'inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-slate-700 shadow-[0_6px_16px_-12px_rgb(30_64_175/0.5)] ring-1 ring-slate-200/80 hover:bg-white hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
+
 /**
  * Home hero: the brand on the left, FormPilot's coach welcoming you on the right, and a few light capability hints
- * on wide screens. Full-width band; its content lines up with the sections below. The guide is a small utility entry.
+ * on wide screens. Full-width band; its content lines up with the sections below. 使用说明 and 评分依据 are two small
+ * utility entries on the same level.
  */
-export function HomeHero({ onOpenGuide }: { onOpenGuide: () => void }) {
+export function HomeHero({ onOpenGuide, onOpenScoringBasis }: { onOpenGuide: () => void; onOpenScoringBasis: () => void }) {
   return (
     <section className="fp-home-hero relative isolate overflow-hidden" aria-labelledby="home-title" data-testid="home-hero">
       <div className="mx-auto grid min-w-0 max-w-[1200px] px-4 pt-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,46%)] sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:px-8 lg:pt-6 xl:grid-cols-[minmax(0,1fr)_468px_196px]">
@@ -86,14 +94,14 @@ export function HomeHero({ onOpenGuide }: { onOpenGuide: () => void }) {
           <h1 id="home-title" className="fp-wordmark pb-1 text-[2.75rem] font-extrabold leading-none tracking-tight sm:text-6xl lg:text-[4.25rem]">FormPilot</h1>
           <p className="mt-3 text-balance text-xl font-semibold text-slate-700 sm:mt-4 sm:text-2xl lg:text-[1.75rem]">你的专属动作教练</p>
           <p className="mt-2 text-pretty text-sm text-slate-500 sm:text-base">实时动作识别 · 动作纠正 · 训练复盘</p>
-          <button
-            type="button"
-            onClick={onOpenGuide}
-            className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-slate-700 shadow-[0_6px_16px_-12px_rgb(30_64_175/0.5)] ring-1 ring-slate-200/80 hover:bg-white hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:mt-7"
-            data-testid="home-guide"
-          >
-            <BookOpen size={16} aria-hidden="true" />使用说明
-          </button>
+          <div className="mt-5 flex flex-wrap items-center gap-2 sm:mt-7">
+            <button type="button" onClick={onOpenGuide} className={UTILITY_BUTTON} data-testid="home-guide">
+              <BookOpen size={16} aria-hidden="true" />使用说明
+            </button>
+            <button type="button" onClick={onOpenScoringBasis} className={UTILITY_BUTTON} aria-haspopup="dialog" data-testid="home-scoring-basis">
+              <ShieldCheck size={16} aria-hidden="true" />评分依据
+            </button>
+          </div>
         </div>
 
         <div className="relative h-[196px] min-w-0 sm:h-[270px] md:h-[320px] lg:h-[430px]" data-testid="home-coach">

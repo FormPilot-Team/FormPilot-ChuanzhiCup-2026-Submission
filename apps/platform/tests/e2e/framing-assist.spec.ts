@@ -10,7 +10,8 @@ test('warm-up framing follows each action profile instead of always requiring fe
   const status = page.getByTestId('framing-status')
   await expect(status).toHaveAttribute('data-framing-profile', 'UPPER_BODY_WITH_HIPS')
   await expect(status).toContainText('入镜 ✓', { timeout: 5000 })
-  await expect(page.getByTestId('framing-safe-zone')).toBeVisible()
+  // No drawn safe zone: recognition uses the whole picture, so a box would only mislead.
+  await expect(page.getByTestId('framing-safe-zone')).toHaveCount(0)
 
   await page.goto('/train?demo=1&course=1&fixture=synthetic&gesture=manual&exercise=squat&coachFixture=upper-body-crop')
   await expect(status).toHaveAttribute('data-framing-profile', 'FULL_BODY')
@@ -32,7 +33,7 @@ test('follow-along camera uses full-body framing UI without transforming the fee
   await page.goto('/routines/baduanjin/train?fixture=synthetic&gesture=manual')
   await expect(page.getByTestId('routine-stage')).toHaveAttribute('data-stage-status', 'ready', { timeout: 20_000 })
   await expect(page.getByTestId('framing-status')).toHaveAttribute('data-framing-profile', 'FULL_BODY')
-  await expect(page.getByTestId('framing-safe-zone')).toBeVisible()
+  await expect(page.getByTestId('framing-safe-zone')).toHaveCount(0)
   const preview = page.getByTestId('camera-stage').locator('[data-demo-source]')
   await expect(preview).toBeVisible()
   expect(await preview.evaluate((element) => getComputedStyle(element).transform)).toBe('none')

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { routinePath } from '../../app/routes'
 import { CameraPanel } from '../../components/camera/CameraPanel'
 import { AICoach } from '../../components/aiCoach/AICoach'
@@ -8,6 +9,7 @@ import { RoutineChapterPoints } from '../../components/routines/RoutineChapterPo
 import { RoutineFeedbackPanel, type RoutineTrackingState } from '../../components/routines/RoutineFeedbackPanel'
 import { RoutineFooter } from '../../components/routines/RoutineFooter'
 import { RoutineVideoStage } from '../../components/routines/RoutineVideoStage'
+import { useMatchedMediaHeight } from '../../components/routines/useMatchedMediaHeight'
 import { TrainingExitControl } from '../../components/training/TrainingExitControl'
 import { routineExitPhase } from '../../features/training/trainingExit'
 import { ROUTINE_ACCENT } from '../../components/routines/routineTheme'
@@ -58,8 +60,20 @@ function trackingState(runtime: RoutineRuntime): RoutineTrackingState {
   return 'preparing'
 }
 
+const CAMERA_ASPECT = 16 / 9
+
+/** Column template for the follow-along stage: demonstration and camera widths in proportion to their pictures. */
+function routineColumns(contentAspect: number): CSSProperties {
+  const demo = Number((contentAspect / CAMERA_ASPECT).toFixed(3))
+  return {
+    '--routine-cols-md': `minmax(0,${demo}fr) minmax(0,1fr)`,
+    '--routine-cols-xl': `minmax(0,${demo}fr) minmax(0,1fr) minmax(280px,.64fr)`,
+  } as CSSProperties
+}
+
 export function RoutineTrainingPage({ program, scope }: { program: RoutineProgram; scope: RoutineScope }) {
   const runtime = useRoutineRuntime(program, scope)
+  const demoMedia = useMatchedMediaHeight<HTMLDivElement>()
   const accent = ROUTINE_ACCENT[program.accent]
   const { chapter, courseSnapshot } = runtime
   const coach = coachLine(runtime)
@@ -96,8 +110,12 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
           </div>
         </div>
 
+        {/* 标准示范 | 我的画面 share one media height. The demonstration column is as wide as its picture needs at the
+            camera's 16:9 height (a 4:3 source gets a narrower column), so neither picture is stretched or cropped and the
+            camera box stays close to its own 16:9; the hook below removes the last few pixels of difference. */}
         <div
-          className="grid min-w-0 items-start gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)_minmax(280px,.64fr)] xl:items-stretch"
+          className="grid min-w-0 items-start gap-3 md:grid-cols-(--routine-cols-md) xl:grid-cols-(--routine-cols-xl) xl:items-stretch"
+          style={routineColumns(program.video.contentAspect)}
           data-testid="routine-training-layout"
           data-layout="camera-centered"
         >
@@ -106,6 +124,7 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
               program={program}
               chapter={chapter}
               stageRef={runtime.stageRef}
+              mediaRef={demoMedia.ref}
               stageStatus={runtime.stageStatus}
               stageSlow={runtime.stageSlow}
               diagnostics={runtime.stageDiagnostics}
@@ -123,6 +142,8 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
           <div className="flex min-w-0 flex-col self-start xl:self-stretch [&>section]:xl:flex-1" data-layout-region="camera">
             <CameraPanel
               variant="compact"
+              stageHeight={demoMedia.height}
+              course={courseSnapshot}
               title="我的画面"
               videoRef={runtime.cameraVideoRef}
               demoImageRef={runtime.demoImageRef}

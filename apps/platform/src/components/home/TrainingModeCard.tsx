@@ -6,20 +6,18 @@ import { ModeFigure } from './ModeFigure'
 import { ModeMotifArt } from './ModeMotifArt'
 
 /**
- * One training mode on Home. Every mode uses this same card and size; each carries its own pale tint, its
- * characteristic pose as a silhouette and a motion trail (plus a faint character for the classical forms). The
- * warm-up's light emphasis is its 推荐 badge and filled button only. A coming-soon mode renders as a static card: no
- * link, no button, no empty route.
+ * One training mode on Home. Every mode uses this same card, size and 开始训练 button; each carries its own pale tint,
+ * its characteristic pose as a silhouette and a motion trail. The card's facts (length, number of forms) stay in its
+ * meta line; the only corner label is the warm-up's 推荐. A coming-soon mode renders as a static card: no link, no
+ * button, no empty route.
  */
 export function TrainingModeCard({ mode }: { mode: ModeHubEntry }) {
   const route = modeEntryRoute(mode)
   const accent = MODE_ACCENT[mode.accent]
   const Icon = mode.icon
   const descriptionId = `mode-${mode.id}-description`
-  const recommended = Boolean(mode.badge)
   const body = (
     <>
-      {mode.mark ? <span className={cn('fp-mode-mark absolute right-3 top-3 hidden md:block', accent.mark)} aria-hidden="true">{mode.mark}</span> : null}
       <ModeMotifArt motif={mode.motif} className={cn('absolute -right-8 bottom-3 hidden h-24 w-44 opacity-25 md:block', accent.motif)} />
       <ModeFigure
         motif={mode.motif}
@@ -44,10 +42,7 @@ export function TrainingModeCard({ mode }: { mode: ModeHubEntry }) {
         </span>
         {route ? (
           <span
-            className={cn(
-              'inline-flex shrink-0 items-center gap-1.5 text-sm font-bold md:mt-auto md:self-start md:rounded-full md:px-3.5 md:py-1.5',
-              recommended ? 'text-blue-700 md:bg-blue-600 md:text-white md:shadow-[0_8px_18px_-10px_rgb(37_99_235/0.9)]' : 'text-blue-700 md:bg-white/90 md:shadow-sm md:ring-1 md:ring-slate-200/70',
-            )}
+            className="inline-flex shrink-0 items-center gap-1.5 text-sm font-bold text-blue-700 md:mt-auto md:self-start md:rounded-full md:bg-white/90 md:px-3.5 md:py-1.5 md:shadow-sm md:ring-1 md:ring-slate-200/70 md:group-hover:bg-white md:group-hover:ring-blue-200"
             aria-hidden="true"
           >
             <span className="hidden md:inline">{mode.cta ?? '开始'}</span><ArrowRight size={17} />

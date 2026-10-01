@@ -119,6 +119,7 @@ export function TrainingPage() {
             outOfFrameMessage={runtime.framingProfile.notInFrame}
             showPoseOverlay={shouldShowPoseOverlay(overlayCourseState)}
             framingAssist={runtime.poseUnavailable ? undefined : runtime.framingAssist}
+            course={runtime.courseEnabled ? demonstrationSnapshot : undefined}
             onStart={runtime.startCamera}
           />
           <AICoachFeedbackDock

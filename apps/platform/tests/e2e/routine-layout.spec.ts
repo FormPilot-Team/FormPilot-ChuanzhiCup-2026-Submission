@@ -48,11 +48,16 @@ test('follow-along layout keeps Camera between Demonstration and Feedback at tar
     if (viewport.width >= 1320) {
       expect(demoBox.x + demoBox.width).toBeLessThanOrEqual(cameraBox.x)
       expect(cameraBox.x + cameraBox.width).toBeLessThanOrEqual(feedbackBox.x)
-      expect(cameraBox.width).toBeGreaterThan(demoBox.width)
+      // 标准示范 and 我的画面 are one media stage: the same top and the same height, side by side.
+      expect(Math.abs(cameraStageBox.y - videoBox.y), `${viewport.width}: top`).toBeLessThanOrEqual(1)
+      expect(Math.abs(cameraStageBox.height - videoBox.height), `${viewport.width}: height`).toBeLessThanOrEqual(1)
+      await expect(page.getByTestId('camera-stage')).toHaveAttribute('data-stage-height', 'matched')
+      expect(cameraBox.width).toBeGreaterThanOrEqual(demoBox.width - 1)
       expect(demoBox.width).toBeGreaterThan(450)
       expect(cameraBox.width).toBeGreaterThan(480)
       expect(feedbackBox.width).toBeGreaterThan(280)
-      expect(cameraStageBox.height).toBeGreaterThan(260)
+      // Equal-width media columns (one shared height): at 1366 px both pictures are about 461 × 259.
+      expect(cameraStageBox.height).toBeGreaterThan(250)
     } else {
       expect(demoBox.y + demoBox.height).toBeLessThanOrEqual(cameraBox.y)
       expect(cameraBox.y + cameraBox.height).toBeLessThanOrEqual(feedbackBox.y)
@@ -71,6 +76,13 @@ test('Taijiquan keeps the established 4:3 content viewport and black-bar crop tr
     await openTraining(page, '/routines/taijiquan/train?fixture=synthetic')
     const stageBox = await box(page.getByTestId('routine-stage-video'))
     expect(stageBox.width / stageBox.height).toBeCloseTo(4 / 3, 1)
+    // The camera box takes the 4:3 video's height without stretching either picture: its column is wider, so it
+    // stays close to the camera's own 16:9 (a sliver of neutral surface at most), and the feed is never cropped.
+    const cameraStage = await box(page.getByTestId('camera-stage'))
+    expect(Math.abs(cameraStage.y - stageBox.y), `${viewport.width}: top`).toBeLessThanOrEqual(1)
+    expect(Math.abs(cameraStage.height - stageBox.height), `${viewport.width}: height`).toBeLessThanOrEqual(1)
+    expect(cameraStage.width / cameraStage.height).toBeGreaterThan(1.7)
+    expect(cameraStage.width / cameraStage.height).toBeLessThan(1.9)
     expect(await page.getByTestId('routine-stage-video').evaluate((video) => getComputedStyle(video).objectFit)).toBe('cover')
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     await page.screenshot({ path: `test-results/routine-layout-taijiquan-${viewport.width}x${viewport.height}.png`, fullPage: true })

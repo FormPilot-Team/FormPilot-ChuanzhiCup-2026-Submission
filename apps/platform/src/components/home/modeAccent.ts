@@ -14,8 +14,6 @@ export interface ModeAccentClasses {
   figureBottom: string
   /** Motion trail stroke colour (currentColor). */
   motif: string
-  /** Faint character of a classical form. */
-  mark: string
   /** Icon tile on phone rows. */
   icon: string
 }
@@ -27,7 +25,6 @@ export const MODE_ACCENT: Readonly<Record<ModeAccent, ModeAccentClasses>> = Obje
     figureTop: 'text-sky-200',
     figureBottom: 'text-blue-400',
     motif: 'text-sky-400',
-    mark: 'text-blue-200/70',
     icon: 'fp-energy-gradient text-white shadow-[0_8px_18px_-10px_rgb(14_165_233/0.9)]',
   },
   orange: {
@@ -36,7 +33,6 @@ export const MODE_ACCENT: Readonly<Record<ModeAccent, ModeAccentClasses>> = Obje
     figureTop: 'text-orange-200',
     figureBottom: 'text-orange-300',
     motif: 'text-orange-300',
-    mark: 'text-orange-200/70',
     icon: 'bg-orange-50 text-orange-700',
   },
   violet: {
@@ -45,7 +41,6 @@ export const MODE_ACCENT: Readonly<Record<ModeAccent, ModeAccentClasses>> = Obje
     figureTop: 'text-violet-200',
     figureBottom: 'text-indigo-300',
     motif: 'text-violet-300',
-    mark: 'text-violet-200/80',
     icon: 'bg-violet-50 text-violet-700',
   },
   emerald: {
@@ -54,7 +49,6 @@ export const MODE_ACCENT: Readonly<Record<ModeAccent, ModeAccentClasses>> = Obje
     figureTop: 'text-emerald-200',
     figureBottom: 'text-teal-300',
     motif: 'text-emerald-300',
-    mark: 'text-emerald-200/80',
     icon: 'bg-emerald-50 text-emerald-700',
   },
   rose: {
@@ -63,7 +57,6 @@ export const MODE_ACCENT: Readonly<Record<ModeAccent, ModeAccentClasses>> = Obje
     figureTop: 'text-rose-200',
     figureBottom: 'text-rose-300',
     motif: 'text-rose-300',
-    mark: 'text-rose-200/80',
     icon: 'bg-rose-50 text-rose-700',
   },
 })

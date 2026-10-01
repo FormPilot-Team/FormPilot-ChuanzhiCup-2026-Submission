@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { MODE_STATUS_LABEL, ROUTINE_MODES, TRAINING_MODES, WARM_UP_MODE, WORKSHOP_ENTRY, modeEntryRoute } from '../src/app/modeCatalog'
+import { MODE_CARD_CTA, MODE_STATUS_LABEL, ROUTINE_MODES, TRAINING_MODES, WARM_UP_MODE, WORKSHOP_ENTRY, modeEntryRoute } from '../src/app/modeCatalog'
 import { HISTORY_PATH, SMART_TRAINING_PATH, START_TRAINING_PATH, WORKSHOP_PATH } from '../src/app/routes'
 import { buildHomeTrainingSummary, startOfLocalWeek, weekChangeText } from '../src/features/history/homeSummary'
 import { mergeHistoryEntries } from '../src/features/history/historyEntries'
@@ -14,6 +14,8 @@ import { COACH_WELCOME_ASSET, COACH_WELCOME_FALLBACK, COACH_WELCOME_FAMILY_A } f
 import { MODE_ACCENT } from '../src/components/home/modeAccent'
 import { MODE_FIGURES } from '../src/components/home/modeFigures'
 import { WORKSHOP_NEUTRAL_FIGURE } from '../src/components/home/workshopTeaserArt'
+import { ScoringBasisContent } from '../src/components/home/ScoringBasisDialog'
+import { SCORING_BASIS, SCORING_CALIBRATION_STATEMENT } from '../src/features/scoring/scoringBasis'
 import { REQUIREMENTS } from '../src/features/workshop/catalog'
 import { ROUTINE_PROGRAMS } from '../src/features/routines/programs'
 import { MemoryRoutineSessionRepository } from '../src/features/routines/session/RoutineSessionRepository'
@@ -157,13 +159,18 @@ describe('Home', () => {
       for (const part of mode.summary?.split(' · ') ?? []) expect(part.length, part).toBeLessThanOrEqual(7)
       expect(markup, mode.id).toContain(`id="mode-${mode.id}-description" class="sr-only">${mode.description}`)
     }
-    // A faint character only on the classical forms.
-    expect(TRAINING_MODES.map((mode) => mode.mark ?? null)).toEqual([null, '锦', '太极', '禽', '经'])
+    // No decorative characters in the corner (testers found them odd); the only corner label is the warm-up's 推荐.
+    expect(section).not.toMatch(/fp-mode-mark|>锦<|>太极<|>禽<|>经<|可使用/)
     // Tints stay pale: the card surfaces use -50-level colours or lighter, never saturated fills.
     for (const accent of Object.values(MODE_ACCENT)) expect(accent.surface).not.toMatch(/-(?:[3-9]00)\b/)
-    // Only the warm-up's button is filled, as its light emphasis.
-    expect(card(section, 'mode-card-smart-training')).toContain('md:bg-blue-600')
-    expect(section.match(/md:bg-blue-600/g)).toHaveLength(1)
+    // Five equal entries: one wording and one button style on every card, the warm-up included.
+    expect(MODE_CARD_CTA).toBe('开始训练')
+    expect(TRAINING_MODES.map((mode) => mode.cta)).toEqual(TRAINING_MODES.map(() => MODE_CARD_CTA))
+    expect(section).not.toContain('开始跟练')
+    expect(section).not.toContain('md:bg-blue-600')
+    const buttons = TRAINING_MODES.map((mode) => card(section, `mode-card-${mode.id}`).match(/<span class="([^"]*md:rounded-full[^"]*)" aria-hidden="true">/)?.[1])
+    expect(buttons.every(Boolean)).toBe(true)
+    expect(new Set(buttons).size).toBe(1)
   })
 
   it('draws the silhouettes from real landmarks, inside the figure box', () => {
@@ -171,6 +178,15 @@ describe('Home', () => {
     for (const [motif, figure] of Object.entries(MODE_FIGURES)) {
       expect(figure.source, motif).toMatch(/^\/assets\/.+\.pose\.json/)
       const [cx, cy, r] = figure.head
+      // The head sits on a real neck: the neck (first segment) starts inside the torso's top edge and ends inside the
+      // head, and is thick enough not to read as a stick (testers found the floating head odd).
+      const [nx1, ny1, nx2, ny2, neckWidth] = figure.segments[0]
+      expect(Math.hypot(nx2 - cx, ny2 - cy), motif).toBeLessThan(r * 0.5)
+      expect(Math.hypot(nx1 - cx, ny1 - cy), motif).toBeGreaterThan(r)
+      expect(neckWidth / r, motif).toBeGreaterThan(0.75)
+      expect(neckWidth / r, motif).toBeLessThan(1.3)
+      // The shoulder line rises towards the neck: the torso outline has eight corners (two trapezius points).
+      expect(figure.torso.match(/\d+(?:\.\d+)? \d+(?:\.\d+)?/g), motif).toHaveLength(8)
       expect(cx - r).toBeGreaterThanOrEqual(0)
       expect(cy - r).toBeGreaterThanOrEqual(0)
       for (const [x1, y1, x2, y2, width] of figure.segments) {
@@ -216,6 +232,29 @@ describe('Home', () => {
     const guide = card(card(home(), 'home-hero'), 'home-guide')
     expect(guide.startsWith('<button')).toBe(true)
     expect(guide).toContain('使用说明')
+  })
+
+  it('offers 评分依据 next to 使用说明, explaining the three layers and which numbers are FormPilot calibration', () => {
+    const hero = card(home(), 'home-hero')
+    const entry = card(hero, 'home-scoring-basis')
+    expect(entry.startsWith('<button')).toBe(true)
+    expect(entry).toContain('评分依据')
+    expect(entry).toContain('aria-haspopup="dialog"')
+    // Same level as 使用说明: the same utility button style, side by side.
+    expect(entry.match(/class="([^"]*)"/)?.[1]).toBe(card(hero, 'home-guide').match(/class="([^"]*)"/)?.[1])
+
+    const content = renderToStaticMarkup(createElement(ScoringBasisContent))
+    for (const title of ['动作规范来源', '机器分析指标', 'FormPilot 标定']) expect(content).toContain(title)
+    for (const source of ['国家体育总局科学健身指导', 'T/CACM 1676—2026 / T/CHQA 0001—2026《八段锦》', '国家体育总局健身气功管理中心', '中国健身气功协会', '二十四式简化太极拳官方审定体系']) expect(content).toContain(source)
+    for (const metric of ['关节角度', '动作幅度', '左右协调 / 对称', '躯干稳定', '轨迹', '节奏', '跟练相似度']) expect(content).toContain(metric)
+    expect(content).toContain('人体姿态估计')
+    expect(content).toContain('动作质量评价')
+    // The sentence that must never be dropped: thresholds are FormPilot's calibration, not a national standard's score.
+    expect(SCORING_CALIBRATION_STATEMENT).toBe('官方资料用于定义动作规范；具体角度阈值、容差和分数映射属于 FormPilot 工程标定值，并非国家标准直接规定的分数。')
+    expect(card(content, 'scoring-basis-statement')).toContain(SCORING_CALIBRATION_STATEMENT)
+    expect(SCORING_BASIS.calibration.example).toMatch(/150°.*不是国家标准/)
+    // A summary, not a medical claim.
+    expect(content).not.toMatch(/诊断(?!。)|治疗|疗效/)
   })
 
   it('merges 训练记录 and 最近训练 into one 我的训练 summary with a single way into History', () => {

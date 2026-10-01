@@ -26,6 +26,19 @@ button:focus-visible { outline: 3px solid rgb(147 197 253 / 0.7); outline-offset
   to { transform: translate3d(calc(-100% + (100% / var(--coach-frame-count))), 0, 0); }
 }
 
+/* The Home welcome bubble pops out from its tail; reduced motion shows it at once (global rule below). */
+@keyframes fp-bubble-in {
+  from { opacity: 0; transform: scale(0.86); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Each 3-2-1 countdown step on the camera: a light scale-in, nothing that moves across the picture. */
+@keyframes fp-countdown-pop {
+  from { opacity: 0; transform: scale(0.72); }
+  30% { opacity: 1; transform: scale(1.04); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 @layer components {
   .panel { @apply rounded-2xl border border-slate-200/70 bg-white shadow-[0_1px_2px_rgb(15_23_42/0.04),0_10px_28px_-18px_rgb(30_64_175/0.18)]; }
   .report-panel { @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgb(15_23_42/0.03)]; }
@@ -73,21 +86,18 @@ button:focus-visible { outline: 3px solid rgb(147 197 253 / 0.7); outline-offset
     background-clip: text;
     color: transparent;
   }
+  .fp-countdown-step { animation: fp-countdown-pop 360ms ease-out both; }
+  .fp-speech-bubble {
+    filter: drop-shadow(0 10px 18px rgb(30 64 175 / 0.18)) drop-shadow(0 1px 2px rgb(15 23 42 / 0.08));
+    transform-origin: 100% 0;
+    animation: fp-bubble-in 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) 250ms both;
+  }
   .fp-coach-halo { background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(224 242 254 / 0.8) 60%, rgb(186 230 253 / 0) 100%); }
   .fp-fade-bottom {
     -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 99%);
     mask-image: linear-gradient(to bottom, #000 72%, transparent 99%);
   }
   .fp-coach-avatar { background: radial-gradient(circle at 50% 38%, #ffffff 0%, #e6f2ff 55%, #cfe3fb 100%); }
-  /* The faint character on a classical form's card; KaiTi ships with Chinese Windows, other systems fall back to serif. */
-  .fp-mode-mark {
-    font-family: "KaiTi", "STKaiti", "Kaiti SC", "BiauKai", serif;
-    font-size: 2.75rem;
-    line-height: 1;
-    writing-mode: vertical-rl;
-    pointer-events: none;
-    user-select: none;
-  }
 }
 
 @media (max-width: 1279px) {

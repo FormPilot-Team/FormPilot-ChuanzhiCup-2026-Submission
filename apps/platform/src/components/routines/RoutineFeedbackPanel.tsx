@@ -92,7 +92,8 @@ export function RoutineFeedbackPanel({ accent, match, checks, trackingState, coa
             <li key={check.id} className="min-w-0 rounded-xl bg-slate-50 px-2.5 py-1.5" data-testid="routine-check" data-check-id={check.id} data-check-status={check.status}>
               <div className="flex min-w-0 items-center gap-2">
                 <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800" title={check.name}>{check.name}</span>
-                <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-semibold', CHECK_TONE[check.status])}>{LIVE_CHECK_LABEL[check.status]}</span>
+                {/* A finished session no longer waits for anything: 已结束 instead of 待开始 (the report has the results). */}
+                <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-semibold', CHECK_TONE[check.status])}>{trackingState === 'done' && check.status === 'idle' ? '已结束' : LIVE_CHECK_LABEL[check.status]}</span>
               </div>
               {check.hint ? <p className="mt-0.5 line-clamp-1 text-xs text-slate-500" title={check.hint}>{check.hint}</p> : null}
             </li>

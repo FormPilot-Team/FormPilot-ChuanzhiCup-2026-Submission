@@ -2,6 +2,7 @@ import { Camera, LoaderCircle, ScanLine } from 'lucide-react'
 import type { ReactNode, RefObject } from 'react'
 import type { CameraFailureKind } from '../../adapters/camera/BrowserCameraAdapter'
 import type { CameraFailureReport } from '../../features/camera/cameraDiagnostics'
+import type { CourseSnapshot } from '../../features/course/CourseController'
 import { isDesktopApp } from '../../features/diagnostics/desktopBridge'
 import type { MotionError } from '../../features/exercises/types'
 import type { FeedbackEvent } from '../../features/feedback/types'
@@ -9,6 +10,7 @@ import type { FramingAssistState } from '../../features/framing/FramingAssist'
 import { cn } from '../../lib/cn'
 import type { PoseOverlayHandle } from '../pose/PoseOverlay'
 import { PoseOverlay } from '../pose/PoseOverlay'
+import { CameraCountdown } from './CameraCountdown'
 import { CameraFailureNotice } from './CameraFailureNotice'
 
 interface CameraPanelProps {
@@ -31,6 +33,13 @@ interface CameraPanelProps {
   framingAssist?: FramingAssistState
   /** `compact` sizes the stage to the camera's native 16:9 viewport without changing the recognition input. */
   variant?: 'default' | 'compact'
+  /**
+   * Compact only: a fixed stage height in px, so the camera box matches the demonstration video beside it. The feed
+   * keeps `object-contain` inside it (a slightly different shape shows a neutral surface, never a cropped body).
+   */
+  stageHeight?: number
+  /** The course's state and countdown: drives the large 3-2-1 → 开始 in the middle of the picture. */
+  course?: Pick<CourseSnapshot, 'state' | 'countdown'>
   /** Visible panel heading; routine training uses “我的画面” while other training modes keep the default. */
   title?: string
   /** Shown under the stage (routine training: framing requirement and recognition status). */
@@ -50,7 +59,7 @@ const FAILURE_STATUS: Readonly<Record<CameraFailureKind, string>> = {
   model_error: '识别模型加载失败',
 }
 
-export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, framingAssist, variant = 'default', title: panelTitle = '实时动作检测', footer, onStart }: CameraPanelProps) {
+export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, framingAssist, variant = 'default', stageHeight, course, title: panelTitle = '实时动作检测', footer, onStart }: CameraPanelProps) {
   const compact = variant === 'compact'
   const promptText = compact ? 'text-base' : 'text-lg sm:text-xl'
   const status = mode === 'demo' ? '演示模式' : mode === 'live' ? '摄像头已连接 · AI 实时分析中' : mode === 'requesting_permission' ? '等待摄像头授权' : mode === 'model_loading' ? '正在加载识别模型' : mode === 'error' ? (failure ? FAILURE_STATUS[failure.kind] : '摄像头无法启动') : '等待连接摄像头'
@@ -59,13 +68,20 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure,
   const title = mode === 'requesting_permission' ? '正在等待摄像头授权…' : mode === 'model_loading' ? '正在加载姿态识别模型…' : mode === 'error' ? '暂时无法开始识别' : '准备开始实时动作检测'
   return (
     <section className="panel flex min-h-0 min-w-0 flex-col p-3" aria-labelledby="camera-title" data-testid="camera-panel" data-variant={variant}>
-      <div className={compact ? 'flex h-10 items-center gap-2 px-1 pb-1' : 'flex h-12 items-center gap-2 px-2'}>
+      {/* The compact header is as tall as the demonstration video's header, so both pictures start on one line. */}
+      <div className={compact ? 'flex min-h-12 items-center gap-2 px-2 pb-2' : 'flex h-12 items-center gap-2 px-2'}>
         <span className="grid size-8 place-items-center rounded-xl bg-blue-50 text-blue-600"><ScanLine size={19} aria-hidden="true" /></span>
         <h2 id="camera-title" className="font-bold text-slate-900">{panelTitle}</h2>
         <span className="ml-auto hidden items-center gap-1.5 text-xs text-slate-500 sm:inline-flex"><i className={mode === 'live' || mode === 'demo' ? 'size-2 rounded-full bg-emerald-400' : mode === 'error' ? 'size-2 rounded-full bg-coral-500' : loading ? 'size-2 rounded-full bg-amber-400' : 'size-2 rounded-full bg-slate-300'} />{status}</span>
       </div>
-      {/* A compact stage keeps the camera's 16:9 picture; with no picture to show (a failure) it grows to fit the notice. */}
-      <div className={compact ? cn('relative w-full overflow-hidden rounded-2xl bg-slate-100', mode === 'error' ? 'min-h-[400px]' : 'aspect-video') : 'camera-stage relative min-h-[380px] flex-1 overflow-hidden rounded-2xl bg-slate-100'} data-testid="camera-stage">
+      {/* A compact stage keeps the camera's 16:9 picture, or the height it is given to match the video beside it; with no
+          picture to show (a failure) it grows to fit the notice. Letterboxing is a neutral surface, never black. */}
+      <div
+        className={compact ? cn('relative w-full overflow-hidden rounded-2xl bg-slate-100', mode === 'error' ? 'min-h-[400px]' : stageHeight ? undefined : 'aspect-video') : 'camera-stage relative min-h-[380px] flex-1 overflow-hidden rounded-2xl bg-slate-100'}
+        style={compact && stageHeight && mode !== 'error' ? { height: stageHeight } : undefined}
+        data-testid="camera-stage"
+        data-stage-height={compact && stageHeight && mode !== 'error' ? 'matched' : 'own'}
+      >
         {mode === 'demo' ? (
           demoFrameSrc ? (
             <img ref={demoImageRef} src={demoFrameSrc} alt={demoAsset.alt} className={demoAsset.fit === 'contain' ? 'size-full object-contain object-center' : 'size-full object-cover object-center'} data-demo-source="real-image-sequence" />
@@ -79,18 +95,8 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure,
           <video ref={videoRef} muted playsInline className="size-full scale-x-[-1] object-contain" />
         )}
         <PoseOverlay ref={overlayRef} visible={showPoseOverlay} />
-        {framingAssist && (mode === 'live' || mode === 'demo') ? (
-          <div
-            className={cn('pointer-events-none absolute inset-[3%] rounded-xl border', framingAssist.status === 'READY' || framingAssist.status === 'TOO_FAR' ? 'border-cyan-300/35' : 'border-cyan-300/80')}
-            aria-hidden="true"
-            data-testid="framing-safe-zone"
-            data-framing-status={framingAssist.status}
-          >
-            {(['left-0 top-0 border-l-2 border-t-2', 'right-0 top-0 border-r-2 border-t-2', 'bottom-0 left-0 border-b-2 border-l-2', 'bottom-0 right-0 border-b-2 border-r-2'] as const).map((classes) => (
-              <span key={classes} className={cn('absolute size-5 rounded-[3px] border-cyan-300/90', classes)} />
-            ))}
-          </div>
-        ) : null}
+        {/* No safe-zone frame: recognition uses the whole camera picture, and a drawn box (over the letterbox too) made
+            people think they had to stand inside it. Framing Assist speaks through the status chip and edge warnings. */}
         {mode === 'live' || mode === 'demo' ? <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-xl bg-slate-900/65 px-3 py-2 text-xs font-medium text-white"><ScanLine size={15} />AI 识别中</span> : null}
         {framingAssist && (mode === 'live' || mode === 'demo') ? (
           <span
@@ -123,6 +129,7 @@ export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure,
             <span className="grid size-5 place-items-center rounded-full bg-current/10">!</span>{feedback.message}
           </div>
         ) : null}
+        {mode === 'live' || mode === 'demo' ? <CameraCountdown course={course} /> : null}
         {blocking ? (
           <div className={cn('absolute inset-0 overflow-y-auto bg-slate-50/92 text-center', compact ? 'p-4' : 'p-6')}>
             <div className="flex min-h-full flex-col items-center justify-center">

@@ -1,4 +1,4 @@
-import type { RefObject } from 'react'
+import type { Ref, RefObject } from 'react'
 import { CircleAlert, Clapperboard, LoaderCircle, Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react'
 import type { CourseSnapshot } from '../../features/course/CourseController'
 import { VIDEO_FAILURE_TEXT, videoDiagnosticsRows, type VideoDiagnosticsReport } from '../../features/diagnostics/videoDiagnostics'
@@ -12,6 +12,8 @@ interface RoutineVideoStageProps {
   program: RoutineProgram
   chapter: RoutineChapter
   stageRef: RefObject<HTMLVideoElement | null>
+  /** The video box, so the camera beside it can take the same height. */
+  mediaRef?: Ref<HTMLDivElement>
   stageStatus: 'loading' | 'ready' | 'error'
   /** Still loading well past the normal time. */
   stageSlow?: boolean
@@ -41,7 +43,7 @@ function playbackLabel(course: CourseSnapshot, manuallyPaused: boolean): string 
  * 16:9) is shown at its picture's aspect with only the black bars cropped; nothing is stretched.
  */
 export function RoutineVideoStage({
-  program, chapter, stageRef, stageStatus, stageSlow = false, diagnostics, stageTime, course, manuallyPaused, videoMuted, onToggleSound, onMetadata, onError, onReload,
+  program, chapter, stageRef, mediaRef, stageStatus, stageSlow = false, diagnostics, stageTime, course, manuallyPaused, videoMuted, onToggleSound, onMetadata, onError, onReload,
 }: RoutineVideoStageProps) {
   const accent = ROUTINE_ACCENT[program.accent]
   const frameAspect = program.video.width / program.video.height
@@ -71,7 +73,7 @@ export function RoutineVideoStage({
         </span>
       </div>
 
-      <div className="relative w-full overflow-hidden rounded-2xl bg-slate-950" style={{ aspectRatio: String(program.video.contentAspect) }}>
+      <div ref={mediaRef} className="relative w-full overflow-hidden rounded-2xl bg-slate-950" style={{ aspectRatio: String(program.video.contentAspect) }} data-testid="routine-stage-media">
         <video
           ref={stageRef}
           src={program.video.src}
@@ -115,9 +117,10 @@ export function RoutineVideoStage({
           </div>
         ) : null}
 
+        {/* The big 3-2-1 is on the camera (where the user looks to check their position); the video only dims. */}
         {stageStatus === 'ready' && course.state === 'COUNTDOWN' ? (
           <div className="absolute inset-0 grid place-items-center bg-slate-950/35" data-testid="routine-countdown">
-            <span className="text-7xl font-bold tabular-nums text-white drop-shadow sm:text-8xl">{Math.max(1, course.countdown)}</span>
+            <p className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm">即将开始</p>
           </div>
         ) : null}
 

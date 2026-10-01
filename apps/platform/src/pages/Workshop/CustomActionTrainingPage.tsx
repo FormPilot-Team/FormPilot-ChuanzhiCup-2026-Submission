@@ -179,6 +179,7 @@ function CustomTrainingView({ action }: { action: CustomActionDefinition }) {
             gestureHolding={runtime.gestureHolding}
             outOfFrameMessage={runtime.framing.hint ?? `请让${setup.framingLabel}完整入镜`}
             showPoseOverlay={courseSnapshot.state === 'PREPARING' || courseSnapshot.state === 'COUNTDOWN'}
+            course={courseSnapshot}
             onStart={() => void runtime.start()}
           />
           <section className="panel flex min-w-0 flex-col gap-3 p-4" aria-labelledby="custom-feedback-title" data-testid="custom-feedback">

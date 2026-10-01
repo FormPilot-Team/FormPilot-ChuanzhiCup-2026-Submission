@@ -30,8 +30,8 @@ export interface CoachImageAsset {
   /** The picture is cut off at the bottom (a half-body crop): fade that edge into the page. */
   fadeBottom: boolean
   /**
-   * Where the welcome bubble's top-right corner sits, as CSS `right` / `top` inside the picture box. Pick empty space
-   * beside the coach (here: under the raised left arm) so the bubble never covers her.
+   * Where the welcome bubble's top-right corner sits, as CSS `right` / `top` inside the picture box; its tail leaves
+   * that corner towards the coach. Pick empty space beside her that clears the face AND the raised arms.
    */
   bubble: { right: string; top: string }
 }
@@ -44,7 +44,9 @@ export const COACH_WELCOME_FAMILY_A: CoachImageAsset = Object.freeze({
   background: 'transparent',
   focus: '50% 22%',
   fadeBottom: true,
-  bubble: { right: '76%', top: '34%' },
+  // Below the raised right arm (which reaches the shoulder at about 33 % across, 52 % down) and beside the torso
+  // (35-38 % across further down): the bubble's right edge stays at 31 %, its tail points up at her.
+  bubble: { right: '69%', top: '54%' },
 })
 
 /**
