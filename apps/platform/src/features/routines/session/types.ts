@@ -1,4 +1,5 @@
 import { isRoutineTechniqueRecord, type RoutineTechniqueRecord } from '../../scoring/routine/techniqueRecord'
+import type { RoutineAnalysisRecord } from '../analyzers/analysisRecord'
 import type { FollowAlongRegion } from '../followAlong/matcher'
 import type { RoutineId, RoutineScope } from '../types'
 
@@ -54,6 +55,11 @@ export interface RoutineSessionRecord {
    * data above: it says whether specific movement requirements were met, not how close the pose was to the video.
    */
   technique?: RoutineTechniqueRecord
+  /**
+   * Routine analyzer evidence (optional; added with the per-routine analyzers). Only checked to be an object here:
+   * the report validates it in depth and ignores it when malformed, so the session itself is never rejected for it.
+   */
+  analysis?: RoutineAnalysisRecord
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -103,6 +109,7 @@ export function isRoutineSessionRecord(value: unknown): value is RoutineSessionR
     && (value.outcome === 'in_progress' || value.outcome === 'completed' || value.outcome === 'incomplete')
     && Array.isArray(value.chapters) && value.chapters.every(isChapterResult)
     && (value.technique === undefined || isRoutineTechniqueRecord(value.technique))
+    && (value.analysis === undefined || isRecord(value.analysis))
 }
 
 export function createRoutineSessionId(now: number): string {

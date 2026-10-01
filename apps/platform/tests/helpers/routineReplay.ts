@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { createRoutineAnalysis, type RoutineAnalysis } from '../../src/features/routines/analyzers/registry'
 import { RoutineFeedbackPolicy } from '../../src/features/routines/followAlong/feedbackPolicy'
 import { liveChecks, type LiveCheck } from '../../src/features/routines/followAlong/liveChecks'
 import { FOLLOW_ALONG_CONFIG, FollowAlongMatcher, type FollowAlongMatch } from '../../src/features/routines/followAlong/matcher'
@@ -114,6 +115,10 @@ export interface ReplayOptions {
   dropped?: (videoSeconds: number, index: number) => boolean
   /** Called after the built-in pipeline on every comparison tick. */
   onTick?: (tick: ReplayTick) => void
+  /** Maps the video time to the demonstrator time whose pose the user shows (time warps, pauses); default = same time. */
+  sourceSeconds?: (videoSeconds: number) => number
+  /** Run the routine analyzer as the runtime does (default true). */
+  analysis?: boolean
 }
 
 export interface FeedbackRun {
@@ -132,6 +137,8 @@ export interface ReplayResult {
   /** 动作规范检查 as shown on the training page at each chapter's midpoint. */
   liveChecks: Array<{ chapterId: string; checks: LiveCheck[] }>
   ticks: number
+  /** The routine analyzer's engine after the replay (undefined when the routine has none or it was switched off). */
+  analysis?: RoutineAnalysis
 }
 
 function nearestFrame(track: ReferenceTrack, seconds: number): ReferenceFrame | undefined {
@@ -163,6 +170,7 @@ export function replayRoutine(id: RoutineId, options: ReplayOptions = {}): Repla
   const technique = new RoutineTechniqueEvaluator(program, scope, track)
   const recorder = new RoutineProgressRecorder(program, scope)
   const policy = new RoutineFeedbackPolicy()
+  const analysis = options.analysis === false ? undefined : createRoutineAnalysis(program, scope, track)
   const feedback: FeedbackRun[] = []
   const spoken: ReplayResult['spoken'] = []
   const checks: ReplayResult['liveChecks'] = []
@@ -194,7 +202,8 @@ export function replayRoutine(id: RoutineId, options: ReplayOptions = {}): Repla
     let confidence = 0.95
     if (options.userPose) landmarks = options.userPose(video)
     else {
-      const frame = nearestFrame(track, video - (options.lagSeconds ?? 0))
+      const source = options.sourceSeconds ? options.sourceSeconds(video) : video
+      const frame = nearestFrame(track, source - (options.lagSeconds ?? 0))
       landmarks = frame && frame.confidence > 0 && frame.landmarks.length ? frame.landmarks : null
       confidence = frame?.confidence ?? 0
     }
@@ -205,6 +214,7 @@ export function replayRoutine(id: RoutineId, options: ReplayOptions = {}): Repla
     lastMatch = match
     recorder.recordComparison(video, match)
     technique.observe(video, pose)
+    analysis?.observe(video, now, pose, match)
     const update = policy.update(match, now, chapter.cue)
     const previous = feedback.at(-1)
     if (previous && previous.code === update.feedback.code && previous.message === update.feedback.message && previous.tone === update.feedback.tone) previous.ticks += 1
@@ -231,5 +241,6 @@ export function replayRoutine(id: RoutineId, options: ReplayOptions = {}): Repla
     chapters: recorder.snapshot(),
     technique: technique.snapshot(),
   }
-  return { program, scope, record, feedback, spoken, liveChecks: checks, ticks: index }
+  if (analysis) record.analysis = analysis.snapshot()
+  return { program, scope, record, feedback, spoken, liveChecks: checks, ticks: index, analysis }
 }

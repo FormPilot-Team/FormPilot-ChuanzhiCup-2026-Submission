@@ -21,6 +21,8 @@ import { PoseFilter } from '../../features/pose/PoseFilter'
 import { normalizePoseFrame } from '../../features/pose/PoseNormalizer'
 import { shouldShowPoseOverlay } from '../../features/pose/poseOverlayVisibility'
 import { FULL_BODY_BOUNDS, SQUAT_REQUIRED, type PoseFrame } from '../../features/pose/types'
+import { createRoutineAnalysis, type RoutineAnalysis } from '../../features/routines/analyzers/registry'
+import type { RoutineAnalysisLive } from '../../features/routines/analyzers/RoutineAnalysisEngine'
 import { RoutineFeedbackPolicy, type RoutineFeedback } from '../../features/routines/followAlong/feedbackPolicy'
 import { FOLLOW_ALONG_CONFIG, FollowAlongMatcher, type FollowAlongMatch } from '../../features/routines/followAlong/matcher'
 import { loadReferenceTrack, type ReferenceTrack } from '../../features/routines/followAlong/referenceTrack'
@@ -105,6 +107,8 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   const trackRef = useRef<ReferenceTrack | undefined>(undefined)
   // Scoring v2: technique checks per phase window, separate from the similarity matcher.
   const techniqueRef = useRef<RoutineTechniqueEvaluator | undefined>(undefined)
+  // Routine analyzer (八段锦到位度 …): adds its own evidence, changes nothing above.
+  const analysisRef = useRef<RoutineAnalysis | undefined>(undefined)
   const recorderRef = useRef(null as unknown as RoutineProgressRecorder)
   recorderRef.current ??= new RoutineProgressRecorder(program, scope)
   const feedbackPolicyRef = useRef(null as unknown as RoutineFeedbackPolicy)
@@ -158,6 +162,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   const [chapterId, setChapterId] = useState(chapters[0].id)
   const [match, setMatch] = useState<FollowAlongMatch>()
   const [techniqueRecord, setTechniqueRecord] = useState<RoutineTechniqueRecord>()
+  const [analysisLive, setAnalysisLive] = useState<RoutineAnalysisLive | null>(null)
   const [feedback, setFeedback] = useState<RoutineFeedback>()
   const [framing, setFraming] = useState<{ valid: boolean; hint?: string }>({ valid: false })
   const [framingAssist, setFramingAssist] = useState(() => initialFramingAssistState('FULL_BODY'))
@@ -231,6 +236,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     if (!record) return false
     record.chapters = recorderRef.current.snapshot()
     if (techniqueRef.current) record.technique = techniqueRef.current.snapshot()
+    if (analysisRef.current) record.analysis = analysisRef.current.snapshot()
     record.matcher = { version: FOLLOW_ALONG_CONFIG.version, available: record.matcher.available || Boolean(matcherRef.current) }
     if (outcome) record.outcome = outcome
     if (endedAt !== undefined) record.endedAt = endedAt
@@ -397,9 +403,11 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
         matchRef.current = result
         recorderRef.current.recordComparison(stage.currentTime, result)
         techniqueRef.current?.observe(stage.currentTime, { landmarks: normalized.landmarks, confidence: normalized.confidence, aspect: options.aspect })
+        analysisRef.current?.observe(stage.currentTime, now, { landmarks: normalized.landmarks, confidence: normalized.confidence, aspect: options.aspect }, result)
         if (techniqueRef.current && now - lastTechniqueViewAtRef.current >= TECHNIQUE_VIEW_INTERVAL_MS) {
           lastTechniqueViewAtRef.current = now
           setTechniqueRecord(techniqueRef.current.snapshot())
+          if (analysisRef.current) setAnalysisLive(analysisRef.current.live())
         }
         const chapter = chapterAt(program, stage.currentTime)
         const update = feedbackPolicyRef.current.update(result, now, chapter.cue)
@@ -591,6 +599,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
       trackRef.current = track
       matcherRef.current = new FollowAlongMatcher(track)
       techniqueRef.current = new RoutineTechniqueEvaluator(program, scope, track)
+      analysisRef.current = createRoutineAnalysis(program, scope, track)
       setTechniqueRecord(techniqueRef.current.snapshot())
       setTrackStatus('ready')
     })
@@ -783,6 +792,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     trackStatus,
     match,
     techniqueRecord,
+    analysisLive,
     feedback,
     framing,
     framingAssist,

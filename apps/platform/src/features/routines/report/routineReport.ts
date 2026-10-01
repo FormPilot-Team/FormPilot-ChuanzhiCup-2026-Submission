@@ -1,4 +1,6 @@
 import { buildRoutineTechniqueReport, type RoutineTechniqueReport } from '../../scoring/routine/techniqueReport'
+import { buildRoutineAnalysisReport } from '../analyzers/registry'
+import type { AnalyzerReportMetrics } from '../analyzers/types'
 import type { FollowAlongRegion } from '../followAlong/matcher'
 import { findRoutineProgram } from '../programs'
 import { chapterDisplayName, scopeChapters } from '../scope'
@@ -102,6 +104,11 @@ export interface RoutineReport {
    * (visual closeness to the video); the two are never combined into one number.
    */
   technique: RoutineTechniqueReport
+  /**
+   * 专项分析 of the routine's own analyzer (八段锦到位度 …); null for records without one. Added as its own field:
+   * headline, notes and focus above are unchanged by it.
+   */
+  analysis: AnalyzerReportMetrics | null
 }
 
 const REGIONS: ReadonlyArray<FollowAlongRegion> = ['arms', 'torso', 'legs']
@@ -260,7 +267,7 @@ export function compareWithPrevious(record: RoutineSessionRecord, program: Routi
   }
 }
 
-function focusItems(report: Omit<RoutineReport, 'focus' | 'focusItems' | 'notes' | 'headline' | 'comparison' | 'technique'>, program: RoutineProgram): RoutineFocusItem[] {
+function focusItems(report: Omit<RoutineReport, 'focus' | 'focusItems' | 'notes' | 'headline' | 'comparison' | 'technique' | 'analysis'>, program: RoutineProgram): RoutineFocusItem[] {
   const items: RoutineFocusItem[] = []
   const weakest = report.weakestChapter
   if (weakest && weakest.similarity !== null && report.similarity !== null && weakest.band !== 'high'
@@ -362,5 +369,6 @@ export function buildRoutineReport(record: RoutineSessionRecord, history: readon
     notes,
     headline,
     technique: buildRoutineTechniqueReport(program, record.scope, record.technique, record.matcher.available),
+    analysis: buildRoutineAnalysisReport(program, record.scope, record.analysis),
   }
 }
