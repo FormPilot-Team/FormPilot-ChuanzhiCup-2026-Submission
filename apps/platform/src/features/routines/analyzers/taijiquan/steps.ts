@@ -18,8 +18,8 @@ export interface TaijiquanStep {
   note?: string
 }
 
-const SIDEWAYS = '二维近似在侧身时左右颠倒：示范者实测方向与描述相反，按描述方向记录，不计分。'
-const DISAGREES = '示范者实测的髋中心位置与该定势的标注方向不一致（二维近似），只记录不计分。'
+const SIDEWAYS = '二维近似在侧身时左右颠倒：示范视频上估计的方向与描述相反，按描述方向记录，不计分。'
+const DISAGREES = '示范视频上估计的髋中心位置与该定势的标注方向不一致（二维近似），只记录不计分。'
 
 export const TAIJIQUAN_STEPS: Readonly<Record<string, TaijiquanStep>> = Object.freeze({
   'tjq-1': { weightShift: 'balanced', scoreShift: true }, // 起势: 100 %
@@ -48,9 +48,10 @@ export const TAIJIQUAN_STEPS: Readonly<Record<string, TaijiquanStep>> = Object.f
   'tjq-24': { weightShift: 'balanced', scoreShift: true }, // 收势: 100 %
 })
 
+/** Wording of the 2D hip-centre estimate: an estimate of the supporting leg, not a measured centre of mass. */
 export const WEIGHT_SHIFT_LABEL: Readonly<Record<WeightShift, string>> = Object.freeze({
-  left: '重心在左腿',
-  right: '重心在右腿',
-  transfer: '重心左右转换',
-  balanced: '重心居中',
+  left: '偏左腿支撑',
+  right: '偏右腿支撑',
+  transfer: '左右转换',
+  balanced: '居中',
 })

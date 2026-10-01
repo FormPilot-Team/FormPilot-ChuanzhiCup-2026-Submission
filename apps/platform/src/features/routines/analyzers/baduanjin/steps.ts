@@ -61,7 +61,7 @@ export const BADUANJIN_STEPS: Readonly<Record<string, BaduanjinStep | null>> = O
     sides: 'bilateral',
     amplitude: 'proxy',
     cue: '脚跟再提起一些，头向上顶',
-    note: '用肩中心抬升近似脚跟提起，依赖相机固定不动，是近似值，不是精确测量。',
+    note: '用肩中心抬升近似估计脚跟提起，依赖相机固定不动，只是近似值。',
   },
   'bdj-close': null,
 })

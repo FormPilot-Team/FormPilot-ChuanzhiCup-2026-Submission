@@ -140,7 +140,7 @@ export function scoreShiftRule(reference: TaijiquanChapterReference, step: Taiji
 /**
  * 太极拳连续性: 动作是否连贯、匀速、不断. Per form: how close the posture stays to the demonstrator (follow-along
  * similarity), how even the speed is, whether the body stops while the demonstrator keeps moving, and — where the
- * 2D hip-centre approximation agrees with the demonstrator — whether the weight is on the labelled leg.
+ * 2D hip-centre approximation agrees with the demonstrator — whether the estimated supporting leg matches the label.
  */
 export class TaijiquanAnalyzer implements RoutineAnalyzer<TaijiquanFeatures, TaijiquanEvaluation> {
   readonly id = 'taijiquan' as const
@@ -244,7 +244,7 @@ export class TaijiquanAnalyzer implements RoutineAnalyzer<TaijiquanFeatures, Tai
       })),
       notes: [
         '连续性看三件事：速度是否均匀、示范者仍在动时你是否停顿、架势与示范是否一致（跟练相似度）。',
-        '重心方向基于姿态关键点的二维髋中心近似：侧身或背身时左右可能颠倒，所以只在示范者实测与标注一致的式中计分，其余式只记录；权重较低。',
+        '重心方向是基于姿态关键点的二维髋中心近似估计：侧身或背身时左右可能颠倒，所以只在示范视频上的估计与标注一致的式中计分，其余式只记录；权重较低。',
         '全部阈值为暂定值，尚未用真人数据标定。快速模式下速度类指标没有意义。',
       ],
       extras: {
@@ -377,13 +377,13 @@ function weightShiftMetric(step: TaijiquanStep, value: number | null): MetricDra
   const transfer = step.weightShift === 'transfer'
   const display = value === null
     ? '两踝不可见或过近，无法判断'
-    : transfer ? `左右转换幅度为示范的 ${percentText(value)}` : `定势时${WEIGHT_SHIFT_LABEL[step.weightShift]}的时间占 ${percentText(value)}`
+    : transfer ? `估计的左右转换幅度为示范的 ${percentText(value)}` : `定势时估计为${WEIGHT_SHIFT_LABEL[step.weightShift]}的时间占 ${percentText(value)}`
   const score = value === null ? null : transfer
     ? rampScore(value, CONFIG.weightShift.zeroRangeRatio, CONFIG.weightShift.fullRangeRatio)
     : rampScore(value, CONFIG.weightShift.zeroShare, CONFIG.weightShift.fullShare)
   return {
     id: 'weightShift',
-    label: `重心转移：${WEIGHT_SHIFT_LABEL[step.weightShift]}（二维髋中心近似）`,
+    label: `重心转移估计：${WEIGHT_SHIFT_LABEL[step.weightShift]}（二维髋中心近似）`,
     value: value === null ? null : round(value, 3),
     unit: transfer ? '示范倍数' : '比例',
     display,
@@ -395,7 +395,7 @@ function weightShiftMetric(step: TaijiquanStep, value: number | null): MetricDra
   }
 }
 
-const SETTLE_ADVICE: Readonly<Record<WeightShift, string>> = { left: '定势时把重心放到左腿', right: '定势时把重心放到右腿', balanced: '定势时重心保持居中', transfer: '' }
+const SETTLE_ADVICE: Readonly<Record<WeightShift, string>> = { left: '定势时重心落在左腿', right: '定势时重心落在右腿', balanced: '定势时重心保持居中', transfer: '' }
 
 function feedbackFor(metric: MetricResult, step: TaijiquanStep): AnalyzerFeedbackItem | null {
   if (metric.value === null) return null
@@ -420,7 +420,7 @@ function feedbackFor(metric: MetricResult, step: TaijiquanStep): AnalyzerFeedbac
     case 'weightShift':
       if (!metric.evaluated) return { metricId: metric.id, tone: 'info', message: `重心方向只记录不计分：${metric.display}` }
       return good
-        ? { metricId: metric.id, tone: 'success', message: `重心转移到位（${metric.display}）` }
+        ? { metricId: metric.id, tone: 'success', message: `重心转移估计与示范一致（${metric.display}）` }
         : { metricId: metric.id, tone: 'warning', message: step.weightShift === 'transfer' ? `${metric.display}，重心前后左右转换再充分一些` : `${metric.display}，${SETTLE_ADVICE[step.weightShift]}` }
     default:
       return null

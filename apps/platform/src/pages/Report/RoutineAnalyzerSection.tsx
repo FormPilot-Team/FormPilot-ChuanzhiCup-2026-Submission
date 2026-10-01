@@ -42,7 +42,7 @@ export function RoutineAnalyzerSection({ report }: { report: RoutineReport }) {
   const categories = categoriesOf(analysis.extras)
   return (
     <section className="report-panel p-5 sm:p-6" aria-labelledby="routine-analyzer-title" data-testid="routine-report-analyzer" data-analyzer={analysis.analyzerId}>
-      <SectionHeading id="routine-analyzer-title" icon={Sparkles} title={`专项分析 · ${analysis.title}`} description="按本功法自身的要点逐段分析，数值来自你与示范者在同一段落的比较；与跟练相似度、动作规范评价分开计算。" />
+      <SectionHeading id="routine-analyzer-title" icon={Sparkles} title={`专项分析 · ${analysis.title}`} description="按本功法自身的要点逐段估计你与示范动作的一致程度，数值来自二维画面中你与示范者在同一段落的比较；与跟练相似度、动作规范评价分开计算。" />
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <p className="text-3xl font-bold tabular-nums text-slate-950" data-testid="routine-analyzer-score">{analysis.score === null ? '—' : analysis.score}</p>
         <div className="w-40"><MiniBar value={analysis.score} tone={scoreTone(analysis.score)} /></div>

@@ -116,7 +116,8 @@ describe('八段锦到位度: evaluation', () => {
     const evaluation = evaluationOf('bdj-8')!
     const proxy = metric(evaluation, 'heelRiseProxy')!
     expect(proxy.display).toContain('近似')
-    expect(proxy.note).toContain('不是精确测量')
+    expect(proxy.note).toContain('近似估计')
+    expect(proxy.note).not.toContain('精确')
     expect(proxy.weight).toBeLessThan(0.15)
     expect(metric(evaluation, 'amplitude')).toBeUndefined()
   })
