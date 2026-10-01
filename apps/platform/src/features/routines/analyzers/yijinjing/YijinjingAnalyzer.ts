@@ -12,43 +12,41 @@ import { YIJINJING_MODE_LABEL, YIJINJING_STEPS, type YijinjingMode, type Yijinji
 interface FramePoint {
   at: number
   videoSeconds: number
-  /** The step from the previous sample (same continuous run) was still. */
+  /** 与前一样本（同一连续段）之间这一步是静止的 */
   still: boolean
-  /** Time of the previous sample of the same run (the start of this sample's step), or null for a run's first sample. */
+  /** 这一步的起点，即同段前一样本的时间；段内第一帧为 null */
   stepFrom: number | null
   stepFromVideo: number | null
-  /** Shaking at this sample: RMS over the six points of their residual around a short average (torso lengths). */
+  /** 六个点相对短平均的残差 RMS，单位躯干长 */
   jitter: number | null
-  /** Shoulder and hip centres (scaled), for sway. */
+  /** 肩、髋中心（已缩放），用于晃动 */
   centre: { x: number; y: number } | null
   targetSimilarity: number | null
 }
 
 export interface StillStretch {
-  /** Video seconds of the first and last still sample. */
   from: number
   to: number
   durationMs: number
 }
 
 export interface YijinjingChapterReference {
-  /** The demonstrator's longest still stretch in the 势. */
+  /** 示范者在本势中最长的静止段 */
   still: StillStretch
-  /** Target pose: the demonstrator's frame at the middle of that stretch (holds only). */
+  /** 目标姿态：该静止段中点的示范帧（仅保持类） */
   target: PoseDescriptor | null
   targetAt: number | null
 }
 
 export interface YijinjingEvaluation extends AnalyzerEvaluation {
   mode: YijinjingMode
-  /** Mean target similarity in the hold window (holds) or mean follow-along similarity (transitions). */
+  /** 保持类为窗口内目标相似度均值，过渡类为跟练相似度均值 */
   pose: number | null
-  /** Longest still-and-in-pose stretch / the demonstrator's still stretch (holds). */
   holdRatio: number | null
   holdSeconds: number | null
   demonstratorHoldSeconds: number | null
   jitter: number | null
-  /** Holds only: drift of the shoulder and hip centres while in the pose. */
+  /** 仅保持类：在目标姿态中时肩、髋中心的漂移 */
   sway: number | null
 }
 
@@ -57,7 +55,7 @@ function robustScale(samples: ReadonlyArray<AnalyzerSample<YijinjingFeatures>>):
   return scale !== null && scale > 0 ? scale : null
 }
 
-/** Per-sample stillness, jitter and centre position; speeds and residuals never cross a gap. */
+/** 逐样本的静止、抖动和中心位置；速度与残差不跨断点 */
 export function framePoints(samples: ReadonlyArray<AnalyzerSample<YijinjingFeatures>>, scale: number): FramePoint[] {
   const points: FramePoint[] = []
   for (const run of continuousRuns(samples, CONFIG.maxGapMs)) {
@@ -83,7 +81,7 @@ export function framePoints(samples: ReadonlyArray<AnalyzerSample<YijinjingFeatu
         }
       }
       const residual = finite(shaking.map((series) => series[item]))
-      // Shoulders and hips are pairs 2–5 of the six points.
+      // 六个点中第 2–5 对是双肩、双髋
       const centre = [2, 3, 4, 5].every((pair) => Number.isFinite(raw[pair * 2][item]) && Number.isFinite(raw[pair * 2 + 1][item]))
         ? { x: (raw[4][item] + raw[6][item] + raw[8][item] + raw[10][item]) / 4, y: (raw[5][item] + raw[7][item] + raw[9][item] + raw[11][item]) / 4 }
         : null
@@ -102,12 +100,12 @@ export function framePoints(samples: ReadonlyArray<AnalyzerSample<YijinjingFeatu
   return points
 }
 
-/** Longest stretch of consecutive still steps, from the start of its first step to the end of its last. */
+/** 最长的连续静止段，从第一步的起点到最后一步的终点 */
 export function longestStill(points: ReadonlyArray<FramePoint>): StillStretch | null {
   let best: StillStretch | null = null
   let start = -1
   for (let index = 0; index <= points.length; index += 1) {
-    // A still step always continues the run of the previous one (framePoints never marks a run's first sample still).
+    // 静止步总是接在同一段的前一样本之后（段内第一帧不会被标为静止）
     const continues = index < points.length && points[index].still && (start < 0 || points[index].stepFrom === points[index - 1].at)
     if (continues) {
       if (start < 0) start = index
@@ -124,7 +122,7 @@ export function longestStill(points: ReadonlyArray<FramePoint>): StillStretch | 
   return best
 }
 
-/** The mode rule of steps.ts: holds for 预备势 / 收势, else a demonstrator still stretch of at least holdMinMs. */
+/** 预备势、收势为保持类；其余按示范静止是否达到 holdMinMs */
 export function modeRule(chapter: RoutineChapter, still: StillStretch | null): YijinjingMode {
   if (chapter.kind !== 'form') return 'hold'
   return still && still.durationMs >= CONFIG.stillness.holdMinMs ? 'hold' : 'transition'
@@ -147,12 +145,8 @@ function sway(points: ReadonlyArray<FramePoint>): number | null {
   return rms(centres.map((centre) => Math.hypot(centre.x - x, centre.y - y)))
 }
 
-/**
- * 易筋经稳定性: holding each 势 steadily. Holds (保持类) are compared with the demonstrator's longest still stretch:
- * how close the pose comes to the demonstrator's pose at its middle (目标姿态), how long the user stays still in it
- * (保持完成度) and how much the body shakes or drifts meanwhile (稳定性). Transitions (过渡类) are judged on the
- * follow-along similarity and on shaking only (姿态 0.40 + 稳定性 0.35, renormalised).
- */
+// 易筋经稳定性（基于姿态关键点的二维近似）：保持类与示范者最长静止段比较目标姿态、保持时长与抖动晃动；
+// 过渡类只看跟练相似度与动作中的抖动
 export class YijinjingAnalyzer implements RoutineAnalyzer<YijinjingFeatures, YijinjingEvaluation> {
   readonly id = 'yijinjing' as const
   readonly version = CONFIG.version
@@ -205,7 +199,7 @@ export class YijinjingAnalyzer implements RoutineAnalyzer<YijinjingFeatures, Yij
   }
 
   private evaluateHold(points: ReadonlyArray<FramePoint>, usableSamples: number, step: YijinjingStep, reference: YijinjingChapterReference): YijinjingEvaluation {
-    // Compare with the part of the demonstrator's hold that the samples cover (the live window may hold only part of it).
+    // 只与样本覆盖到的那部分示范静止段比较（实时窗口可能只覆盖一部分）
     const coveredFrom = Math.max(reference.still.from, points[0]?.videoSeconds ?? Infinity)
     const coveredTo = Math.min(reference.still.to, points[points.length - 1]?.videoSeconds ?? -Infinity)
     const demonstratorSeconds = Math.max(0, coveredTo - coveredFrom)
@@ -218,7 +212,7 @@ export class YijinjingAnalyzer implements RoutineAnalyzer<YijinjingFeatures, Yij
     const held = longestStill(window.map((point, index) => ({ ...point, still: point.still && inPose[index] })))
     const holdSeconds = window.length >= 5 ? (held?.durationMs ?? 0) / 1000 : null
     const holdRatio = holdSeconds === null || !(demonstratorSeconds > 0) ? null : Math.min(1, holdSeconds / demonstratorSeconds)
-    // Shaking and drift are read while the user is in the pose (the longest in-pose stretch).
+    // 抖动与晃动取用户处于目标姿态的最长一段
     const posed = longestTrueRun(inPose, window.map((point) => point.at))
     const stretch = posed.from >= 0 ? window.slice(posed.from, posed.to + 1) : []
     const jitter = stretch.length >= 5 ? rms(finite(stretch.map((point) => point.jitter))) : null

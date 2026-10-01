@@ -1,6 +1,6 @@
 import type { PosePointLike } from '../followAlong/matcher'
 
-/** MediaPipe Pose landmark indices used by the analyzers. */
+/** 分析器用到的 MediaPipe Pose 关键点序号 */
 export const LM = {
   nose: 0,
   leftEar: 7,
@@ -29,23 +29,20 @@ export interface Point {
 }
 
 export interface BodyFrame {
-  /** A landmark in aspect-corrected image units (x × width/height, y as is), or null when not visible enough. */
+  /** 按宽高比校正后的图像坐标（x × 宽/高，y 不变）；可见度不足时为 null */
   point(index: number): Point | null
   shoulderMid: Point
   hipMid: Point
-  /** Shoulder centre to hip centre. Shrinks when bending towards the camera, so analyzers scale by a robust value over time. */
+  /** 肩中心到髋中心。身体朝镜头弯曲时会变短，所以分析器按一段时间内的稳健值做尺度 */
   torsoLength: number
   shoulderWidth: number
   hipWidth: number
 }
 
-/** Same visibility rule as the follow-along matcher and the Scoring v2 metrics. */
+/** 与跟练比对、动作规范指标相同的可见度门槛 */
 export const MIN_LANDMARK_VISIBILITY = 0.5
 
-/**
- * The 2D body seen by the camera, in true proportions. Returns null without both shoulders and both hips, like
- * `describePose` and `computePoseMetric`. Image y grows downwards: “higher” means a smaller y.
- */
+/** 摄像头看到的二维身体（真实比例）；缺双肩或双髋时为 null。图像 y 向下，“更高”即 y 更小 */
 export function bodyFrame(landmarks: ReadonlyArray<PosePointLike>, aspect: number, minVisibility = MIN_LANDMARK_VISIBILITY): BodyFrame | null {
   if (!(aspect > 0)) return null
   const point = (index: number): Point | null => {
@@ -72,7 +69,7 @@ export function bodyFrame(landmarks: ReadonlyArray<PosePointLike>, aspect: numbe
   }
 }
 
-/** Trunk lean from vertical in degrees, signed: positive when the shoulders are to the image right of the hips. */
+/** 躯干偏离竖直的角度，度；肩在髋的画面右侧为正 */
 export function trunkSideLeanDegrees(body: BodyFrame): number {
   const dx = body.shoulderMid.x - body.hipMid.x
   const dy = body.hipMid.y - body.shoulderMid.y

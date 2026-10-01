@@ -1,10 +1,5 @@
-/**
- * Pose time series extracted offline from a routine's standard video (scripts/extract-video-reference.mjs).
- *
- * Stored compactly (schema 2): every frame is `[t, confidence%, x0‰, y0‰, visibility0%, x1‰, …]` for all 33
- * MediaPipe landmarks, in the video's own image coordinates; a frame without a detected pose is `[t, 0]`.
- * Only 2D position and visibility are kept: depth is never used for follow-along comparison.
- */
+// 标准视频离线提取的姿态序列。每帧存为 [t, 置信度%, x0‰, y0‰, 可见度0%, x1‰, …]（33 个关键点，
+// 视频自身坐标）；未检测到姿态的帧为 [t, 0]。只保留二维位置与可见度
 export const REFERENCE_TRACK_SCHEMA_VERSION = 2
 export const REFERENCE_LANDMARK_COUNT = 33
 
@@ -15,7 +10,7 @@ export interface ReferencePoint {
 }
 
 export interface ReferenceFrame {
-  /** Seconds into the video. */
+  /** 视频内秒数 */
   t: number
   confidence: number
   landmarks: ReadonlyArray<ReferencePoint>
@@ -71,7 +66,7 @@ function decodeFrame(raw: unknown): ReferenceFrame | undefined {
   return { t, confidence: confidence / 100, landmarks }
 }
 
-/** Validates and decodes a stored track; returns undefined for anything malformed or empty. */
+/** 校验并解码；格式错误或为空时返回 undefined */
 export function parseReferenceTrack(raw: unknown): ReferenceTrack | undefined {
   if (!isStoredTrack(raw)) return undefined
   const frames: ReferenceFrame[] = []
@@ -84,7 +79,6 @@ export function parseReferenceTrack(raw: unknown): ReferenceTrack | undefined {
   return { asset: raw.asset, duration: raw.duration, fps: raw.fps, width: raw.width, height: raw.height, frames }
 }
 
-/** Encodes one detected pose into the stored frame layout (used by the extraction script and tests). */
 export function encodeReferenceFrame(t: number, confidence: number, landmarks: ReadonlyArray<ReferencePoint>): number[] {
   if (confidence <= 0 || landmarks.length < REFERENCE_LANDMARK_COUNT) return [Number(t.toFixed(2)), 0]
   const values = [Number(t.toFixed(2)), Math.round(confidence * 100)]
@@ -97,7 +91,7 @@ export function encodeReferenceFrame(t: number, confidence: number, landmarks: R
 
 const trackCache = new Map<string, Promise<ReferenceTrack | undefined>>()
 
-/** Loads and caches a track; any network or format failure resolves to undefined (follow-along comparison off). */
+/** 加载并缓存；任何失败都返回 undefined（关闭跟练比对） */
 export function loadReferenceTrack(src: string, fetcher: typeof fetch = fetch): Promise<ReferenceTrack | undefined> {
   const cached = trackCache.get(src)
   if (cached) return cached

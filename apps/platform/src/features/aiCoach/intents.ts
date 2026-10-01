@@ -14,9 +14,9 @@ export type CoachIntentId =
 
 interface IntentSpec {
   question: string
-  /** Specific words: any one of them is enough to recognise the question. */
+  /** 任一关键词即可识别问题 */
   anchors: ReadonlyArray<string>
-  /** Generic words (怎么样, 现在 …): they only strengthen a match that already has an anchor. */
+  /** 泛化词（怎么样、现在…）只加强已有关键词的匹配 */
   boosters?: ReadonlyArray<string>
 }
 
@@ -68,7 +68,7 @@ export type CoachMatch =
   | { kind: 'safety' }
   | { kind: 'unknown' }
 
-/** Simple keyword matching over the questions this page can answer. Anything else is said to be out of scope. */
+/** 按关键词匹配本页能回答的问题，其余视为超出范围 */
 export function matchQuestion(text: string, context: CoachPageContext): CoachMatch {
   const input = normalized(text)
   if (!input) return { kind: 'unknown' }
@@ -86,8 +86,6 @@ export function matchQuestion(text: string, context: CoachPageContext): CoachMat
   if (GREETING_WORDS.some((word) => input.includes(word))) return { kind: 'greeting' }
   return { kind: 'unknown' }
 }
-
-// ---- answers ------------------------------------------------------------------------------------------------------
 
 const WARM_UP_EXPLANATION: ReadonlyArray<[RegExp, string]> = [
   [/^ELBOW_TOO_BENT/, '识别到手肘弯曲，没有达到这个动作要求的伸直程度。'],
@@ -117,7 +115,7 @@ function explainFeedback(code: string, kind: string): string {
   return WARM_UP_EXPLANATION.find(([pattern]) => pattern.test(code))?.[1] ?? '这是根据摄像头识别到的关节位置判断的。'
 }
 
-/** Scoring v2: which checked requirement a correction belongs to, and what kind of signal it is. */
+/** 纠正所对应的检查项及其信号类型 */
 function criterionNote(code: string, kind: string, exerciseId: string | undefined): string {
   if (kind === 'routine') return '这是跟练相似度提示（与示范视频的视觉差异），不是动作规范扣分。'
   if (kind !== 'smart-training' || !exerciseId || !isRegisteredExerciseId(exerciseId)) return ''
@@ -311,7 +309,7 @@ export interface CoachReply {
   answer: CoachAnswer
 }
 
-/** Free input: a matched question is answered like its chip; health questions and anything unknown are declined. */
+/** 自由输入：匹配到的问题按快捷问题回答，健康类和未知问题婉拒 */
 export function reply(text: string, context: CoachPageContext): CoachReply {
   const match = matchQuestion(text, context)
   if (match.kind === 'intent') return { intent: match.id, answer: answerIntent(match.id, context) }

@@ -8,10 +8,7 @@ import { effectiveRequirements, evaluateRequirement, measureRequirements, type E
 import { FEATURE_TEMPLATES, PROFILE_BOUNDS, templateSignalThresholds, type TemplateCounting } from './templates'
 import { templateSignal } from './templateSignal'
 
-/**
- * Recognition of one custom action. Pure and frame driven (no camera, no timers), so the workshop test, the custom
- * training page and the unit tests all run the same code. It never touches the warm-up exercise engines.
- */
+// 自定义动作识别：纯函数、按帧驱动，工坊测试、训练页和单测共用同一份代码
 
 export type RecognizerMode = 'pose-match' | 'template-calibrated' | 'template'
 export type RecognizerPhase = 'READY' | 'MOVING' | 'PEAK' | 'RETURNING' | 'HOLDING'
@@ -19,7 +16,7 @@ export type RecognizerQuality = 'good' | 'degraded' | 'lost'
 
 export interface RequirementResult {
   id: RequirementId
-  /** null: the body parts it needs were not visible. */
+  /** null：所需部位不可见 */
   passed: boolean | null
 }
 
@@ -29,7 +26,6 @@ export interface RepEvent {
   peakProgress: number
   requirements: RequirementResult[]
   failed: RequirementId[]
-  /** Every requirement that could be judged was met. */
   passed: boolean
 }
 
@@ -42,12 +38,12 @@ export interface RecognizerFeedback {
 export interface RecognizerSnapshot {
   quality: RecognizerQuality
   phase: RecognizerPhase
-  /** 0 = start pose, 1 = finish pose (template mode: the template's peak). Null when it cannot be judged. */
+  /** 0 = 起始姿势，1 = 结束姿势（模板模式为峰值）；无法判断时为 null */
   progress: number | null
   reps: number
   passedReps: number
   holdMs: number
-  /** Present only on the frame a repetition (or a hold second) completes. */
+  /** 只在完成一次（或保持满一秒）的那一帧出现 */
   repEvent?: RepEvent
   lastRep?: RepEvent
   feedback: RecognizerFeedback | null
@@ -59,14 +55,13 @@ export interface RecognitionSetup {
   mode: RecognizerMode
   counting: TemplateCounting
   ready: boolean
-  /** Why recognition cannot start yet, in user language. */
   issue?: string
   template: FeatureTemplateId | null
   model?: PoseMatchModel
   calibration?: { start: number; finish: number }
   thresholds: PhaseThresholds
   requirements: EffectiveRequirement[]
-  /** Landmarks that must be visible and inside the picture. */
+  /** 必须可见且在画面内的关键点 */
   bounds: LandmarkName[]
   framingLabel: string
 }
@@ -83,7 +78,7 @@ function capturedFrame(pose: CapturedPose): NormalizedPoseFrame | null {
   return normalizePoseFrame({ timestamp: 0, landmarks: pose.landmarks.map((point) => ({ ...point, presence: point.visibility })), confidence: 1 })
 }
 
-/** Decides how an action is measured, from its signal source and whatever poses were recorded. */
+/** 根据信号来源和已录制的姿势决定测量方式 */
 export function resolveRecognition(definition: CustomActionDefinition): RecognitionSetup {
   const { recognition, startPose, finishPose } = definition
   const requirements = effectiveRequirements(definition)
@@ -135,10 +130,7 @@ export function resolveRecognition(definition: CustomActionDefinition): Recognit
 
 const FRAME_MARGIN = 0.02
 
-/**
- * Whether the landmarks an action needs are visible and inside the picture; a user-facing hint when not.
- * Used by the recognizer while following and by the training page before it starts.
- */
+/** 所需关键点是否可见且在画面内；不满足时返回提示 */
 export function framingHintFor(landmarks: ReadonlyArray<PoseLandmark>, setup: Pick<RecognitionSetup, 'bounds' | 'framingLabel'>): string | undefined {
   let outVertically = false
   let outSideways = false
@@ -178,15 +170,12 @@ export class CustomActionRecognizer {
   private gapStartedAt?: number
   private lastTimestamp?: number
   private flash?: { feedback: RecognizerFeedback; until: number }
-  // template (absolute) state
   private neutralSignal?: number
   private neutralHipY?: number
-  // orbit / alternate state
   private orbit?: { left: number; right: number }
   private orbitTravel = 0
   private side?: number
   private armed = true
-  // hold state
   private holdStartedAt?: number
   private holdSecondsCounted = 0
 
@@ -239,9 +228,7 @@ export class CustomActionRecognizer {
     return this.snapshot('good', progress, reading.metrics, timestamp, repEvent)
   }
 
-  // ---- reading --------------------------------------------------------------------------------------------------
-
-  /** Pose match needs both shoulders and hips; a template (side planks, seated moves) can live with one of each. */
+  /** 姿势匹配需要双肩双髋；模板（侧平板、坐姿）各一侧即可 */
   private hasTorso(landmarks: ReadonlyArray<PoseLandmark>): boolean {
     const usable = (name: LandmarkName) => isUsable(landmark(landmarks, name))
     if (this.setup.mode === 'pose-match') return TORSO_ANCHORS.every(usable)
@@ -270,9 +257,8 @@ export class CustomActionRecognizer {
       const { start, finish } = this.setup.calibration
       return { progress: (signal.raw - start) / (finish - start), metrics }
     }
-    // Uncalibrated template: measured against the user's own ready pose, then the template's peak threshold is 100 %.
-    // The workbench did this only for its 'difference' templates; its absolute ones could sit above their own return
-    // threshold at rest (arm-raise: straight elbows alone give 0.2 against a 0.06 return), so a repetition never ended.
+    // 未标定的模板以用户自己的准备姿势为基准，峰值阈值记为 100%；
+    // 否则绝对模板在静止时可能已高于回落阈值，一次动作永远不会结束
     if (this.phase === 'READY') {
       if (this.neutralSignal === undefined) this.neutralSignal = signal.raw
       else if (Math.abs(signal.raw - this.neutralSignal) <= Math.min(template.baseline.range, 0.05)) this.neutralSignal = this.neutralSignal * 0.9 + signal.raw * 0.1
@@ -293,8 +279,6 @@ export class CustomActionRecognizer {
     const peak = templateSignalThresholds(templateId, this.definition.recognition.profile).peak
     return { progress: value / peak, metrics: { ...metrics, signal: value, hipDrop } }
   }
-
-  // ---- counting -------------------------------------------------------------------------------------------------
 
   private track(progress: number, measures: RequirementMeasures, timestamp: number): void {
     this.rep ??= { startedAt: timestamp, maxProgress: -Infinity, peakMeasures: null, maxLean: null }
@@ -353,7 +337,7 @@ export class CustomActionRecognizer {
     if (this.phase === 'MOVING') {
       if (progress >= peak) this.phase = 'PEAK'
       else if (progress <= returnThreshold) {
-        // Went out and came back without reaching the finish pose: not a repetition.
+        // 未到结束姿势就回来，不计次
         this.phase = 'READY'
         this.movingFrames = 0
         this.rep = undefined
@@ -361,7 +345,6 @@ export class CustomActionRecognizer {
       }
       return undefined
     }
-    // PEAK or RETURNING
     if (progress < peak) this.phase = 'RETURNING'
     if (progress <= returnThreshold) {
       this.returnFrames += 1
@@ -402,7 +385,7 @@ export class CustomActionRecognizer {
       return undefined
     }
     if (this.phase !== 'HOLDING') {
-      // A new hold may only start from the start pose again (except the very first one).
+      // 新的保持必须从起始姿势重新开始（第一次除外）
       if (!durationGoal && this.phase === 'RETURNING') return undefined
       this.phase = 'HOLDING'
       this.holdStartedAt = timestamp
@@ -414,7 +397,7 @@ export class CustomActionRecognizer {
       if (previous !== undefined) this.holdMs += Math.min(250, Math.max(0, timestamp - previous))
       const heldSeconds = Math.floor((timestamp - (this.holdStartedAt ?? timestamp)) / 1000)
       if (heldSeconds > this.holdSecondsCounted) {
-        // Each full second of holding is judged like a repetition, so the report can say how much of it met the requirements.
+        // 每满一秒按一次计，报告可以给出达标比例
         this.holdSecondsCounted = heldSeconds
         const event = this.complete(timestamp)
         this.rep = { startedAt: timestamp, maxProgress: -Infinity, peakMeasures: null, maxLean: null }
@@ -485,13 +468,11 @@ export class CustomActionRecognizer {
     return undefined
   }
 
-  // ---- gaps and output --------------------------------------------------------------------------------------------
-
   private gap(timestamp: number, quality: RecognizerQuality, hint: string, metrics: Record<string, number> = {}): RecognizerSnapshot {
     if (this.phase !== 'READY') {
       this.gapStartedAt ??= timestamp
       if (timestamp - this.gapStartedAt >= GAP_ABORT_MS) {
-        // A movement interrupted by lost tracking is never completed by the frames after it.
+        // 跟踪中断的动作不会由后续帧补完
         this.phase = 'READY'
         this.rep = undefined
         this.movingFrames = 0

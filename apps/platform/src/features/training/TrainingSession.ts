@@ -155,7 +155,7 @@ export class TrainingSession {
     return created
   }
 
-  /** Guidance exercises have no repetitions; keep running means of their live metrics for the report. */
+  /** 引导类动作没有次数，记录实时指标的均值供报告使用 */
   private sampleGuidance(exercise: ExerciseSessionResult, result: RuleResult): void {
     const metrics = Object.entries(result.metrics)
     if (result.phase === 'READY' || !metrics.length || !metrics.every(([, metric]) => metric.valid)) return

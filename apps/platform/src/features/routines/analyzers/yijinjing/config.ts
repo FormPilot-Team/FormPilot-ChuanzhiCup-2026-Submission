@@ -1,55 +1,39 @@
-/**
- * 易筋经稳定性 thresholds. Provisional (待标定): set so that the standard demonstration scores full marks on its own
- * pose track and the self-check perturbations are told apart; not calibrated on recorded users.
- */
+// 易筋经稳定性阈值。阈值为暂定值：参照示范者自身的数值设定，尚未用真人数据标定
 export const YIJINJING_ANALYZER_CONFIG = Object.freeze({
   version: 'yijinjing-stability-v1',
   minSamples: 20,
   maxGapMs: 400,
-  /** Live view: one hold. */
   liveWindowMs: 6000,
   scalePercentile: 0.9,
   stillness: {
-    /**
-     * Still = the fastest of wrists, shoulders and hips moves slower than this, in torso lengths of the current frame
-     * per second, from one sample to the next (raw positions). This is the measurement the stage-0 audit used and the
-     * hold rule was decided on; a stretch lasts from the start of its first still step to the end of its last.
-     */
+    /** 静止：腕、肩、髋中最快一点的逐帧速度低于此值（当前帧躯干长 / s，原始位置） */
     maxSpeed: 0.25,
-    /**
-     * A 势 whose demonstrator holds still for at least this long is a hold (保持类); otherwise a transition
-     * (过渡类). 预备势 and 收势 are holds by definition.
-     */
+    /** 示范者连续静止达到此时长为保持类，否则为过渡类；预备势、收势固定为保持类 */
     holdMinMs: 1500,
   },
   target: {
-    /** The user's window around the demonstrator's longest still stretch stays open this long after it (following lags). */
+    /** 跟练略慢于视频，用户窗口在示范静止段后多留 */
     lagSeconds: 1,
-    /** At or above this target similarity the user is in the target pose. */
+    /** 目标姿态相似度达到此值视为到位 */
     reachSimilarity: 0.75,
-    /** Mean target similarity in the window: full marks at 0.85, zero at 0.55. */
     fullSimilarity: 0.85,
     zeroSimilarity: 0.55,
   },
   hold: {
-    /**
-     * Longest still-and-in-pose stretch / the demonstrator's still stretch: full marks at 0.9, zero at 0.4. The window
-     * already stays open 1 s longer than the demonstrator's stretch, so following up to 1 s late keeps full marks.
-     * (First set at 0.8 / 0.3: following 2–3.5 s late then cost only 12 points over the routine — self-check.)
-     */
+    /** 保持时长 / 示范静止时长；窗口已多留 1 s，落后 1 s 以内仍为满分 */
     fullRatio: 0.9,
     zeroRatio: 0.4,
-    /** The samples must cover at least this much of the demonstrator's hold to judge it (the live window may not). */
+    /** 样本覆盖示范静止段不足此时长时不评保持（实时窗口可能只覆盖一部分） */
     minCoveredSeconds: 1,
   },
-  /** Transitions: mean follow-along similarity over the 势. */
+  /** 过渡类：整势的跟练相似度 */
   pose: { fullSimilarity: 0.85, zeroSimilarity: 0.55 },
   stability: {
-    /** Jitter = RMS of positions around their ±halfWidth average (torso lengths): high-frequency shaking. */
+    /** 抖动：位置相对 ±halfWidth 平均的 RMS，单位躯干长 */
     residualHalfWidth: 2,
     fullJitter: 0.015,
     zeroJitter: 0.035,
-    /** Sway (holds only) = RMS of the shoulder and hip centres around their own mean in the hold (torso lengths). */
+    /** 晃动（仅保持类）：保持期间肩、髋中心相对其均值的 RMS，单位躯干长 */
     fullSway: 0.04,
     zeroSway: 0.12,
   },

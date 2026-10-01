@@ -1,69 +1,57 @@
-/**
- * 太极拳连续性 thresholds. Provisional (待标定): set so that the standard demonstration scores full marks on its own
- * pose track and the self-check perturbations are told apart; not calibrated on recorded users.
- */
+// 太极拳连续性阈值。阈值为暂定值：参照示范者自身的数值设定，尚未用真人数据标定
 export const TAIJIQUAN_ANALYZER_CONFIG = Object.freeze({
   version: 'taijiquan-continuity-v1',
   minSamples: 20,
   maxGapMs: 400,
-  /** Live view: a few seconds of movement, enough to see a stop or a jerk. */
   liveWindowMs: 6000,
   scalePercentile: 0.9,
-  /** Positions are averaged over ±2 samples before speeds are taken (tracking jitter is not movement). */
+  /** 先对位置做 ±2 样本平均再求速度，跟踪抖动不算运动 */
   positionHalfWidth: 2,
   pose: {
-    /** Mean follow-along similarity: full marks at 90 %, zero at 60 %. */
     fullSimilarity: 0.9,
     zeroSimilarity: 0.6,
   },
   smoothness: {
-    /**
-     * Jitter = median over 1 s blocks and over the wrists / hip centre of the RMS of positions around their own
-     * ±halfWidth average (torso lengths). The demonstrator's tracked pose stays ≤ 0.019 in every form.
-     * (A speed-fluctuation measure was tried first and dropped: it did not separate any self-check perturbation.)
-     */
+    /** 抖动：腕、髋中心位置相对 ±halfWidth 平均的 RMS，按 1 s 分块取中位数，单位躯干长 */
     residualHalfWidth: 2,
     blockSamples: 10,
     fullJitter: 0.02,
     zeroJitter: 0.035,
   },
   extent: {
-    /** 舒展度 = the user's path / the demonstrator's path over the same video moments (positions averaged ±2). */
+    /** 舒展度 = 用户路程 / 示范者在相同视频时刻的路程 */
     fullRatio: 0.9,
     zeroRatio: 0.5,
     maxRatio: 1.2,
   },
   pauses: {
-    /** Below this mean speed (torso lengths / s) the body has stopped … */
+    /** 平均速度低于此值（躯干长 / s）且持续 minStopSeconds，视为停顿 */
     stopSpeed: 0.1,
-    /** … for at least this long (a 太极 form never really stops) … */
     minStopSeconds: 0.8,
-    /** … while the demonstrator at the same video time moves at least this fast. */
+    /** 只在示范者同一时刻的速度高于此值时计入 */
     demonstratorMovingSpeed: 0.2,
-    /** Share of the demonstrator's moving time spent stopped: full marks at or below, zero at. */
     fullShare: 0.03,
     zeroShare: 0.25,
   },
   weightShift: {
-    /** 定势窗口: the demonstrator's slowest stretch of this length in the last share of the form. */
+    /** 定势窗口：本式后段中示范者最慢的一段 */
     settleSeconds: 2,
     settleSearchShare: 0.6,
-    /** The user's window stays open this long after the demonstrator's (following lags a little). */
+    /** 跟练略慢于视频，用户窗口向后多留 */
     lagSeconds: 1,
-    /** Support ratio bands: left < 0.4, right > 0.6, balanced 0.3–0.7. */
+    /** 支撑比例：left < 0.4，right > 0.6，balanced 0.3–0.7 */
     leftBelow: 0.4,
     rightAbove: 0.6,
     balancedMin: 0.3,
     balancedMax: 0.7,
-    /** Crossing bands for transfers (hysteresis). */
+    /** transfer 式的穿越判定带（滞回） */
     crossLow: 0.35,
     crossHigh: 0.65,
-    /** The rule for scoreShift (see steps.ts). */
     scoreShiftMinShare: 0.7,
-    /** Directional forms: share of the user's window frames agreeing with the label. */
+    /** 方向类：用户窗口内与标注一致的帧比例 */
     fullShare: 0.7,
     zeroShare: 0.4,
-    /** Transfer forms: user support-ratio range (p90 − p10) / demonstrator range. */
+    /** transfer 类：用户支撑比例范围（p90 − p10）/ 示范者范围 */
     fullRangeRatio: 0.85,
     zeroRangeRatio: 0.5,
     minKnownSamples: 5,

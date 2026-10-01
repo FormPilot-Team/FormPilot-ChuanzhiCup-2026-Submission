@@ -5,7 +5,7 @@ import type { RoutineChapterResult } from './types'
 
 const REGIONS: ReadonlyArray<FollowAlongRegion> = ['arms', 'torso', 'legs']
 
-/** Whole seconds whose midpoint lies inside the chapter; boundaries shared by two chapters go to exactly one. */
+/** 中点落在章节内的整秒；两章共用的边界秒只归一章 */
 function chapterBuckets(chapter: RoutineChapter): number[] {
   const buckets: number[] = []
   for (let second = Math.floor(chapter.startSeconds); second < Math.ceil(chapter.endSeconds); second += 1) {
@@ -30,10 +30,7 @@ function emptyResult(chapter: RoutineChapter, totalSeconds: number): RoutineChap
   }
 }
 
-/**
- * Accumulates what happened in each chapter of the scope: which seconds of the standard video were actually
- * followed (coverage survives pauses, jumps and repeats) and the follow-along comparisons made meanwhile.
- */
+/** 按章节累计：实际跟练了标准视频的哪些秒（暂停、跳转、重复都保留），以及期间的比对结果 */
 export class RoutineProgressRecorder {
   private readonly chapters: ReadonlyArray<RoutineChapter>
   private readonly buckets = new Map<string, ReadonlySet<number>>()
@@ -49,10 +46,7 @@ export class RoutineProgressRecorder {
     }
   }
 
-  /**
-   * Marks the video seconds played between two consecutive observations. A backwards step or a step longer
-   * than `maxContinuousStepSeconds` is a seek, so only the landing second is marked.
-   */
+  /** 标记两次观察之间播放过的秒；倒退或跨度超过 maxContinuousStepSeconds 视为跳转，只标落点 */
   markPlayback(fromSeconds: number, toSeconds: number, maxContinuousStepSeconds = 3): void {
     if (!Number.isFinite(toSeconds)) return
     const continuous = Number.isFinite(fromSeconds) && toSeconds >= fromSeconds && toSeconds - fromSeconds <= maxContinuousStepSeconds
@@ -60,7 +54,6 @@ export class RoutineProgressRecorder {
     for (let second = first; second <= Math.floor(toSeconds); second += 1) this.covered.add(second)
   }
 
-  /** Records one comparison made while the video was at `videoSeconds`. */
   recordComparison(videoSeconds: number, match: FollowAlongMatch): void {
     const chapter = chapterAt(this.program, videoSeconds)
     const result = this.results.get(chapter.id)
@@ -81,7 +74,6 @@ export class RoutineProgressRecorder {
     }
   }
 
-  /** Seconds of the scope followed so far. */
   coveredSeconds(): number {
     let total = 0
     for (const chapter of this.chapters) total += this.chapterCoverage(chapter.id)

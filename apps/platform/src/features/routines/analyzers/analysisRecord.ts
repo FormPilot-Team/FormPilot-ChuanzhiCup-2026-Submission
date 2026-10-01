@@ -1,17 +1,14 @@
 import type { AnalyzerEvaluation, MetricResult } from './types'
 
-/** One chapter's analyzer result as saved in the session record: the evaluation of its whole feature sequence. */
+/** 一章的分析结果：对整章特征序列的评价 */
 export interface AnalysisChapterRecord {
   chapterId: string
-  /** Feature samples taken in this chapter (usable or not). */
+  /** 本章采集的样本数（含不可用的） */
   samples: number
   evaluation: AnalyzerEvaluation | null
 }
 
-/**
- * Stored inside `RoutineSessionRecord.analysis` (optional, added with the routine analyzers). Summary numbers only —
- * never the pose sequence — so a full routine stays a few kilobytes in localStorage.
- */
+/** 存在会话记录的 analysis 中，只存汇总数值不存姿态序列，整套只有几 KB */
 export interface RoutineAnalysisRecord {
   analyzerId: string
   version: string
@@ -45,10 +42,7 @@ export function isAnalyzerEvaluation(value: unknown): value is AnalyzerEvaluatio
     && Array.isArray(value.metrics) && value.metrics.every(isMetric)
 }
 
-/**
- * Deep check used by the report. The session record's own guard only checks that `analysis` is an object, so a
- * malformed analysis is ignored by the report instead of discarding the whole session.
- */
+/** 报告使用的深层校验；格式不对时报告忽略分析结果，而不是丢弃整条记录 */
 export function isRoutineAnalysisRecord(value: unknown): value is RoutineAnalysisRecord {
   return isRecord(value)
     && typeof value.analyzerId === 'string'

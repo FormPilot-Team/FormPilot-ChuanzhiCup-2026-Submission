@@ -2,10 +2,7 @@ import type { EvaluationCriterion } from '../types'
 import { notObservable, referenceOnly } from './define'
 import { COMMON_NOT_OBSERVABLE_REASONS, poseCheck } from './routineHelpers'
 
-/**
- * 易筋经. The shoulder and hip error analysis (国家体育总局健身气功管理中心, 2018-02-26, checked online) names the
- * visible errors used here: 韦驮献杵第一势耸肩抬肘、第二势两臂侧举不呈水平、三盘落地下蹲不充分与两膝过度内合或外展.
- */
+// 易筋经：依据官方肩髋易犯错误分析中能看到的部分（第一势耸肩抬肘、第二势两臂不平、三盘落地下蹲不足与两膝内合外展）
 const ERRORS = 'gsqc-yjj-errors'
 const SHOULDER_HIP = 'gsqc-yjj-shoulder-hip-2018'
 const check = poseCheck.bind(null, 'yijinjing')
@@ -110,7 +107,7 @@ export const YIJINJING_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.fre
     feedback: { issue: '下蹲时上体倾斜', cue: '上体保持中正，松腰裹臀' },
     limitations: ['官方指出的是“上体前倾”（前后方向），正面画面只能检查左右侧倾。'],
   }),
-  // ---- 规范参考（尚未进入视觉评分）----
+  // 规范参考（尚未进入视觉评分）
   referenceOnly({
     id: 'yjj.4.hips_centered', mode: 'yijinjing', exercise: 'yjj-4', name: '摘星换斗：屈膝时髋部中正、扩胸展肩',
     requirement: '屈膝下蹲时保持髋关节中正，重心不移至一侧；扩胸展肩要充分，呼吸自然。', sourceId: SHOULDER_HIP,

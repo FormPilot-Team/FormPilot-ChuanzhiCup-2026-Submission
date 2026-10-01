@@ -26,7 +26,7 @@ export interface PoseCheckInput {
   limitations?: ReadonlyArray<string>
 }
 
-/** A follow-along technique check: the user's metric inside phase windows found in the standard video. */
+/** 跟练动作规范检查：在标准视频的阶段窗口内取用户的指标 */
 export function poseCheck(mode: RoutineId, input: PoseCheckInput): EvaluationCriterion {
   return defineCriterion({
     id: input.id,
@@ -50,7 +50,6 @@ export function poseCheck(mode: RoutineId, input: PoseCheckInput): EvaluationCri
   })
 }
 
-/** Routine-wide requirements a camera cannot judge. */
 export const COMMON_NOT_OBSERVABLE_REASONS = Object.freeze({
   breathing: '呼吸节律无法从二维姿态可靠判断；标准视频的口令已包含呼吸提示。',
   intent: '意念、神态与精神状态无法从画面判断。',

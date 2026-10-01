@@ -50,18 +50,17 @@ export interface RoutineCompletion {
   saved: boolean
 }
 
-/** Full body in view: the routines use the whole body, feet included. */
+/** 跟练需要全身入镜，包括双脚 */
 const REQUIRED_LANDMARKS = [...SQUAT_REQUIRED, 'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist'] as const
 const FRAME_MARGIN = 0.02
 const FRAMING_CONFIDENCE = 0.65
-/** Losing the pose for this long pauses the video; shorter losses (deep bends, low stances) are tolerated. */
+/** 丢失姿态超过此时长才暂停视频；深蹲、低架等短暂丢失可以容忍 */
 const POSE_LOSS_PAUSE_MS = 2000
 const EVALUATION_INTERVAL_MS = 100
-/** The training page's 动作规范检查 reads the technique snapshot at this rate; the report reads it once at the end. */
 const TECHNIQUE_VIEW_INTERVAL_MS = 500
 const UI_INTERVAL_MS = 100
 const PERSIST_INTERVAL_MS = 10_000
-/** A standard video still without metadata after this long is reported (with diagnostics) instead of spinning forever. */
+/** 超过此时长仍无元数据则报告（附诊断），不无限等待 */
 const STAGE_SLOW_MS = 20_000
 
 type GestureTestWindow = typeof window & { __gestureTestPose?: 'start' | 'pause' | 'none'; __forceNoPose?: boolean }
@@ -72,7 +71,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   const debug = params.get('debug') === '1'
   const trainingMode = resolveTrainingMode(params.get('fast') === '1')
   const fast = trainingMode === 'fast'
-  // DEV-only test path: the "user" is the standard video's own pose (optionally late or mirrored), no camera.
+  // 仅开发环境：用标准视频自身的姿态充当用户（可延迟或镜像），不用摄像头
   const synthetic = import.meta.env.DEV && params.get('fixture') === 'synthetic'
   const manualGesture = synthetic && params.get('gesture') === 'manual'
   const fixtureLagSeconds = synthetic ? Number(params.get('lag') ?? 0) || 0 : 0
@@ -81,7 +80,6 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   const playbackRate = fast ? 8 : 1
 
   const chapters = useMemo(() => scopeChapters(program, scope), [program, scope])
-  // Runtime objects are created once; several register listeners or allocate per-second buckets.
   const courseRef = useRef(null as unknown as CourseController<RoutineCourseStep>)
   courseRef.current ??= new CourseController(createRoutineCourse(program, scope, fast))
   const step = courseRef.current.getStep()
@@ -105,9 +103,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   framingAssistRef.current ??= new FramingAssistController()
   const matcherRef = useRef<FollowAlongMatcher | undefined>(undefined)
   const trackRef = useRef<ReferenceTrack | undefined>(undefined)
-  // Scoring v2: technique checks per phase window, separate from the similarity matcher.
   const techniqueRef = useRef<RoutineTechniqueEvaluator | undefined>(undefined)
-  // Routine analyzer (八段锦到位度 …): adds its own evidence, changes nothing above.
   const analysisRef = useRef<RoutineAnalysis | undefined>(undefined)
   const recorderRef = useRef(null as unknown as RoutineProgressRecorder)
   recorderRef.current ??= new RoutineProgressRecorder(program, scope)
@@ -189,7 +185,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     setSessionStatus(status)
   }, [])
 
-  // Pose frames arrive at camera rate; these only re-render when what is shown actually changes.
+  // 姿态帧按摄像头帧率到达，显示内容变化时才重新渲染
   const showFraming = useCallback((next: { valid: boolean; hint?: string }) => {
     if (framingRef.current.valid === next.valid && framingRef.current.hint === next.hint) return
     framingRef.current = next
@@ -203,7 +199,6 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     setGestureStatus(rounded)
   }, [])
 
-  // ---- voice ---------------------------------------------------------------------------------------------------
   const applyVoiceCommand = useCallback((command: VoiceGuideCommand) => {
     if (command.kind === 'cancel') speechRef.current.cancel()
     if (command.kind === 'speak') speechRef.current.speak(command.text, command.priority, command.interrupt, command.event)
@@ -230,7 +225,6 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     applyVoiceCommand(voicePolicyRef.current.onPoseAvailability(available, at, voiceContext()))
   }, [applyVoiceCommand, voiceContext, voiceFlowEnabled])
 
-  // ---- session record ------------------------------------------------------------------------------------------
   const persist = useCallback((outcome?: RoutineSessionRecord['outcome'], endedAt?: number): boolean => {
     const record = recordRef.current
     if (!record) return false
@@ -295,7 +289,6 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     setCameraMode('idle')
   }, [dispatchVoiceEvent, persist, setStatus, stopCapture])
 
-  // ---- course / playback clock -----------------------------------------------------------------------------------
   const applyCourse = useCallback((before: CourseSnapshot, after: CourseSnapshot, now: number) => {
     if (after.state !== before.state) {
       gestureControllerRef.current.reset()
@@ -312,7 +305,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     if (after.state === 'COURSE_COMPLETE') finishCompleted()
   }, [beginRecord, dispatchCourseVoice, finishCompleted, showGesture, step.startSeconds])
 
-  /** Runs every animation frame while capturing: coverage, the course's progress and throttled UI state. */
+  /** 采集期间每帧运行：覆盖进度、课程进度与节流后的界面状态 */
   const tick = useCallback((now: number) => {
     if (completedRef.current) return
     const stage = stageRef.current
@@ -346,7 +339,6 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   }, [applyCourse, chapters, persist, playbackRate, program, step])
   tickRef.current = tick
 
-  // ---- pose processing -------------------------------------------------------------------------------------------
   const processFrame = useCallback((rawFrame: PoseFrame, options: PoseOverlayDrawOptions & { aspect: number }) => {
     const now = rawFrame.timestamp
     noPoseStartedAtRef.current = undefined
@@ -370,8 +362,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     if (!normalized || !gesturePose) return
     const quality = extractPoseQuality(normalized, REQUIRED_LANDMARKS, FRAME_MARGIN, FULL_BODY_BOUNDS)
     const assist = framingAssistRef.current.update('FULL_BODY', normalized, now)
-    // Starting needs the whole body clearly visible. While following, limbs are often hidden by the body itself
-    // (side-facing forms), so only leaving the frame counts as a framing problem.
+    // 开始前要求全身清晰可见；跟练中侧身动作常有肢体被遮挡，只有离开画面才算入镜问题
     const framingValid = quality.confidence >= FRAMING_CONFIDENCE && quality.bodyInFrame
     const inFrame = quality.bodyInFrame && normalized.confidence >= FOLLOW_ALONG_CONFIG.minUserConfidence
     const before = courseRef.current.getSnapshot()
@@ -382,7 +373,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
       if (gesture.triggered === 'resume') togglePauseRef.current()
     } else if (before.state === 'PREPARING' || before.state === 'COUNTDOWN') {
       if (!framingValid) startGestureConfirmedRef.current = false
-      // Routine movements (合掌, 十字手 …) resemble the gestures, so gestures only act outside active following.
+      // 合掌、十字手等动作与手势相似，手势只在非跟练状态下生效
       const gesture = gestureControllerRef.current.update({ courseState: before.state, framingValid, pose: gesturePose })
       showGesture({ action: gesture.action, progress: gesture.progress })
       if (gesture.triggered === 'start') startGestureConfirmedRef.current = true
@@ -450,7 +441,6 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
   }, [applyCourse, dispatchPoseAvailability, persist, showFraming, showGesture])
   processNoPoseRef.current = processNoPose
 
-  // ---- pause / voice / sound / chapter jumps ------------------------------------------------------------------
   const togglePause = useCallback(() => {
     if (sessionStatusRef.current === 'completed' || sessionStatusRef.current === 'ready') return
     gestureControllerRef.current.reset()
@@ -497,8 +487,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     setStageTime(target.startSeconds)
   }, [program, scope.kind])
 
-  // ---- stage video events (wired by the stage component) ----------------------------------------------------------
-  /** Idempotent: called from several media events and once after mount (a cached video can load before React commits). */
+  /** 可重复调用：多个媒体事件和挂载后各调用一次（缓存视频可能在 React 提交前就已加载） */
   const onStageMetadata = useCallback(() => {
     const stage = stageRef.current
     if (!stage || stage.readyState < HTMLMediaElement.HAVE_METADATA || stageStatusRef.current === 'ready') return
@@ -517,7 +506,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     durationSeconds: program.video.durationSeconds,
   }), [program.video])
 
-  /** Media error, HTTP/Range answers and codec support, shown under 查看诊断信息 and written to the diagnostics log. */
+  /** 媒体错误、HTTP/Range 应答与编码支持情况，显示在“查看诊断信息”并写入诊断日志 */
   const diagnoseStage = useCallback((reason: 'error' | 'slow') => {
     const token = ++stageDiagnosticsTokenRef.current
     setStageDiagnostics(undefined)
@@ -535,7 +524,6 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     diagnoseStage('error')
   }, [diagnoseStage])
 
-  /** 重新加载: the same source again from the start of its resource selection. */
   const reloadStage = useCallback(() => {
     const stage = stageRef.current
     if (!stage || completedRef.current) return
@@ -578,7 +566,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
       return
     }
     void stage.play().catch((error: unknown) => {
-      // Autoplay with sound can be refused; follow on muted rather than not at all.
+      // 带声音的自动播放可能被拒绝，此时改为静音播放
       if (error instanceof DOMException && error.name === 'NotAllowedError' && !stage.muted) {
         stage.muted = true
         setVideoMuted(true)
@@ -587,7 +575,6 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     })
   }, [playbackRate, shouldPlay, stageStatus, videoMuted])
 
-  // ---- lifecycle -----------------------------------------------------------------------------------------------------
   useEffect(() => {
     let disposed = false
     void loadReferenceTrack(program.video.poseTrackSrc).then((track) => {
@@ -633,7 +620,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     }
   }, [persist])
 
-  // Space pauses and resumes, as in Smart Training.
+  // 空格键暂停 / 继续，与智能训练一致
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.code !== 'Space') return
@@ -709,7 +696,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     }
   }, [beginLoop, clearCameraFailure, debug, reportCameraFailure])
 
-  // Synthetic fixture: starts by itself and feeds the reference pose (DEV only).
+  // synthetic 测试模式：自动开始并输入标准姿态（仅开发环境）
   useEffect(() => {
     if (!synthetic) return
     const generation = generationRef.current + 1
@@ -722,7 +709,7 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
       const forceNoPose = Boolean((window as GestureTestWindow).__forceNoPose)
       const stageSeconds = stageRef.current?.currentTime ?? step.startSeconds
       const reference = track ? referencePoseFrame(track, Math.max(0, stageSeconds - fixtureLagSeconds), now) : null
-      // The first posed frames of a video can have poorly tracked feet; start from a clearly visible posture.
+      // 视频开头几帧脚部跟踪可能不准，从清晰可见的姿势开始
       const firstClear = track?.frames.find((item) => item.t >= step.startSeconds && item.confidence > 0
         && [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28].every((index) => (item.landmarks[index]?.visibility ?? 0) >= 0.8))
       const startBase = track && firstClear ? referencePoseFrame(track, firstClear.t, now) : null
@@ -739,7 +726,6 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     return () => { generationRef.current += 1 }
   }, [beginLoop, fixtureLagSeconds, fixtureMirror, manualGesture, step.startSeconds, synthetic])
 
-  // ---- derived view ------------------------------------------------------------------------------------------------
   const chapter = chapters.find((item) => item.id === chapterId) ?? chapters[0]
   const chapterIndex = chapters.indexOf(chapter)
   const totalSeconds = chapters.reduce((sum, item) => sum + (item.endSeconds - item.startSeconds), 0)

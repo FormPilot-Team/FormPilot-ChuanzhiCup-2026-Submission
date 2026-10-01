@@ -8,15 +8,13 @@ import { BADUANJIN_ANALYZER_CONFIG as CONFIG } from './config'
 import { baduanjinFeatures, type BaduanjinFeatures } from './features'
 import { BADUANJIN_STEPS, type BaduanjinStep, type BaduanjinTrajectory } from './steps'
 
-/** One movement of the demonstrator (托举 / 开弓 …), in video seconds; excursions in torso lengths. */
+/** 示范者的一次动作（托举、开弓…）：时间为视频秒，幅度为躯干长 */
 export interface Repetition {
   onset: number
-  /** First moment above the rise level (see config.timing). */
   rise: number
   peakAt: number
   offset: number
   excursion: number
-  /** Excursion of the step's second amplitude in the same span (摇头摆尾: trunk side lean, degrees). */
   secondaryExcursion: number | null
 }
 
@@ -28,20 +26,16 @@ export interface BaduanjinChapterReference {
 
 export interface BaduanjinEvaluation extends AnalyzerEvaluation {
   trajectory: BaduanjinTrajectory
-  /** False for 攒拳怒目增气力: the punch is only detected, its amplitude is not judged (未评估幅度). */
+  /** 攒拳只检测阶段，不评幅度时为 false */
   amplitudeEvaluated: boolean
-  /** Demonstrator repetitions whose rise and peak the samples covered. */
   observedRepetitions: number
   expectedRepetitions: number
-  /** Repetitions the user completed (own rise, amplitude-free). */
+  /** 用户自身升起即算完成，与幅度无关 */
   completedRepetitions: number
-  /** Mean user excursion / demonstrator excursion over the observed repetitions. */
   amplitudeRatio: number | null
-  /** Same for the second amplitude (摇头摆尾 trunk lean); null for the other forms. */
   secondaryRatio: number | null
-  /** Mean rise time − demonstrator rise time, s (positive = late). */
+  /** 平均升起时刻差，s；正值表示偏晚 */
   timingOffsetSeconds: number | null
-  /** Median jitter in the top holds, torso lengths. */
   holdJitter: number | null
 }
 
@@ -59,7 +53,7 @@ function robustScale(samples: ReadonlyArray<AnalyzerSample<BaduanjinFeatures>>):
   return scale !== null && scale > 0 ? scale : null
 }
 
-/** Scaled, lightly smoothed trajectory points; each continuous run is smoothed on its own. */
+/** 缩放并轻度平滑；每个连续段单独平滑 */
 function trajectoryRuns(samples: ReadonlyArray<AnalyzerSample<BaduanjinFeatures>>, scale: number): TrajectoryPoint[][] {
   const usable = samples.filter((sample) => typeof sample.features?.trajectory === 'number')
   return continuousRuns(usable, CONFIG.maxGapMs).map((run) => {
@@ -87,7 +81,6 @@ function secondaryPeak(points: ReadonlyArray<TrajectoryPoint>): number | null {
   return values.length ? Math.max(...values) : null
 }
 
-/** The demonstrator's repetitions: stretches above a share of the chapter's own range (see config). */
 export function findRepetitions(runs: ReadonlyArray<ReadonlyArray<TrajectoryPoint>>, chapter: RoutineChapter): BaduanjinChapterReference | null {
   const points = runs.flat()
   const values = points.map((point) => point.value)
@@ -125,7 +118,7 @@ export function findRepetitions(runs: ReadonlyArray<ReadonlyArray<TrajectoryPoin
   return { base, top, repetitions }
 }
 
-/** Median over coordinates of the residual RMS (jitter) in one hold; coordinates with gaps are skipped. */
+/** 一次保持内各坐标残差 RMS 的中位数；有缺失的坐标跳过 */
 function holdJitter(hold: ReadonlyArray<TrajectoryPoint>): number | null {
   if (hold.length < CONFIG.steadiness.minHoldSamples) return null
   const coordinates = hold[0].steady.length
@@ -139,7 +132,7 @@ function holdJitter(hold: ReadonlyArray<TrajectoryPoint>): number | null {
   return percentile(values, 0.5)
 }
 
-/** The run of points at or above `level` that contains `peak` (the repetition's top hold). */
+/** 包含峰值、且不低于 level 的连续段，即一次动作的顶点保持 */
 function topHold(points: ReadonlyArray<TrajectoryPoint>, peakIndex: number, level: number): TrajectoryPoint[] {
   let from = peakIndex
   let to = peakIndex
@@ -156,12 +149,8 @@ interface RepetitionResult {
   jitter: number | null
 }
 
-/**
- * 八段锦到位度: does each movement reach the position the demonstrator reaches, in time, and hold it steadily?
- * The demonstrator's repetitions are found once in the standard video's pose track (the video is the clock); in
- * each repetition's span the user's trajectory is compared with the demonstrator's: peak excursion (到位幅度), rise
- * time (到位时机), jitter in the top hold (定势稳定) and whether a rise happened at all (完成次数).
- */
+// 八段锦到位度（基于姿态关键点的二维近似）：在示范者每次动作的时间段内，
+// 比较用户与示范者的峰值幅度、升起时机、顶点抖动以及是否完成
 export class BaduanjinAnalyzer implements RoutineAnalyzer<BaduanjinFeatures, BaduanjinEvaluation> {
   readonly id = 'baduanjin' as const
   readonly version = CONFIG.version
@@ -213,7 +202,7 @@ export class BaduanjinAnalyzer implements RoutineAnalyzer<BaduanjinFeatures, Bad
       const from = repetition.onset - CONFIG.repetition.leadSeconds
       const to = repetition.offset + CONFIG.repetition.lagSeconds
       const inside = points.filter((point) => point.videoSeconds >= from && point.videoSeconds <= to)
-      // Only repetitions whose rise and peak were both followed count.
+      // 只统计升起和峰值都被跟到的动作
       if (inside.length < CONFIG.repetition.minSamples || inside[0].videoSeconds > repetition.onset || inside[inside.length - 1].videoSeconds < repetition.peakAt) continue
       const peakIndex = inside.reduce((best, point, index) => (point.value > inside[best].value ? index : best), 0)
       const peak = inside[peakIndex].value
@@ -299,7 +288,7 @@ export class BaduanjinAnalyzer implements RoutineAnalyzer<BaduanjinFeatures, Bad
 
 function amplitudeMetric(step: BaduanjinStep, ratio: number | null, secondaryRatio: number | null, evaluated: boolean): MetricDraft {
   const proxy = step.amplitude === 'proxy'
-  // 摇头摆尾: head offset and trunk side lean are both part of the sway.
+  // 摇头摆尾：头部偏移和躯干侧倾都计入
   const combined = ratio !== null && step.secondary && secondaryRatio !== null ? (ratio + secondaryRatio) / 2 : ratio
   const secondaryText = step.secondary && secondaryRatio !== null && ratio !== null ? `（头部偏移 ${percentText(ratio)}，${step.secondary.label} ${percentText(secondaryRatio)}）` : ''
   return {
@@ -316,7 +305,7 @@ function amplitudeMetric(step: BaduanjinStep, ratio: number | null, secondaryRat
   }
 }
 
-/** Seconds outside the tolerance (late beyond 1 s or early beyond 0.6 s). */
+/** 超出容差的秒数（晚于 1 s 或早于 0.6 s） */
 function timingExcess(offset: number): number {
   return offset >= 0 ? Math.max(0, offset - CONFIG.timing.lateToleranceSeconds) : Math.max(0, -offset - CONFIG.timing.earlyToleranceSeconds)
 }

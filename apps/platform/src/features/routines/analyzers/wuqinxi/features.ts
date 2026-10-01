@@ -1,11 +1,8 @@
 import { bodyFrame, LM, trunkSideLeanDegrees, type BodyFrame, type Point } from '../bodyFrame'
 import type { AnalyzerContext, AnalyzerPose } from '../types'
 
-/**
- * Movement features of the five animals. Each is a 2D quantity whose range over a form shows how fully the
- * animal's characteristic movement was made; lengths are aspect-corrected image units (scaled later by a robust
- * torso length), angles are degrees. Several are proxies of 3D movements seen from the front (noted per feature).
- */
+// 五禽戏特征（基于姿态关键点的二维近似）：特征在一动中的变化范围体现该戏的动作是否做足。
+// 长度为图像单位（评价时按稳健躯干长缩放），角度为度；部分是正面画面对三维动作的代理量
 export type WuqinxiFeatureId =
   | 'reachUp'
   | 'wristHeight'
@@ -22,9 +19,9 @@ export type WuqinxiFeatureId =
 
 export interface WuqinxiFeatureDefinition {
   label: string
-  /** 'length' values are divided by the body scale; angles are used as they are. */
+  /** length 类除以身体尺度，角度直接使用 */
   kind: 'length' | 'angle'
-  /** Present when the quantity only approximates a 3D movement. */
+  /** 只是三维动作的近似时给出说明 */
   proxy?: string
   compute(body: BodyFrame): number | null
 }
@@ -153,10 +150,10 @@ export const WUQINXI_FEATURES: Readonly<Record<WuqinxiFeatureId, WuqinxiFeatureD
 })
 
 export interface WuqinxiFeatures {
-  /** The form's profile features, in the order of its step entry (null when not visible). */
+  /** 本动的特征值，顺序同步骤表（不可见为 null） */
   profile: Array<number | null>
   torso: number
-  /** Wrists, nose and shoulder centre relative to the hip centre (x, y pairs; NaN when not visible). */
+  /** 腕、鼻、肩中心相对髋中心的 x, y（不可见为 NaN） */
   steady: number[]
   similarity: number | null
 }

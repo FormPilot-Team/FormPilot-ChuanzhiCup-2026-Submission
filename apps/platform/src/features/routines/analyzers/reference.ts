@@ -2,14 +2,10 @@ import type { ReferenceTrack } from '../followAlong/referenceTrack'
 import type { RoutineChapter } from '../types'
 import type { AnalyzerContext, AnalyzerPose, AnalyzerSample } from './types'
 
-/** Same rule as the matcher's reference frames. */
+/** 与跟练比对的参考帧门槛一致 */
 export const MIN_REFERENCE_CONFIDENCE = 0.5
 
-/**
- * The demonstrator's own feature sequence for one chapter, taken from the standard video's pose track with the
- * analyzer's own `extractFeatures` (so the user and the demonstrator are measured the same way). Wall-clock time is
- * the video time: the standard video plays at normal speed.
- */
+/** 示范者在一章内的特征序列，用分析器自己的 extractFeatures 提取，保证与用户同一测法；视频按原速播放，墙钟即视频时间 */
 export function referenceSamples<F>(
   track: ReferenceTrack,
   chapter: RoutineChapter,
@@ -26,7 +22,7 @@ export function referenceSamples<F>(
   return samples
 }
 
-/** The track frame nearest to `seconds` (binary search; tracks are sorted by time). */
+/** 离 seconds 最近的轨迹帧（轨迹按时间排序，二分查找） */
 export function nearestTrackFrame(track: ReferenceTrack, seconds: number) {
   const frames = track.frames
   if (!frames.length) return undefined

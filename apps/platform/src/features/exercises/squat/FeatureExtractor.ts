@@ -11,7 +11,7 @@ export class SquatFeatureExtractor implements ExerciseFeatureExtractor<SquatFeat
   private readonly baseline: StandingBaseline
 
   constructor(
-    private readonly config: SquatConfig = SQUAT_V1,
+    config: SquatConfig = SQUAT_V1,
     private readonly frameMargin = 0.025,
   ) {
     this.baseline = new StandingBaseline(config)

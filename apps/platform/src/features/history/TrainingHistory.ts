@@ -7,7 +7,7 @@ import type { TrainingSessionState } from '../training/types'
 export interface TrainingHistoryItem {
   session: TrainingSessionState
   analysis: TrainingAnalysis
-  /** Presentation label source (full course / free training); analysis never reads it. */
+  /** 仅用于展示（完整课程 / 自由训练），分析不读取 */
   scope: TrainingScope
   incomplete: boolean
   legacy: boolean
@@ -58,14 +58,14 @@ export function isPrimaryHistorySession(session: TrainingSessionState): boolean 
   return session.source !== 'demo' && session.source !== 'synthetic' && session.mode !== 'fast'
 }
 
-/** Free training is finished when its one exercise reached the target and the session ended normally. */
+/** 自由训练：唯一的动作达到目标且正常结束才算完成 */
 function freeTrainingIncomplete(session: TrainingSessionState, analysis: TrainingAnalysis, exerciseId: ExerciseId): boolean {
   if (session.courseStatus !== 'completed') return true
   if (exerciseId === 'shoulder_rotation') return analysis.guidance.status !== 'completed'
   return analysis.exercises.find((item) => item.exerciseId === exerciseId)?.completion.status !== 'completed'
 }
 
-/** Course sessions keep analysis-v1's course completeness; free training is judged on its own exercise. */
+/** 课程按整体完整度判断，自由训练只看所练动作 */
 export function isTrainingIncomplete(session: TrainingSessionState, analysis: TrainingAnalysis, scope: TrainingScope): boolean {
   return scope.kind === 'free_training' ? freeTrainingIncomplete(session, analysis, scope.exerciseId) : !analysis.courseComplete
 }
@@ -119,7 +119,7 @@ function issueLabel(exerciseId: string, reportLabel: string): string {
   return exercise ? `${exercise} · ${reportLabel}` : reportLabel
 }
 
-/** Pure multi-session presentation analysis. Input order never affects the result. */
+/** 多次训练的展示分析，与输入顺序无关 */
 export function buildTrainingHistoryOverview(analyses: readonly TrainingAnalysis[]): TrainingHistoryOverview {
   const reliable = analyses
     .filter(isReliableFullCourse)

@@ -6,7 +6,7 @@ import {
 export interface CustomActionRepository {
   load(): CustomActionLoadResult
   get(id: string): CustomActionDefinition | undefined
-  /** False when storage is unavailable, full, or holds data from a newer version (never overwritten). */
+  /** 存储不可用、已满或存有更新版本数据时返回 false（不覆盖） */
   save(action: CustomActionDefinition): boolean
   remove(id: string): boolean
 }
@@ -16,7 +16,7 @@ interface StoredPayload {
   actions: unknown[]
 }
 
-/** Parses the stored library. Invalid entries are skipped, never "repaired" into something the user did not make. */
+/** 解析存储的动作库；无效条目跳过，不做修补 */
 export function parseStoredActions(raw: unknown): CustomActionLoadResult {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { actions: [], readOnly: false, skipped: 0 }
   const payload = raw as Partial<StoredPayload>
@@ -41,7 +41,7 @@ export function parseStoredActions(raw: unknown): CustomActionLoadResult {
   return { actions, readOnly: false, skipped }
 }
 
-/** Most recently changed first. */
+/** 最近修改的在前 */
 export function sortActions(actions: readonly CustomActionDefinition[]): CustomActionDefinition[] {
   return [...actions].sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt) || (left.id < right.id ? -1 : 1))
 }
@@ -71,7 +71,7 @@ export class LocalStorageCustomActionRepository implements CustomActionRepositor
       const result = raw ? parseStoredActions(JSON.parse(raw) as unknown) : { actions: [], readOnly: false, skipped: 0 }
       return { ...result, actions: sortActions(result.actions) }
     } catch {
-      // Unreadable JSON is kept as it is (read only) rather than replaced by an empty library on the next save.
+      // 无法解析的 JSON 保持原样（只读），不会在下次保存时被清空
       return { actions: [], readOnly: true, skipped: 0 }
     }
   }

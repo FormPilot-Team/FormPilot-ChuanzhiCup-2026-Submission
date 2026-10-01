@@ -12,7 +12,7 @@ export type RoutineHistoryLoadState =
   | { status: 'ready'; items: RoutineHistoryItem[] }
   | { status: 'error' }
 
-/** Same rule as Smart Training: test (synthetic) and fast-mode records stay out of the user's history. */
+/** 与智能训练一致：测试（synthetic）和快速模式记录不进入历史 */
 export function isPrimaryRoutineRecord(record: RoutineSessionRecord): boolean {
   return record.source === 'live' && record.mode === 'normal'
 }
@@ -39,5 +39,4 @@ export function loadRoutineHistory(repository: RoutineSessionRepository): Routin
   }
 }
 
-/** The merged cross-mode timeline lives in historyEntries; re-exported for existing callers. */
 export { mergeHistoryEntries, type HistoryEntry } from './historyEntries'

@@ -1,22 +1,14 @@
-/**
- * Acceptance rule for every routine analyzer, checked by `tests/routine-analyzer-self-check.test.ts` on the standard
- * videos' own pose tracks (no recorded users yet):
- * - the demonstrator following their own video must score at least `demonstratorMinScore` in every scored chapter;
- * - each perturbation of that same sequence must lower the analyzer's mean score by at least `minPerturbationDrop`.
- * A metric that none of the perturbations moves has no discriminating power and is reported as such.
- */
+// 自检验收：示范者跟练自己的视频，每个计分章节不低于 demonstratorMinScore；
+// 每种扰动使平均分至少下降 minPerturbationDrop
 export const ANALYZER_SELF_CHECK = Object.freeze({
   demonstratorMinScore: 80,
   minPerturbationDrop: 15,
   perturbations: Object.freeze({
-    /** Gaussian noise on every landmark, standard deviation in torso lengths (isotropic in true proportions). */
+    /** 每个关键点加高斯噪声，标准差以躯干长计 */
     noise: Object.freeze({ sigmaTorso: 0.05, seed: 2026 }),
-    /** Every landmark (and the hip centre's path) pulled towards the chapter's mean posture: movements at 0.6 × size. */
+    /** 关键点与髋中心轨迹向本章平均姿态收缩，动作幅度变为 0.6 倍 */
     amplitude: Object.freeze({ factor: 0.6 }),
-    /**
-     * Following late with stops: the user is `lagSeconds` behind and, every `cycleSeconds`, stands still for
-     * `pauseSeconds` before catching up a little faster.
-     */
+    /** 落后 lagSeconds，并且每 cycleSeconds 先停 pauseSeconds 再加快追上 */
     timing: Object.freeze({ lagSeconds: 2, cycleSeconds: 6, pauseSeconds: 1.5 }),
   }),
 })

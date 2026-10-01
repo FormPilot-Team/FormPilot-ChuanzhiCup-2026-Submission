@@ -27,7 +27,7 @@ function metricOf(measurement: CriterionMeasurement): Pick<EvaluationCriterion, 
   return { metric: { label: definition.label, unit: definition.unit }, landmarks: definition.landmarks }
 }
 
-/** Fills the fields derived from the source registry and the measurement, and freezes the result. */
+/** 补全来源与测量派生的字段并冻结 */
 export function defineCriterion(input: CriterionInput): EvaluationCriterion {
   const source = getScoringSource(input.sourceId)
   for (const id of input.additionalSourceIds ?? []) getScoringSource(id)
@@ -52,7 +52,7 @@ export function defineCriterion(input: CriterionInput): EvaluationCriterion {
   })
 }
 
-/** A movement requirement the camera cannot judge (breathing, gaze, hand shape …): shown, never scored. */
+/** 摄像头无法判断的要求（呼吸、眼神、手型…）：只展示，不计分 */
 export function notObservable(input: Pick<EvaluationCriterion, 'id' | 'mode' | 'exercise' | 'name' | 'requirement' | 'sourceId'> & {
   evidenceLevel?: EvaluationCriterion['evidenceLevel']
   reason: string
@@ -76,7 +76,7 @@ export function notObservable(input: Pick<EvaluationCriterion, 'id' | 'mode' | '
   })
 }
 
-/** A requirement the camera could estimate, but which is not automated or calibrated yet. */
+/** 摄像头可以估计、但尚未自动化或定阈值的要求 */
 export function referenceOnly(input: Pick<EvaluationCriterion, 'id' | 'mode' | 'exercise' | 'name' | 'requirement' | 'sourceId'> & {
   evidenceLevel?: EvaluationCriterion['evidenceLevel']
   reason: string

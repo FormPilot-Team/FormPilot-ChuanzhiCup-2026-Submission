@@ -2,17 +2,14 @@ import { bodyFrame, LM, trunkSideLeanDegrees, type BodyFrame, type Point } from 
 import type { AnalyzerPose } from '../types'
 import type { BaduanjinStep, BaduanjinTrajectory } from './steps'
 
-/**
- * One frame of 八段锦 features. Lengths are in aspect-corrected image units; the analyzer divides them by a robust
- * torso length over time, because the 2D torso shortens when the body bends towards the camera (攀足).
- */
+/** 八段锦的单帧特征。长度为宽高比校正后的图像单位，评价时再除以稳健躯干长（攀足时二维躯干变短） */
 export interface BaduanjinFeatures {
-  /** The step's main trajectory; bigger = further towards the movement's position. */
+  /** 主轨迹，越大越接近到位 */
   trajectory: number | null
-  /** Second amplitude of the step (摇头摆尾: trunk side lean, degrees). */
+  /** 第二幅度（摇头摆尾：躯干侧倾，度） */
   secondary: number | null
   torso: number
-  /** Wrists, nose and shoulder centre relative to the hip centre (x, y pairs; NaN when not visible): steadiness. */
+  /** 腕、鼻、肩中心相对髋中心的 x, y（不可见为 NaN），用于定势稳定 */
   steady: number[]
 }
 
@@ -21,7 +18,7 @@ function above(reference: Point, point: Point): number {
 }
 
 const TRAJECTORIES: Readonly<Record<BaduanjinTrajectory, (body: BodyFrame) => number | null>> = {
-  // Lower of the two wrists above the nose: both hands must go up.
+  // 取较低的手腕：两手都要上举
   liftBoth: (body) => {
     const nose = body.point(LM.nose)
     const left = body.point(LM.leftWrist)
@@ -54,12 +51,12 @@ const TRAJECTORIES: Readonly<Record<BaduanjinTrajectory, (body: BodyFrame) => nu
     const right = body.point(LM.rightWrist)
     return left && right ? (left.y + right.y) / 2 - body.hipMid.y : null
   },
-  // A forward punch is foreshortened in a frontal picture, but the fist still rises from the waist to shoulder height.
+  // 正面画面中前冲拳被透视缩短，但拳仍从腰间抬到肩高
   punchLift: (body) => {
     const heights = [LM.leftWrist, LM.rightWrist].map((index) => body.point(index)).filter((point): point is Point => point !== null)
     return heights.length ? Math.max(...heights.map((wrist) => above(body.hipMid, wrist))) : null
   },
-  // The shoulder centre rises when the heels lift (camera fixed): an approximation of the heel rise.
+  // 相机固定时，提踵会带动肩中心上升，以此近似估计提踵
   heelRiseProxy: (body) => -body.shoulderMid.y,
 }
 

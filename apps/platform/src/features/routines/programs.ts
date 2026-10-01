@@ -2,7 +2,7 @@ import type { RoutineChapter, RoutineChapterSource, RoutineId, RoutineProgram, R
 
 const DIGITS = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九']
 
-/** 1..99 as Chinese numerals: 十一, 二十, 二十四. */
+/** 1..99 转中文数字：十一、二十、二十四 */
 export function chineseNumeral(value: number): string {
   if (!Number.isInteger(value) || value < 1 || value > 99) throw new Error(`Unsupported numeral: ${value}`)
   if (value < 10) return DIGITS[value]
@@ -11,7 +11,7 @@ export function chineseNumeral(value: number): string {
   return `${tens === 1 ? '' : DIGITS[tens]}十${DIGITS[ones]}`
 }
 
-/** Derives end times, indexes and form numbers; chapter starts must be strictly increasing and inside the video. */
+/** 推导结束时间、序号和式序号；章节起点必须严格递增且在视频内 */
 export function buildChapters(sources: ReadonlyArray<RoutineChapterSource>, durationSeconds: number): RoutineChapter[] {
   let formNumber = 0
   return sources.map((source, index) => {
@@ -25,7 +25,7 @@ export function buildChapters(sources: ReadonlyArray<RoutineChapterSource>, dura
   })
 }
 
-/** `codecs` is what the shipped file really contains (tests/routine-video-files.test.ts reads the MP4 to check). */
+/** codecs 为发布文件的真实编码（由 routine-video-files 测试读取 MP4 核对） */
 function video(id: RoutineId, width: number, height: number, durationSeconds: number, codecs: string, contentAspect = width / height): RoutineVideo {
   return {
     src: `/assets/routines/${id}-standard.mp4`,
@@ -93,7 +93,7 @@ const TAIJIQUAN_FORMS: ReadonlyArray<readonly [string, number, string]> = [
   ['收势', 337.5, '两掌分开下落，缓缓还原站立'],
 ]
 
-// 4:3 footage pillarboxed in a 640×360 frame (picture spans x 78–555).
+// 4:3 画面以黑边置于 640×360 帧内（画面横向 78–555）
 const TAIJIQUAN_VIDEO = video('taijiquan', 640, 360, 340.3, 'avc1.640033, mp4a.40.5', 4 / 3)
 const TAIJIQUAN: RoutineProgram = {
   id: 'taijiquan',
@@ -104,7 +104,6 @@ const TAIJIQUAN: RoutineProgram = {
   formUnit: '式',
   accent: 'violet',
   video: TAIJIQUAN_VIDEO,
-  // Captions mark each form's start slightly after the movement begins; starts are taken 1 s before the caption.
   timingSource: `${CAPTION_TIMING} 太极拳字幕在动作开始后约 1 秒出现，因此起点取字幕前 1 秒；原片在收势开始约 3 秒后结束。`,
   chapters: buildChapters(TAIJIQUAN_FORMS.map(([name, startSeconds, cue], index) => ({
     id: `tjq-${index + 1}`,
@@ -183,7 +182,6 @@ const YIJINJING: RoutineProgram = {
   ], YIJINJING_VIDEO.durationSeconds),
 }
 
-/** Catalog order: the two routines already promised on the Mode Hub first, then the two new ones. */
 export const ROUTINE_PROGRAMS: ReadonlyArray<RoutineProgram> = Object.freeze([BADUANJIN, TAIJIQUAN, WUQINXI, YIJINJING])
 
 const PROGRAMS_BY_ID: ReadonlyMap<string, RoutineProgram> = new Map(ROUTINE_PROGRAMS.map((program) => [program.id, program]))

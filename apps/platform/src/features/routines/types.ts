@@ -1,31 +1,28 @@
-/** The four follow-along routines integrated from the teammate's 2026-09 standard-video version. */
 export type RoutineId = 'baduanjin' | 'taijiquan' | 'wuqinxi' | 'yijinjing'
 
-/** Opening and closing sequences belong to the routine but are not numbered forms. */
+/** 预备势、收势属于套路，但不编式序号 */
 export type RoutineChapterKind = 'opening' | 'form' | 'closing'
 
-/** Accent family used sparingly for mode identity (chips, ribbon highlight). Primary actions stay FormPilot blue. */
 export type RoutineAccent = 'orange' | 'violet' | 'emerald' | 'rose'
 
 export interface RoutineChapterSource {
   id: string
   kind: RoutineChapterKind
-  /** Short position label shown in the UI, e.g. 第三式 / 预备势 / 虎戏. */
+  /** 界面上的位置标签，如 第三式 / 预备势 / 虎戏 */
   label: string
-  /** Full name as captioned in the standard video, e.g. 调理脾胃须单举. */
+  /** 标准视频字幕中的全名，如 调理脾胃须单举 */
   name: string
-  /** When the chapter begins in the standard video, in seconds. */
+  /** 在标准视频中的起点，秒 */
   startSeconds: number
-  /** What to watch for while following this chapter. */
   cue: string
 }
 
 export interface RoutineChapter extends RoutineChapterSource {
-  /** 0-based position in the routine. */
+  /** 从 0 开始 */
   index: number
-  /** 1-based number among `form` chapters only. */
+  /** 仅 form 章节，从 1 开始 */
   formNumber?: number
-  /** Next chapter's start, or the video's end for the last chapter. */
+  /** 下一章起点，最后一章为视频结尾 */
   endSeconds: number
 }
 
@@ -35,33 +32,28 @@ export interface RoutineVideo {
   posterSrc: string
   width: number
   height: number
-  /**
-   * Aspect ratio of the picture inside the frame. Differs from width / height when the source is pillarboxed
-   * (the 太极拳 video carries 4:3 footage in a 16:9 frame); the stage crops only the black bars.
-   */
+  /** 帧内画面的宽高比；太极拳视频为 16:9 帧内的 4:3 画面，只裁黑边 */
   contentAspect: number
   durationSeconds: number
-  /** RFC 6381 codecs of the shipped file, e.g. `avc1.64001E, mp4a.40.2` (checked against the MP4 by a unit test). */
+  /** 发布文件的 RFC 6381 编码，由单测核对 */
   codecs: string
 }
 
 export interface RoutineProgram {
   id: RoutineId
-  /** Bumped whenever chapter timing or content changes, so saved sessions can be compared safely. */
+  /** 章节时间或内容变化时递增，保证历史记录可比 */
   version: string
   title: string
   subtitle: string
   description: string
-  /** Counting word for numbered forms: 式 / 动 / 势. */
+  /** 式 / 动 / 势 */
   formUnit: string
   accent: RoutineAccent
   video: RoutineVideo
   chapters: ReadonlyArray<RoutineChapter>
-  /** How the chapter times were established, kept next to the data it justifies. */
   timingSource: string
 }
 
-/** A full run of the routine, or one numbered form practised on its own. */
 export type RoutineScope =
   | { kind: 'full' }
   | { kind: 'form'; chapterId: string }

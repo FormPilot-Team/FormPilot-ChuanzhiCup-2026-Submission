@@ -3,11 +3,7 @@ import type { RoutineAnalysisRecord } from '../analyzers/analysisRecord'
 import type { FollowAlongRegion } from '../followAlong/matcher'
 import type { RoutineId, RoutineScope } from '../types'
 
-/**
- * A follow-along routine session. Kept apart from Smart Training's `TrainingSessionState` on purpose: that schema
- * and its analysis (analysis-v1) are built around the six scored exercises, while a routine is measured by how
- * closely and how completely the user followed the standard video, chapter by chapter.
- */
+// 跟练会话记录，与智能训练的 TrainingSessionState 分开：跟练按章节衡量跟随标准视频的程度
 export const ROUTINE_SESSION_SCHEMA_VERSION = 1
 
 export type RoutineSessionSource = 'live' | 'synthetic'
@@ -17,15 +13,13 @@ export type FollowAlongCountedStatus = 'in_sync' | 'ahead' | 'behind' | 'mismatc
 
 export interface RoutineChapterResult {
   chapterId: string
-  /** Chapter length in whole seconds (the coverage denominator). */
+  /** 章节整秒数，完成度的分母 */
   totalSeconds: number
-  /** Distinct seconds of this chapter that played while the user was training. */
   coveredSeconds: number
-  /** Comparisons that produced a result. */
   samples: number
-  /** Comparisons skipped because the pose was not reliable enough. */
+  /** 姿态不可靠而跳过的比对 */
   insufficientSamples: number
-  /** Sum of the smoothed similarity (0..1) over `samples`. */
+  /** 平滑后相似度（0..1）之和 */
   similaritySum: number
   regionSums: Record<FollowAlongRegion, number>
   regionSamples: Record<FollowAlongRegion, number>
@@ -42,23 +36,16 @@ export interface RoutineSessionRecord {
   scope: RoutineScope
   source: RoutineSessionSource
   mode: RoutineSessionMode
-  /** Comparison rules used, and whether the reference track was available at all. */
   matcher: { version: string; available: boolean }
   startedAt: number
   endedAt?: number
-  /** Wall-clock time spent actively following (pauses excluded). */
+  /** 实际跟练时长（不含暂停） */
   activeMs: number
   outcome: RoutineSessionOutcome
   chapters: RoutineChapterResult[]
-  /**
-   * Scoring v2 technique evidence (optional; records saved before it have none). Kept apart from the similarity
-   * data above: it says whether specific movement requirements were met, not how close the pose was to the video.
-   */
+  /** 动作规范证据（可选，旧记录没有） */
   technique?: RoutineTechniqueRecord
-  /**
-   * Routine analyzer evidence (optional; added with the per-routine analyzers). Only checked to be an object here:
-   * the report validates it in depth and ignores it when malformed, so the session itself is never rejected for it.
-   */
+  /** 分析器结果（可选）；这里只检查是对象，深层校验在报告中，异常时忽略而不拒绝整条记录 */
   analysis?: RoutineAnalysisRecord
 }
 

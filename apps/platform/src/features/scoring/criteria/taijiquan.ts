@@ -2,12 +2,8 @@ import type { EvaluationCriterion } from '../types'
 import { defineCriterion, notObservable, referenceOnly } from './define'
 import { COMMON_NOT_OBSERVABLE_REASONS, poseCheck } from './routineHelpers'
 
-/**
- * 二十四式太极拳. Borrows only the idea of the traditional-wushu rules — 动作质量 (does each posture meet its
- * specification) apart from 演练水平 (连贯、协调、节奏) — never their deduction table or total. 虚实 (true weight
- * distribution) is not measurable from a 2D camera; the visual estimate is named estimatedWeightShift and is advisory.
- * Checks apply to the whole routine: the phase windows are wherever the demonstrator is upright / in a bent stance.
- */
+// 二十四式太极拳：只借用传统武术规则中“动作质量”与“演练水平”分开的思路，不用其扣分表。
+// 虚实（真实重心分布）无法从二维画面测得，视觉估计记为 estimatedWeightShift，仅作提示
 const ROUTINE = 'taiji-24-routine'
 const RULES = 'cwa-traditional-rules-2012'
 const RESEARCH = 'gdut-taiji-quality-2026'

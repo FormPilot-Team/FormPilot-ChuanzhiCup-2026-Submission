@@ -3,16 +3,12 @@ import type { VoiceGuideEvent } from '../voice/VoiceGuidePolicy'
 import { scopeBounds, scopeChapters, chapterDisplayName, type ScopeBounds } from './scope'
 import type { RoutineProgram, RoutineScope } from './types'
 
-/**
- * A routine runs as a one-step course through the shared CourseController, so preparation, the start gesture,
- * the countdown, pausing and manual end behave exactly as in Smart Training. The step's progress is the
- * standard video's position inside the scope: the video, not the user's motion, sets the pace.
- */
+/** 跟练作为单步课程运行在公共 CourseController 上；进度取标准视频在范围内的位置，由视频而不是动作决定节奏 */
 export interface RoutineCourseStep extends ScopeBounds {
   scope: RoutineScope
 }
 
-/** The video's `ended`/boundary timing is not frame exact; this much before the end counts as finished. */
+/** 视频结束时刻不精确到帧，离结尾这么近即算完成 */
 export const ROUTINE_END_TOLERANCE_SECONDS = 0.3
 
 export function createRoutineCourse(program: RoutineProgram, scope: RoutineScope, fast = false): CourseTimeline<RoutineCourseStep> {
@@ -35,7 +31,7 @@ export function routinePreparationVoice(program: RoutineProgram, scope: RoutineS
   return `接下来是${what}。请后退一些，确保全身完整入镜，然后双手在胸前合拢，开始跟练。`
 }
 
-/** Voice events for course state changes. Chapter changes are not announced: the standard video names them. */
+/** 课程状态变化的语音事件；章节切换不播报，标准视频自带口令 */
 export function deriveRoutineVoiceEvents(
   before: CourseSnapshot | undefined,
   after: CourseSnapshot,

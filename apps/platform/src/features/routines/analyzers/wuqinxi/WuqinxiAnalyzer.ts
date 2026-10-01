@@ -14,18 +14,17 @@ interface SeriesPoint {
 }
 
 export interface WuqinxiChapterReference {
-  /** Demonstrator range of each profile feature (scaled), in step order. */
+  /** 示范者各特征的范围（已缩放），顺序同步骤表 */
   ranges: Array<number | null>
-  /** The first feature over the form (smoothed, scaled), sorted by video time: the rhythm reference. */
+  /** 第一个特征的示范序列，按视频时间排序，作节律参考 */
   primary: SeriesPoint[]
 }
 
 export interface WuqinxiEvaluation extends AnalyzerEvaluation {
   category: WuqinxiCategory
-  /** User range / demonstrator range per profile feature. */
   profile: Array<{ feature: WuqinxiFeatureId; ratio: number | null }>
   similarity: number | null
-  /** Lag of the movement rhythm behind the demonstrator, s (positive = late); null when not readable. */
+  /** 动作节律相对示范的滞后，s；正值表示偏晚，读不出时为 null */
   lagSeconds: number | null
   jitter: number | null
 }
@@ -35,7 +34,7 @@ function robustScale(samples: ReadonlyArray<AnalyzerSample<WuqinxiFeatures>>): n
   return scale !== null && scale > 0 ? scale : null
 }
 
-/** One profile feature as smoothed points; lengths divided by the body scale. Smoothing never crosses a gap. */
+/** 单个特征的平滑序列，长度按身体尺度缩放；平滑不跨断点 */
 function featureSeries(samples: ReadonlyArray<AnalyzerSample<WuqinxiFeatures>>, index: number, feature: WuqinxiFeatureId, scale: number): SeriesPoint[] {
   const divisor = WUQINXI_FEATURES[feature].kind === 'length' ? scale : 1
   const visible = samples.filter((sample) => typeof sample.features?.profile[index] === 'number')
@@ -79,7 +78,7 @@ function correlation(pairs: ReadonlyArray<readonly [number, number]>): number | 
   return varianceA > 0 && varianceB > 0 ? covariance / Math.sqrt(varianceA * varianceB) : null
 }
 
-/** The lag at which the user's first feature best matches the demonstrator's (positive = the user is late). */
+/** 用户第一个特征与示范者相关最强的滞后（正值表示偏晚） */
 export function rhythmLag(user: ReadonlyArray<SeriesPoint>, reference: ReadonlyArray<SeriesPoint>): number | null {
   if (!user.length || user[user.length - 1].videoSeconds - user[0].videoSeconds < CONFIG.rhythm.minSeconds) return null
   let best: { lag: number; correlation: number } | null = null
@@ -92,7 +91,7 @@ export function rhythmLag(user: ReadonlyArray<SeriesPoint>, reference: ReadonlyA
       if (expected !== null) pairs.push([point.value, expected])
     }
     const value = correlation(pairs)
-    // Prefer the smallest lag among equally good ones.
+    // 相关相同时取绝对值最小的滞后
     if (value !== null && (!best || value > best.correlation + 1e-6 || (Math.abs(value - best.correlation) <= 1e-6 && Math.abs(lag) < Math.abs(best.lag)))) best = { lag, correlation: value }
   }
   return best && best.correlation >= CONFIG.rhythm.minCorrelation ? best.lag : null
@@ -114,12 +113,8 @@ function blockJitter(samples: ReadonlyArray<AnalyzerSample<WuqinxiFeatures>>, sc
   return percentile(blocks, 0.5)
 }
 
-/**
- * 五禽戏五戏特征 (Profile): does each movement show its animal? Per form, the range of the animal's characteristic
- * 2D features (虎的上举与扑按、鹿的侧屈转腰、熊的摇转与晃动、猿的耸肩提踵、鸟的起落与提膝) is compared with the
- * demonstrator's, together with the movement's rhythm against the video, the posture similarity and steadiness.
- * The report groups the forms by animal.
- */
+// 五禽戏五戏特征（基于姿态关键点的二维近似）：每一动比较该戏特征的变化范围与示范者的比值，
+// 并结合节律、跟练相似度与稳定性；报告按虎、鹿、熊、猿、鸟分组
 export class WuqinxiAnalyzer implements RoutineAnalyzer<WuqinxiFeatures, WuqinxiEvaluation> {
   readonly id = 'wuqinxi' as const
   readonly version = CONFIG.version

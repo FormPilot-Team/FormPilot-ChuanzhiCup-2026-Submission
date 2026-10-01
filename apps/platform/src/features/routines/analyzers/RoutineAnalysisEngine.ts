@@ -6,12 +6,9 @@ import { TimeWindow } from './timeWindow'
 import type { AnalyzerEvaluation, AnalyzerFeedbackItem, AnalyzerPose, AnalyzerSample, MetricResult, RoutineAnalyzer } from './types'
 
 export const ANALYSIS_ENGINE_CONFIG = Object.freeze({
-  /**
-   * Feature samples kept per chapter: the longest chapter (≈ 126 s) at the 10 Hz comparison rate is ≈ 1260.
-   * Repeating a chapter (jumps in the full routine) keeps the newest samples.
-   */
+  /** 每章保留的样本数：最长一章约 126 s × 10 Hz ≈ 1260；重复跟练同一章时保留最新的 */
   maxSamplesPerChapter: 1500,
-  /** Live window capacity (samples, 30 s at 10 Hz); the analyzer's own `liveWindowMs` decides how much of it is used. */
+  /** 实时窗口容量（10 Hz 下 30 s），实际长度由各分析器的 liveWindowMs 决定 */
   liveCapacity: 300,
 })
 
@@ -21,28 +18,24 @@ export interface RoutineAnalysisLive {
   chapterId: string
   score: number | null
   metrics: MetricResult[]
-  /** The most relevant sentence for right now (worst metric first), or null while still reading. */
+  /** 当前最该提示的一句（最差项在前）；读取中为 null */
   feedback: AnalyzerFeedbackItem | null
 }
 
 interface ChapterSeries<F, E> {
   chapter: RoutineChapter
   samples: Array<AnalyzerSample<F>>
-  /** Samples ever added (keeps counting when the oldest are dropped), so the cached evaluation knows it is stale. */
+  /** 累计加入的样本数（丢弃旧样本也继续计数），用来判断缓存的评价是否过期 */
   added: number
   evaluated?: { added: number; evaluation: E | null }
 }
 
-/**
- * Runs one routine analyzer next to the follow-along matcher: cuts the feature sequence by chapter (the standard
- * video is the clock), evaluates a short sliding window for the live view and each chapter's whole sequence for
- * the record. It never touches the matcher, recorder, technique evaluator or feedback policy.
- */
+/** 在跟练比对旁运行一个分析器：按视频时间切分章节，实时评价短窗口，存档评价整章；不触碰比对、记录与反馈 */
 export class RoutineAnalysisEngine<F, E extends AnalyzerEvaluation> {
   private readonly series = new Map<string, ChapterSeries<F, E>>()
   private readonly window: TimeWindow<AnalyzerSample<F>>
   private liveChapterId?: string
-  /** The last live view with an evaluation, kept while the window holds no complete movement of the same chapter. */
+  /** 窗口内还没有完整动作时（如两次托举之间）沿用的上一次实时结果 */
   private lastLive?: RoutineAnalysisLive
 
   constructor(readonly analyzer: RoutineAnalyzer<F, E>, private readonly program: RoutineProgram, scope: RoutineScope) {
@@ -52,7 +45,6 @@ export class RoutineAnalysisEngine<F, E extends AnalyzerEvaluation> {
     this.window = new TimeWindow(analyzer.liveWindowMs, ANALYSIS_ENGINE_CONFIG.liveCapacity)
   }
 
-  /** One comparison tick: `videoSeconds` of the standard video, `now` in ms, the user's pose and the tick's match. */
   observe(videoSeconds: number, now: number, pose: AnalyzerPose, match?: FollowAlongMatch): void {
     if (!Number.isFinite(videoSeconds) || !Number.isFinite(now)) return
     const chapter = chapterAt(this.program, videoSeconds)
@@ -71,10 +63,6 @@ export class RoutineAnalysisEngine<F, E extends AnalyzerEvaluation> {
     this.window.push(now, sample)
   }
 
-  /**
-   * The live view of the current chapter, from the sliding window only. When the window holds no complete movement
-   * yet (e.g. between two 托举), the last evaluated view of the same chapter is kept instead of going blank.
-   */
   live(): RoutineAnalysisLive | null {
     const series = this.liveChapterId ? this.series.get(this.liveChapterId) : undefined
     if (!series) return null
@@ -94,7 +82,7 @@ export class RoutineAnalysisEngine<F, E extends AnalyzerEvaluation> {
     return live
   }
 
-  /** Whole-chapter evaluations for the session record; chapters without samples are left out. */
+  /** 存档用的整章评价；没有样本的章节不写 */
   snapshot(): RoutineAnalysisRecord {
     const chapters: RoutineAnalysisRecord['chapters'] = []
     for (const series of this.series.values()) {

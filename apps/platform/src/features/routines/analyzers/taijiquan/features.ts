@@ -1,26 +1,19 @@
 import { bodyFrame, LM, type Point } from '../bodyFrame'
 import type { AnalyzerContext, AnalyzerPose } from '../types'
 
-/**
- * One frame of 太极拳 features. Positions are aspect-corrected image units (the analyzer scales them by a robust
- * torso length over time); the support ratio is the 2D hip-centre approximation of where the weight is.
- */
+/** 太极拳单帧特征（基于姿态关键点的二维近似）；位置为图像单位，评价时按稳健躯干长缩放 */
 export interface TaijiquanFeatures {
-  /** Wrists and hip centre (x, y pairs; NaN when not visible): the moving points whose speed is followed. */
+  /** 双腕与髋中心的 x, y（不可见为 NaN），用于速度 */
   points: number[]
   torso: number
-  /**
-   * (hip centre x − left ankle x) / (right ankle x − left ankle x): 0 = over the left ankle, 1 = over the right
-   * (the person's own sides). Null when the ankles are hidden or too close together to tell.
-   */
+  /** (髋中心x − 左踝x) / (右踝x − 左踝x)：0 在左踝上方，1 在右踝上方；两踝不可见或过近时为 null */
   supportRatio: number | null
-  /** Follow-along similarity of the same tick (null for the demonstrator's own frames or an unusable comparison). */
   similarity: number | null
-  /** The matcher found the left/right-mirrored pose closer: the user follows as in a mirror. */
+  /** 镜像姿态与示范更接近，即用户按镜像跟练 */
   mirrored: boolean
 }
 
-/** Ankles closer than this (torso lengths) say nothing about which leg carries the weight. */
+/** 两踝间距小于此值（躯干长）时无法判断支撑腿 */
 export const MIN_SUPPORT_SPAN = 0.25
 
 export function taijiquanFeatures(pose: AnalyzerPose, context: Pick<AnalyzerContext, 'match'>): TaijiquanFeatures | null {

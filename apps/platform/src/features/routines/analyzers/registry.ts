@@ -9,10 +9,8 @@ import { WuqinxiAnalyzer } from './wuqinxi/WuqinxiAnalyzer'
 import { YijinjingAnalyzer } from './yijinjing/YijinjingAnalyzer'
 import type { AnalyzerEvaluation, AnalyzerReportMetrics, RoutineAnalyzer } from './types'
 
-/** Any analyzer, seen through the shared contract (features stay opaque outside the analyzer). */
 export type AnyRoutineAnalyzer = RoutineAnalyzer<unknown, AnalyzerEvaluation>
 
-/** The engine running one routine's analyzer during a session. */
 export type RoutineAnalysis = RoutineAnalysisEngine<unknown, AnalyzerEvaluation>
 
 type AnalyzerFactory = (program: RoutineProgram, track?: ReferenceTrack) => AnyRoutineAnalyzer
@@ -24,29 +22,22 @@ const FACTORIES: Partial<Record<RoutineId, AnalyzerFactory>> = {
   yijinjing: (program, track) => new YijinjingAnalyzer(program, track) as unknown as AnyRoutineAnalyzer,
 }
 
-/**
- * The routine's analyzer. Without a track it can still format saved evaluations (report), but evaluates nothing
- * that needs the demonstrator's reference.
- */
+/** 没有轨迹时只能格式化已存的评价（报告），不能做需要示范参考的评价 */
 export function createRoutineAnalyzer(program: RoutineProgram, track?: ReferenceTrack): AnyRoutineAnalyzer | undefined {
   return FACTORIES[program.id]?.(program, track)
 }
 
-/** Name of the routine's analysis (八段锦到位度 …), or undefined when the routine has no analyzer. */
 export function routineAnalyzerTitle(program: RoutineProgram): string | undefined {
   return createRoutineAnalyzer(program)?.title
 }
 
-/** The live analysis next to the follow-along matcher; undefined when the routine has no analyzer (nothing changes then). */
+/** 功法没有分析器时返回 undefined，跟练流程不受影响 */
 export function createRoutineAnalysis(program: RoutineProgram, scope: RoutineScope, track: ReferenceTrack): RoutineAnalysis | undefined {
   const analyzer = createRoutineAnalyzer(program, track)
   return analyzer ? new RoutineAnalysisEngine(analyzer, program, scope) : undefined
 }
 
-/**
- * Report of a saved analysis. Records without one (saved before the analyzers, or the pose data missing), from
- * another analyzer version, or malformed, give null: the report then shows no 专项分析 section.
- */
+/** 记录缺失、分析器版本不同或格式不对时返回 null，报告不显示专项分析 */
 export function buildRoutineAnalysisReport(program: RoutineProgram, scope: RoutineScope, analysis: unknown): AnalyzerReportMetrics | null {
   const analyzer = createRoutineAnalyzer(program)
   if (!analyzer || !isRoutineAnalysisRecord(analysis)) return null

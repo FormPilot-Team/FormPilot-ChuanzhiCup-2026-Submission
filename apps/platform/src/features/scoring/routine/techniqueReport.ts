@@ -5,11 +5,10 @@ import { targetText, withUnit } from '../targetScore'
 import { SCORING_VERSION, type EvaluationCriterion } from '../types'
 import type { RoutineTechniqueRecord, TechniqueWindowObservation } from './techniqueRecord'
 
-/** One observed window, ready to quote as evidence. */
 export interface TechniqueEvidence {
-  /** 1-based position among this criterion's windows in the chapter (第 N 次). */
+  /** 本检查项在该章节内的第几次（第 N 次），从 1 开始 */
   occurrence: number
-  /** Video time of the phase, seconds. */
+  /** 阶段在视频中的时间，秒 */
   start: number
   phase: string | null
   value: number
@@ -24,40 +23,37 @@ export interface TechniqueCriterionResult {
   windowsTotal: number
   windowsObserved: number
   passed: number
-  /** Mean window score, 0–100; null when no window could be observed. */
+  /** 窗口平均分 0–100；没有可观测窗口时为 null */
   score: number | null
-  /** Lowest-scoring observed windows (up to three), worst first; only windows below full marks. */
+  /** 低于满分的窗口，最差的在前，最多三个 */
   failures: TechniqueEvidence[]
 }
 
 export interface TechniqueChapterResult {
   chapter: RoutineChapter
-  /** Weighted mean of the chapter's scored criteria that were observed. */
   score: number | null
   measured: TechniqueCriterionResult[]
-  /** Requirements shown for reference: not measured yet, or not observable at all. */
+  /** 仅供参考的要求：尚未测量或无法观测 */
   references: EvaluationCriterion[]
 }
 
 export interface TechniqueDeduction {
   result: TechniqueCriterionResult
   chapter: RoutineChapter
-  /** weight × (100 − score), the share of the technique score this criterion cost. */
+  /** weight × (100 − score)，即该项扣掉的分 */
   lostPoints: number
 }
 
 export interface RoutineTechniqueReport {
   version: string
-  /** False when the record predates Scoring v2 or the standard pose data was missing. */
+  /** 旧记录或缺少标准姿态数据时为 false */
   available: boolean
   reason: string | null
-  /** 动作规范评价: weighted mean over all observed scored criteria; null when nothing could be observed. */
   score: number | null
   chapters: TechniqueChapterResult[]
-  /** Chapters that have at least one camera check (the rest are reference-only for now). */
+  /** 至少有一项摄像头检查的章节数 */
   measuredChapterCount: number
   deductions: TechniqueDeduction[]
-  /** Routine-wide requirements the camera cannot judge (breathing, intent …). */
   routineNotObservable: EvaluationCriterion[]
 }
 
@@ -106,10 +102,7 @@ function weightedScore(results: readonly TechniqueCriterionResult[]): number | n
 const UNAVAILABLE_OLD = '这条记录生成于评分说明上线之前，没有保存动作规范检查的数据。'
 const UNAVAILABLE_TRACK = '本次没有加载到标准动作姿态数据，无法划分动作阶段，因此没有动作规范检查。'
 
-/**
- * 动作规范评价 for a routine session. Similarity (how close the pose is to the video) is reported elsewhere and is
- * never mixed in here: this is only whether the specific, sourced requirements were met in each phase.
- */
+/** 动作规范评价：只看各阶段是否满足有出处的要求，不混入跟练相似度 */
 export function buildRoutineTechniqueReport(
   program: RoutineProgram,
   scope: RoutineScope,
@@ -152,13 +145,12 @@ export function buildRoutineTechniqueReport(
   }
 }
 
-/** “01:27” for evidence lines. */
 export function videoClock(seconds: number): string {
   const safe = Math.max(0, Math.floor(seconds))
   return `${String(Math.floor(safe / 60)).padStart(2, '0')}:${String(safe % 60).padStart(2, '0')}`
 }
 
-/** “第 3 次托举顶点（视频 01:27）双肘伸展角（较弯一侧）137°，要求 ≥ 150°”. */
+/** 如“第 3 次托举顶点（视频 01:27）双肘伸展角（较弯一侧）137°，要求 ≥ 150°” */
 export function evidenceSentence(result: TechniqueCriterionResult, evidence: TechniqueEvidence): string {
   const metric = result.criterion.metric?.label ?? result.criterion.name
   return `第 ${evidence.occurrence} 次${evidence.phase ?? ''}（视频 ${videoClock(evidence.start)}）${metric} ${evidence.valueText}，要求 ${evidence.targetText}`

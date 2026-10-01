@@ -2,12 +2,8 @@ import type { EvaluationCriterion } from '../types'
 import { notObservable, referenceOnly } from './define'
 import { COMMON_NOT_OBSERVABLE_REASONS, poseCheck } from './routineHelpers'
 
-/**
- * 八段锦. Each numbered form turns the official habitual errors (国家体育总局健身气功管理中心《健身气功•八段锦习惯性
- * 错误及纠正方法》, checked online 2026-09-28) into camera checks where a frontal 2D pose can see them. Phase windows
- * come from the standard video's own pose track; every threshold is FormPilot-calibrated from the demonstrator's
- * measured values (see thresholdBasis) and is not an official number.
- */
+// 八段锦：把官方《健身气功•八段锦习惯性错误及纠正方法》中正面二维姿态能看到的部分转为摄像头检查。
+// 阶段窗口取自标准视频的姿态轨迹；阈值参照示范者的数值暂定，不是官方数值
 const ERRORS = 'gsqc-bdj-errors-2018'
 const STANDARD = 'tcacm-1676-2026-baduanjin'
 const check = poseCheck.bind(null, 'baduanjin')
@@ -27,7 +23,7 @@ const HORSE_7 = { label: '马步冲拳', when: [{ metric: 'kneeAngleMean', max: 
 const HEEL_RAISE = { label: '提踵颠足', when: [{ metric: 'stanceWidth', max: 1.2 }, { metric: 'kneeAngleMean', min: 165 }], minSeconds: 2, maxSeconds: 8 } as const
 
 export const BADUANJIN_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.freeze([
-  // ---- 第一式 两手托天理三焦（Scoring v2 样板）----------------------------------------------------------------------
+  // 第一式 两手托天理三焦
   check({
     id: 'bdj.1.elbow_extension', exercise: 'bdj-1', name: '双臂伸直上托',
     description: '托举顶点时两侧肘角（取较弯一侧），按每次托举中保持住的伸展程度计。',
@@ -107,7 +103,7 @@ export const BADUANJIN_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.fre
     reason: '可以用手腕速度估计“猛拉”，但需要真人数据标定速度阈值；本轮未进入自动评分。',
   }),
 
-  // ---- 第二式 左右开弓似射雕 ------------------------------------------------------------------------------------------
+  // 第二式 左右开弓似射雕
   check({
     id: 'bdj.2.horse_stance', exercise: 'bdj-2', name: '屈膝成马步',
     description: '开弓定势时两膝关节角的平均值（按保持住的最低程度计）。',
@@ -162,7 +158,7 @@ export const BADUANJIN_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.fre
     reason: '需要轨迹级别的比较，本轮只做定势检查。',
   }),
 
-  // ---- 第三式 调理脾胃须单举 ------------------------------------------------------------------------------------------
+  // 第三式 调理脾胃须单举
   check({
     id: 'bdj.3.upper_hand_height', exercise: 'bdj-3', name: '上举手撑举到位',
     description: '单举定势时上举手腕高出同侧肩的距离（以躯干长为单位）。',
@@ -218,7 +214,7 @@ export const BADUANJIN_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.fre
     reason: '需要手指尖轨迹，本轮只做定势检查。',
   }),
 
-  // ---- 第四式 五劳七伤往后瞧 ------------------------------------------------------------------------------------------
+  // 第四式 五劳七伤往后瞧
   check({
     id: 'bdj.4.head_turn', exercise: 'bdj-4', name: '转头后瞧',
     description: '后瞧时鼻尖偏离两肩中点的距离（以肩宽为单位）。',
@@ -270,7 +266,7 @@ export const BADUANJIN_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.fre
     reason: '手臂旋转与掌心朝向无法从二维全身关键点可靠判断。',
   }),
 
-  // ---- 第五式 摇头摆尾去心火 ------------------------------------------------------------------------------------------
+  // 第五式 摇头摆尾去心火
   check({
     id: 'bdj.5.horse_stance', exercise: 'bdj-5', name: '马步蹲坐',
     description: '马步阶段两膝关节角的平均值。',
@@ -310,7 +306,7 @@ export const BADUANJIN_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.fre
     reason: COMMON_NOT_OBSERVABLE_REASONS.gaze,
   }),
 
-  // ---- 第六式 两手攀足固肾腰 ------------------------------------------------------------------------------------------
+  // 第六式 两手攀足固肾腰
   check({
     id: 'bdj.6.arms_lead_rise', exercise: 'bdj-6', name: '以臂带身、帖耳起身',
     description: '俯身前伸到起身阶段，两臂与躯干的夹角（髋—肩—肘，左右平均）。',
@@ -344,7 +340,7 @@ export const BADUANJIN_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.fre
     reason: '该过渡阶段在示范姿态中难以稳定切分，本轮未进入自动评分。',
   }),
 
-  // ---- 第七式 攒拳怒目增气力 ------------------------------------------------------------------------------------------
+  // 第七式 攒拳怒目增气力
   check({
     id: 'bdj.7.horse_stance', exercise: 'bdj-7', name: '马步稳定',
     description: '冲拳阶段两膝关节角的平均值。',
@@ -388,7 +384,7 @@ export const BADUANJIN_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.fre
     reason: `${COMMON_NOT_OBSERVABLE_REASONS.gaze}${COMMON_NOT_OBSERVABLE_REASONS.handShape}`,
   }),
 
-  // ---- 第八式 背后七颠百病消 ------------------------------------------------------------------------------------------
+  // 第八式 背后七颠百病消
   check({
     id: 'bdj.8.body_steady', exercise: 'bdj-8', name: '起落时身体中正',
     description: '提踵起落阶段躯干侧倾角。',
@@ -412,7 +408,7 @@ export const BADUANJIN_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.fre
     reason: '前后方向的重心移动无法从正面二维画面判断。',
   }),
 
-  // ---- 预备势 / 收势与全套通用 --------------------------------------------------------------------------------------
+  // 预备势、收势与全套通用
   notObservable({
     id: 'bdj.open.gaze_and_feet', mode: 'baduanjin', exercise: 'bdj-open', name: '目光平视、两脚平行',
     requirement: '开步时目光平视、不低头；左脚开步先落脚尖再落脚跟，两脚平行，不成八字脚（预备势习惯性错误一）。', sourceId: ERRORS,

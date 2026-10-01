@@ -15,7 +15,7 @@ export type CameraFailureKind =
   | 'unknown_error'
   | 'model_error'
 
-/** What FormPilot asks for first. A camera that cannot deliver it gets a second, plain request. */
+/** 首选参数；摄像头不支持时再用普通参数请求一次 */
 export const PREFERRED_CAMERA_CONSTRAINTS: MediaTrackConstraints = Object.freeze({
   facingMode: 'user',
   width: { ideal: 1280 },
@@ -23,10 +23,7 @@ export const PREFERRED_CAMERA_CONSTRAINTS: MediaTrackConstraints = Object.freeze
   frameRate: { ideal: 30, min: 20 },
 })
 
-/**
- * Failures a plainer request can get past: the camera exists and may be used, but refused the preferred mode
- * (resolution, 20 fps minimum) or failed to start in it. Permission and missing-device errors are final.
- */
+/** 这些错误可用普通参数重试；权限和无设备错误不重试 */
 const RETRY_WITH_BASIC: ReadonlySet<string> = new Set(['OverconstrainedError', 'NotReadableError', 'AbortError', 'TypeError'])
 
 export interface CameraAttempt {
@@ -34,17 +31,15 @@ export interface CameraAttempt {
   ok: boolean
   errorName?: string
   errorMessage?: string
-  /** OverconstrainedError: the constraint the camera could not meet. */
+  /** OverconstrainedError 时无法满足的约束 */
   constraint?: string
 }
 
 export interface CameraStartInfo {
   attempts: CameraAttempt[]
-  /** What the camera delivers once it runs. */
   settings?: { width?: number; height?: number; frameRate?: number }
 }
 
-/** A failed start with where it failed and every request tried. */
 export class CameraStartError extends Error {
   constructor(
     readonly stage: 'unsupported' | 'getUserMedia' | 'play',
@@ -74,19 +69,16 @@ function attemptOf(request: CameraAttempt['request'], error: unknown): CameraAtt
 }
 
 export interface CameraErrorContext {
-  /** The packaged desktop app, which always lets its own page use the camera: a refusal there comes from Windows. */
+  /** 桌面版总允许本页面使用摄像头，被拒说明来自 Windows 设置 */
   desktop?: boolean
-  /** Windows camera privacy is off (reported by the desktop app). */
   systemBlocked?: boolean
 }
 
 export interface CameraErrorPresentation {
   kind: Exclude<CameraFailureKind, 'model_error'>
-  /** One sentence: what is wrong. */
   message: string
-  /** What the reviewer can do about it. */
   guidance: string
-  /** Fixed in Windows Settings → 隐私和安全性 → 相机 (the desktop app offers a shortcut). */
+  /** 需在 Windows 设置 → 隐私和安全性 → 相机 中开启 */
   windowsPrivacy: boolean
 }
 
@@ -124,7 +116,6 @@ export function cameraErrorPresentation(error: unknown, context: CameraErrorCont
 
 export class BrowserCameraAdapter implements CameraAdapter {
   private stream?: MediaStream
-  /** The requests of the latest start, successful or not (diagnostics). */
   lastStart: CameraStartInfo = { attempts: [] }
 
   async start(video: HTMLVideoElement): Promise<MediaStream> {

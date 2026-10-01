@@ -1,6 +1,6 @@
 import type { AnalyzerSample, MetricResult } from './types'
 
-/** Small, allocation-light numeric helpers shared by the analyzers. All of them ignore non-finite values. */
+// 分析器共用的数值工具，都会忽略非有限值
 
 export function finite(values: ReadonlyArray<number | null | undefined>): number[] {
   return values.filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
@@ -13,7 +13,7 @@ export function mean(values: ReadonlyArray<number>): number | null {
   return sum / values.length
 }
 
-/** Linear-interpolated percentile (q in 0..1); null for an empty list. */
+/** 线性插值分位数，q ∈ 0..1；空数组为 null */
 export function percentile(values: ReadonlyArray<number>, q: number): number | null {
   if (!values.length) return null
   const sorted = [...values].sort((left, right) => left - right)
@@ -23,7 +23,7 @@ export function percentile(values: ReadonlyArray<number>, q: number): number | n
   return sorted[low] + (sorted[high] - sorted[low]) * (index - low)
 }
 
-/** 0–100: 0 at `zeroAt`, 100 at `fullAt`, linear between; works for either direction. */
+/** zeroAt 为 0 分、fullAt 为 100 分，之间线性；两个方向都可以 */
 export function rampScore(value: number, zeroAt: number, fullAt: number): number {
   if (!Number.isFinite(value)) return 0
   if (zeroAt === fullAt) return value >= fullAt ? 100 : 0
@@ -31,10 +31,7 @@ export function rampScore(value: number, zeroAt: number, fullAt: number): number
   return Math.round(100 * Math.min(1, Math.max(0, share)))
 }
 
-/**
- * Splits a sample sequence into continuous stretches: a new stretch starts when the wall clock jumps by more than
- * `maxGapMs` (pause, lost pose) or the video goes backwards / jumps (a seek). Speeds are never taken across a break.
- */
+/** 切成连续段：墙钟间隔超过 maxGapMs（暂停、丢失姿态）或视频倒退 / 跳转时断开，速度不跨段计算 */
 export function continuousRuns<F>(samples: ReadonlyArray<AnalyzerSample<F>>, maxGapMs: number, maxVideoJumpSeconds = 3): Array<Array<AnalyzerSample<F>>> {
   const runs: Array<Array<AnalyzerSample<F>>> = []
   let current: Array<AnalyzerSample<F>> = []
@@ -55,7 +52,7 @@ export function continuousRuns<F>(samples: ReadonlyArray<AnalyzerSample<F>>, max
   return runs
 }
 
-/** Centred moving average over ±halfWidth items (shrinking at the ends). */
+/** 居中滑动平均（两端窗口缩短） */
 export function movingAverage(values: ReadonlyArray<number>, halfWidth: number): number[] {
   const result: number[] = []
   for (let index = 0; index < values.length; index += 1) {
@@ -72,7 +69,7 @@ export function movingAverage(values: ReadonlyArray<number>, halfWidth: number):
   return result
 }
 
-/** Residuals of a series around its own moving average: the high-frequency part (tremor, tracking jitter). */
+/** 相对自身滑动平均的残差，即高频部分（颤动、跟踪抖动） */
 export function residuals(values: ReadonlyArray<number>, halfWidth: number): number[] {
   const smooth = movingAverage(values, halfWidth)
   return values.map((value, index) => value - smooth[index])
@@ -85,7 +82,7 @@ export function rms(values: ReadonlyArray<number>): number | null {
   return Math.sqrt(sum / values.length)
 }
 
-/** Longest stretch of consecutive `true` flags, as a duration between the first and last sample's times (ms). */
+/** 最长的连续 true 段，用首尾样本时间差表示（ms） */
 export function longestTrueRun(flags: ReadonlyArray<boolean>, times: ReadonlyArray<number>): { durationMs: number; from: number; to: number } {
   let best = { durationMs: 0, from: -1, to: -1 }
   let start = -1
@@ -104,7 +101,7 @@ export function longestTrueRun(flags: ReadonlyArray<boolean>, times: ReadonlyArr
   return best
 }
 
-/** Crossings between the low and high band of a signal (hysteresis), e.g. left ↔ right weight transfers. */
+/** 低带与高带之间的穿越次数（滞回），如左右重心转换 */
 export function hysteresisCrossings(values: ReadonlyArray<number>, low: number, high: number): number {
   let side: 'low' | 'high' | undefined
   let crossings = 0
@@ -117,14 +114,11 @@ export function hysteresisCrossings(values: ReadonlyArray<number>, low: number, 
 }
 
 export interface MetricDraft extends Omit<MetricResult, 'weight'> {
-  /** Configured weight before metrics that are not scored are taken out. */
+  /** 剔除不计分项之前的配置权重 */
   nominalWeight: number
 }
 
-/**
- * Chapter score = weighted mean of the evaluated, measured metrics. Metrics without a score or recorded only give
- * their weight to the others in proportion (so a 0.2 metric that cannot be judged does not cost 20 points).
- */
+/** 章节分 = 计分项加权平均；无法测量或只记录的项按比例把权重让给其他项 */
 export function combineMetrics(drafts: ReadonlyArray<MetricDraft>): { score: number | null; metrics: MetricResult[] } {
   const scored = drafts.filter((draft) => draft.evaluated && draft.score !== null && draft.nominalWeight > 0)
   const total = scored.reduce((sum, draft) => sum + draft.nominalWeight, 0)

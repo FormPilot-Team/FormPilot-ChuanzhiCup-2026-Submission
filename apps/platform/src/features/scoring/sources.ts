@@ -1,12 +1,8 @@
 import type { ScoringSource } from './types'
 
-/**
- * Source registry: every requirement and every threshold in Scoring v2 points at one of these ids.
- * Verification is deliberately split into metadata and full-text checks (see docs/scoring/SCORING_V2.md).
- * A source is never treated as full-text verified merely because an official catalogue page or search result exists.
- */
+// 评分来源登记：每条要求和阈值都指向这里的一个 id；元数据核对与全文核对分开记录
 export const SCORING_SOURCES: ReadonlyArray<ScoringSource> = Object.freeze([
-  // ---- 八段锦 ----------------------------------------------------------------------------------------------------
+  // 八段锦
   {
     id: 'tcacm-1676-2026-baduanjin',
     type: 'OFFICIAL_STANDARD',
@@ -37,7 +33,7 @@ export const SCORING_SOURCES: ReadonlyArray<ScoringSource> = Object.freeze([
     verificationNote: '国家体育总局健身气功管理中心页面及正文已核对。',
     usedFor: '预备势、八式与收势的习惯性错误及纠正方法；八段锦机器检查项优先由这些错误转化而来。',
   },
-  // ---- 五禽戏 ----------------------------------------------------------------------------------------------------
+  // 五禽戏
   {
     id: 'gsqc-wqx-requirements',
     type: 'OFFICIAL_GUIDANCE',
@@ -83,7 +79,7 @@ export const SCORING_SOURCES: ReadonlyArray<ScoringSource> = Object.freeze([
     verificationNote: '国家体育总局健身气功管理中心页面及正文已核对。',
     usedFor: '上肢、躯干（熊运“相对固定腰胯”）、桩功（尾闾中正）、步法与提踵平衡的要求及易犯错误。',
   },
-  // ---- 易筋经 ----------------------------------------------------------------------------------------------------
+  // 易筋经
   {
     id: 'gsqc-yjj-errors',
     type: 'OFFICIAL_GUIDANCE',
@@ -114,7 +110,7 @@ export const SCORING_SOURCES: ReadonlyArray<ScoringSource> = Object.freeze([
     verificationNote: '国家体育总局健身气功管理中心页面及正文已核对。',
     usedFor: '韦驮献杵第一、二势的肩部错误，三盘落地的下蹲与两膝方向，屈膝下蹲时髋部中正、重心不偏移。',
   },
-  // ---- 太极拳 ----------------------------------------------------------------------------------------------------
+  // 太极拳
   {
     id: 'taiji-24-routine',
     type: 'OFFICIAL_GUIDANCE',
@@ -160,7 +156,7 @@ export const SCORING_SOURCES: ReadonlyArray<ScoringSource> = Object.freeze([
     verificationNote: '期刊官网元数据、DOI 与 PDF 正文已核对。',
     usedFor: 'Scoring v2 架构依据：重心转移、关节角度变化、时序连续性等指标与专家模板、时序对齐的思路；FormPilot 不采用其 3D / MotionBERT 模型。',
   },
-  // ---- 热身训练 --------------------------------------------------------------------------------------------------
+  // 热身训练
   {
     id: 'sgas-fitness-guide-2017',
     type: 'OFFICIAL_GUIDANCE',
@@ -236,7 +232,7 @@ export const SCORING_SOURCES: ReadonlyArray<ScoringSource> = Object.freeze([
     verificationNote: '国家体育总局转载页面及相关正文已核对。',
     usedFor: '侧平举：抬起手肘和大臂、手肘微屈、肩部下沉不要耸肩、身体直立、腰腹收紧。',
   },
-  // ---- 算法层 ----------------------------------------------------------------------------------------------------
+  // 算法层
   {
     id: 'pose-fitness-eval',
     type: 'ACADEMIC_EVIDENCE',
@@ -267,7 +263,7 @@ export const SCORING_SOURCES: ReadonlyArray<ScoringSource> = Object.freeze([
     verificationNote: '上海交通大学学报页面确认题名、卷期与起始页；本轮未通读论文全文。',
     usedFor: '关节运动特征、局部与整体评价、多特征融合、DTW 时序评估；本轮只用于动作阶段划分与接口设计（temporalAlignmentScore 预留）。',
   },
-  // ---- FormPilot 自身 --------------------------------------------------------------------------------------------
+  // FormPilot 自身
   {
     id: 'fp-reference-demo',
     type: 'FORMPILOT_CALIBRATED',
@@ -312,7 +308,7 @@ export function findScoringSource(id: string): ScoringSource | undefined {
   return BY_ID.get(id)
 }
 
-/** “来源名称 · 机构 · 年份/编号” for the report; never a long citation. */
+/** 报告中的简短出处：“来源名称 · 机构 · 年份/编号” */
 export function sourceCitation(source: ScoringSource): string {
   const identifier = source.type === 'FORMPILOT_CALIBRATED' ? null : source.identifier
   const detail = [identifier, source.published].filter(Boolean).join('，')

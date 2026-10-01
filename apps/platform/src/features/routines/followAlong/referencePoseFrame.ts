@@ -1,17 +1,12 @@
 import type { PoseFrame } from '../../pose/types'
 import type { ReferenceTrack } from './referenceTrack'
 
-/** MediaPipe's left/right landmark pairs (face, arms, hands, legs, feet). */
 const MIRROR_PAIRS: ReadonlyArray<readonly [number, number]> = [
   [1, 4], [2, 5], [3, 6], [7, 8], [9, 10], [11, 12], [13, 14], [15, 16], [17, 18], [19, 20], [21, 22],
   [23, 24], [25, 26], [27, 28], [29, 30], [31, 32],
 ]
 
-/**
- * The standard video's own pose nearest to `seconds`, as a camera frame. Used by the DEV-only synthetic fixture
- * that "follows" the video perfectly (optionally late or mirrored) so the routine page can be tested without a
- * camera.
- */
+/** 离 seconds 最近的标准视频姿态，作为摄像头帧；仅供开发用的 synthetic 测试模式 */
 export function referencePoseFrame(track: ReferenceTrack, seconds: number, timestamp: number): PoseFrame | null {
   const frames = track.frames
   if (!frames.length) return null
@@ -32,7 +27,7 @@ export function referencePoseFrame(track: ReferenceTrack, seconds: number, times
   }
 }
 
-/** The same frame as a mirror image: left and right landmarks swap and x flips. */
+/** 镜像：左右关键点互换，x 翻转 */
 export function mirrorPoseFrame(frame: PoseFrame): PoseFrame {
   const landmarks = frame.landmarks.map((point) => ({ ...point, x: 1 - point.x }))
   for (const [left, right] of MIRROR_PAIRS) {

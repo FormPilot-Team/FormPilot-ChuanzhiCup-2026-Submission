@@ -1,8 +1,4 @@
-/**
- * 八段锦 step table for the 到位度 analyzer, keyed by the chapter ids of `programs.ts` (which is not changed: its
- * version guards the history comparison). Each form names the one joint trajectory whose peak shows whether the
- * movement reached its position; the value is measured in the 2D camera picture, so it is a projection.
- */
+// 八段锦步骤表，按 programs.ts 的章节 id 索引。每式取一条主关节轨迹，峰值表示是否到位；数值是二维画面中的投影
 export type BaduanjinTrajectory =
   | 'liftBoth'
   | 'pushReach'
@@ -13,25 +9,24 @@ export type BaduanjinTrajectory =
   | 'punchLift'
   | 'heelRiseProxy'
 
-/** `scored`: amplitude counts; `proxy`: counts with a low weight and is called an approximation; `phase-only`: not judged. */
+/** scored 计分；proxy 近似值、低权重；phase-only 只检测阶段，不评幅度 */
 export type AmplitudeMode = 'scored' | 'proxy' | 'phase-only'
 
 export interface BaduanjinStep {
   trajectory: BaduanjinTrajectory
-  /** What the trajectory measures, as shown in the report. */
   label: string
-  /** Both sides together, or one side at a time (the trajectory then takes the more active side). */
+  /** 双侧同时，或左右交替（交替时取更活跃的一侧） */
   sides: 'bilateral' | 'alternating'
   amplitude: AmplitudeMode
-  /** What to do to reach further, quoted in the feedback after the measured value. */
+  /** 反馈中接在数值后面的动作提示 */
   cue: string
-  /** Second amplitude of the same movement, reported next to the main one (摇头摆尾的躯干侧倾). */
+  /** 同一动作的第二幅度（摇头摆尾的躯干侧倾） */
   secondary?: { id: 'trunkSideLean'; label: string }
   note?: string
 }
 
 export const BADUANJIN_STEPS: Readonly<Record<string, BaduanjinStep | null>> = Object.freeze({
-  // 预备势 / 收势 have no movement peak to reach; the 到位度 analyzer does not score them.
+  // 预备势、收势没有需要到达的峰值，不评到位度
   'bdj-open': null,
   'bdj-1': { trajectory: 'liftBoth', label: '两腕上托高出头部', sides: 'bilateral', amplitude: 'scored', cue: '两掌继续上托，两臂充分伸展' },
   'bdj-2': { trajectory: 'pushReach', label: '推弓手离肩中点的水平距离', sides: 'alternating', amplitude: 'scored', cue: '推弓手向侧推远，拉弓手拉至肩前' },

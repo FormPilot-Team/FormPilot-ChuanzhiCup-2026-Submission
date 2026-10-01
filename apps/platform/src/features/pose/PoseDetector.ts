@@ -18,11 +18,10 @@ export type PoseImageSource = HTMLVideoElement | HTMLImageElement | HTMLCanvasEl
 
 export type PoseDelegate = 'GPU' | 'CPU'
 
-/** Why the pose model did not start, for the diagnostics panel. */
 export interface PoseModelFailure {
   stage: 'model-fetch' | 'landmarker'
   modelAssetPath: string
-  /** HTTP status of the model file (null: the request itself failed). */
+  /** 模型文件的 HTTP 状态；null 表示请求本身失败 */
   modelStatus: number | null
   modelBytes: number | null
   gpuError: string | null
@@ -51,9 +50,8 @@ export class PoseDetector implements PoseDetectorLike {
 
   initializeCalls = 0
   initializationCount = 0
-  /** The delegate the running landmarker uses; CPU only when the GPU delegate could not start on this machine. */
+  /** 仅当 GPU 委托无法启动时才用 CPU */
   delegate?: PoseDelegate
-  /** Why the GPU delegate failed, when it did. */
   gpuError?: string
 
   async initialize(): Promise<void> {
@@ -104,7 +102,7 @@ export class PoseDetector implements PoseDetectorLike {
     }
   }
 
-  /** The model file itself, so a missing or unreadable file is told apart from a delegate that cannot start. */
+  /** 单独请求模型文件，以区分文件缺失和委托无法启动 */
   private async fetchModel(): Promise<Uint8Array> {
     const failure = (modelStatus: number | null, message: string): PoseModelError => new PoseModelError(message, {
       stage: 'model-fetch', modelAssetPath: this.config.modelAssetPath, modelStatus, modelBytes: null, gpuError: null, cpuError: null,
@@ -143,7 +141,7 @@ export class PoseDetector implements PoseDetectorLike {
       this.gpuError = undefined
       return landmarker
     } catch (gpuFailure) {
-      // Some GPUs / drivers cannot run the GPU delegate; the CPU delegate gives the same landmarks, only slower.
+      // 部分显卡驱动无法运行 GPU 委托；CPU 委托结果相同，只是更慢
       this.gpuError = errorText(gpuFailure)
       try {
         const landmarker = await create('CPU')

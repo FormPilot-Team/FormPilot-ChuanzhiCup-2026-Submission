@@ -11,18 +11,16 @@ import { TAIJIQUAN_STEPS, WEIGHT_SHIFT_LABEL, type TaijiquanStep, type WeightShi
 interface SpeedPoint {
   at: number
   videoSeconds: number
-  /** Mean speed of the wrists and the hip centre, torso lengths per second. */
+  /** 双腕与髋中心的平均速度，躯干长 / s */
   speed: number
 }
 
 export interface TaijiquanChapterReference {
-  /** The demonstrator's speed over the form, sorted by video time. */
   speeds: SpeedPoint[]
-  /** 定势窗口 start (video seconds); the window lasts CONFIG.weightShift.settleSeconds. */
+  /** 定势窗口起点（视频秒） */
   settleStart: number
-  /** Share of the known frames in the 定势窗口 agreeing with the label (directional forms). */
+  /** 方向类：定势窗口已知帧中与标注一致的比例 */
   settleAgreement: number | null
-  /** Support ratio p90 − p10 over the form, known-frame share and left ↔ right crossings. */
   supportRange: number | null
   knownShare: number
   crossings: number
@@ -32,13 +30,11 @@ export interface TaijiquanEvaluation extends AnalyzerEvaluation {
   weightShift: WeightShift
   scoreShift: boolean
   similarity: number | null
-  /** Median position jitter, torso lengths. */
   jitter: number | null
-  /** Share of the demonstrator's moving time the user spent stopped. */
+  /** 示范者仍在动时用户停顿的时间占比 */
   pauseShare: number | null
-  /** The user's path / the demonstrator's path over the same video moments. */
   extentRatio: number | null
-  /** Directional forms: share agreeing with the label; transfer forms: range / demonstrator range. */
+  /** 方向类为一致比例，transfer 类为范围之比 */
   weightShiftValue: number | null
 }
 
@@ -47,7 +43,7 @@ function robustScale(samples: ReadonlyArray<AnalyzerSample<TaijiquanFeatures>>):
   return scale !== null && scale > 0 ? scale : null
 }
 
-/** Speed of each sample from the previous one, per continuous run; positions are averaged first (jitter is not speed). */
+/** 各连续段内相邻样本的速度；先平均位置，抖动不算速度 */
 export function speedSeries(samples: ReadonlyArray<AnalyzerSample<TaijiquanFeatures>>, scale: number): SpeedPoint[][] {
   return continuousRuns(samples, CONFIG.maxGapMs).map((run) => {
     const coordinates = (run[0].features as TaijiquanFeatures).points.length
@@ -69,7 +65,7 @@ export function speedSeries(samples: ReadonlyArray<AnalyzerSample<TaijiquanFeatu
   })
 }
 
-/** Demonstrator speed at a video time (nearest point), or null outside the reference. */
+/** 某视频时刻示范者的速度（最近点）；超出参考范围为 null */
 function speedAt(reference: ReadonlyArray<SpeedPoint>, videoSeconds: number): number | null {
   let low = 0
   let high = reference.length - 1
@@ -90,12 +86,12 @@ function agrees(ratio: number, expected: WeightShift): boolean {
   return true
 }
 
-/** As seen in a mirror the person's left leg is where the demonstrator's right leg is. */
+/** 镜像跟练时，本人的左腿对应示范者的右腿 */
 function mirroredShift(shift: WeightShift): WeightShift {
   return shift === 'left' ? 'right' : shift === 'right' ? 'left' : shift
 }
 
-/** The 定势窗口: the demonstrator's slowest `settleSeconds` within the last `settleSearchShare` of the form. */
+/** 定势窗口：本式后 settleSearchShare 部分中示范者最慢的 settleSeconds */
 function settleWindowStart(speeds: ReadonlyArray<SpeedPoint>, chapter: RoutineChapter): number {
   const length = chapter.endSeconds - chapter.startSeconds
   const earliest = chapter.endSeconds - CONFIG.weightShift.settleSearchShare * length
@@ -110,7 +106,7 @@ function settleWindowStart(speeds: ReadonlyArray<SpeedPoint>, chapter: RoutineCh
   return best.start
 }
 
-/** The demonstrator's reference for one form, measured with the analyzer's own features. */
+/** 用分析器自己的特征提取示范者的参考 */
 export function taijiquanReference(samples: ReadonlyArray<AnalyzerSample<TaijiquanFeatures>>, chapter: RoutineChapter, step: TaijiquanStep): TaijiquanChapterReference | null {
   const scale = robustScale(samples)
   if (!scale) return null
@@ -131,17 +127,13 @@ export function taijiquanReference(samples: ReadonlyArray<AnalyzerSample<Taijiqu
   }
 }
 
-/** The scoreShift rule of steps.ts, applied to a demonstrator reference. */
 export function scoreShiftRule(reference: TaijiquanChapterReference, step: TaijiquanStep): boolean {
   if (step.weightShift === 'transfer') return reference.knownShare >= CONFIG.weightShift.scoreShiftMinShare && reference.crossings >= 1
   return (reference.settleAgreement ?? 0) >= CONFIG.weightShift.scoreShiftMinShare
 }
 
-/**
- * 太极拳连续性: 动作是否连贯、匀速、不断. Per form: how close the posture stays to the demonstrator (follow-along
- * similarity), how even the speed is, whether the body stops while the demonstrator keeps moving, and — where the
- * 2D hip-centre approximation agrees with the demonstrator — whether the estimated supporting leg matches the label.
- */
+// 太极拳连续性（基于姿态关键点的二维近似）：架势与示范的一致程度、动作是否圆顺不抖、
+// 示范仍在动时是否停顿、舒展度，以及二维髋中心估计的支撑腿是否符合标注
 export class TaijiquanAnalyzer implements RoutineAnalyzer<TaijiquanFeatures, TaijiquanEvaluation> {
   readonly id = 'taijiquan' as const
   readonly version = CONFIG.version
@@ -258,7 +250,7 @@ export class TaijiquanAnalyzer implements RoutineAnalyzer<TaijiquanFeatures, Tai
   }
 }
 
-/** Median over 1 s blocks and coordinates of the positions' RMS around their own short average (torso lengths). */
+/** 位置相对短平均的 RMS，按 1 s 分块与坐标取中位数，单位躯干长 */
 function positionJitter(samples: ReadonlyArray<AnalyzerSample<TaijiquanFeatures>>, scale: number): number | null {
   const blocks: number[] = []
   const block = CONFIG.smoothness.blockSamples
@@ -275,7 +267,7 @@ function positionJitter(samples: ReadonlyArray<AnalyzerSample<TaijiquanFeatures>
   return percentile(blocks, 0.5)
 }
 
-/** The user's travelled path over the demonstrator's, both measured at the user's sample moments. */
+/** 用户路程 / 示范者路程，均在用户的样本时刻计算 */
 function extent(runs: ReadonlyArray<ReadonlyArray<SpeedPoint>>, reference: TaijiquanChapterReference): number | null {
   let user = 0
   let demonstrator = 0
@@ -291,7 +283,7 @@ function extent(runs: ReadonlyArray<ReadonlyArray<SpeedPoint>>, reference: Taiji
   return demonstrator > 0.5 ? Math.min(CONFIG.extent.maxRatio, user / demonstrator) : null
 }
 
-/** Share of the demonstrator's moving time during which the user stood still for at least minStopSeconds. */
+/** 示范者在动时，用户停住至少 minStopSeconds 的时间占比 */
 function pausedShare(runs: ReadonlyArray<ReadonlyArray<SpeedPoint>>, reference: TaijiquanChapterReference): number | null {
   let moving = 0
   let paused = 0

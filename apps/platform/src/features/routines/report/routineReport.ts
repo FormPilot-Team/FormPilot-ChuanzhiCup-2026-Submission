@@ -7,15 +7,12 @@ import { chapterDisplayName, scopeChapters } from '../scope'
 import type { RoutineChapterResult, RoutineSessionRecord } from '../session/types'
 import type { RoutineChapter, RoutineProgram, RoutineScope } from '../types'
 
-/**
- * Deterministic routine report. Metrics are follow-along specific on purpose (coverage, similarity to the
- * standard video, rhythm, body regions); they are not Smart Training's rep scores or five capabilities.
- */
+/** 跟练报告：只用跟练相关指标（完成度、与标准视频的相似度、节奏、身体部位），不用智能训练的次数评分 */
 export const ROUTINE_REPORT_CONFIG = Object.freeze({
-  /** ≈ 2 s of comparisons at the 10 Hz comparison rate. */
+  /** 10 Hz 比对约 2 秒 */
   minSamplesPerChapter: 20,
   chapterCoveredRatio: 0.8,
-  /** Both sessions must have followed at least half of the scope to be compared. */
+  /** 两次都至少跟练了一半才比较 */
   comparableCoverage: 0.5,
   similarityDeadband: 3,
   syncDeadband: 5,
@@ -64,16 +61,16 @@ export interface RoutineComparison {
   syncTrend: DeltaTrend | null
 }
 
-/** One "下次练习重点" item: the sentence the report always gave, plus its value, reason and practice target. */
+/** 一条“下次练习重点”：原有句子及其数值、原因和练习目标 */
 export interface RoutineFocusItem {
   kind: 'chapter' | 'region' | 'tempo' | 'coverage' | 'steady'
   text: string
   title: string
-  /** What to do next time, in user language (for a chapter: its own teaching cue). */
+  /** 下次怎么做；章节项用该章节自身的动作要领 */
   detail: string
   value: string | null
   reason: string | null
-  /** A numbered form that can be practised on its own. */
+  /** 可单独练习的式 */
   chapterId: string | null
 }
 
@@ -99,15 +96,9 @@ export interface RoutineReport {
   comparison: RoutineComparison
   notes: string[]
   headline: string
-  /**
-   * Scoring v2 动作规范评价: sourced technique checks per phase. Deliberately separate from `similarity`
-   * (visual closeness to the video); the two are never combined into one number.
-   */
+  /** 动作规范评价，与跟练相似度分开，不合成一个分数 */
   technique: RoutineTechniqueReport
-  /**
-   * 专项分析 of the routine's own analyzer (八段锦到位度 …); null for records without one. Added as its own field:
-   * headline, notes and focus above are unchanged by it.
-   */
+  /** 本功法分析器的专项分析；没有分析记录时为 null */
   analysis: AnalyzerReportMetrics | null
 }
 
@@ -187,7 +178,7 @@ function totalsOf(results: ReadonlyArray<RoutineChapterResult>, reports: Readonl
   for (const result of results) {
     totals.coveredSeconds += Math.min(result.coveredSeconds, result.totalSeconds)
     totals.totalSeconds += result.totalSeconds
-    // Chapters with too little evidence do not move the session averages either.
+    // 数据太少的章节不计入整体平均
     if (!usable.has(result.chapterId)) continue
     totals.samples += result.samples
     totals.similaritySum += result.similaritySum

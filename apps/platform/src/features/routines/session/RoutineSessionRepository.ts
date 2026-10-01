@@ -13,7 +13,7 @@ export function parseStoredRoutineSessions(raw: unknown): RoutineSessionRecord[]
   return Array.isArray(raw) ? raw.filter(isRoutineSessionRecord) : []
 }
 
-/** Keeps the newest `limit` records, dropping test (synthetic / fast) records before real ones. */
+/** 保留最新的 limit 条，先删测试记录（synthetic / fast） */
 export function retainRoutineSessions(records: readonly RoutineSessionRecord[], limit = ROUTINE_SESSION_RETENTION): RoutineSessionRecord[] {
   if (records.length <= limit) return [...records]
   const lowPriority = (record: RoutineSessionRecord) => record.source !== 'live' || record.mode !== 'normal'

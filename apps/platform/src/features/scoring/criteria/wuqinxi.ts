@@ -2,10 +2,7 @@ import type { EvaluationCriterion } from '../types'
 import { notObservable, referenceOnly } from './define'
 import { COMMON_NOT_OBSERVABLE_REASONS, poseCheck } from './routineHelpers'
 
-/**
- * 五禽戏. The official requirements split each movement into 动作规范 / 精神劲力 / 呼吸配合 / 易犯错误; only the parts a
- * frontal 2D pose can see enter automatic scoring. Everything else is listed as “动作规范参考，目前不进入视觉评分”.
- */
+// 五禽戏：只有正面二维姿态能看到的要求进入自动评分，其余列为“动作规范参考，目前不进入视觉评分”
 const REQUIREMENTS = 'gsqc-wqx-requirements'
 const ERRORS = 'gsqc-wqx-errors'
 const BASICS = 'chqa-wqx-basics-2012'
@@ -16,7 +13,7 @@ const BEAR_CIRCLE = { label: '熊运摇转', when: [], minSeconds: 3, maxSeconds
 const BIRD_FLY = { label: '鸟飞提膝独立', when: [{ metric: 'raisedKneeHeight', min: -0.45 }], minSeconds: 0.8 } as const
 
 export const WUQINXI_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.freeze([
-  // ---- 虎举 ----
+  // 虎举
   check({
     id: 'wqx.1.arms_overhead', exercise: 'wqx-1', name: '两掌上举到位',
     description: '虎举上举时两腕高出头部的距离（取较低一侧）。',
@@ -43,7 +40,7 @@ export const WUQINXI_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.freez
     id: 'wqx.1.tiger_claw', mode: 'wuqinxi', exercise: 'wqx-1', name: '虎爪手型变化',
     requirement: '掌—虎爪—拳的手型变化要清楚，不要由掌直接变拳。', sourceId: ERRORS, reason: COMMON_NOT_OBSERVABLE_REASONS.handShape,
   }),
-  // ---- 熊运 ----
+  // 熊运
   check({
     id: 'wqx.5.hips_steady', exercise: 'wqx-5', name: '相对固定腰胯',
     description: '熊运摇转中髋中心水平位置的波动范围（第 90 与第 10 百分位之差，以髋宽为单位）。',
@@ -55,7 +52,7 @@ export const WUQINXI_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.freez
     weight: 2,
     feedback: { issue: '熊运时腰胯晃动过大', cue: '腰胯相对固定，以腰腹为轴在腹前画圆' },
   }),
-  // ---- 鸟飞 ----
+  // 鸟飞
   check({
     id: 'wqx.10.knee_lift', exercise: 'wqx-10', name: '提膝独立',
     description: '鸟飞提膝时膝相对同侧髋的高度（0 = 大腿抬平）。',
@@ -79,7 +76,7 @@ export const WUQINXI_CRITERIA: ReadonlyArray<EvaluationCriterion> = Object.freez
     feedback: { issue: '独立时身体晃动', cue: '头向上顶，收腹敛臀，保持平衡' },
     limitations: ['官方基本功中“失去平衡、重心不稳”出自提踵练习，对鸟飞属同类平衡要求；只看得到左右倾斜。'],
   }),
-  // ---- 规范参考（尚未进入视觉评分）----
+  // 规范参考（尚未进入视觉评分）
   referenceOnly({
     id: 'wqx.2.spine_wave', mode: 'wuqinxi', exercise: 'wqx-2', name: '虎扑：躯干由屈到伸、塌腰前伸',
     requirement: '两手前伸如虎扑，躯干由屈到伸，抬头前伸、臀部后顶，不要拱腰低头。', sourceId: ERRORS, additionalSourceIds: [BASICS],

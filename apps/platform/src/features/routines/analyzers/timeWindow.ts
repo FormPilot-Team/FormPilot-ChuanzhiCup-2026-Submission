@@ -1,7 +1,4 @@
-/**
- * Items kept for a fixed span of time: pushing an item drops everything older than `durationMs` before it.
- * Backed by a ring buffer so the live analysis window costs no allocation per frame.
- */
+/** 只保留最近 durationMs 内的元素；环形缓冲，实时窗口每帧不分配内存 */
 export class TimeWindow<T> {
   private readonly times: number[]
   private readonly items: T[]
@@ -18,14 +15,13 @@ export class TimeWindow<T> {
     return this.count
   }
 
-  /** Time of the newest item, or undefined when empty. */
   get latestAt(): number | undefined {
     return this.count ? this.times[(this.head + this.count - 1) % this.capacity] : undefined
   }
 
   push(at: number, item: T): void {
     const latest = this.latestAt
-    // Time going backwards (a new session clock, a seek) starts the window over.
+    // 时间倒退（新的计时或跳转）时窗口重新开始
     if (latest !== undefined && at < latest) this.clear()
     if (this.count === this.capacity) {
       this.head = (this.head + 1) % this.capacity
@@ -46,7 +42,7 @@ export class TimeWindow<T> {
     this.count = 0
   }
 
-  /** Items oldest first. */
+  /** 从旧到新 */
   toArray(): T[] {
     const result: T[] = []
     for (let index = 0; index < this.count; index += 1) result.push(this.items[(this.head + index) % this.capacity])
