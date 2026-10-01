@@ -8,7 +8,7 @@ import { selfCheckRun, type SelfCheckCase } from './helpers/analyzerSelfCheck'
  * demonstrator scores high in every chapter, and noise, smaller movements and late stop-and-go timing each lower
  * the mean clearly. Results are summarised in docs/ANALYZER_AUDIT.md.
  */
-const ANALYZERS: ReadonlyArray<RoutineId> = ['baduanjin', 'taijiquan']
+const ANALYZERS: ReadonlyArray<RoutineId> = ['baduanjin', 'taijiquan', 'wuqinxi']
 const PERTURBATIONS: ReadonlyArray<Exclude<SelfCheckCase, 'demonstrator'>> = ['noise', 'amplitude', 'timing']
 
 describe('routine analyzer self-check on the standard demonstration', () => {
