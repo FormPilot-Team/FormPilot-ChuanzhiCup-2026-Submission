@@ -6,6 +6,7 @@ import { BaduanjinAnalyzer } from './baduanjin/BaduanjinAnalyzer'
 import { RoutineAnalysisEngine } from './RoutineAnalysisEngine'
 import { TaijiquanAnalyzer } from './taijiquan/TaijiquanAnalyzer'
 import { WuqinxiAnalyzer } from './wuqinxi/WuqinxiAnalyzer'
+import { YijinjingAnalyzer } from './yijinjing/YijinjingAnalyzer'
 import type { AnalyzerEvaluation, AnalyzerReportMetrics, RoutineAnalyzer } from './types'
 
 /** Any analyzer, seen through the shared contract (features stay opaque outside the analyzer). */
@@ -20,6 +21,7 @@ const FACTORIES: Partial<Record<RoutineId, AnalyzerFactory>> = {
   baduanjin: (program, track) => new BaduanjinAnalyzer(program, track) as unknown as AnyRoutineAnalyzer,
   taijiquan: (program, track) => new TaijiquanAnalyzer(program, track) as unknown as AnyRoutineAnalyzer,
   wuqinxi: (program, track) => new WuqinxiAnalyzer(program, track) as unknown as AnyRoutineAnalyzer,
+  yijinjing: (program, track) => new YijinjingAnalyzer(program, track) as unknown as AnyRoutineAnalyzer,
 }
 
 /**

@@ -320,3 +320,49 @@ transition 势不计算保持完成度。总分按“姿态 0.40 + 稳定性 0.3
 ---
 
 确认 D1–D3，并复核第 4 节标 ✔ 的步骤后，我开始阶段 1。
+
+---
+
+## 6. 决策落实与实测（阶段 1–2，2026-10-01）
+
+D1–D3 均按建议采纳：平台篇只锁定 Word 实际打印的 21 个文件；mode / weightShift / category 放进各分析器自己的步骤表（`src/features/routines/analyzers/<功法>/steps.ts`），`programs.ts` 与 `programVersion` 不变；目标姿态相似度复用 `describePose` / `comparePoses`，不改 matcher。
+
+### 6.1 易筋经 hold / transition（按规则，不按主观判断）
+
+规则：预备势、收势为 hold；其余势在示范者存在连续静止段 ≥ 1500 ms（`YIJINJING_ANALYZER_CONFIG.stillness.holdMinMs`）时为 hold，否则 transition。静止的测法与第 4.1 节相同（腕、肩、髋六点逐帧最大速度 < 0.25 当前帧躯干长/s，原始位置，不平滑），这是你做决定时依据的测法，实现时没有换成别的定义。`tests/routine-analyzer-yijinjing.test.ts` 用示范轨迹逐势复核规则与步骤表一致。
+
+| 段 | 名称 | 示范最长静止 | 结果 | 与第 4.1 节建议相比 |
+|---|---|---|---|---|
+| yjj-open | 预备势 | 14.8 s | hold | 同 |
+| yjj-1 | 韦驮献杵第一势 | 5.8 s | hold | 同 |
+| yjj-2 | 韦驮献杵第二势 | 6.5 s | hold | 同 |
+| yjj-3 | 韦驮献杵第三势 | 9.5 s | hold | 同 |
+| yjj-4 | 摘星换斗势 | 2.2 s | hold | 原建议 transition |
+| yjj-5 | 倒拽九牛尾势 | 1.2 s | **transition** | 同 |
+| yjj-6 | 出爪亮翅势 | 11.9 s | hold | 原建议 transition |
+| yjj-7 | 九鬼拔马刀势 | 3.1 s | hold | 原建议 transition |
+| yjj-8 | 三盘落地势 | 3.4 s | hold | 同 |
+| yjj-9 | 青龙探爪势 | 5.8 s | hold | 原建议 transition |
+| yjj-10 | 卧虎扑食势 | 5.3 s | hold | 原建议 transition |
+| yjj-11 | 打躬势 | 13.7 s | hold | 原建议 transition |
+| yjj-12 | 掉尾势 | **1.5 s（恰好 1500 ms）** | hold | 原建议 transition；正好落在阈值上，按 “≥” 判为 hold，少一帧就会变成 transition |
+| yjj-close | 收势 | 8.6 s | hold | 原建议 transition；规则规定收势为 hold |
+
+结果：只有倒拽九牛尾势是 transition。目标姿态 = 示范者该势最长静止段中点的帧；有左右之分的势（摘星换斗、倒拽九牛尾、九鬼拔马刀、青龙探爪、卧虎扑食、掉尾）只按原样比较，不取镜像。
+
+### 6.2 太极拳 scoreShift（按规则）
+
+定势窗口：示范者在该式后 60% 时间内速度最低的 2 s。规则：定势窗口内示范者已知帧中与标注方向一致的比例 ≥ 70% 才计分（left < 0.4，right > 0.6，balanced 0.3–0.7）；transfer 式要求全式已知帧 ≥ 70% 且至少一次左右穿越。
+
+| 式 | 标注 | 示范一致比例 | scoreShift |
+|---|---|---|---|
+| 手挥琵琶 | right（按描述保留） | 0% | false（二维近似在侧身时左右颠倒） |
+| 双峰贯耳 | right（按描述保留） | 0% | false（同上） |
+| 单鞭（第 9 式） | left | 0% | **false**（按规则） |
+| 单鞭（第 11 式） | left | 35% | **false**（按规则） |
+| 十字手 | balanced | 0% | **false**（按规则） |
+| 左下势独立 | transfer | 已知帧 58% | **false**（按规则） |
+| 闪通臂 | left | 85% | true |
+| 其余 17 式 | 见步骤表 | 73%–100% / transfer 已知帧 76%–99% | true |
+
+单鞭 ×2、十字手、左下势独立是规则算出来的 false，不是我改的标注：标注方向仍是你定的 left / balanced / transfer，只记录不计分，权重按比例分给其他项。
