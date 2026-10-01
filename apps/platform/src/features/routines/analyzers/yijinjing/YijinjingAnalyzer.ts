@@ -205,14 +205,19 @@ export class YijinjingAnalyzer implements RoutineAnalyzer<YijinjingFeatures, Yij
   }
 
   private evaluateHold(points: ReadonlyArray<FramePoint>, usableSamples: number, step: YijinjingStep, reference: YijinjingChapterReference): YijinjingEvaluation {
-    const demonstratorSeconds = reference.still.durationMs / 1000
-    const window = points.filter((point) => point.videoSeconds >= reference.still.from && point.videoSeconds <= reference.still.to + CONFIG.target.lagSeconds)
+    // Compare with the part of the demonstrator's hold that the samples cover (the live window may hold only part of it).
+    const coveredFrom = Math.max(reference.still.from, points[0]?.videoSeconds ?? Infinity)
+    const coveredTo = Math.min(reference.still.to, points[points.length - 1]?.videoSeconds ?? -Infinity)
+    const demonstratorSeconds = Math.max(0, coveredTo - coveredFrom)
+    const window = demonstratorSeconds >= CONFIG.hold.minCoveredSeconds
+      ? points.filter((point) => point.videoSeconds >= coveredFrom && point.videoSeconds <= reference.still.to + CONFIG.target.lagSeconds)
+      : []
     const similarities = finite(window.map((point) => point.targetSimilarity))
     const pose = similarities.length >= 5 ? (mean(similarities) as number) : null
     const inPose = window.map((point) => point.targetSimilarity !== null && point.targetSimilarity >= CONFIG.target.reachSimilarity)
     const held = longestStill(window.map((point, index) => ({ ...point, still: point.still && inPose[index] })))
     const holdSeconds = window.length >= 5 ? (held?.durationMs ?? 0) / 1000 : null
-    const holdRatio = holdSeconds === null ? null : Math.min(1, holdSeconds / demonstratorSeconds)
+    const holdRatio = holdSeconds === null || !(demonstratorSeconds > 0) ? null : Math.min(1, holdSeconds / demonstratorSeconds)
     // Shaking and drift are read while the user is in the pose (the longest in-pose stretch).
     const posed = longestTrueRun(inPose, window.map((point) => point.at))
     const stretch = posed.from >= 0 ? window.slice(posed.from, posed.to + 1) : []

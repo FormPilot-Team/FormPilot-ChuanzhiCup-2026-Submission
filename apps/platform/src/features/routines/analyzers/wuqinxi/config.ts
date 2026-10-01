@@ -6,8 +6,8 @@ export const WUQINXI_ANALYZER_CONFIG = Object.freeze({
   version: 'wuqinxi-profile-v1',
   minSamples: 20,
   maxGapMs: 400,
-  /** Live view: long enough for one 虎举 / 鸟飞 cycle. */
-  liveWindowMs: 8000,
+  /** Live view: long enough for one 虎举 / 鸟飞 cycle and a readable rhythm (≥ 8 s, see rhythm.minSeconds). */
+  liveWindowMs: 10_000,
   scalePercentile: 0.9,
   /** Feature series are averaged over ±2 samples before taking their range. */
   smoothHalfWidth: 2,

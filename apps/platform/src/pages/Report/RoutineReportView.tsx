@@ -8,6 +8,7 @@ import {
 import { chapterDisplayName, formatClock, scopeTitle } from '../../features/routines/scope'
 import { cn } from '../../lib/cn'
 import { formatDate, formatDuration, formatShortDate, scoreTone } from './reportPresentation'
+import { RoutineAnalyzerSection } from './RoutineAnalyzerSection'
 import { FocusCard, FocusPanel, MiniBar, ReportActions, ReportLayout, ReportSummary, SectionHeading, type ReportTakeaway } from './reportShell'
 import { RoutineTechniqueSection } from './scoreExplanation'
 
@@ -240,6 +241,7 @@ export function RoutineReportView({ report }: { report: RoutineReport }) {
       <RoutineFocusSection report={report} />
       <OverviewSection report={report} />
       <RoutineTechniqueSection report={report} />
+      <RoutineAnalyzerSection report={report} />
       <ChaptersSection report={report} />
       <ProgressSection report={report} />
       <NotesSection report={report} />

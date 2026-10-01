@@ -9,8 +9,8 @@ export const BADUANJIN_ANALYZER_CONFIG = Object.freeze({
   minSamples: 20,
   /** Samples further apart than this are not one continuous movement (pause, lost pose). */
   maxGapMs: 400,
-  /** Live view: long enough to contain one whole 托举 / 开弓 repetition. */
-  liveWindowMs: 10_000,
+  /** Live view: long enough to contain one whole 托举 / 开弓 repetition (they repeat every ≈ 12–16 s). */
+  liveWindowMs: 20_000,
   /** Robust body scale: this percentile of the 2D torso length (bending towards the camera shortens it). */
   scalePercentile: 0.9,
   /** Moving-average half width (samples) applied to trajectories before finding peaks. */

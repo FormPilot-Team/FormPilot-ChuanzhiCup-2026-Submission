@@ -11,8 +11,8 @@ export const ANALYSIS_ENGINE_CONFIG = Object.freeze({
    * Repeating a chapter (jumps in the full routine) keeps the newest samples.
    */
   maxSamplesPerChapter: 1500,
-  /** Live window capacity (samples); the analyzer's own `liveWindowMs` decides how much of it is used. */
-  liveCapacity: 200,
+  /** Live window capacity (samples, 30 s at 10 Hz); the analyzer's own `liveWindowMs` decides how much of it is used. */
+  liveCapacity: 300,
 })
 
 export interface RoutineAnalysisLive {
@@ -42,6 +42,8 @@ export class RoutineAnalysisEngine<F, E extends AnalyzerEvaluation> {
   private readonly series = new Map<string, ChapterSeries<F, E>>()
   private readonly window: TimeWindow<AnalyzerSample<F>>
   private liveChapterId?: string
+  /** The last live view with an evaluation, kept while the window holds no complete movement of the same chapter. */
+  private lastLive?: RoutineAnalysisLive
 
   constructor(readonly analyzer: RoutineAnalyzer<F, E>, private readonly program: RoutineProgram, scope: RoutineScope) {
     for (const chapter of scopeChapters(program, scope)) {
@@ -64,24 +66,32 @@ export class RoutineAnalysisEngine<F, E extends AnalyzerEvaluation> {
     if (this.liveChapterId !== chapter.id) {
       this.window.clear()
       this.liveChapterId = chapter.id
+      this.lastLive = undefined
     }
     this.window.push(now, sample)
   }
 
-  /** The live view of the current chapter, from the sliding window only. */
+  /**
+   * The live view of the current chapter, from the sliding window only. When the window holds no complete movement
+   * yet (e.g. between two 托举), the last evaluated view of the same chapter is kept instead of going blank.
+   */
   live(): RoutineAnalysisLive | null {
     const series = this.liveChapterId ? this.series.get(this.liveChapterId) : undefined
     if (!series) return null
     const evaluation = this.analyzer.evaluate(this.window.toArray(), series.chapter)
-    const feedback = evaluation ? this.analyzer.buildFeedback(evaluation, series.chapter)[0] ?? null : null
-    return {
+    if (evaluation?.score === null || evaluation?.score === undefined) {
+      if (this.lastLive) return this.lastLive
+    }
+    const live: RoutineAnalysisLive = {
       analyzerId: this.analyzer.id,
       title: this.analyzer.title,
       chapterId: series.chapter.id,
       score: evaluation?.score ?? null,
       metrics: evaluation?.metrics ?? [],
-      feedback,
+      feedback: evaluation ? this.analyzer.buildFeedback(evaluation, series.chapter)[0] ?? null : null,
     }
+    if (live.score !== null) this.lastLive = live
+    return live
   }
 
   /** Whole-chapter evaluations for the session record; chapters without samples are left out. */

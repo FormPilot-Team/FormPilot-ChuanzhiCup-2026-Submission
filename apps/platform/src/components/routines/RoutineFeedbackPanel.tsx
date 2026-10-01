@@ -1,11 +1,13 @@
 import { Gauge, ShieldCheck } from 'lucide-react'
 import { CoachAvatar } from '../coach/CoachAvatar'
+import type { RoutineAnalysisLive } from '../../features/routines/analyzers/RoutineAnalysisEngine'
 import type { RoutineFeedbackTone } from '../../features/routines/followAlong/feedbackPolicy'
 import { LIVE_CHECK_LABEL, type LiveCheck, type LiveCheckStatus } from '../../features/routines/followAlong/liveChecks'
 import type { FollowAlongMatch, FollowAlongRegion } from '../../features/routines/followAlong/matcher'
 import { REGION_LABEL, SIMILARITY_BAND_LABEL, similarityBand } from '../../features/routines/report/routineReport'
 import type { RoutineAccent } from '../../features/routines/types'
 import { cn } from '../../lib/cn'
+import { RoutineAnalyzerLive } from './RoutineAnalyzerLive'
 import { ROUTINE_ACCENT } from './routineTheme'
 
 export type RoutineTrackingState = 'preparing' | 'normal' | 'adjust' | 'paused' | 'done'
@@ -19,6 +21,8 @@ interface RoutineFeedbackPanelProps {
   coachMessage: string
   coachTone: RoutineFeedbackTone
   comparisonAvailable: boolean
+  /** 专项分析 of the routine's own analyzer; absent for routines without one. */
+  analyzer?: { title: string; live: RoutineAnalysisLive | null; following: boolean }
 }
 
 const TRACKING: Readonly<Record<RoutineTrackingState, { label: string; tone: string }>> = {
@@ -59,7 +63,7 @@ const CHECK_TONE: Readonly<Record<LiveCheckStatus, string>> = {
  * Live follow-along feedback: the AI Coach line, the chapter's 动作规范检查, similarity to the standard video, rhythm
  * and body regions. Technique checks and similarity stay separate, as in the report.
  */
-export function RoutineFeedbackPanel({ accent, match, checks, trackingState, coachMessage, coachTone, comparisonAvailable }: RoutineFeedbackPanelProps) {
+export function RoutineFeedbackPanel({ accent, match, checks, trackingState, coachMessage, coachTone, comparisonAvailable, analyzer }: RoutineFeedbackPanelProps) {
   const measured = match && match.status !== 'insufficient'
   const similarity = measured ? Math.round(match.similarity * 100) : null
   const band = similarity === null ? null : similarityBand(similarity)
@@ -100,6 +104,8 @@ export function RoutineFeedbackPanel({ accent, match, checks, trackingState, coa
           ))}
         </ul>
       </div>
+
+      {analyzer ? <RoutineAnalyzerLive title={analyzer.title} live={analyzer.live} following={analyzer.following} /> : null}
 
       <div
         className="rounded-2xl border border-slate-100 bg-white p-3"

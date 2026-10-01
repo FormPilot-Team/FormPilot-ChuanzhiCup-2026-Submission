@@ -39,6 +39,8 @@ export const YIJINJING_ANALYZER_CONFIG = Object.freeze({
      */
     fullRatio: 0.9,
     zeroRatio: 0.4,
+    /** The samples must cover at least this much of the demonstrator's hold to judge it (the live window may not). */
+    minCoveredSeconds: 1,
   },
   /** Transitions: mean follow-along similarity over the 势. */
   pose: { fullSimilarity: 0.85, zeroSimilarity: 0.55 },

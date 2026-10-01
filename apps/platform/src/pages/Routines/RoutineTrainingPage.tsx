@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { useMemo, type CSSProperties } from 'react'
 import { routinePath } from '../../app/routes'
 import { CameraPanel } from '../../components/camera/CameraPanel'
 import { AICoach } from '../../components/aiCoach/AICoach'
@@ -15,6 +15,7 @@ import { routineExitPhase } from '../../features/training/trainingExit'
 import { ROUTINE_ACCENT } from '../../components/routines/routineTheme'
 import { shouldShowPoseOverlay } from '../../features/pose/poseOverlayVisibility'
 import type { RoutineFeedbackTone } from '../../features/routines/followAlong/feedbackPolicy'
+import { routineAnalyzerTitle } from '../../features/routines/analyzers/registry'
 import { liveChecks } from '../../features/routines/followAlong/liveChecks'
 import { chapterDisplayName, scopeChapters } from '../../features/routines/scope'
 import type { RoutineProgram, RoutineScope } from '../../features/routines/types'
@@ -81,13 +82,15 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
   const capturing = runtime.cameraMode === 'live' || runtime.cameraMode === 'demo'
   const outOfFrame = capturing && courseSnapshot.state === 'ACTIVE' && !runtime.framing.valid && !runtime.poseUnavailable
   const finished = runtime.sessionStatus === 'completed' || courseSnapshot.state === 'TRANSITION' || courseSnapshot.state === 'COURSE_COMPLETE'
+  const following = capturing && courseSnapshot.state === 'ACTIVE' && runtime.sessionStatus === 'active'
+  const analyzerTitle = useMemo(() => routineAnalyzerTitle(program), [program])
   const checks = liveChecks({
     routine: program.id,
     chapter,
     record: runtime.techniqueRecord,
     videoSeconds: runtime.stageTime,
     match: runtime.match,
-    following: capturing && courseSnapshot.state === 'ACTIVE' && runtime.sessionStatus === 'active',
+    following,
     comparisonAvailable: runtime.trackStatus !== 'unavailable',
   })
   return (
@@ -172,6 +175,7 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
               coachMessage={coach.message}
               coachTone={coach.tone}
               comparisonAvailable={runtime.trackStatus !== 'unavailable'}
+              analyzer={analyzerTitle && runtime.trackStatus !== 'unavailable' ? { title: analyzerTitle, live: runtime.analysisLive, following } : undefined}
             />
           </div>
         </div>

@@ -32,6 +32,11 @@ export function createRoutineAnalyzer(program: RoutineProgram, track?: Reference
   return FACTORIES[program.id]?.(program, track)
 }
 
+/** Name of the routine's analysis (八段锦到位度 …), or undefined when the routine has no analyzer. */
+export function routineAnalyzerTitle(program: RoutineProgram): string | undefined {
+  return createRoutineAnalyzer(program)?.title
+}
+
 /** The live analysis next to the follow-along matcher; undefined when the routine has no analyzer (nothing changes then). */
 export function createRoutineAnalysis(program: RoutineProgram, scope: RoutineScope, track: ReferenceTrack): RoutineAnalysis | undefined {
   const analyzer = createRoutineAnalyzer(program, track)

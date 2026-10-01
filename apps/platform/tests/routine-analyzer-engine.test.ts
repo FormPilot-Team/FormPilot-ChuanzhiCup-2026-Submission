@@ -97,6 +97,20 @@ describe('RoutineAnalysisEngine', () => {
     expect(engine.live()).toMatchObject({ chapterId: 'bdj-2', score: 40 })
   })
 
+  it('keeps the last scored live view while the window has nothing to score, until the chapter changes', () => {
+    let scoring = true
+    const analyzer = confidenceAnalyzer(() => true)
+    const switchable = { ...analyzer, evaluate: (samples: ReadonlyArray<AnalyzerSample<number>>, chapter: RoutineChapter) => (scoring ? analyzer.evaluate(samples, chapter) : { score: null, usableSamples: 0, metrics: [] }) }
+    const engine = new RoutineAnalysisEngine(switchable, program, { kind: 'full' })
+    engine.observe(50, 1000, pose(0.7))
+    expect(engine.live()).toMatchObject({ chapterId: 'bdj-1', score: 70 })
+    scoring = false
+    engine.observe(50.1, 1100, pose(0.9))
+    expect(engine.live()).toMatchObject({ chapterId: 'bdj-1', score: 70 })
+    engine.observe(140, 1200, pose(0.9))
+    expect(engine.live()).toMatchObject({ chapterId: 'bdj-2', score: null })
+  })
+
   it('only follows the chapters of a single-form scope', () => {
     const engine = new RoutineAnalysisEngine(confidenceAnalyzer(() => true), program, { kind: 'form', chapterId: 'bdj-3' })
     engine.observe(50, 1000, pose(0.9))
