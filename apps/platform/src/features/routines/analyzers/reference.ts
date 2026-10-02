@@ -5,7 +5,7 @@ import type { AnalyzerContext, AnalyzerPose, AnalyzerSample } from './types'
 /** 与跟练比对的参考帧门槛一致 */
 export const MIN_REFERENCE_CONFIDENCE = 0.5
 
-/** 示范者在一章内的特征序列，用分析器自己的 extractFeatures 提取，保证与用户同一测法；视频按原速播放，墙钟即视频时间 */
+/** 示范者一章的特征序列，用分析器自己的 extractFeatures 提取，与用户同一测法（墙钟即视频时间） */
 export function referenceSamples<F>(
   track: ReferenceTrack,
   chapter: RoutineChapter,

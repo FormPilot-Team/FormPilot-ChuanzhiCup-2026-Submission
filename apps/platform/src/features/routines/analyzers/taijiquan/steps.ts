@@ -1,5 +1,6 @@
 // 太极拳步骤表，按 programs.ts 的章节 id 索引。left / right 指本人左右腿（MediaPipe 标注）。
-// scoreShift 规则：定势窗口内示范者二维髋中心与标注一致的已知帧 ≥ 70% 才计分；transfer 式要求全式已知帧 ≥ 70% 且至少一次左右穿越
+// scoreShift 规则：定势窗口内示范者二维髋中心与标注一致的已知帧 ≥ 70% 才计分；
+// transfer 式要求全式已知帧 ≥ 70% 且至少一次左右穿越
 export type WeightShift = 'left' | 'right' | 'transfer' | 'balanced'
 
 export interface TaijiquanStep {

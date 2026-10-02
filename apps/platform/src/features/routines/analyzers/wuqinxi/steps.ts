@@ -1,7 +1,7 @@
 import type { WuqinxiFeatureId } from './features'
 
-// 五禽戏步骤表，按 programs.ts 的章节 id 索引。每一动标出所属动物和一到两个二维特征，特征的变化范围体现该戏的特点；
-// 第一个特征同时用于节律。起势、收势不属于任何一戏
+// 五禽戏步骤表，按 programs.ts 的章节 id 索引。每一动标出所属动物和一到两个二维特征，
+// 特征的变化范围体现该戏的特点；第一个特征同时用于节律。起势、收势不属于任何一戏
 export type WuqinxiCategory = 'tiger' | 'deer' | 'bear' | 'ape' | 'bird'
 
 export interface WuqinxiStep {

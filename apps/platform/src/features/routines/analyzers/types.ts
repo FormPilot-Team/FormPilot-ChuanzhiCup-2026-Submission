@@ -1,8 +1,8 @@
 import type { FollowAlongMatch, PosePointLike } from '../followAlong/matcher'
 import type { RoutineChapter, RoutineId } from '../types'
 
-// 功法专项分析器的公共接口。分析基于姿态关键点的二维近似，只在跟练引擎之外追加证据，不改变相似度、动作规范、反馈与语音。
-// evaluate 是纯函数：实时用短窗口，存档用整章序列
+// 功法专项分析器的公共接口。分析基于姿态关键点的二维近似，只在跟练引擎之外追加证据，
+// 不改变相似度、动作规范、反馈与语音。evaluate 是纯函数：实时用短窗口，存档用整章序列
 
 /** 与跟练比对输入同形的一帧用户姿态 */
 export interface AnalyzerPose {
