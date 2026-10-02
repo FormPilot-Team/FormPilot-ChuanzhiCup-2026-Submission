@@ -1,11 +1,8 @@
 import type { RecognizerMode, RepEvent } from './recognition/recognizer'
 import type { CustomActionBodyArea, CustomActionDefinition, CustomActionGoal, CustomActionSourceKind, RequirementId } from './types'
 
-/**
- * A custom-action training: the third session scope next to 热身训练 (`ai-coach.sessions:v2`, analysis-v1) and
- * 跟练课程 (`formpilot.routine-sessions:v1`). It records completion, repetitions and the 识别重点 results only — there is
- * no composite score, five-dimension ability or follow-along similarity for a user-defined action.
- */
+// 自定义动作训练记录：与热身训练、跟练课程分开存储，只记录完成情况、次数和识别重点结果，
+// 不给综合分、五维能力或跟练相似度
 export const CUSTOM_SESSION_STORAGE_KEY = 'formpilot.custom-action-sessions:v1'
 export const CUSTOM_SESSION_SCHEMA_VERSION = 1 as const
 export const CUSTOM_SESSION_ID_PREFIX = 'custom-session-'
@@ -13,7 +10,7 @@ export const MAX_CUSTOM_SESSIONS = 40
 
 export interface RequirementTally {
   id: RequirementId
-  /** Repetitions (or held seconds) where it could be judged. */
+  /** 能够判断的次数（或保持秒数） */
   checked: number
   passed: number
 }
@@ -23,7 +20,7 @@ export interface CustomActionSessionRecord {
   kind: 'custom-action'
   id: string
   actionId: string
-  /** Name at training time; the action may be renamed or deleted later. */
+  /** 训练时的动作名；动作之后可能改名或删除 */
   actionName: string
   actionSource: CustomActionSourceKind
   bodyArea: CustomActionBodyArea
@@ -35,12 +32,12 @@ export interface CustomActionSessionRecord {
   endedAt?: number
   activeMs: number
   outcome: 'in_progress' | 'completed' | 'incomplete'
-  /** Completed repetitions; for a hold goal, judged seconds of holding. */
+  /** 完成次数；保持目标时为判断过的保持秒数 */
   reps: number
   passedReps: number
   holdMs: number
   requirements: RequirementTally[]
-  /** Feedback shown during training, by code (requirements, motion too small, framing). */
+  /** 训练中显示过的反馈，按代码计数 */
   feedbackCounts: Record<string, number>
 }
 
@@ -76,7 +73,6 @@ export function startCustomSession(action: CustomActionDefinition, options: { id
   }
 }
 
-/** Adds one repetition (or held second) to the record. */
 export function recordRep(record: CustomActionSessionRecord, event: RepEvent): void {
   record.reps = Math.max(record.reps, event.index)
   if (event.passed) record.passedReps += 1
@@ -98,8 +94,6 @@ export function goalProgress(record: Pick<CustomActionSessionRecord, 'goal' | 'r
     : { done: Math.floor(record.holdMs / 1000), target: record.goal.seconds, unit: '秒' }
 }
 
-// ---- storage ----------------------------------------------------------------------------------------------------------
-
 export interface CustomSessionRepository {
   save(record: CustomActionSessionRecord): boolean
   get(id: string): CustomActionSessionRecord | undefined
@@ -110,7 +104,7 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
 }
 
-/** Structural check of a stored record; anything else is ignored rather than guessed at. */
+/** 结构校验；不符合的记录直接忽略，不做猜测 */
 export function isCustomSessionRecord(value: unknown): value is CustomActionSessionRecord {
   if (!value || typeof value !== 'object') return false
   const record = value as Partial<CustomActionSessionRecord>
@@ -134,7 +128,7 @@ export function parseStoredCustomSessions(raw: unknown): CustomActionSessionReco
   return Array.isArray(raw) ? raw.filter(isCustomSessionRecord) : []
 }
 
-/** Keep the newest records; an in-progress record without any movement is dropped once a newer one exists. */
+/** 保留最新的记录；存在更新记录时，丢弃没有任何动作的进行中记录 */
 export function retainCustomSessions(records: readonly CustomActionSessionRecord[]): CustomActionSessionRecord[] {
   const sorted = [...records].sort((left, right) => right.startedAt - left.startedAt)
   return sorted.filter((item, index) => !(index > 0 && item.outcome === 'in_progress' && item.reps === 0 && item.holdMs === 0)).slice(0, MAX_CUSTOM_SESSIONS)

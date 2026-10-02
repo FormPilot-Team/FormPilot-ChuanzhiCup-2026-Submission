@@ -2,22 +2,11 @@ import { angleDegrees, clamp, deriveBodyPoints, distance, torsoLeanDegrees } fro
 import type { PoseLandmark } from '../../pose/types'
 import type { ReferenceTrack } from './referenceTrack'
 
-/**
- * Follow-along comparison between the user's live pose and the standard video's pose at the same moment.
- *
- * Origin: the teammate's `videoReferenceMatcher` (torso-normalised points + joint angles, three body regions,
- * best match inside a time window around the video's current time, EMA smoothing). Changes made while
- * integrating it, each for a failure seen in the original:
- * - coordinates are aspect-corrected before normalising, so a 4:3 camera compares fairly with the 16:9 video;
- * - a region without visible landmarks is "unknown", not 0 — the original reported "mismatch" whenever the legs
- *   were out of view;
- * - joint angles are only used when all three landmarks are visible;
- * - the user may follow as in a mirror: the left/right-swapped pose is compared too and the better one counts;
- * - during holds many reference frames match equally well, and the original picked the first, which invented
- *   "too fast/too slow" offsets; near-best candidates now resolve to the one closest to the video time;
- * - following naturally lags the video a little, so "behind" tolerates 1 s while "ahead" tolerates 0.6 s.
- * Thresholds remain engineering values (not yet calibrated on recorded users).
- */
+// 跟练比对：用户实时姿态与标准视频同一时刻的姿态（躯干归一化的点 + 关节角，分上肢、躯干、下肢三区，
+// 在视频当前时间附近的窗口内取最佳匹配并做 EMA 平滑）。
+// 先按宽高比校正坐标，摄像头 4:3 与视频 16:9 才能公平比较；看不到的区域记为未知而不是 0；
+// 允许镜像跟练，左右互换后的姿态也参与比较；定势时多帧同样匹配，取离视频时间最近的一帧，避免虚报快慢；
+// 跟练天然略慢，偏慢容忍 1 s、偏快容忍 0.6 s。阈值为暂定值
 export const FOLLOW_ALONG_CONFIG = Object.freeze({
   version: 'follow-along-v1',
   searchWindowMs: 2500,
@@ -42,16 +31,16 @@ export type FollowAlongRegionScores = Record<FollowAlongRegion, number | null>
 
 export interface FollowAlongMatch {
   status: FollowAlongStatus
-  /** Smoothed overall similarity, 0..1. */
+  /** 平滑后的总相似度 0..1 */
   similarity: number
-  /** Smoothed timing offset in ms: positive = the user is ahead of the video, negative = behind. */
+  /** 平滑后的时间偏差，ms；正值表示比视频快 */
   timingOffsetMs: number
-  /** Reference time of the selected match, seconds. */
+  /** 选中匹配在参考轨迹中的时间，秒 */
   matchedAt: number
   videoTime: number
-  /** Region scores of the selected match (null when that region was not visible). */
+  /** 选中匹配的各区得分（该区不可见时为 null） */
   regionScores: FollowAlongRegionScores
-  /** True when the left/right-mirrored pose matched better than the pose as seen. */
+  /** 镜像后的姿态比原样更接近 */
   mirrored: boolean
 }
 
@@ -110,10 +99,7 @@ export interface PosePointLike {
   visibility?: number
 }
 
-/**
- * Describes a pose in a torso-normalised frame: origin at the shoulder/hip centre, one unit = torso length.
- * `aspect` is the source image's width / height; x is scaled by it so distances and angles are in true proportions.
- */
+/** 以躯干归一化描述姿态：原点为肩髋中心，单位为躯干长；x 先乘宽高比，距离和角度按真实比例 */
 export function describePose(landmarks: ReadonlyArray<PosePointLike>, aspect: number): PoseDescriptor | null {
   const at = (index: number): PoseLandmark | undefined => {
     const point = landmarks[index]
@@ -154,7 +140,7 @@ export function describePose(landmarks: ReadonlyArray<PosePointLike>, aspect: nu
   return { points, angles }
 }
 
-/** The same pose seen in a mirror: left and right swap and x flips around the torso centre. */
+/** 镜像：左右互换，x 绕躯干中心翻转 */
 export function mirrorDescriptor(descriptor: PoseDescriptor): PoseDescriptor {
   const points: PoseDescriptor['points'] = {}
   for (const index of POINT_INDICES) {
@@ -199,7 +185,7 @@ function regionScore(user: PoseDescriptor, reference: PoseDescriptor, spec: Regi
     angleSum += Math.abs(a - b) / 180
     angleCount += 1
   }
-  // A region counts as seen only through its visible landmarks; torso lean alone is always computable.
+  // 区域只按可见关键点计入；躯干倾角总能算出，不单独作为可见依据
   if (pointCount === 0) return null
   const pointError = pointSum / pointCount
   const angleError = angleCount ? angleSum / angleCount : 0
@@ -233,7 +219,7 @@ interface PreparedFrame {
 export interface UserPoseInput {
   landmarks: ReadonlyArray<PosePointLike>
   confidence: number
-  /** Camera image width / height. */
+  /** 摄像头画面宽 / 高 */
   aspect: number
 }
 
@@ -297,7 +283,7 @@ export class FollowAlongMatcher {
     }
     if (!candidates.length) return insufficient
 
-    // Near-best candidates are equally plausible; prefer the one closest to the video's own time.
+    // 相似度接近最佳的候选同样可信，取离视频时间最近的一个
     let best = candidates[0]
     for (const candidate of candidates) {
       if (candidate.similarity < bestSimilarity - FOLLOW_ALONG_CONFIG.tieBreakEpsilon) continue

@@ -12,14 +12,14 @@ import type { CapturedPose } from '../../features/workshop/types'
 export type WorkshopCameraMode = 'idle' | 'requesting_permission' | 'model_loading' | 'live' | 'demo' | 'error'
 
 export interface WorkshopFrame {
-  /** Filtered and normalised; null when no person is detected. */
+  /** 滤波并归一化后的姿态；未检测到人时为 null */
   pose: NormalizedPoseFrame | null
-  /** The filtered frame, for drawing. */
+  /** 滤波后的帧，用于绘制 */
   raw: PoseFrame | null
-  /** The detector's own frame before filtering (gestures use a lighter filter of their own). */
+  /** 滤波前的检测帧（手势使用自己的轻量滤波） */
   detected: PoseFrame | null
   timestamp: number
-  /** Width / height of the camera picture. */
+  /** 摄像头画面宽 / 高 */
   aspect: number
 }
 
@@ -30,16 +30,12 @@ export interface WorkshopFixtureControl {
 
 type FixtureWindow = typeof window & { __workshopFixtureMode?: FixtureMode }
 
-/**
- * Camera + pose pipeline for the workshop and custom-action training: the shared camera adapter, filter and
- * normaliser with the workshop's own detector instance (see features/workshop/detector.ts). DEV builds can replace the
- * camera with a synthetic person (`?fixture=synthetic`) whose pose the page controls.
- */
+/** 动作工坊与自定义训练的摄像头 + 姿态管线；开发环境可用 ?fixture=synthetic 的合成人物代替摄像头 */
 export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = () => true }: {
   synthetic: boolean
   onFrame: (frame: WorkshopFrame) => void
   fixture?: () => WorkshopFixtureControl
-  /** Whether to draw the skeleton on this frame (training hides it while following, as the other modes do). */
+  /** 本帧是否绘制骨架（跟练中隐藏，与其他模式一致） */
   showOverlay?: () => boolean
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -143,7 +139,7 @@ export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = (
     cancelAnimationFrame(rafRef.current)
     cameraRef.current?.stop()
     const detector = detectorRef.current
-    // Closing on the next tick lets an in-flight detect() finish first.
+    // 下一个 tick 再关闭，让进行中的 detect() 先完成
     if (detector) window.setTimeout(() => detector.close(), 0)
   }, [])
 

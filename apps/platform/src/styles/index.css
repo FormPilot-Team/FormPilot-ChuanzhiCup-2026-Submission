@@ -26,13 +26,13 @@ button:focus-visible { outline: 3px solid rgb(147 197 253 / 0.7); outline-offset
   to { transform: translate3d(calc(-100% + (100% / var(--coach-frame-count))), 0, 0); }
 }
 
-/* The Home welcome bubble pops out from its tail; reduced motion shows it at once (global rule below). */
+/* 首页欢迎气泡从尾部弹出；减少动效时直接显示（见下方全局规则） */
 @keyframes fp-bubble-in {
   from { opacity: 0; transform: scale(0.86); }
   to { opacity: 1; transform: scale(1); }
 }
 
-/* Each 3-2-1 countdown step on the camera: a light scale-in, nothing that moves across the picture. */
+/* 摄像头上的 3-2-1 倒计时每步轻微放大出现，不在画面上移动 */
 @keyframes fp-countdown-pop {
   from { opacity: 0; transform: scale(0.72); }
   30% { opacity: 1; transform: scale(1.04); }
@@ -43,17 +43,14 @@ button:focus-visible { outline: 3px solid rgb(147 197 253 / 0.7); outline-offset
   .panel { @apply rounded-2xl border border-slate-200/70 bg-white shadow-[0_1px_2px_rgb(15_23_42/0.04),0_10px_28px_-18px_rgb(30_64_175/0.18)]; }
   .report-panel { @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgb(15_23_42/0.03)]; }
   .tool-button { @apply grid size-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50; }
-  /* Blue-600 keeps white button text above 4.5:1; the soft blue glow carries the refreshed, more energetic look. */
+  /* blue-600 保证白字对比度高于 4.5:1 */
   .primary-button { @apply rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_18px_-10px_rgb(37_99_235/0.8)] hover:bg-blue-700; }
   .secondary-button { @apply rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50; }
   .danger-button { @apply rounded-xl bg-coral-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-coral-600; }
   .correction-badge { @apply absolute left-1/2 top-[16%] flex -translate-x-1/2 items-center gap-2 rounded-xl border border-coral-500 bg-white px-4 py-2.5 text-lg font-bold text-coral-600 shadow-lg sm:text-xl; }
   .correction-badge.success { @apply border-emerald-400 text-emerald-600; }
 
-  /*
-   * Phase II visual refresh: FormPilot blue stays the brand; bright blue, cyan and a pale teal add motion energy on
-   * surfaces, progress and highlights only. Text on these surfaces stays slate for contrast.
-   */
+  /* 品牌主色为蓝色；亮蓝、青色和浅青绿只用于背景、进度和高亮，文字保持石板灰以保证对比度 */
   .fp-page {
     background:
       radial-gradient(1100px 420px at 88% -8%, rgb(56 189 248 / 0.12), transparent 62%),
@@ -70,10 +67,7 @@ button:focus-visible { outline: 3px solid rgb(147 197 253 / 0.7); outline-offset
   .fp-energy-gradient { background-image: linear-gradient(100deg, #2563eb 0%, #0ea5e9 60%, #14b8a6 100%); }
   .fp-section-title { @apply text-balance text-xl font-bold tracking-tight text-slate-950 sm:text-2xl; }
 
-  /*
-   * Phase III Home: an open hero band that fades into the page (no box around the coach), a deep-navy wordmark, the
-   * coach's halo and faded lower edge, and the avatar disc shared by every AI coach entry.
-   */
+  /* 首页主视觉：渐隐的背景带、深海军蓝字标、教练光晕与下沿渐隐，以及各 AI 教练入口共用的头像圆盘 */
   .fp-home-hero {
     background:
       radial-gradient(56% 78% at 70% 48%, rgb(186 230 253 / 0.55), transparent 70%),
