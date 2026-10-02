@@ -1,18 +1,18 @@
-// 进入游戏 → 游戏说明 → 站位提示 → 摄像头识别(+校准) → 准备倒计时 3/2/1 → 开始 → 结果.
+// 进入游戏 → 游戏说明 → 站位提示 → 摄像头识别(+校准) → 准备倒计时 3/2/1 → 开始 → 结果. Same for all games.
 // One MotionSession (camera + model) lives from "打开摄像头" until the player leaves the game.
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ApplePlay } from '../games/apple/ApplePlay'
-import type { AppleController } from '../games/apple/controller'
+import { REGISTRY } from '../games/registry'
 import type { CalibrationProfile } from '../motion/contracts'
 import { PoseSourceError } from '../motion/poseSource'
 import { startMotionSession, type MotionSession } from '../motion/session'
 import { sfx } from '../shared/audio'
 import { FLAGS } from '../shared/flags'
-import type { GameResult } from '../shared/metrics'
+import type { GameId, GameResult } from '../shared/metrics'
 import { perf } from '../shared/perf'
 import { addPlayedMs, playedThisSessionMs, type Settings } from '../shared/settings'
 import { CameraStep } from './CameraStep'
 import { DebugPanel } from './DebugPanel'
+import type { AnyController } from './GamePlay'
 import { ResultScreen } from './ResultScreen'
 import { IntroStep, PositioningStep, Stepper } from './Steps'
 
@@ -20,7 +20,8 @@ type Step = 'intro' | 'positioning' | 'camera' | 'play' | 'result'
 const STEP_INDEX: Record<Step, number> = { intro: 0, positioning: 1, camera: 2, play: 3, result: 4 }
 const REST_LOCK_MS = 60_000
 
-export function GameFlow({ settings, onSettings, onHub }: { settings: Settings; onSettings: (s: Settings) => void; onHub: () => void }) {
+export function GameFlow({ gameId, settings, onSettings, onHub }: { gameId: GameId; settings: Settings; onSettings: (s: Settings) => void; onHub: () => void }) {
+  const game = REGISTRY[gameId]
   const [step, setStep] = useState<Step>('intro')
   const [session, setSession] = useState<MotionSession | null>(null)
   const [starting, setStarting] = useState(false)
@@ -29,7 +30,7 @@ export function GameFlow({ settings, onSettings, onHub }: { settings: Settings; 
   const [result, setResult] = useState<GameResult | null>(null)
   const [restLockMs, setRestLockMs] = useState(0)
   const [playKey, setPlayKey] = useState(0)
-  const [controller, setController] = useState<AppleController | null>(null)
+  const [controller, setController] = useState<AnyController | null>(null)
   const sessionRef = useRef<MotionSession | null>(null)
 
   const stopSession = useCallback(() => {
@@ -47,11 +48,11 @@ export function GameFlow({ settings, onSettings, onHub }: { settings: Settings; 
   // Test / debug hook (read-only handles; no UI depends on it).
   useEffect(() => {
     ;(window as unknown as { __mgl?: unknown }).__mgl = {
-      step, session, controller, perf, flags: FLAGS,
+      game: gameId, step, session, controller, perf, flags: FLAGS,
       diagnostics: () => session?.adapter.diagnostics() ?? null,
       synthetic: session?.synthetic ?? null,
     }
-  }, [step, session, controller])
+  }, [gameId, step, session, controller])
 
   const openCamera = useCallback(async () => {
     sfx.unlock()
@@ -60,7 +61,7 @@ export function GameFlow({ settings, onSettings, onHub }: { settings: Settings; 
     setError(null)
     setStarting(true)
     try {
-      const next = await startMotionSession({ synthetic: FLAGS.synthetic, missEvery: FLAGS.missEvery, delegate: FLAGS.delegate })
+      const next = await startMotionSession({ synthetic: FLAGS.synthetic, bot: game.bot, missEvery: FLAGS.missEvery, delegate: FLAGS.delegate })
       sessionRef.current = next
       setSession(next)
     } catch (e) {
@@ -68,7 +69,7 @@ export function GameFlow({ settings, onSettings, onHub }: { settings: Settings; 
     } finally {
       setStarting(false)
     }
-  }, [])
+  }, [game.bot])
 
   const exit = useCallback(() => {
     stopSession()
@@ -94,10 +95,12 @@ export function GameFlow({ settings, onSettings, onHub }: { settings: Settings; 
     setStep('play')
   }, [])
 
+  const Play = game.Play
+  const durationMs = (FLAGS.durationSeconds ?? settings.roundSeconds) * 1000
   return (
-    <div className="stage">
+    <div className={`stage stage-${gameId}`}>
       {step !== 'play' && step !== 'result' && <Stepper index={STEP_INDEX[step]} />}
-      {step === 'intro' && <IntroStep settings={settings} onChange={onSettings} onNext={() => setStep('positioning')} onBack={exit} />}
+      {step === 'intro' && <IntroStep game={game} settings={settings} onChange={onSettings} onNext={() => setStep('positioning')} onBack={exit} />}
       {step === 'positioning' && <PositioningStep seated={settings.seated} onNext={() => void openCamera()} onBack={() => setStep('intro')} />}
       {step === 'camera' && (
         <CameraStep
@@ -105,6 +108,7 @@ export function GameFlow({ settings, onSettings, onHub }: { settings: Settings; 
           starting={starting}
           error={error}
           seated={settings.seated}
+          gameId={gameId}
           onRetry={() => {
             stopSession()
             void openCamera()
@@ -117,11 +121,12 @@ export function GameFlow({ settings, onSettings, onHub }: { settings: Settings; 
         />
       )}
       {step === 'play' && session && (
-        <ApplePlay
+        <Play
           key={playKey}
           session={session}
           profile={profile}
           settings={settings}
+          durationMs={durationMs}
           onEnd={onEnd}
           onRestart={replay}
           onExit={exit}

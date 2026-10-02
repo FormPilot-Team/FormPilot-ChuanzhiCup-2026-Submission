@@ -5,6 +5,8 @@
 // - a hand that completed a target, or that was already inside when the target appeared, must leave
 //   the exit radius before it can start a new attempt on that target (release / re-arm);
 // - one hand owns a target's attempt; the other hand is ignored until the owner leaves.
+// - hit-testing uses the palm-centre estimate (MotionFrame.leftHand / rightHand), the same point the
+//   hand cursor is drawn at, so "looks touching" and "counts as touching" agree.
 // The idea of timed hold + cooldown comes from FormPilot_v3 GestureHoldController, which lacks
 // re-arming (Phase 0 audit); this is a new implementation.
 import { SIDES, type MotionEvent, type MotionFrame, type MotionTarget, type Point, type Side } from './contracts'
@@ -60,7 +62,7 @@ export class TargetTracker {
         continue
       }
       const sideState = (side: Side): SideState => {
-        const wrist = frame ? wristOf(frame, side) : undefined
+        const wrist = frame ? handOf(frame, side) : undefined
         const inside = wrist ? distance(wrist, target.center) <= target.radius + TARGET_CONFIG.exitMargin : false
         return { phase: 'outside', armed: !inside, attemptId: 0, holdStartedAt: 0, lastAt: 0 }
       }
@@ -120,7 +122,7 @@ export class TargetTracker {
       let progress = 0
       for (const side of SIDES) {
         const s = state.sides[side]
-        const wrist = wristOf(frame, side)
+        const wrist = handOf(frame, side)
         const base = { timestamp: now, targetId: target.id, side, attemptId: s.attemptId }
         if (!wrist) {
           if (s.phase === 'holding') events.push({ ...base, type: 'TARGET_EXIT', completed: false, reason: 'tracking-lost' })
@@ -188,6 +190,8 @@ export class TargetTracker {
   }
 }
 
-function wristOf(frame: MotionFrame, side: Side): Point | undefined {
-  return frame.tracking[side] ? (side === 'left' ? frame.leftWrist : frame.rightWrist) : undefined
+/** Hit point of a hand: the palm-centre estimate (falls back to the wrist for hand-made frames). */
+export function handOf(frame: MotionFrame, side: Side): Point | undefined {
+  if (!frame.tracking[side]) return undefined
+  return side === 'left' ? (frame.leftHand ?? frame.leftWrist) : (frame.rightHand ?? frame.rightWrist)
 }

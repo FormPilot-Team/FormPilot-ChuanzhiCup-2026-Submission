@@ -1,7 +1,7 @@
-// Performance run for Apple Picking against the production build (vite preview on :5181).
-//   node scripts/perf.mjs --video <file.mjpeg|file.y4m> [--seconds 30] [--headed]
+// Performance run for one game against the production build (vite preview on :5181).
+//   node scripts/perf.mjs --game apple|boating|archery --video <file.mjpeg|file.y4m> [--seconds 30] [--headed]
 // Scenario "camera-model": Chromium fake camera fed from the video file → real MediaPipe model +
-// Phaser rendering together. Scenario "synthetic": scripted player (many picks → pick latency).
+// Phaser rendering together. Scenario "synthetic": scripted player (many events → event latency).
 // OS CPU / memory are sampled for the launched browser's own process tree only (Win32_Process).
 import { chromium } from '@playwright/test'
 import { execFileSync } from 'node:child_process'
@@ -17,7 +17,9 @@ const opt = (name, fallback) => {
 const VIDEO = opt('video', null)
 const SECONDS = Number(opt('seconds', 30))
 const HEADED = args.includes('--headed')
-const OUT = path.resolve(opt('out', '../docs/stage-ab/perf.json'))
+const GAME = opt('game', 'apple')
+const OUT = path.resolve(opt('out', `../docs/stage-c-e/perf-${GAME}.json`))
+const SKIP_CPU = args.includes('--skip-cpu')
 const BASE = 'http://127.0.0.1:5181'
 
 function processTree(rootPid) {
@@ -58,12 +60,12 @@ async function runScenario(name, launchArgs, query) {
     return ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : 'unknown'
   })
   const click = (label) => page.getByRole('button', { name: label, exact: true }).first().click()
-  await click('开始')
+  await page.getByTestId(`card-${GAME}`).getByRole('button', { name: '开始' }).click()
   await click('下一步')
   await click('打开摄像头')
   if (name.startsWith('camera-model-gpu') && !name.includes('cap')) {
     await page.waitForTimeout(6000)
-    await page.screenshot({ path: path.join(path.dirname(OUT), 'screenshots', '12-camera-real-model.png') })
+    await page.screenshot({ path: path.join(path.dirname(OUT), 'screenshots', `perf-${GAME}-camera-check-real-model.png`) })
   }
   // get into the round: normal path, or the page's own fallbacks if the clip never satisfies framing
   const started = Date.now()
@@ -106,10 +108,10 @@ async function runScenario(name, launchArgs, query) {
       frameLatencies: c.frameLatencies, feedbackLatencies: c.feedbackLatencies, inferenceMsP95: d.inferenceMsP95,
       delegate: d.source.delegate, camera: `${d.source.cameraWidth}x${d.source.cameraHeight}@${d.source.cameraFrameRate}`,
       longTasks: window.__mgl.perf.longTasks, longTaskMs: window.__mgl.perf.longTaskMs, frames: window.__mgl.perf.frameCount,
-      heapMB: window.__mgl.perf.heapMB(), picks: c.round.completed,
+      heapMB: window.__mgl.perf.heapMB(), events: c.feedbackLatencies.length, score: c.round.score,
     }
   })
-  await page.screenshot({ path: path.join(path.dirname(OUT), 'screenshots', `perf-${name}.png`) })
+  await page.screenshot({ path: path.join(path.dirname(OUT), 'screenshots', `perf-${GAME}-${name}.png`) })
   await browser.close()
   await server.close()
   const fps = samples.map((s) => s.renderFps)
@@ -128,8 +130,8 @@ async function runScenario(name, launchArgs, query) {
     camera: end.camera,
     bodyTrackedShare: samples.filter((s) => s.tracked).length / samples.length,
     frameToRenderMs: { p50: pct(end.frameLatencies, 0.5), p95: pct(end.frameLatencies, 0.95), n: end.frameLatencies.length },
-    pickToRenderMs: { p50: pct(end.feedbackLatencies, 0.5), p95: pct(end.feedbackLatencies, 0.95), n: end.feedbackLatencies.length },
-    picks: end.picks,
+    eventToRenderMs: { p50: pct(end.feedbackLatencies, 0.5), p95: pct(end.feedbackLatencies, 0.95), n: end.feedbackLatencies.length },
+    score: end.score,
     mainThreadBusyShare: Math.round(((m1.TaskDuration - m0.TaskDuration) / (wallMs / 1000)) * 1000) / 1000,
     scriptShare: Math.round(((m1.ScriptDuration - m0.ScriptDuration) / (wallMs / 1000)) * 1000) / 1000,
     longTasks: { count: end.longTasks - before.longTasks, ms: Math.round(end.longTaskMs - before.longTaskMs) },
@@ -148,6 +150,7 @@ const power = (() => {
   } catch { return 'unknown' }
 })()
 const report = {
+  game: GAME,
   date: new Date().toISOString(),
   machine: { cpu: os.cpus()[0].model, logicalCores: os.cpus().length, memoryGB: Math.round(os.totalmem() / 1073741824), power: power === '2' ? 'AC' : power === '1' ? 'battery' : power },
   headed: HEADED,
@@ -158,7 +161,7 @@ if (VIDEO) {
   report.video = path.basename(VIDEO)
   const fake = ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', `--use-file-for-fake-video-capture=${VIDEO}`]
   report.scenarios.push(await runScenario('camera-model-gpu', fake, ''))
-  report.scenarios.push(await runScenario('camera-model-cpu', fake, '?delegate=cpu'))
+  if (!SKIP_CPU) report.scenarios.push(await runScenario('camera-model-cpu', fake, '?delegate=cpu'))
   if (args.includes('--compare-cap')) report.scenarios.push(await runScenario('camera-model-gpu-cap60', fake, '?fpsLimit=60'))
 }
 report.scenarios.push(await runScenario('synthetic', [], '?source=synthetic&duration=180&seed=5'))

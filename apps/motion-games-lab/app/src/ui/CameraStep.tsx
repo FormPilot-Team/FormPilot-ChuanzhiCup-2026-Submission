@@ -3,17 +3,25 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CalibrationProfile, CalibrationStatus, FramingState } from '../motion/contracts'
 import type { MotionSession } from '../motion/session'
+import type { GameId } from '../shared/metrics'
 import { RaiseHandArt } from './Illustrations'
 import { MirrorView } from './MirrorView'
 
 const READY_HOLD_MS = 1200
 const OFFER_FALLBACK_AFTER_MS = 20_000
 
-export function CameraStep({ session, starting, error, seated, onRetry, onBack, onReady }: {
+const REACH_NOTE: Record<GameId, string> = {
+  apple: '不用勉强，舒服就好。苹果会出现在你够得到的地方。',
+  boating: '不用勉强，舒服就好。划船时手不用举这么高。',
+  archery: '不用勉强，舒服就好。拉弓的幅度会按你的手臂来定。',
+}
+
+export function CameraStep({ session, starting, error, seated, gameId, onRetry, onBack, onReady }: {
   session: MotionSession | null
   starting: boolean
   error: { message: string; guidance: string } | null
   seated: boolean
+  gameId: GameId
   onRetry: () => void
   onBack: () => void
   onReady: (profile: CalibrationProfile | null) => void
@@ -88,6 +96,7 @@ export function CameraStep({ session, starting, error, seated, onRetry, onBack, 
             <Calibration
               status={calibration}
               seated={seated}
+              note={REACH_NOTE[gameId]}
               onSkip={() => {
                 // Skipping the neutral step skips calibration entirely (conservative default reach, no
                 // posture baseline); skipping a reach step keeps the neutral posture just measured.
@@ -123,7 +132,7 @@ export function CameraStep({ session, starting, error, seated, onRetry, onBack, 
   )
 }
 
-function Calibration({ status, seated, onSkip }: { status: CalibrationStatus; seated: boolean; onSkip: () => void }) {
+function Calibration({ status, seated, note, onSkip }: { status: CalibrationStatus; seated: boolean; note: string; onSkip: () => void }) {
   const step = status.step
   const side = step === 'reach-left' ? 'left' : step === 'reach-right' ? 'right' : 'none'
   const title = step === 'neutral' ? `双手自然放下，${seated ? '坐好' : '站好'}别动`
@@ -146,7 +155,7 @@ function Calibration({ status, seated, onSkip }: { status: CalibrationStatus; se
           <div className="bar"><i style={{ width: `${raised * 100}%`, background: side === 'left' ? 'var(--left)' : 'var(--right)' }} /></div>
           <div style={{ marginTop: 8, fontSize: 18, color: 'var(--ink-soft)' }}>保持住</div>
           <div className="bar"><i style={{ width: `${status.progress * 100}%` }} /></div>
-          <p style={{ margin: '12px 0 0', color: 'var(--ink-soft)' }}>不用勉强，舒服就好。苹果会出现在你够得到的地方。</p>
+          <p style={{ margin: '12px 0 0', color: 'var(--ink-soft)' }}>{note}</p>
         </>
       )}
       {step === 'neutral' && <div className="bar"><i style={{ width: `${status.progress * 100}%` }} /></div>}

@@ -2,8 +2,11 @@
 // enabled detectors → (MotionFrame, MotionEvent[]) for the game. One source, one model, one loop.
 import { Calibrator } from './calibration'
 import type {
-  CalibrationStatus, MotionAdapterApi, MotionCapability, MotionEvent, MotionFrame, MotionListener, MotionTarget, PostureFlags, Side,
+  CalibrationStatus, DrawOptions, DrawState, MotionAdapterApi, MotionCapability, MotionEvent, MotionFrame, MotionListener, MotionTarget,
+  PostureFlags, Side, StrokeOptions, StrokeState,
 } from './contracts'
+import { DrawDetector } from './drawDetector'
+import { StrokeDetector } from './strokeDetector'
 import { FramingController } from './framing'
 import { FrameBuilder, type BodyMeasures } from './frameBuilder'
 import type { PoseSource, PoseSourceInfo, RawPoseSample } from './poseSource'
@@ -52,6 +55,8 @@ export interface AdapterDiagnostics {
   framing: MotionFrame['framing']
   measures: Pick<BodyMeasures, 'valid' | 'hipsValid' | 'scale' | 'shoulderWidth' | 'leanDeg' | 'shoulderTiltDeg' | 'earGap'> | null
   targets: TrackerSnapshot[]
+  strokes: StrokeState | null
+  draw: DrawState | null
   calibration: CalibrationStatus
   capabilities: MotionCapability[]
   detecting: boolean
@@ -64,6 +69,8 @@ export class MotionAdapter implements MotionAdapterApi {
   private readonly framing = new FramingController()
   private readonly calibrator = new Calibrator()
   private readonly tracker = new TargetTracker()
+  private readonly strokes = new StrokeDetector()
+  private readonly draw = new DrawDetector()
   private readonly listeners = new Set<MotionListener>()
   private readonly capabilities = new Set<MotionCapability>()
   private readonly body = new LossTracker(ADAPTER_CONFIG.bodyLostMs, ADAPTER_CONFIG.bodyRestoreMs)
@@ -118,8 +125,23 @@ export class MotionAdapter implements MotionAdapterApi {
   }
 
   enable(capability: MotionCapability): void {
-    if (capability !== 'targets') throw new Error(`Motion capability "${capability}" is reserved and not implemented yet.`)
     this.capabilities.add(capability)
+  }
+
+  configureStrokes(options: Partial<StrokeOptions>): void {
+    this.strokes.configure(options)
+  }
+
+  strokeState(): StrokeState {
+    return this.strokes.state()
+  }
+
+  configureDraw(options: Partial<DrawOptions>): void {
+    this.draw.configure(options)
+  }
+
+  drawState(): DrawState {
+    return this.draw.state()
   }
 
   setTargets(targets: readonly MotionTarget[]): void {
@@ -136,12 +158,15 @@ export class MotionAdapter implements MotionAdapterApi {
 
   resetAttempts(reason: string): void {
     const at = this.latest?.timestamp ?? performance.now()
-    this.pending.push(...this.tracker.cancelAll(at))
+    this.pending.push(...this.tracker.cancelAll(at), ...this.strokes.cancelAll(at, 'paused'), ...this.draw.cancelAll(at, 'paused'))
     this.recent.unshift({ type: 'RESET', at: Math.round(at), detail: reason })
   }
 
   setDetectionActive(active: boolean): void {
-    if (this.detecting && !active) this.pending.push(...this.tracker.cancelAll(this.latest?.timestamp ?? performance.now()))
+    if (this.detecting && !active) {
+      const at = this.latest?.timestamp ?? performance.now()
+      this.pending.push(...this.tracker.cancelAll(at), ...this.strokes.cancelAll(at, 'paused'), ...this.draw.cancelAll(at, 'paused'))
+    }
     this.detecting = active
   }
 
@@ -174,6 +199,8 @@ export class MotionAdapter implements MotionAdapterApi {
       framing: this.latest?.framing ?? { bodyInFrame: false, leftHandVisible: false, rightHandVisible: false, distance: 'unknown', roomToMove: false, hint: null, ready: false },
       measures: m ? { valid: m.valid, hipsValid: m.hipsValid, scale: m.scale, shoulderWidth: m.shoulderWidth, leanDeg: m.leanDeg, shoulderTiltDeg: m.shoulderTiltDeg, earGap: m.earGap } : null,
       targets: this.tracker.snapshot(),
+      strokes: this.capabilities.has('strokes') ? this.strokes.state() : null,
+      draw: this.capabilities.has('draw') ? this.draw.state() : null,
       calibration: this.calibrator.status(),
       capabilities: [...this.capabilities],
       detecting: this.detecting,
@@ -202,7 +229,9 @@ export class MotionAdapter implements MotionAdapterApi {
       const change = this.hands[side].update(frame.tracking[side], now)
       if (change) this.pending.push({ type: change === 'lost' ? 'TRACKING_LOST' : 'TRACKING_RESTORED', timestamp: now, scope: side })
     }
-    if (bodyChange === 'lost') this.pending.push(...this.tracker.cancelAll(now))
+    if (bodyChange === 'lost') {
+      this.pending.push(...this.tracker.cancelAll(now), ...this.strokes.cancelAll(now, 'tracking-lost'), ...this.draw.cancelAll(now, 'tracking-lost'))
+    }
 
     if (this.lastPosture && !samePosture(this.lastPosture, frame.posture)) {
       this.pending.push({ type: 'POSTURE_CHANGED', timestamp: now, posture: frame.posture })
@@ -210,7 +239,11 @@ export class MotionAdapter implements MotionAdapterApi {
     this.lastPosture = frame.posture
 
     if (this.calibrator.update(frame, measures)) this.posture.setBaseline(this.calibrator.postureBaseline())
-    if (this.capabilities.has('targets') && this.body.tracked && this.detecting) this.pending.push(...this.tracker.update(frame))
+    if (this.body.tracked && this.detecting) {
+      if (this.capabilities.has('targets')) this.pending.push(...this.tracker.update(frame))
+      if (this.capabilities.has('strokes')) this.pending.push(...this.strokes.update(frame))
+      if (this.capabilities.has('draw')) this.pending.push(...this.draw.update(frame))
+    }
 
     this.latest = frame
     this.latestMeasures = measures
@@ -234,6 +267,13 @@ function describe(event: MotionEvent): string {
     case 'TRACKING_LOST':
     case 'TRACKING_RESTORED': return event.scope
     case 'POSTURE_CHANGED': return `lean=${event.posture.torsoLean} shrug=${event.posture.shrugSide ?? 'no'}`
+    case 'STROKE_LEFT':
+    case 'STROKE_RIGHT': return `#${event.cycleId} amp ${event.amplitude.toFixed(2)} ${Math.round(event.durationMs)} ms`
+    case 'STROKE_CANCEL': return `${event.side} #${event.cycleId} ${event.reason}`
+    case 'DRAW_START': return `${event.side} attempt ${event.attemptId}`
+    case 'DRAW_HOLD': return `#${event.attemptId} ${event.progress >= 1 ? 'armed' : 'hold'} stab ${event.stability.toFixed(2)}`
+    case 'RELEASE': return `#${event.attemptId} draw ${event.drawRatio.toFixed(2)} stab ${event.holdStability.toFixed(2)}`
+    case 'DRAW_CANCEL': return `#${event.attemptId} ${event.reason}`
     default: return ''
   }
 }

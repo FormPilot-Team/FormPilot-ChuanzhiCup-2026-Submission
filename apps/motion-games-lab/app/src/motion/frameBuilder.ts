@@ -22,7 +22,14 @@ export const FRAME_CONFIG = Object.freeze({
   /** shoulder width / torso length used before hips have been seen */
   defaultShoulderToTorso: 0.75,
   filter: { medianWindow: 3, emaAlpha: 0.5 },
+  /** palm centre ≈ wrist + this × (wrist − elbow); a forearm is ~3× a palm-centre offset */
+  handExtend: 0.3,
 })
+
+/** Palm-centre estimate from the elbow → wrist direction (see MotionFrame.leftHand). */
+export function handPoint(elbow: Point, wrist: Point, extend: number = FRAME_CONFIG.handExtend): Point {
+  return { x: wrist.x + (wrist.x - elbow.x) * extend, y: wrist.y + (wrist.y - elbow.y) * extend }
+}
 
 const CORE = [LM.nose, LM.leftEar, LM.rightEar, LM.leftShoulder, LM.rightShoulder, LM.leftHip, LM.rightHip] as const
 const ARM: Record<Side, readonly [number, number]> = { left: [LM.leftElbow, LM.leftWrist], right: [LM.rightElbow, LM.rightWrist] }
@@ -173,12 +180,15 @@ export class FrameBuilder {
       const arm = this.armFilters[side].push({ timestamp: sample.timestamp, confidence: 1, landmarks: [raw[elbowIndex], raw[wristIndex]] })
       const elbow = toBody(iso(arm.landmarks[0]))
       const wrist = toBody(iso(arm.landmarks[1]))
+      const hand = handPoint(elbow, wrist)
       if (side === 'left') {
         frame.leftElbow = elbow
         frame.leftWrist = wrist
+        frame.leftHand = hand
       } else {
         frame.rightElbow = elbow
         frame.rightWrist = wrist
+        frame.rightHand = hand
       }
       frame.tracking[side] = true
     }

@@ -140,6 +140,81 @@ export class Sfx {
     if (t === null) return
     this.tone(880, t, 0.06, 'sine', 0.08)
   }
+
+  /** Pause: a soft falling pair. Resume: the same pair rising. */
+  pause(): void {
+    const t = this.now()
+    if (t === null) return
+    this.tone(noteFreq(ladder(4)), t, 0.18, 'sine', 0.12)
+    this.tone(noteFreq(ladder(1)), t + 0.1, 0.26, 'sine', 0.1)
+  }
+
+  resume(): void {
+    const t = this.now()
+    if (t === null) return
+    this.tone(noteFreq(ladder(1)), t, 0.18, 'sine', 0.12)
+    this.tone(noteFreq(ladder(4)), t + 0.1, 0.26, 'sine', 0.12)
+  }
+
+  /** Boating: a paddle splash plus a soft pitched knock (left / right a fifth apart). */
+  stroke(sideIndex: 0 | 1, flow: boolean): void {
+    const t = this.now()
+    if (t === null) return
+    this.noise(t, 0.22, 0.32, 900)
+    this.noise(t + 0.05, 0.16, 0.16, 2400)
+    this.tone(noteFreq(ladder(sideIndex ? 4 : 2) - 12), t, 0.16, 'triangle', flow ? 0.16 : 0.1)
+  }
+
+  /** Boating: entering "flow" (steady rhythm). */
+  flow(): void {
+    const t = this.now()
+    if (t === null) return
+    ;[0, 2, 4, 7].forEach((step, i) => this.tone(noteFreq(ladder(step + 5)), t + i * 0.07, 0.35, 'sine', 0.14))
+  }
+
+  /** Archery: string tension rises while drawing (call sparingly). */
+  creak(amount: number): void {
+    const t = this.now()
+    if (t === null) return
+    this.tone(160 + amount * 140, t, 0.12, 'sawtooth', 0.025)
+  }
+
+  /** Archery: the hold completed, ready to release. */
+  armed(): void {
+    const t = this.now()
+    if (t === null) return
+    this.tone(noteFreq(ladder(7)), t, 0.22, 'sine', 0.14)
+  }
+
+  /** Archery: bow string twang + arrow whoosh. */
+  release(): void {
+    const t = this.now()
+    if (t === null) return
+    this.tone(220, t, 0.25, 'triangle', 0.22, 110)
+    this.noise(t + 0.02, 0.35, 0.12, 3200)
+  }
+
+  /** Archery: arrow lands; brighter for inner rings. ring = 0 (bullseye) … 4, null = missed the target. */
+  hit(ring: number | null): void {
+    const t = this.now()
+    if (t === null) return
+    if (ring === null) {
+      this.noise(t, 0.2, 0.12, 600) // a soft thud in the grass, never a failure sound
+      return
+    }
+    this.noise(t, 0.08, 0.35, 700)
+    this.tone(150, t, 0.12, 'sine', 0.3, 90)
+    const steps = [9, 7, 5, 4, 2][ring] ?? 2
+    this.tone(noteFreq(ladder(steps)), t + 0.06, 0.4, 'triangle', 0.2)
+    if (ring === 0) [0, 2, 4].forEach((s, i) => this.tone(noteFreq(ladder(steps + s + 1)), t + 0.16 + i * 0.08, 0.35, 'sine', 0.14))
+  }
+
+  /** Result page: a short warm chord. */
+  result(): void {
+    const t = this.now()
+    if (t === null) return
+    ;[0, 4, 7].forEach((step) => this.tone(noteFreq(ladder(step)), t, 0.9, 'sine', 0.1))
+  }
 }
 
 export const sfx = new Sfx()

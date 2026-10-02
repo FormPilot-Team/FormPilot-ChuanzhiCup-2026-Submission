@@ -1,195 +1,115 @@
 // Glue between the MotionAdapter (motion events only) and the Apple round + renderer.
+// Shared play behaviour (pause, tracking loss, posture hints, rest reminder) lives in PlayController.
 // No Phaser and no DOM here, so the same controller runs in the browser and in replay tests.
 import type { MotionAdapterApi, MotionEvent, MotionFrame, Point, Side } from '../../motion/contracts'
-import { POSTURE_HINT_COOLDOWN_MS } from './config'
+import { handOf } from '../../motion/targetTracker'
+import { PlayController, type BaseEffect, type PlayOptions } from '../../shared/play/PlayController'
+import type { CursorPose } from '../../shared/handCursor'
 import type { AppleRound, AppleTarget, RoundEvent } from './round'
 
-export type PlayStatus = 'countdown' | 'playing' | 'paused' | 'ended'
-export type PauseReason = 'user' | 'tracking' | 'hidden'
+export type { PauseReason, PlayStatus } from '../../shared/play/PlayController'
 
-export type ControllerEffect =
-  | RoundEvent
-  | { type: 'status'; status: PlayStatus; reason: PauseReason | null }
-  | { type: 'posture-hint'; kind: 'lean' | 'shrug' }
-  | { type: 'tracking-restored' }
-  | { type: 'rest-reminder' }
+export type AppleEffect = Exclude<RoundEvent, { type: 'end' }>
+export type ControllerEffect = BaseEffect | AppleEffect
+
+export const APPLE_CURSOR = Object.freeze({
+  /** hand within radius + this (torso units) of the apple = "near": halo + apple highlight */
+  nearMargin: 0.32,
+  /** how long the fist shows after a pick (ms) */
+  grabShowMs: 420,
+})
 
 export interface CursorView {
   position: Point | null
   tracked: boolean
-  holding: boolean
+  pose: CursorPose
+  near: boolean
 }
 
-export interface ControllerOptions {
-  /** gentle "you can rest" reminder after this much active play; 0 = off */
-  restReminderMs?: number
-  /** wait this long after tracking comes back before the round continues */
-  resumeAfterTrackingMs?: number
+/**
+ * Hand pose for the Apple cursor. Approaching an apple only lights it up (open hand + halo); inside
+ * the grab range the hand half-closes while the hold ring fills; the fist appears only once the hold
+ * completed — never on first touch.
+ */
+export function appleHandPose(input: { distance: number | null; radius: number; holding: boolean; grabbing: boolean }): { pose: CursorPose; near: boolean } {
+  if (input.grabbing) return { pose: 'grab', near: true }
+  if (input.holding) return { pose: 'half', near: true }
+  const near = input.distance !== null && input.distance <= input.radius + APPLE_CURSOR.nearMargin
+  return { pose: 'open', near }
 }
 
-export class AppleController {
-  status: PlayStatus = 'countdown'
-  pauseReason: PauseReason | null = null
+export type ControllerOptions = PlayOptions
+
+export class AppleController extends PlayController<AppleRound, AppleEffect> {
   holdProgress = 0
   holdingSide: Side | null = null
-  private readonly listeners = new Set<(effect: ControllerEffect) => void>()
-  private readonly unsubscribe: () => void
-  private frame: MotionFrame | null = null
-  private lastHint: Record<'lean' | 'shrug', number> = { lean: -Infinity, shrug: -Infinity }
-  private posture = { lean: false, shrug: false }
-  private resumeAt: number | null = null
-  private restReminded = false
-  private readonly pendingFeedback: number[] = []
-  private readonly pendingFrames: number[] = []
-  /** camera frame of a completed hold → first rendered frame showing the pick (ms) */
-  readonly feedbackLatencies: number[] = []
-  /** camera frame → first rendered frame drawing its hand positions (ms) */
-  readonly frameLatencies: number[] = []
+  private grabUntil: Record<Side, number> = { left: -Infinity, right: -Infinity }
 
-  constructor(readonly adapter: MotionAdapterApi, readonly round: AppleRound, private readonly options: ControllerOptions = {}) {
-    adapter.enable('targets')
+  constructor(adapter: MotionAdapterApi, round: AppleRound, options: ControllerOptions = {}) {
+    super(adapter, round, 'targets', options)
     adapter.setTargets([])
-    adapter.setDetectionActive(false) // until the countdown ends
-    this.unsubscribe = adapter.subscribe((frame, events) => this.onMotion(frame, events))
   }
 
-  destroy(): void {
-    this.unsubscribe()
-    this.adapter.setTargets([])
-    this.adapter.setDetectionActive(true)
-    this.listeners.clear()
-  }
-
-  subscribe(listener: (effect: ControllerEffect) => void): () => void {
-    this.listeners.add(listener)
-    return () => this.listeners.delete(listener)
-  }
-
-  latestFrame(): MotionFrame | null {
-    return this.frame
-  }
-
-  cursor(side: Side): CursorView {
+  /** Cursor view for one hand: palm position (unsmoothed, body space), tracking and pose. */
+  cursor(side: Side, now: number = performance.now()): CursorView {
     const f = this.frame
-    const position = (side === 'left' ? f?.leftWrist : f?.rightWrist) ?? null
-    return { position, tracked: Boolean(f?.tracking[side]), holding: this.holdingSide === side }
+    const position = f ? handOf(f, side) ?? null : null
+    const target = this.round.activeTarget()
+    const distance = position && target ? Math.hypot(position.x - target.center.x, position.y - target.center.y) : null
+    const { pose, near } = appleHandPose({
+      distance,
+      radius: target?.radius ?? 0,
+      holding: this.holdingSide === side && this.holdProgress > 0,
+      grabbing: now < this.grabUntil[side],
+    })
+    return { position, tracked: Boolean(f?.tracking[side]), pose, near }
   }
 
   target(): AppleTarget | null {
     return this.round.activeTarget()
   }
 
-  startPlaying(now: number): void {
-    if (this.status !== 'countdown') return
-    this.round.start(now)
-    this.adapter.setDetectionActive(true)
-    this.setStatus('playing', null)
-    // If the player is already out of view when the round starts, wait for them.
-    if (this.frame && !this.frame.tracking.body) this.pause('tracking')
+  /** Any hand near the current apple (drives the apple's hover highlight). */
+  appleNear(): boolean {
+    return this.cursor('left').near || this.cursor('right').near
   }
 
-  pause(reason: PauseReason): void {
-    if (this.status === 'ended' || this.status === 'countdown') return
-    if (this.status === 'paused') {
-      // a user pause overrides an automatic one, so it is not auto-resumed
-      if (reason === 'user') this.pauseReason = 'user'
-      return
-    }
-    this.round.pause()
-    this.adapter.setDetectionActive(false)
+  override debugRows(): [string, string][] {
+    return [
+      ['hold', `${this.holdingSide ?? '—'} ${this.holdProgress.toFixed(2)}`],
+      ['reach f / max° L R', `${this.round.reachFraction().toFixed(2)} / ${this.round.reach.sides.left.maxElevationDeg.toFixed(0)} ${this.round.reach.sides.right.maxElevationDeg.toFixed(0)}`],
+    ]
+  }
+
+  protected override onPaused(): void {
     this.holdProgress = 0
     this.holdingSide = null
-    this.resumeAt = null
-    this.setStatus('paused', reason)
   }
 
-  resume(now: number): void {
-    if (this.status !== 'paused') return
-    if (this.frame && !this.frame.tracking.body) {
-      // Cannot play without the player in view; keep waiting automatically.
-      this.pauseReason = 'tracking'
-      this.emit({ type: 'status', status: 'paused', reason: 'tracking' })
-      return
-    }
-    this.resumeAt = null
-    this.round.resume(now)
-    this.adapter.setDetectionActive(true)
-    this.setStatus('playing', null)
-  }
-
-  /** Called every rendered frame. */
-  step(now: number): void {
-    if (this.status === 'paused' && this.pauseReason === 'tracking' && this.resumeAt !== null && now >= this.resumeAt) this.resume(now)
-    if (this.status !== 'playing') return
-    this.handleRoundEvents(this.round.tick(now))
-    const restAfter = this.options.restReminderMs ?? 0
-    if (restAfter > 0 && !this.restReminded && this.round.elapsedMs() >= restAfter && this.round.remainingMs() > 20_000) {
-      this.restReminded = true
-      this.emit({ type: 'rest-reminder' })
-    }
-  }
-
-  /** The renderer calls this after drawing a frame; closes any open "event → feedback" latency samples. */
-  markRendered(now: number): void {
-    while (this.pendingFeedback.length) {
-      this.feedbackLatencies.push(now - this.pendingFeedback.shift()!)
-      if (this.feedbackLatencies.length > 200) this.feedbackLatencies.shift()
-    }
-    // only the newest frame is drawn; older unrendered ones were superseded
-    if (this.pendingFrames.length) {
-      this.frameLatencies.push(now - this.pendingFrames[this.pendingFrames.length - 1])
-      this.pendingFrames.length = 0
-      if (this.frameLatencies.length > 600) this.frameLatencies.shift()
-    }
-  }
-
-  quit(): RoundEvent | null {
-    if (this.status === 'ended') return null
-    this.status = 'ended'
+  protected override onDestroy(): void {
     this.adapter.setTargets([])
-    return { type: 'end', result: this.round.result('quit') }
   }
 
-  private onMotion(frame: MotionFrame, events: readonly MotionEvent[]): void {
-    this.frame = frame
-    if (frame.tracking.body) this.pendingFrames.push(frame.timestamp)
+  protected onTick(now: number): void {
+    this.handleRoundEvents(this.round.tick(now))
+  }
+
+  protected onFrame(frame: MotionFrame, events: readonly MotionEvent[]): void {
     for (const event of events) {
-      if (event.type === 'TRACKING_LOST' && event.scope === 'body') {
-        if (this.status === 'playing') {
-          this.round.trackingLosses += 1
-          this.pause('tracking')
-        }
-      } else if (event.type === 'TRACKING_RESTORED' && event.scope === 'body') {
-        if (this.status === 'paused' && this.pauseReason === 'tracking') {
-          this.resumeAt = frame.timestamp + (this.options.resumeAfterTrackingMs ?? 1200)
-          this.emit({ type: 'tracking-restored' })
-        }
-      } else if (event.type === 'POSTURE_CHANGED') {
-        this.onPosture(event.posture.torsoLean, event.posture.shrug, frame.timestamp)
-      } else if (event.type === 'TARGET_ENTER') {
+      if (event.type === 'TARGET_ENTER') {
         this.holdingSide = event.side
       } else if (event.type === 'TARGET_HOLD') {
         this.holdProgress = event.completed ? 0 : event.progress
-        if (event.completed) this.holdingSide = null
+        if (event.completed) {
+          this.holdingSide = null
+          this.grabUntil[event.side] = performance.now() + APPLE_CURSOR.grabShowMs
+        }
       } else if (event.type === 'TARGET_EXIT') {
         if (this.holdingSide === event.side) this.holdingSide = null
         if (!event.completed) this.holdProgress = 0
       }
     }
-    if (this.status === 'playing') this.handleRoundEvents(this.round.handleMotion(frame, events))
-  }
-
-  private onPosture(lean: boolean, shrug: boolean, now: number): void {
-    const rising = { lean: lean && !this.posture.lean, shrug: shrug && !this.posture.shrug }
-    this.posture = { lean, shrug }
-    if (this.status !== 'playing') return
-    for (const kind of ['lean', 'shrug'] as const) {
-      if (!rising[kind] || now - this.lastHint[kind] < POSTURE_HINT_COOLDOWN_MS) continue
-      this.lastHint[kind] = now
-      if (kind === 'lean') this.round.leanReminders += 1
-      else this.round.shrugReminders += 1
-      this.emit({ type: 'posture-hint', kind })
-    }
+    this.handleRoundEvents(this.round.handleMotion(frame, events))
   }
 
   private handleRoundEvents(events: RoundEvent[]): void {
@@ -200,23 +120,14 @@ export class AppleController {
       } else if (event.type === 'collect' || event.type === 'expire') {
         this.adapter.setTargets([])
         this.holdProgress = 0
-        if (event.type === 'collect') this.pendingFeedback.push(event.frameTimestamp)
-      } else if (event.type === 'end') {
-        this.adapter.setTargets([])
-        this.adapter.setDetectionActive(false)
-        this.status = 'ended'
+        if (event.type === 'collect') this.markFeedback(event.frameTimestamp)
+      }
+      if (event.type === 'end') {
+        this.finish(event.result)
+        continue
       }
       this.emit(event)
+      if (event.type === 'collect' || event.type === 'expire') this.emit({ type: 'hud' })
     }
-  }
-
-  private setStatus(status: PlayStatus, reason: PauseReason | null): void {
-    this.status = status
-    this.pauseReason = reason
-    this.emit({ type: 'status', status, reason })
-  }
-
-  private emit(effect: ControllerEffect): void {
-    for (const listener of this.listeners) listener(effect)
   }
 }

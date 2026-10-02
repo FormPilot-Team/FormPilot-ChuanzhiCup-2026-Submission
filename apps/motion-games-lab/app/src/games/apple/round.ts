@@ -247,6 +247,7 @@ export class AppleRound {
       maxCombo: this.maxCombo,
       activeMs: Math.min(this.activeMs, this.durationMs),
       motionQuality,
+      labels: { completed: '摘到苹果', successRate: '摘取成功率', combo: '最多连摘' },
       feedback: [
         { label: '左手摘到', value: `${this.bySide.left} 个` },
         { label: '右手摘到', value: `${this.bySide.right} 个` },

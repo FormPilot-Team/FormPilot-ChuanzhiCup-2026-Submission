@@ -4,9 +4,11 @@
 import * as Phaser from 'phaser'
 import type { Point, Side } from '../../motion/contracts'
 import { sfx } from '../../shared/audio'
+import { HandCursor, paintHandTextures } from '../../shared/handCursor'
 import { perf } from '../../shared/perf'
 import { FONT_FAMILY, paintTexture } from '../../shared/phaserHost'
-import { HAND_COLOR, PALETTE } from '../../shared/world/palette'
+import { drawDebugBody } from '../../shared/play/debugOverlay'
+import { PALETTE } from '../../shared/world/palette'
 import {
   paintApple, paintBasket, paintButterfly, paintCloud, paintGlow, paintHills, paintLeaf, paintMeadow, paintOrchard,
   paintSky, paintSparkle, paintTreeLine, paintTwig,
@@ -32,15 +34,13 @@ interface AppleView {
   apple: Phaser.GameObjects.Image
   twig: Phaser.GameObjects.Image
   zone: Phaser.GameObjects.Graphics
+  halo: Phaser.GameObjects.Image
   bornAt: number
+  /** 0..1 eased hover highlight */
+  hover: number
 }
 
-interface CursorView {
-  glow: Phaser.GameObjects.Image
-  ring: Phaser.GameObjects.Graphics
-  label: Phaser.GameObjects.Text
-  visible: number
-}
+const GOLD = 0xffc94d
 
 const HUD_TOP_FRACTION = 0.13
 
@@ -53,10 +53,11 @@ export class AppleScene extends Phaser.Scene {
   private bg?: Phaser.GameObjects.Image
   private land?: Phaser.GameObjects.Image
   private clouds: Phaser.GameObjects.Image[] = []
-  private figure!: Phaser.GameObjects.Graphics
   private holdRing!: Phaser.GameObjects.Graphics
   private debugGfx?: Phaser.GameObjects.Graphics
-  private cursors!: Record<Side, CursorView>
+  private debugBody?: Phaser.GameObjects.Graphics
+  private cursors!: Record<Side, HandCursor>
+  private burst!: Phaser.GameObjects.Graphics
   private appleView: AppleView | null = null
   private basket!: Phaser.GameObjects.Image
   private pile: Phaser.GameObjects.Image[] = []
@@ -79,10 +80,11 @@ export class AppleScene extends Phaser.Scene {
   create(): void {
     this.paintStaticTextures()
     this.buildBackground()
-    this.figure = this.add.graphics().setDepth(20)
     this.basket = this.add.image(0, 0, 'basket').setDepth(30)
     this.holdRing = this.add.graphics().setDepth(45)
-    this.cursors = { left: this.makeCursor('left'), right: this.makeCursor('right') }
+    this.burst = this.add.graphics().setDepth(65)
+    paintHandTextures(this, this.dpr)
+    this.cursors = { left: new HandCursor(this, 'left', 50), right: new HandCursor(this, 'right', 50) }
     this.sparkles = this.add.particles(0, 0, 'sparkle', {
       speed: { min: 90 * this.dpr, max: 320 * this.dpr }, lifespan: 750, scale: { start: 0.7, end: 0 }, alpha: { start: 1, end: 0 },
       rotate: { min: 0, max: 360 }, blendMode: 'ADD', emitting: false,
@@ -91,7 +93,10 @@ export class AppleScene extends Phaser.Scene {
       speed: { min: 60 * this.dpr, max: 180 * this.dpr }, lifespan: 1100, gravityY: 260 * this.dpr, scale: { start: 0.55, end: 0.25 },
       rotate: { min: 0, max: 360 }, alpha: { start: 1, end: 0 }, emitting: false,
     }).setDepth(41)
-    if (this.debug) this.debugGfx = this.add.graphics().setDepth(90)
+    if (this.debug) {
+      this.debugBody = this.add.graphics().setDepth(20)
+      this.debugGfx = this.add.graphics().setDepth(90)
+    }
     this.layout = this.computeLayout()
     this.relayoutStatic()
     this.unsubscribe = this.controller.subscribe((effect) => this.onEffect(effect))
@@ -123,6 +128,7 @@ export class AppleScene extends Phaser.Scene {
     paintTexture(this, 'leaf', 48, 48, (ctx, w) => paintLeaf(ctx, w))
     paintTexture(this, 'sparkle', 48, 48, (ctx, w) => paintSparkle(ctx, w))
     paintTexture(this, 'glow', 128, 128, (ctx, w) => paintGlow(ctx, w, 'rgba(255, 255, 255, 1)'))
+    paintTexture(this, 'apple-halo', 128, 128, (ctx, w) => paintGlow(ctx, w, 'rgba(255, 236, 160, 1)'))
     paintTexture(this, 'pollen', 24, 24, (ctx, w) => paintGlow(ctx, w, 'rgba(255, 248, 210, 1)'))
     paintTexture(this, 'basket', 260 * d, 170 * d, (ctx, w, h) => paintBasket(ctx, w, h))
     paintTexture(this, 'butterfly-a', 48, 48, (ctx, w) => paintButterfly(ctx, w, '#ffd36b'))
@@ -256,7 +262,8 @@ export class AppleScene extends Phaser.Scene {
   // ---------- frame loop ----------
 
   update(time: number): void {
-    this.controller.step(performance.now())
+    const now = performance.now()
+    this.controller.step(now)
     // the comfortable area may grow during play: follow it smoothly, never jump
     this.layoutGoal = this.computeLayout()
     const g = this.layoutGoal
@@ -264,102 +271,20 @@ export class AppleScene extends Phaser.Scene {
     if (Math.abs(g.s - l.s) > 0.5 || Math.abs(g.ax - l.ax) > 0.5 || Math.abs(g.ay - l.ay) > 0.5) {
       this.layout = { s: l.s + (g.s - l.s) * 0.04, ax: l.ax + (g.ax - l.ax) * 0.04, ay: l.ay + (g.ay - l.ay) * 0.04 }
     }
-    this.drawFigure()
-    this.drawCursors(time)
     this.drawApple(time)
+    this.drawCursors(now)
+    if (this.debugBody) drawDebugBody(this.debugBody, this.controller.latestFrame(), (p) => this.toScreen(p), this.layout.s, this.dpr)
     if (this.debugGfx) this.drawDebug()
   }
 
-  private drawFigure(): void {
-    const f = this.controller.latestFrame()
-    const g = this.figure
-    g.clear()
-    if (!f?.tracking.body || !f.leftShoulder || !f.rightShoulder) return
-    const s = this.layout.s
-    const ls = this.toScreen(f.leftShoulder)
-    const rs = this.toScreen(f.rightShoulder)
-    const mid = { x: (ls.x + rs.x) / 2, y: (ls.y + rs.y) / 2 }
-    const hipL = this.toScreen({ x: f.leftShoulder.x * 0.78, y: f.leftShoulder.y + 1 })
-    const hipR = this.toScreen({ x: f.rightShoulder.x * 0.78, y: f.rightShoulder.y + 1 })
-    // soft "light figure" of the player: torso, head, arms
-    g.lineStyle(Math.max(2, 0.03 * s), 0xffffff, 0.35)
-    g.fillStyle(0xffffff, 0.2)
-    g.beginPath()
-    g.moveTo(ls.x, ls.y)
-    g.lineTo(rs.x, rs.y)
-    g.lineTo(hipR.x, hipR.y)
-    g.lineTo(hipL.x, hipL.y)
-    g.closePath()
-    g.fillPath()
-    g.strokePath()
-    // head: a soft layered glow rather than a hard outline
-    for (const [radius, alpha] of [[0.27, 0.07], [0.22, 0.1], [0.17, 0.14]] as const) {
-      g.fillStyle(0xffffff, alpha)
-      g.fillCircle(mid.x, mid.y - 0.55 * s, radius * s)
-    }
+  private drawCursors(now: number): void {
+    // a little smaller than the apple, so the apple stays visible under the hand
+    const size = Math.max(54 * this.dpr, 0.3 * this.layout.s)
     for (const side of ['left', 'right'] as const) {
-      const shoulder = side === 'left' ? ls : rs
-      const elbowP = side === 'left' ? f.leftElbow : f.rightElbow
-      const wristP = side === 'left' ? f.leftWrist : f.rightWrist
-      if (!f.tracking[side] || !elbowP || !wristP) continue
-      const elbow = this.toScreen(elbowP)
-      const wrist = this.toScreen(wristP)
-      g.lineStyle(0.24 * s, 0x1f3a2e, 0.1)
-      g.beginPath()
-      g.moveTo(shoulder.x, shoulder.y)
-      g.lineTo(elbow.x, elbow.y)
-      g.lineTo(wrist.x, wrist.y)
-      g.strokePath()
-      g.lineStyle(0.2 * s, 0xffffff, 0.2)
-      g.beginPath()
-      g.moveTo(shoulder.x, shoulder.y)
-      g.lineTo(elbow.x, elbow.y)
-      g.lineTo(wrist.x, wrist.y)
-      g.strokePath()
-      g.lineStyle(0.09 * s, 0xffffff, 0.32)
-      g.beginPath()
-      g.moveTo(shoulder.x, shoulder.y)
-      g.lineTo(elbow.x, elbow.y)
-      g.lineTo(wrist.x, wrist.y)
-      g.strokePath()
-      g.fillStyle(0xffffff, 0.3)
-      g.fillCircle(shoulder.x, shoulder.y, 0.07 * s)
-      g.fillCircle(elbow.x, elbow.y, 0.055 * s)
-    }
-  }
-
-  private makeCursor(side: Side): CursorView {
-    const color = HAND_COLOR[side]
-    const glow = this.add.image(0, 0, 'glow').setTint(color).setDepth(50).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0)
-    const ring = this.add.graphics().setDepth(51)
-    const label = this.add.text(0, 0, side === 'left' ? '左' : '右', {
-      fontFamily: FONT_FAMILY, fontSize: `${Math.round(20 * this.dpr)}px`, fontStyle: 'bold', color: '#ffffff',
-      stroke: '#1f3a2e', strokeThickness: Math.round(4 * this.dpr),
-    }).setOrigin(0.5).setDepth(52).setAlpha(0)
-    return { glow, ring, label, visible: 0 }
-  }
-
-  private drawCursors(time: number): void {
-    const r = Math.max(24 * this.dpr, 0.1 * this.layout.s)
-    for (const side of ['left', 'right'] as const) {
-      const view = this.cursors[side]
-      const c = this.controller.cursor(side)
-      view.visible += ((c.tracked && c.position ? 1 : 0) - view.visible) * 0.25
-      const alpha = view.visible
-      view.ring.clear()
-      if (!c.position || alpha < 0.02) {
-        view.glow.setAlpha(0)
-        view.label.setAlpha(0)
-        continue
-      }
-      const p = this.toScreen(c.position)
-      const pulse = c.holding ? 1 + 0.08 * Math.sin(time / 90) : 1
-      view.glow.setPosition(p.x, p.y).setDisplaySize(r * 3.2 * pulse, r * 3.2 * pulse).setAlpha(0.75 * alpha)
-      view.ring.lineStyle(Math.max(3, 4 * this.dpr), HAND_COLOR[side], alpha)
-      view.ring.strokeCircle(p.x, p.y, r * pulse)
-      view.ring.fillStyle(0xffffff, 0.85 * alpha)
-      view.ring.fillCircle(p.x, p.y, r * 0.42)
-      view.label.setPosition(p.x, p.y + r * 1.55).setAlpha(alpha)
+      const c = this.controller.cursor(side, now)
+      const cursor = this.cursors[side]
+      cursor.setSize(size)
+      cursor.update(now, { position: c.position ? this.toScreen(c.position) : null, tracked: c.tracked, pose: c.pose, near: c.near }, 1 / this.layout.s)
     }
   }
 
@@ -370,40 +295,41 @@ export class AppleScene extends Phaser.Scene {
     if (!view || !target || view.id !== target.id) return
     const p = this.toScreen(target.center)
     const rPx = target.radius * this.layout.s
-    const sway = Math.sin(time / 600 + view.id) * 0.06
-    const size = rPx * 1.55
+    const progress = this.controller.holdProgress
+    view.hover += ((this.controller.appleNear() || progress > 0 ? 1 : 0) - view.hover) * 0.18
+    const hover = view.hover
+    // the apple loosens from the twig as the hold fills: the sway grows into a little shake
+    const sway = Math.sin(time / 600 + view.id) * 0.06 + (progress > 0 ? Math.sin(time / 38) * 0.05 * (0.3 + progress) : 0)
+    const size = rPx * 1.55 * (1 + 0.08 * hover)
     view.apple.setPosition(p.x, p.y).setRotation(sway)
     if (!view.apple.getData('popping')) view.apple.setDisplaySize(size * view.apple.getData('grow'), size * view.apple.getData('grow'))
-    view.twig.setPosition(p.x + rPx * 0.05, p.y - rPx * 0.95).setDisplaySize(rPx * 1.6, rPx * 1.6).setRotation(sway * 0.5)
+    view.twig.setPosition(p.x + rPx * 0.05, p.y - rPx * 0.95).setDisplaySize(rPx * 1.6, rPx * 1.6).setRotation(sway * 0.5 - progress * 0.12)
+    const haloSize = rPx * (3 + hover * 0.6)
+    view.halo.setPosition(p.x, p.y).setDisplaySize(haloSize, haloSize).setAlpha((0.12 + 0.55 * hover) * view.twig.alpha)
     view.zone.clear()
-    view.zone.lineStyle(Math.max(2, 2.5 * this.dpr), 0xffffff, 0.6)
+    view.zone.lineStyle(Math.max(2, (2.5 + 1.5 * hover) * this.dpr), 0xffffff, 0.5 + 0.4 * hover)
     view.zone.strokeCircle(p.x, p.y, rPx)
-    view.zone.fillStyle(0xffffff, 0.1)
+    view.zone.fillStyle(0xffffff, 0.08 + 0.1 * hover)
     view.zone.fillCircle(p.x, p.y, rPx)
-    const progress = this.controller.holdProgress
     if (progress > 0) {
-      const width = Math.max(6, 0.12 * rPx)
-      this.holdRing.lineStyle(width, 0x000000, 0.18)
-      this.holdRing.strokeCircle(p.x, p.y, rPx + width)
-      this.holdRing.lineStyle(width, 0xffc94d, 1)
+      const width = Math.max(8 * this.dpr, 0.16 * rPx)
+      const ringR = rPx + width * 0.9
+      this.holdRing.lineStyle(width, 0x1f3a2e, 0.25)
+      this.holdRing.strokeCircle(p.x, p.y, ringR)
+      this.holdRing.lineStyle(width, GOLD, 1)
       this.holdRing.beginPath()
-      this.holdRing.arc(p.x, p.y, rPx + width, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * progress, false)
+      this.holdRing.arc(p.x, p.y, ringR, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * progress, false)
       this.holdRing.strokePath()
-      view.apple.setScale(view.apple.scaleX * (1 + 0.04 * Math.sin(time / 70)), view.apple.scaleY)
+      // bright head of the progress arc
+      const head = -Math.PI / 2 + Math.PI * 2 * progress
+      this.holdRing.fillStyle(0xfff6c9, 1)
+      this.holdRing.fillCircle(p.x + Math.cos(head) * ringR, p.y + Math.sin(head) * ringR, width * 0.62)
     }
   }
 
   private drawDebug(): void {
     const g = this.debugGfx!
     g.clear()
-    const f = this.controller.latestFrame()
-    if (!f) return
-    g.fillStyle(0xff00ff, 1)
-    for (const p of [f.leftShoulder, f.rightShoulder, f.leftElbow, f.rightElbow, f.leftWrist, f.rightWrist]) {
-      if (!p) continue
-      const s = this.toScreen(p)
-      g.fillCircle(s.x, s.y, 5 * this.dpr)
-    }
     const t = this.controller.target()
     if (t) {
       const c = this.toScreen(t.center)
@@ -433,7 +359,7 @@ export class AppleScene extends Phaser.Scene {
   private onEffect(effect: ControllerEffect): void {
     switch (effect.type) {
       case 'spawn': this.spawnApple(effect.target); break
-      case 'collect': this.collectApple(effect.points, effect.combo); break
+      case 'collect': this.collectApple(effect.side, effect.points, effect.combo); break
       case 'expire': this.expireApple(); break
       case 'milestone': this.milestone(effect.combo); break
       case 'end': this.finish(); break
@@ -446,7 +372,8 @@ export class AppleScene extends Phaser.Scene {
     const apple = this.add.image(0, 0, 'apple').setDepth(40).setData('grow', 0.01).setData('popping', false)
     const twig = this.add.image(0, 0, 'twig').setDepth(39).setAlpha(0)
     const zone = this.add.graphics().setDepth(38).setAlpha(0)
-    this.appleView = { id: target.id, target, apple, twig, zone, bornAt: this.time.now }
+    const halo = this.add.image(0, 0, 'apple-halo').setDepth(37).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0)
+    this.appleView = { id: target.id, target, apple, twig, zone, halo, bornAt: this.time.now, hover: 0 }
     this.tweens.addCounter({ from: 0.01, to: 1, duration: 520, ease: 'Back.easeOut', onUpdate: (tw) => apple.active && apple.setData('grow', tw.getValue()) })
     this.tweens.add({ targets: [twig, zone], alpha: 1, duration: 400 })
     const p = this.toScreen(target.center)
@@ -459,11 +386,29 @@ export class AppleScene extends Phaser.Scene {
     if (!v) return
     v.zone.destroy()
     v.twig.destroy()
+    v.halo.destroy()
     if (!v.apple.getData('popping')) v.apple.destroy()
     this.appleView = null
   }
 
-  private collectApple(points: number, combo: number): void {
+  /** Expanding white ring: the instant "got it!" flash. */
+  private ringBurst(x: number, y: number, r: number): void {
+    const g = this.burst
+    this.tweens.addCounter({
+      from: 0, to: 1, duration: 360, ease: 'Cubic.easeOut',
+      onUpdate: (tw) => {
+        const t = tw.getValue() ?? 0
+        g.clear()
+        g.lineStyle(Math.max(3, 10 * this.dpr * (1 - t)), 0xffffff, 1 - t)
+        g.strokeCircle(x, y, r * (0.8 + 1.1 * t))
+        g.fillStyle(0xfff6c9, 0.45 * (1 - t))
+        g.fillCircle(x, y, r * (0.7 + 0.5 * t))
+      },
+      onComplete: () => g.clear(),
+    })
+  }
+
+  private collectApple(side: Side, points: number, combo: number): void {
     const v = this.appleView
     if (!v) return
     this.appleView = null
@@ -473,10 +418,14 @@ export class AppleScene extends Phaser.Scene {
     const end = { x: this.basket.x, y: this.basket.y - this.basket.displayHeight * 0.25 }
     const control = { x: (start.x + end.x) / 2 + (start.x < end.x ? -1 : 1) * this.scale.width * 0.04, y: Math.min(start.y, end.y) - this.scale.height * 0.18 }
     const size = apple.displayWidth
-    this.sparkles.explode(16, start.x, start.y)
-    this.leafBurst.explode(4, start.x, start.y - size * 0.4)
+    this.sparkles.explode(22, start.x, start.y)
+    this.leafBurst.explode(6, start.x, start.y - size * 0.4)
+    this.ringBurst(start.x, start.y, size * 0.55)
+    this.cameras.main.shake(90, 0.0025)
+    this.cursors[side].celebrate()
     v.twig.destroy()
     v.zone.destroy()
+    v.halo.destroy()
     this.floatText(`+${points}`, start.x, start.y - size * 0.7, '#fff6c9', 34)
     if (combo >= 2) this.floatText(`连摘 ×${combo}`, start.x, start.y - size * 1.25, '#ffd36b', 26, 120)
     sfx.collect(combo)
@@ -515,6 +464,7 @@ export class AppleScene extends Phaser.Scene {
     if (!v) return
     this.appleView = null
     // the apple simply floats back up into the leaves — no failure sound, no text
+    v.halo.destroy()
     this.tweens.add({ targets: [v.apple, v.twig, v.zone], alpha: 0, y: '-=40', duration: 700, ease: 'Sine.easeIn', onComplete: () => { v.apple.destroy(); v.twig.destroy(); v.zone.destroy() } })
   }
 
@@ -533,7 +483,6 @@ export class AppleScene extends Phaser.Scene {
 
   private finish(): void {
     this.clearAppleView()
-    sfx.finish()
   }
 
   private floatText(content: string, x: number, y: number, color: string, size: number, delay = 0): void {

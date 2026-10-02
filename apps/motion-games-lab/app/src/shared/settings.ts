@@ -12,6 +12,8 @@ export interface Settings {
   restReminderSeconds: number
   /** total play per browser session before a rest break is suggested */
   sessionCapMinutes: number
+  /** Archery: the hand that pulls the string (the other holds the bow) */
+  drawSide: 'left' | 'right'
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -22,6 +24,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showMirror: true,
   restReminderSeconds: 90,
   sessionCapMinutes: 15,
+  drawSide: 'right',
 }
 
 export const ROUND_OPTIONS = [60, 120, 180, 240] as const

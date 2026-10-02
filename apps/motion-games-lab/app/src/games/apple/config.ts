@@ -49,5 +49,3 @@ export const ROUND_DEFAULTS = Object.freeze({
   /** minimum distance between a new apple and the hands' current positions (torso units) */
   clearanceFromHands: 0.35,
 })
-
-export const POSTURE_HINT_COOLDOWN_MS = 8000

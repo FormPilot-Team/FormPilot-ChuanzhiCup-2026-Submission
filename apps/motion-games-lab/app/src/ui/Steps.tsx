@@ -1,7 +1,7 @@
-import { COPY } from '../data/games'
-import { DIFFICULTIES } from '../games/apple/config'
+import { COPY, INTRO } from '../data/games'
+import type { GameDefinition } from '../games/registry'
 import { ROUND_OPTIONS, type Difficulty, type Settings } from '../shared/settings'
-import { HowBasket, HowHold, HowReach, PositioningArt } from './Illustrations'
+import { PositioningArt } from './Illustrations'
 
 export function Stepper({ index }: { index: number }) {
   return (
@@ -15,31 +15,34 @@ export function Stepper({ index }: { index: number }) {
   )
 }
 
-export function IntroStep({ settings, onChange, onNext, onBack }: { settings: Settings; onChange: (s: Settings) => void; onNext: () => void; onBack: () => void }) {
-  const art = [<HowReach key="a" />, <HowHold key="b" />, <HowBasket key="c" />]
+export function IntroStep({ game, settings, onChange, onNext, onBack }: { game: GameDefinition; settings: Settings; onChange: (s: Settings) => void; onNext: () => void; onBack: () => void }) {
+  const copy = INTRO[game.id]
   return (
     <div className="page">
-      <section className="panel" data-testid="step-intro">
-        <h2>{COPY.apple.title}</h2>
-        <p className="lead">{COPY.apple.lead}</p>
+      <section className={`panel intro-${game.id}`} data-testid="step-intro">
+        <h2>{copy.title}</h2>
+        <p className="lead">{copy.lead}</p>
         <div className="how">
-          {COPY.apple.how.map((item, i) => (
-            <div className="how-item" key={item.title}>
-              {art[i]}
-              <b>{i + 1}. {item.title}</b>
-              <span>{item.text}</span>
-            </div>
-          ))}
+          {copy.how.map((item, i) => {
+            const Art = game.howArt[i]
+            return (
+              <div className="how-item" key={item.title}>
+                {Art && <Art />}
+                <b>{i + 1}. {item.title}</b>
+                <span>{item.text}</span>
+              </div>
+            )
+          })}
         </div>
-        <div className="options">
+        <div className={`options${game.drawSideOption ? ' four' : ''}`}>
           <div>
             <div className="option-label">难度</div>
             <div className="seg">
-              {(Object.keys(DIFFICULTIES) as Difficulty[]).map((d) => (
-                <button key={d} aria-pressed={settings.difficulty === d} onClick={() => onChange({ ...settings, difficulty: d })}>{DIFFICULTIES[d].label}</button>
+              {(Object.keys(game.difficulty) as Difficulty[]).map((d) => (
+                <button key={d} aria-pressed={settings.difficulty === d} onClick={() => onChange({ ...settings, difficulty: d })}>{game.difficulty[d].label}</button>
               ))}
             </div>
-            <div className="seg-note">{DIFFICULTIES[settings.difficulty].description}</div>
+            <div className="seg-note">{game.difficulty[settings.difficulty].description}</div>
           </div>
           <div>
             <div className="option-label">怎么玩</div>
@@ -48,6 +51,15 @@ export function IntroStep({ settings, onChange, onNext, onBack }: { settings: Se
               <button aria-pressed={settings.seated} onClick={() => onChange({ ...settings, seated: true })}>坐着玩</button>
             </div>
           </div>
+          {game.drawSideOption && (
+            <div>
+              <div className="option-label">拉弦的手</div>
+              <div className="seg">
+                <button aria-pressed={settings.drawSide === 'right'} onClick={() => onChange({ ...settings, drawSide: 'right' })}>右手</button>
+                <button aria-pressed={settings.drawSide === 'left'} onClick={() => onChange({ ...settings, drawSide: 'left' })}>左手</button>
+              </div>
+            </div>
+          )}
           <div>
             <div className="option-label">时长</div>
             <div className="seg">

@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { defaultCalibration } from '../../motion/calibration'
 import type { MotionEvent, MotionFrame, Side } from '../../motion/contracts'
 import { MotionAdapter } from '../../motion/MotionAdapter'
+import { directorContext } from '../../motion/session'
 import { SyntheticPoseSource } from '../../motion/synthetic'
 import { DIFFICULTIES } from './config'
-import { AppleController, type ControllerEffect } from './controller'
+import { APPLE_CURSOR, AppleController, appleHandPose, type ControllerEffect } from './controller'
 import { elevationOf, ReachModel } from './reach'
 import { AppleRound, pickQuality, type RoundEvent } from './round'
 
@@ -129,6 +130,18 @@ describe('AppleRound: hold → pick, combo, cooldown, expiry', () => {
   })
 })
 
+describe('Hand cursor pose (open → near → half → grab)', () => {
+  it('approaching only lights the apple; holding half-closes the hand; only a finished hold makes a fist', () => {
+    const r = 0.21
+    expect(appleHandPose({ distance: null, radius: r, holding: false, grabbing: false })).toEqual({ pose: 'open', near: false })
+    expect(appleHandPose({ distance: r + APPLE_CURSOR.nearMargin + 0.05, radius: r, holding: false, grabbing: false })).toEqual({ pose: 'open', near: false })
+    expect(appleHandPose({ distance: r + 0.1, radius: r, holding: false, grabbing: false })).toEqual({ pose: 'open', near: true })
+    // touching the apple is not yet a grab: the hand half-closes while the ring fills
+    expect(appleHandPose({ distance: 0.05, radius: r, holding: true, grabbing: false })).toEqual({ pose: 'half', near: true })
+    expect(appleHandPose({ distance: 0.05, radius: r, holding: false, grabbing: true })).toEqual({ pose: 'grab', near: true })
+  })
+})
+
 describe('ReachModel: personal comfortable area', () => {
   it('keeps every apple inside the calibrated elevation and grows only with sustained further reach', () => {
     const profile = defaultCalibration()
@@ -172,7 +185,7 @@ describe('Pause gating (regression: a hold must not complete while the game is p
   it('after tracking comes back, an apple is still pickable once play resumes', () => {
     const source = new SyntheticPoseSource({ manual: true, seed: 2 })
     const adapter = new MotionAdapter(source, { watchdog: false })
-    source.attach({ calibration: () => adapter.calibration(), targets: () => adapter.getTargets() })
+    source.attach(directorContext(adapter))
     void adapter.start()
     const round = new AppleRound({ difficulty: 'easy', durationMs: 60_000, reach: new ReachModel(defaultCalibration()), seed: 4 })
     const controller = new AppleController(adapter, round, { resumeAfterTrackingMs: 1200 })
@@ -211,7 +224,7 @@ describe('Synthetic replay: Apple runs from start to the result page', () => {
   it('calibrates, plays a full round through the real MotionAdapter and produces a result', () => {
     const source = new SyntheticPoseSource({ manual: true, seed: 11 })
     const adapter = new MotionAdapter(source, { watchdog: false })
-    source.attach({ calibration: () => adapter.calibration(), targets: () => adapter.getTargets() })
+    source.attach(directorContext(adapter))
     source.bot.missEvery = 6
     void adapter.start()
 

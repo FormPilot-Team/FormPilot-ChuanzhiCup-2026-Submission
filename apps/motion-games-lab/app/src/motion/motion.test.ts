@@ -4,6 +4,7 @@ import { elevationDeg } from './calibration'
 import { FrameBuilder } from './frameBuilder'
 import { MotionAdapter } from './MotionAdapter'
 import { PostureMonitor } from './posture'
+import { directorContext } from './session'
 import { SyntheticActor, SyntheticPoseSource } from './synthetic'
 import { TargetTracker } from './targetTracker'
 
@@ -208,7 +209,7 @@ describe('MotionAdapter pipeline with the synthetic player', () => {
   it('calibrates neutral posture and both comfortable reaches', () => {
     const source = new SyntheticPoseSource({ manual: true })
     const adapter = new MotionAdapter(source, { watchdog: false })
-    source.attach({ calibration: () => adapter.calibration(), targets: () => adapter.getTargets() })
+    source.attach(directorContext(adapter))
     void adapter.start()
     adapter.startCalibration()
     run(adapter, source, 0, 9000)
@@ -242,10 +243,17 @@ describe('MotionAdapter pipeline with the synthetic player', () => {
     expect(back.filter((e) => e.type === 'TRACKING_RESTORED' && e.scope === 'body')).toHaveLength(1)
   })
 
-  it('refuses reserved Boating / Archery capabilities this round', () => {
+  it('accepts every game capability (targets, strokes, draw)', () => {
     const adapter = new MotionAdapter(new SyntheticPoseSource({ manual: true }), { watchdog: false })
-    expect(() => adapter.enable('strokes')).toThrow(/reserved/)
-    expect(() => adapter.enable('draw')).toThrow(/reserved/)
+    for (const capability of ['targets', 'strokes', 'draw'] as const) expect(() => adapter.enable(capability)).not.toThrow()
+    expect(adapter.diagnostics().capabilities).toEqual(['targets', 'strokes', 'draw'])
+  })
+
+  it('the hand point sits a little beyond the wrist, along the forearm', () => {
+    const actor = new SyntheticActor()
+    actor.wrist.right = { x: 0.375, y: 1 }
+    const { frame: f } = frameFromActor(actor)
+    expect(f.rightHand!.y).toBeGreaterThan(f.rightWrist!.y + 0.05)
   })
 
   it('elevation angle: 0 hanging, 90 horizontal, 180 overhead', () => {

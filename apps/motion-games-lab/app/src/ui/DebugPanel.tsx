@@ -7,12 +7,14 @@ import { ADAPTER_CONFIG, type AdapterDiagnostics } from '../motion/MotionAdapter
 import type { MotionSession } from '../motion/session'
 import { POSTURE_CONFIG } from '../motion/posture'
 import { TARGET_CONFIG } from '../motion/targetTracker'
-import type { AppleController } from '../games/apple/controller'
+import { DRAW_CONFIG } from '../motion/drawDetector'
+import { STROKE_CONFIG } from '../motion/strokeDetector'
 import { perf, percentile } from '../shared/perf'
+import type { AnyController } from './GamePlay'
 
 const f = (v: number | null | undefined, digits = 2) => (v === null || v === undefined || !Number.isFinite(v) ? '—' : v.toFixed(digits))
 
-export function DebugPanel({ session, controller }: { session: MotionSession | null; controller: AppleController | null }) {
+export function DebugPanel({ session, controller }: { session: MotionSession | null; controller: AnyController | null }) {
   const [open, setOpen] = useState(true)
   const [d, setD] = useState<AdapterDiagnostics | null>(null)
   const [, tick] = useState(0)
@@ -35,7 +37,7 @@ export function DebugPanel({ session, controller }: { session: MotionSession | n
         <tr><td>inference fps</td><td>{f(d?.inferenceFps, 1)}</td></tr>
         <tr><td>inference ms last / p95</td><td>{f(d?.inferenceMsLast, 1)} / {f(d?.inferenceMsP95, 1)}</td></tr>
         <tr><td>frame→render ms p50 / p95</td><td>{f(percentile(controller?.frameLatencies ?? [], 0.5), 0)} / {f(percentile(controller?.frameLatencies ?? [], 0.95), 0)}</td></tr>
-        <tr><td>pick→render ms p50 / p95</td><td>{f(percentile(latency, 0.5), 0)} / {f(percentile(latency, 0.95), 0)}</td></tr>
+        <tr><td>event→render ms p50 / p95</td><td>{f(percentile(latency, 0.5), 0)} / {f(percentile(latency, 0.95), 0)}</td></tr>
         <tr><td>long tasks</td><td>{perf.longTasks} ({f(perf.longTaskMs, 0)} ms)</td></tr>
         <tr><td>JS heap MB</td><td>{f(perf.heapMB(), 1)}</td></tr>
       </tbody></table>
@@ -58,7 +60,9 @@ export function DebugPanel({ session, controller }: { session: MotionSession | n
         {d?.targets.map((t) => (
           <tr key={t.targetId}><td>target #{t.targetId}</td><td>L {t.left} · R {t.right} · {f(t.progress)}</td></tr>
         ))}
-        <tr><td>reach f / max° L R</td><td>{controller ? `${f(controller.round.reachFraction())} / ${f(controller.round.reach.sides.left.maxElevationDeg, 0)} ${f(controller.round.reach.sides.right.maxElevationDeg, 0)}` : '—'}</td></tr>
+        {controller?.debugRows().map(([k, v]) => (
+          <tr key={k}><td>{k}</td><td>{v}</td></tr>
+        ))}
       </tbody></table>
       <h4>thresholds</h4>
       <table><tbody>
@@ -70,6 +74,10 @@ export function DebugPanel({ session, controller }: { session: MotionSession | n
         <tr><td>lean on/off °</td><td>{POSTURE_CONFIG.leanOnDeg} / {POSTURE_CONFIG.leanOffDeg}</td></tr>
         <tr><td>shrug on/off</td><td>{POSTURE_CONFIG.shrugOnRatio} / {POSTURE_CONFIG.shrugOffRatio}</td></tr>
         <tr><td>calib neutral / hold ms</td><td>{CALIBRATION_CONFIG.neutralMs} / {CALIBRATION_CONFIG.reachHoldMs}</td></tr>
+        <tr><td>stroke start / neutral band</td><td>{STROKE_CONFIG.startBand} / {STROKE_CONFIG.neutralBand}</td></tr>
+        <tr><td>stroke min catch / outside</td><td>{STROKE_CONFIG.minCatchMs} ms / {STROKE_CONFIG.sweepMinOutside}</td></tr>
+        <tr><td>draw start / turn ratio</td><td>{DRAW_CONFIG.startDelta} / {DRAW_CONFIG.turnRatio}</td></tr>
+        <tr><td>bow elbow min° / release</td><td>{DRAW_CONFIG.bowElbowMinDeg} / {DRAW_CONFIG.releaseTravel} in {DRAW_CONFIG.releaseWindowMs} ms</td></tr>
       </tbody></table>
       <h4>motion events</h4>
       {d?.recentEvents.map((e, i) => (

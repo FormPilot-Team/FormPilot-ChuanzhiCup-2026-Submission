@@ -16,7 +16,16 @@ function Apple({ x, y, r = 16 }: { x: number; y: number; r?: number }) {
   )
 }
 
-function Person({ x, y, armL, armR, seated = false }: { x: number; y: number; armL: [number, number]; armR: [number, number]; seated?: boolean }) {
+function Person({ x, y, armL, armR, seated = false, elbowL, elbowR }: {
+  x: number
+  y: number
+  armL: [number, number]
+  armR: [number, number]
+  seated?: boolean
+  /** optional elbow offsets from the shoulder (bent arms) */
+  elbowL?: [number, number]
+  elbowR?: [number, number]
+}) {
   // armX = [elbowX, elbowY] etc. expressed as wrist offset from shoulder
   const sl = { x: x - 22, y: y }
   const sr = { x: x + 22, y: y }
@@ -28,8 +37,8 @@ function Person({ x, y, armL, armR, seated = false }: { x: number; y: number; ar
       <path d={`M${x - 26} ${y - 4} Q${x} ${y - 12} ${x + 26} ${y - 4} L${x + 20} ${y + 60} L${x - 20} ${y + 60} Z`} fill={SHIRT} />
       {!seated && <path d={`M${x - 14} ${y + 60} L${x - 16} ${y + 120} M${x + 14} ${y + 60} L${x + 16} ${y + 120}`} stroke="#3c5a8a" strokeWidth="14" />}
       {seated && <path d={`M${x - 14} ${y + 60} L${x - 14} ${y + 64} L${x - 40} ${y + 66} L${x - 42} ${y + 110} M${x + 14} ${y + 60} L${x + 14} ${y + 64}`} stroke="#3c5a8a" strokeWidth="14" />}
-      <line x1={sl.x} y1={sl.y} x2={sl.x + armL[0]} y2={sl.y + armL[1]} stroke={SKIN} strokeWidth="11" />
-      <line x1={sr.x} y1={sr.y} x2={sr.x + armR[0]} y2={sr.y + armR[1]} stroke={SKIN} strokeWidth="11" />
+      <polyline points={`${sl.x},${sl.y} ${elbowL ? `${sl.x + elbowL[0]},${sl.y + elbowL[1]} ` : ''}${sl.x + armL[0]},${sl.y + armL[1]}`} stroke={SKIN} strokeWidth="11" fill="none" />
+      <polyline points={`${sr.x},${sr.y} ${elbowR ? `${sr.x + elbowR[0]},${sr.y + elbowR[1]} ` : ''}${sr.x + armR[0]},${sr.y + armR[1]}`} stroke={SKIN} strokeWidth="11" fill="none" />
       <circle cx={sl.x + armL[0]} cy={sl.y + armL[1]} r="8" fill={LEFT} />
       <circle cx={sr.x + armR[0]} cy={sr.y + armR[1]} r="8" fill={RIGHT} />
       <circle cx={x} cy={y - 26} r="17" fill={SKIN} />
@@ -115,6 +124,115 @@ export function RaiseHandArt({ side }: { side: 'left' | 'right' | 'none' }) {
     <svg viewBox="0 0 200 170" role="img" aria-label={side === 'none' ? '双手自然放下' : side === 'left' ? '举起左手' : '举起右手'} style={{ width: 150, height: 128 }}>
       <rect width="200" height="170" rx="20" fill="#e8f6fb" />
       <Person x={100} y={86} armL={side === 'left' ? up : down('l')} armR={side === 'right' ? up : down('r')} />
+    </svg>
+  )
+}
+
+// ---------- Boating ----------
+
+function Water() {
+  return (
+    <g>
+      <path d="M0 112 Q60 104 120 112 T240 112 L240 150 L0 150 Z" fill="#5cb8d6" />
+      <path d="M20 124 q14 -6 28 0 M150 132 q14 -6 28 0 M90 140 q14 -6 28 0" stroke="#fff" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.7" />
+    </g>
+  )
+}
+
+export function HowPaddleReady() {
+  return (
+    <svg viewBox="0 0 240 150" role="img" aria-label="两手放在身前，手肘靠近身体">
+      <rect width="240" height="150" rx="18" fill="#e8f6fb" />
+      <Water />
+      <Person x={120} y={50} elbowL={[-6, 34]} armL={[14, 52]} elbowR={[6, 34]} armR={[-14, 52]} />
+    </svg>
+  )
+}
+
+export function HowPaddleSweep() {
+  return (
+    <svg viewBox="0 0 240 150" role="img" aria-label="手向外侧划开，再收回">
+      <rect width="240" height="150" rx="18" fill="#e8f6fb" />
+      <Water />
+      <Person x={120} y={50} elbowL={[-6, 34]} armL={[14, 52]} elbowR={[8, 34]} armR={[52, 44]} />
+      <path d="M140 104 Q168 108 186 96" fill="none" stroke={RIGHT} strokeWidth="4" strokeDasharray="5 6" markerEnd="url(#sweep)" />
+      <defs>
+        <marker id="sweep" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill={RIGHT} />
+        </marker>
+      </defs>
+    </svg>
+  )
+}
+
+export function HowLantern() {
+  return (
+    <svg viewBox="0 0 240 150" role="img" aria-label="顺路收下水面上的花灯">
+      <rect width="240" height="150" rx="18" fill="#e8f6fb" />
+      <Water />
+      <path d="M86 110 L154 110 Q148 132 120 134 Q92 132 86 110 Z" fill="#8a5a32" />
+      <rect x="88" y="104" width="64" height="8" rx="4" fill="#c08a55" />
+      <g transform="translate(184 106)">
+        <circle r="18" fill="#ffe7a0" opacity="0.6" />
+        <path d="M-14 4 Q-10 -12 0 -16 Q10 -12 14 4 Z" fill="#f59fb8" />
+        <path d="M-8 4 Q0 -20 8 4 Z" fill="#ffd0dd" />
+        <rect x="-14" y="2" width="28" height="6" rx="3" fill="#6fb35d" />
+      </g>
+      <text x="176" y="72" fontSize="22" fontWeight="800" fill="#2f6b4f">+20</text>
+    </svg>
+  )
+}
+
+// ---------- Archery ----------
+
+function Bow({ x, y, bend, flip = false }: { x: number; y: number; bend: number; flip?: boolean }) {
+  const s = flip ? -1 : 1
+  return (
+    <g>
+      <path d={`M${x} ${y - 34} Q${x - s * (16 + bend)} ${y} ${x} ${y + 34}`} fill="none" stroke="#8a5a32" strokeWidth="5" strokeLinecap="round" />
+      <path d={`M${x} ${y - 34} L${x + s * bend * 1.6} ${y} L${x} ${y + 34}`} fill="none" stroke="#fffaf0" strokeWidth="2" />
+    </g>
+  )
+}
+
+export function HowBowReady() {
+  return (
+    <svg viewBox="0 0 240 150" role="img" aria-label="双手合在胸前">
+      <rect width="240" height="150" rx="18" fill="#e8f6fb" />
+      <Person x={120} y={60} elbowL={[-10, 30]} armL={[16, 30]} elbowR={[10, 30]} armR={[-16, 30]} />
+      <Bow x={120} y={88} bend={0} />
+    </svg>
+  )
+}
+
+export function HowBowDraw() {
+  return (
+    <svg viewBox="0 0 240 150" role="img" aria-label="向两边拉开弓，稳住">
+      <rect width="240" height="150" rx="18" fill="#e8f6fb" />
+      <Person x={120} y={60} armL={[-70, 4]} elbowR={[34, 4]} armR={[8, 6]} />
+      <Bow x={52} y={64} bend={30} />
+      <circle cx="198" cy="40" r="20" fill="none" stroke="#d9e3dc" strokeWidth="7" />
+      <path d="M198 20 A20 20 0 1 1 178 40" fill="none" stroke="#ffc94d" strokeWidth="7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function HowBowRelease() {
+  return (
+    <svg viewBox="0 0 240 150" role="img" aria-label="拉弦的手往回一松，箭飞向靶心">
+      <rect width="240" height="150" rx="18" fill="#e8f6fb" />
+      <g transform="translate(190 64)">
+        <circle r="34" fill="#f4ead2" />
+        <circle r="26" fill="#e5483b" />
+        <circle r="18" fill="#f4ead2" />
+        <circle r="10" fill="#2bb5a8" />
+        <circle r="4" fill="#ffc94d" />
+      </g>
+      <path d="M40 66 L182 64" stroke="#553623" strokeWidth="4" strokeLinecap="round" />
+      <path d="M182 64 l-12 -6 l2 6 l-2 6 z" fill="#553623" />
+      <path d="M40 66 l-10 -8 M40 66 l-10 8" stroke="#fffaf0" strokeWidth="4" strokeLinecap="round" />
+      <path d="M60 104 q30 -12 60 0" fill="none" stroke={RIGHT} strokeWidth="4" strokeDasharray="5 6" />
+      <text x="98" y="132" fontSize="18" fontWeight="800" fill="#2f6b4f" textAnchor="middle">松手！</text>
     </svg>
   )
 }
