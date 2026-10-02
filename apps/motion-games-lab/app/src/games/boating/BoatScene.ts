@@ -3,25 +3,29 @@
 // the river streams toward the player exactly as fast as the boat moves. All rules live in
 // round.ts / controller.ts; this file only draws them.
 //
-// The shared hand language: each hand has a stroke track (划桨轨迹提示) at its side of the screen; the
-// hand cursor rides along it with the live stroke progress (inner end = hands at rest, outer end =
-// the stroke counts). The oar on that side follows the same progress. A pulsing guide dot shows the
-// side to paddle next (节奏引导点), turning gold when a lantern is waiting there.
+// The shared hand language: each hand has a stroke track (划桨轨迹提示) at its side of the screen. Round 1
+// made it a real guide: the start point says 从这里开始, the track fills in gold as the hand moves out
+// ("I have done 60 %") and drains as it comes back, an arrow shows the direction, and the whole track
+// flashes when the stroke counts. The hand cursor rides along it and the oar follows the same progress,
+// eased every rendered frame (the pose only arrives at ~30 Hz). Until a side has paddled, a translucent
+// ghost hand demonstrates the stroke a few times. A pulsing guide dot shows the side to paddle next
+// (节奏引导点), turning gold when a lantern is waiting there.
 import * as Phaser from 'phaser'
 import type { Point, Side } from '../../motion/contracts'
 import { sfx } from '../../shared/audio'
-import { HandCursor, paintHandTextures } from '../../shared/handCursor'
+import { HandCursor, handTextureKey, paintHandTextures } from '../../shared/handCursor'
 import { perf } from '../../shared/perf'
 import { FONT_FAMILY, paintTexture } from '../../shared/phaserHost'
 import { drawDebugBody } from '../../shared/play/debugOverlay'
 import { paintGlow, paintLeaf, paintSparkle } from '../../shared/world/painters'
-import { HAND_COLOR } from '../../shared/world/palette'
+import { Follow1D } from '../../shared/smoothing'
+import { HAND_ACCENT } from '../../shared/world/palette'
 import {
   paintBoat, paintLandmark, paintLantern, paintLilyPad, paintOar, paintPine, paintReeds, paintRiverBanks, paintRiverSky, paintRipple,
   paintRock, paintRoundTree,
 } from '../../shared/world/river'
 import { LANDMARKS } from './config'
-import type { BoatController, BoatControllerEffect } from './controller'
+import type { BoatController, BoatControllerEffect, OarView } from './controller'
 import type { Lantern } from './round'
 
 export interface BoatSceneData {
@@ -38,6 +42,9 @@ const Z_FAR = 85
 const Z_BOAT = 2.6
 const RIVER_HALF = 2.4
 const LANTERN_X = 1.75
+
+/** Ghost-hand demonstration: out, back, a short rest (ms); loops before waiting for the player. */
+const DEMO = Object.freeze({ outMs: 900, backMs: 750, restMs: 450, loops: 3, idleReplayMs: 10_000, replayLoops: 2 })
 
 interface WorldSprite {
   image: Phaser.GameObjects.Image
@@ -86,6 +93,13 @@ export class BoatScene extends Phaser.Scene {
   private seed = 1
   private boatBaseY = 0
   private resizeTimer?: Phaser.Time.TimerEvent
+  private readonly shown: Record<Side, Follow1D> = { left: new Follow1D(45), right: new Follow1D(45) }
+  private startLabels!: Record<Side, Phaser.GameObjects.Text>
+  private ghosts!: Record<Side, Phaser.GameObjects.Image>
+  private demo: { side: Side; startedAt: number; loopsLeft: number } | null = null
+  private demoBudget: number = DEMO.loops
+  private demoStrokes = 0
+  private lastAnyStroke = 0
 
   constructor() {
     super('boating')
@@ -112,6 +126,15 @@ export class BoatScene extends Phaser.Scene {
     this.guide = this.add.graphics().setDepth(391)
     paintHandTextures(this, this.dpr)
     this.cursors = { left: new HandCursor(this, 'left', 400), right: new HandCursor(this, 'right', 400) }
+    const label = (side: Side) => this.add.text(0, 0, '从这里开始', {
+      fontFamily: FONT_FAMILY, fontSize: `${Math.round(22 * this.dpr)}px`, fontStyle: 'bold', color: '#fffaf0',
+      stroke: '#2f6b4f', strokeThickness: Math.round(6 * this.dpr),
+    }).setOrigin(0.5, 1).setDepth(392).setAlpha(0).setName(`start-${side}`)
+    this.startLabels = { left: label('left'), right: label('right') }
+    this.ghosts = {
+      left: this.add.image(0, 0, handTextureKey('left', 'open')).setOrigin(0.5, 0.61).setDepth(395).setAlpha(0),
+      right: this.add.image(0, 0, handTextureKey('right', 'open')).setOrigin(0.5, 0.61).setDepth(395).setAlpha(0),
+    }
     this.splash = this.add.particles(0, 0, 'droplet', {
       speed: { min: 80 * this.dpr, max: 260 * this.dpr }, angle: { min: 200, max: 340 }, gravityY: 600 * this.dpr, lifespan: 700,
       scale: { start: 0.9, end: 0.2 }, alpha: { start: 0.95, end: 0 }, emitting: false,
@@ -219,7 +242,8 @@ export class BoatScene extends Phaser.Scene {
     const H = this.scale.height
     const s = side === 'left' ? -1 : 1
     const x = (f: number) => W / 2 + s * W * f
-    return { inner: { x: x(0.17), y: H * 0.73 }, control: { x: x(0.31), y: H * 0.8 }, outer: { x: x(0.41), y: H * 0.57 } }
+    // a gentle, almost level outward arc at waist height: the path a relaxed forearm sweep really takes
+    return { inner: { x: x(0.17), y: H * 0.74 }, control: { x: x(0.3), y: H * 0.79 }, outer: { x: x(0.41), y: H * 0.7 } }
   }
 
   private trackPoint(t: Track, u: number): Point {
@@ -338,9 +362,8 @@ export class BoatScene extends Phaser.Scene {
     for (const side of ['left', 'right'] as const) {
       const s = side === 'left' ? -1 : 1
       const oar = this.oars[side]
-      const view = this.controller.oar(side)
-      // rest: blade forward (toward the horizon); stroke: swept back past the boat
-      const angle = -0.55 + view.progress * 0.95
+      // rest: blade forward (toward the horizon); stroke: swept back past the boat (eased progress)
+      const angle = -0.55 + (this.shown[side].value ?? 0) * 0.95
       const pivot = { x: W / 2 + s * this.boat.displayWidth * 0.43, y: this.boat.y - this.boat.displayHeight * 0.12 }
       oar.setPosition(pivot.x, pivot.y).setDisplaySize(oarLen, oarLen * (40 / 300)).setRotation(s * angle)
     }
@@ -353,52 +376,141 @@ export class BoatScene extends Phaser.Scene {
     guide.clear()
     const width = Math.max(10 * this.dpr, this.scale.height * 0.016)
     const cue = this.controller.round.cue()
+    const playing = this.controller.status === 'playing'
     const nextSide: Side = cue?.inWindow ? cue.lantern.side : this.lastSide === 'left' ? 'right' : 'left'
+    const views = { left: this.controller.oar('left'), right: this.controller.oar('right') }
+    this.updateDemo(now, nextSide, views, playing)
     for (const side of ['left', 'right'] as const) {
       const t = this.track(side)
-      const view = this.controller.oar(side)
-      const color = HAND_COLOR[side]
+      const view = views[side]
+      const progress = this.shown[side].step(view.progress, now)
       const strokeFlash = Math.max(0, 1 - (now - this.lastStroke[side]) / 450)
-      // track: soft white path, the done part in the hand colour
       const path = (from: number, to: number) => {
         g.beginPath()
         const a = this.trackPoint(t, from)
         g.moveTo(a.x, a.y)
-        for (let u = from; u <= to + 1e-6; u += 0.05) {
-          const p = this.trackPoint(t, Math.min(u, to))
-          g.lineTo(p.x, p.y)
+        for (let u = from; u <= to + 1e-6; u += 0.04) {
+          const q = this.trackPoint(t, Math.min(u, to))
+          g.lineTo(q.x, q.y)
         }
         g.strokePath()
       }
-      g.lineStyle(width + 6 * this.dpr, 0x1f3a2e, 0.18)
+      // the path: soft shadow, then a light rail
+      g.lineStyle(width + 6 * this.dpr, 0x1f3a2e, 0.2)
       path(0, 1)
-      g.lineStyle(width, 0xffffff, 0.55 + 0.3 * strokeFlash)
+      g.lineStyle(width, 0xffffff, 0.5 + 0.35 * strokeFlash)
       path(0, 1)
-      if (view.progress > 0.02) {
-        g.lineStyle(width, color, 0.95)
-        path(0, view.progress)
+      // live fill: how far this stroke has got (it drains while the hand comes back)
+      if (progress > 0.01) {
+        g.lineStyle(width, HAND_ACCENT, view.returning ? 0.6 : 0.95)
+        path(0, progress)
+        g.lineStyle(Math.max(2, width * 0.3), 0xfff6c9, view.returning ? 0.35 : 0.8)
+        path(0, progress)
       }
-      // outer end: where the stroke counts
-      const end = t.outer
-      g.fillStyle(strokeFlash > 0 ? 0xfff6c9 : 0xffffff, 0.9)
-      g.fillCircle(end.x, end.y, width * (0.9 + strokeFlash * 0.8))
-      g.lineStyle(3 * this.dpr, color, 1)
-      g.strokeCircle(end.x, end.y, width * (0.9 + strokeFlash * 0.8))
+      // the whole track lights up when the stroke counts
+      if (strokeFlash > 0) {
+        g.lineStyle(width + 10 * this.dpr * strokeFlash, 0xfff6c9, 0.55 * strokeFlash)
+        path(0, 1)
+      }
+      // direction: a chevron near the outer end, pointing outward along the track
+      const a = this.trackPoint(t, 0.8)
+      const b = this.trackPoint(t, 0.88)
+      const ang = Math.atan2(b.y - a.y, b.x - a.x)
+      const cs = width * 0.9
+      g.lineStyle(Math.max(2, 3 * this.dpr), 0x2f6b4f, 0.55)
+      g.beginPath()
+      g.moveTo(b.x - Math.cos(ang - 0.6) * cs, b.y - Math.sin(ang - 0.6) * cs)
+      g.lineTo(b.x, b.y)
+      g.lineTo(b.x - Math.cos(ang + 0.6) * cs, b.y - Math.sin(ang + 0.6) * cs)
+      g.strokePath()
+      // start point (从这里开始) and the outer end (where the stroke counts)
+      g.fillStyle(0xffffff, 0.95)
+      g.fillCircle(t.inner.x, t.inner.y, width * 0.85)
+      g.lineStyle(3 * this.dpr, 0x2f6b4f, 0.8)
+      g.strokeCircle(t.inner.x, t.inner.y, width * 0.85)
+      const endR = width * (0.95 + strokeFlash * 0.8)
+      g.fillStyle(strokeFlash > 0 || progress > 0.85 ? 0xfff0b8 : 0xffffff, 0.92)
+      g.fillCircle(t.outer.x, t.outer.y, endR)
+      g.lineStyle(3 * this.dpr, HAND_ACCENT, 1)
+      g.strokeCircle(t.outer.x, t.outer.y, endR)
+      const label = this.startLabels[side]
+      const showLabel = playing && view.strokes < 2
+      // above a hand resting on the start point (the cursor reaches ~0.6 of its size above its centre)
+      const cursorSize = Math.max(56 * this.dpr, this.scale.height * 0.085)
+      label.setPosition(t.inner.x, t.inner.y - cursorSize * 0.68)
+      label.setAlpha(label.alpha + ((showLabel ? 1 : 0) - label.alpha) * 0.12)
       // guide dot on the side to paddle next (gold when a lantern waits there)
-      if (side === nextSide && this.controller.status === 'playing') {
+      if (side === nextSide && playing) {
         const pulse = 0.5 + 0.5 * Math.sin(time / 260)
         const gold = Boolean(cue?.inWindow)
         guide.lineStyle(4 * this.dpr, gold ? 0xffc94d : 0xffffff, 0.4 + 0.5 * pulse)
-        guide.strokeCircle(end.x, end.y, width * (1.6 + pulse * 0.9))
+        guide.strokeCircle(t.outer.x, t.outer.y, width * (1.6 + pulse * 0.9))
         if (gold) {
           guide.fillStyle(0xffc94d, 0.25 + 0.2 * pulse)
-          guide.fillCircle(end.x, end.y, width * 2.2)
+          guide.fillCircle(t.outer.x, t.outer.y, width * 2.2)
         }
       }
       const cursor = this.cursors[side]
-      cursor.setSize(Math.max(56 * this.dpr, this.scale.height * 0.085))
-      cursor.update(now, { position: this.trackPoint(t, view.progress), tracked: view.tracked, pose: view.pose, near: view.cued }, 1 / (this.scale.height * 0.3))
+      const size = Math.max(56 * this.dpr, this.scale.height * 0.085)
+      cursor.setSize(size)
+      cursor.update(now, { position: this.trackPoint(t, progress), tracked: view.tracked, pose: view.pose, near: view.cued }, 1 / (this.scale.height * 0.3))
+      this.drawGhost(side, t, size, now)
     }
+  }
+
+  /**
+   * Ghost hand: a translucent hand shows the stroke (out along the track and back) on the side to
+   * paddle next, only until that side has paddled, only while the player's own hand there is at rest,
+   * and at most a few loops; it returns for two loops if nobody has paddled for a while.
+   */
+  private updateDemo(now: number, nextSide: Side, views: Record<Side, OarView>, playing: boolean): void {
+    if (!playing) {
+      this.demo = null
+      return
+    }
+    if (this.lastAnyStroke === 0) this.lastAnyStroke = now
+    if (this.demoBudget === 0 && now - this.lastAnyStroke > DEMO.idleReplayMs) {
+      this.demoBudget = DEMO.replayLoops
+      this.lastAnyStroke = now
+    }
+    const loopMs = DEMO.outMs + DEMO.backMs + DEMO.restMs
+    if (this.demo) {
+      const view = views[this.demo.side]
+      const loops = Math.floor((now - this.demo.startedAt) / loopMs)
+      if (view.strokes > this.demoStrokes || view.progress > 0.2 || loops >= this.demo.loopsLeft) {
+        this.demoBudget = Math.max(0, this.demoBudget - Math.max(1, Math.min(this.demo.loopsLeft, loops + 1)))
+        this.demo = null
+      }
+      return
+    }
+    const view = views[nextSide]
+    const idle = now - this.lastAnyStroke > DEMO.idleReplayMs * 0.9 || view.strokes === 0
+    if (this.demoBudget > 0 && idle && view.tracked && view.progress < 0.1) {
+      this.demo = { side: nextSide, startedAt: now, loopsLeft: this.demoBudget }
+      this.demoStrokes = view.strokes
+    }
+  }
+
+  private drawGhost(side: Side, t: Track, size: number, now: number): void {
+    const ghost = this.ghosts[side]
+    const demo = this.demo
+    if (!demo || demo.side !== side) {
+      ghost.setAlpha(Math.max(0, ghost.alpha - 0.06))
+      return
+    }
+    const loopMs = DEMO.outMs + DEMO.backMs + DEMO.restMs
+    const k = (now - demo.startedAt) % loopMs
+    const ease = (x: number) => 0.5 - 0.5 * Math.cos(Math.PI * Math.max(0, Math.min(1, x)))
+    const u = k < DEMO.outMs ? ease(k / DEMO.outMs) : k < DEMO.outMs + DEMO.backMs ? 1 - ease((k - DEMO.outMs) / DEMO.backMs) : 0
+    const q = this.trackPoint(t, u)
+    const fade = Math.min(1, (now - demo.startedAt) / 300)
+    ghost.setTexture(handTextureKey(side, k < DEMO.outMs ? 'half' : 'open'))
+    ghost.setPosition(q.x, q.y).setDisplaySize(size * 0.92, size * 0.92).setAlpha(0.42 * fade)
+  }
+
+  /** Test / screenshot hook: is the ghost hand demonstrating right now, and on which side. */
+  demoState(): { side: Side } | null {
+    return this.demo ? { side: this.demo.side } : null
   }
 
   // ---------- effects ----------
@@ -416,6 +528,7 @@ export class BoatScene extends Phaser.Scene {
 
   private onStroke(side: Side, flow: boolean): void {
     this.lastStroke[side] = performance.now()
+    this.lastAnyStroke = performance.now()
     this.lastSide = side
     const oar = this.oars[side]
     const s = side === 'left' ? -1 : 1

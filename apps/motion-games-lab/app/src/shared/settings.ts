@@ -27,7 +27,8 @@ export const DEFAULT_SETTINGS: Settings = {
   drawSide: 'right',
 }
 
-export const ROUND_OPTIONS = [60, 120, 180, 240] as const
+/** Round lengths offered by every game (Round 1: 4 minutes was dropped — too long, and it wrapped onto its own row). */
+export const ROUND_OPTIONS = [60, 120, 180] as const
 export const SESSION_CAP_OPTIONS = [10, 15, 20, 30] as const
 
 const KEY = 'motion-games-lab.settings.v1'
@@ -36,7 +37,12 @@ const PLAYED_KEY = 'motion-games-lab.played-ms.v1'
 export function loadSettings(): Settings {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<Settings>) }
+    if (raw) {
+      const saved = { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<Settings>) }
+      // a length no longer offered (e.g. a saved 4 minutes) falls back to the default
+      if (!(ROUND_OPTIONS as readonly number[]).includes(saved.roundSeconds)) saved.roundSeconds = DEFAULT_SETTINGS.roundSeconds
+      return saved
+    }
   } catch {
     // storage unavailable: defaults
   }

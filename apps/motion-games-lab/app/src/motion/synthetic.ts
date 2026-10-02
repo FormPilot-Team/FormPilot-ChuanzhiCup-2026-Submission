@@ -201,7 +201,11 @@ export class AppleBot implements Bot {
   }
 }
 
-/** Boating: alternating paddle strokes (scheme-aware), one side at a time, with a steady rhythm. */
+/**
+ * Boating: alternating paddle strokes (scheme-aware), one side at a time, with a steady rhythm. Round 1:
+ * the sweep is human-sized (hands from in front of the belly to a little past the shoulders, at waist
+ * height) instead of the earlier oversized sweep that hid how hard the old detector was for real people.
+ */
 export class BoatBot implements Bot {
   paused = false
   /** every Nth stroke is deliberately too small (it must not count) */
@@ -218,12 +222,15 @@ export class BoatBot implements Bot {
     const scheme = ctx.strokes().options.scheme
     const neutral = (side: Side): Point => (scheme === 'down'
       ? { x: side === 'left' ? -0.45 : 0.45, y: 0.35 }
-      : { x: side === 'left' ? -0.15 : 0.15, y: 0.75 })
+      : { x: side === 'left' ? -0.2 : 0.2, y: 0.75 })
     const outward = (side: Side, small: boolean): Point => (scheme === 'down'
       ? { x: side === 'left' ? -0.5 : 0.5, y: small ? 0.45 : 1.08 }
-      : { x: (side === 'left' ? -1 : 1) * (small ? 0.42 : 0.88), y: 0.68 })
+      : { x: (side === 'left' ? -1 : 1) * (small ? 0.3 : 0.62), y: 0.7 })
     actor.elbowGoal.left = null
     actor.elbowGoal.right = null
+    // an unhurried, human sweep (~0.3 s outward) rather than the actor's full hand speed
+    actor.speed.left = 0.6
+    actor.speed.right = 0.6
     if (now < this.phaseUntil) return
     const other: Side = this.side === 'left' ? 'right' : 'left'
     if (this.stage === 'neutral') {
@@ -342,7 +349,7 @@ export class SyntheticPoseSource implements PoseSource {
   }
 
   info(): PoseSourceInfo {
-    return { kind: 'synthetic', delegate: 'none', model: 'synthetic-actor', cameraWidth: 1280, cameraHeight: 720, cameraFrameRate: 1000 / (this.options.frameMs ?? 33) }
+    return { kind: 'synthetic', delegate: 'none', model: 'synthetic-actor', cameraWidth: 1280, cameraHeight: 720, cameraFrameRate: 1000 / (this.options.frameMs ?? 33), inferenceThread: 'none', workerFallback: null, framesDropped: 0 }
   }
 
   /** Advance the actor to `now` and emit one landmark sample. */

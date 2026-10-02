@@ -6,7 +6,11 @@ import type { Difficulty } from '../../shared/settings'
 export interface BoatParams {
   label: string
   description: string
-  /** stroke displacement from the player's neutral, torso units (motion detector option) */
+  /**
+   * hand travel from the player's neutral that counts as a stroke, in the player's shoulder widths
+   * (motion detector option). Round 1: lowered and made relative to shoulder width — real players
+   * sweep ~0.3–0.6 shoulder widths with relaxed elbows; the old values sat at the top of that range.
+   */
   amplitude: number
   /** speed added per stroke, m/s */
   impulse: number
@@ -21,9 +25,9 @@ export interface BoatParams {
 }
 
 export const BOAT_DIFFICULTIES: Record<Difficulty, BoatParams> = {
-  easy: { label: '轻松', description: '划开一点就能走，花灯停留得久', amplitude: 0.26, impulse: 1.3, lanternSpacing: 13, windowAhead: 5, windowBehind: 1.6, minWindowMs: 3200 },
-  standard: { label: '标准', description: '适中的划水幅度和花灯节奏', amplitude: 0.32, impulse: 1.15, lanternSpacing: 15, windowAhead: 4.2, windowBehind: 1.4, minWindowMs: 2600 },
-  challenge: { label: '挑战', description: '划得更开、节奏更稳，才能走得快', amplitude: 0.4, impulse: 1.05, lanternSpacing: 17, windowAhead: 3.6, windowBehind: 1.2, minWindowMs: 2000 },
+  easy: { label: '轻松', description: '划开一点就能走，花灯停留得久', amplitude: 0.22, impulse: 1.3, lanternSpacing: 13, windowAhead: 5, windowBehind: 1.6, minWindowMs: 3200 },
+  standard: { label: '标准', description: '适中的划水幅度和花灯节奏', amplitude: 0.28, impulse: 1.15, lanternSpacing: 15, windowAhead: 4.2, windowBehind: 1.4, minWindowMs: 2600 },
+  challenge: { label: '挑战', description: '划得更开、节奏更稳，才能走得快', amplitude: 0.36, impulse: 1.05, lanternSpacing: 17, windowAhead: 3.6, windowBehind: 1.2, minWindowMs: 2000 },
 }
 
 export const BOAT_PHYSICS = Object.freeze({

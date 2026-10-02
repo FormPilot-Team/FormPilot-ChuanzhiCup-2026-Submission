@@ -64,8 +64,8 @@ export const INTRO: Record<GameId, IntroCopy> = {
     lead: '像划水一样，两只手轮流向外侧划开再收回，小船就往前走。',
     how: [
       { title: '两手放在身前', text: '手肘靠近身体，放松就好' },
-      { title: '向外侧划开，再收回', text: '左手划左边，右手划右边' },
-      { title: '轮流划，节奏稳', text: '顺路收下水面上的花灯' },
+      { title: '向外侧划开，再收回', text: '从身前划到外侧，再回到身前' },
+      { title: '轮流划，节奏稳', text: '左右轮流划，顺路收下花灯' },
     ],
   },
   archery: {
@@ -112,7 +112,8 @@ export const COPY = Object.freeze({
     armed: '松手！拉弦的手往回一松',
     reset: '再来一箭：双手回到胸前',
     turned: '身体正对屏幕，用手臂拉弓',
-    bowArmBent: '持弓的手臂伸直一点',
+    bowArmBent: '持弓的手臂再伸直一些',
+    bowArmSoft: '手臂再伸展一点会更稳',
     elbowOnly: '拉弦时手肘也一起往外拉',
     handsLow: '把弓抬到胸口的高度',
     lowered: '没关系，放下休息一下，再来一箭',

@@ -492,7 +492,7 @@ export function paintRangeCard(ctx: Ctx, w: number, h: number): void {
   ctx.lineTo(tx, ty)
   ctx.lineTo(tx + r * 0.6, ty + r * 1.7)
   ctx.stroke()
-  const rings = ['#f4ead2', P.appleRed, '#f4ead2', P.leftHand, P.gold]
+  const rings = ['#f4ead2', P.appleRed, '#f4ead2', P.teal, P.gold]
   rings.forEach((color, i) => blob(ctx, tx, ty, r * (1 - i * 0.19), color))
   // arrow
   ctx.strokeStyle = P.barkDark

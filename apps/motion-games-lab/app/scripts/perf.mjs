@@ -1,7 +1,16 @@
-// Performance run for one game against the production build (vite preview on :5181).
-//   node scripts/perf.mjs --game apple|boating|archery --video <file.mjpeg|file.y4m> [--seconds 30] [--headed]
-// Scenario "camera-model": Chromium fake camera fed from the video file → real MediaPipe model +
-// Phaser rendering together. Scenario "synthetic": scripted player (many events → event latency).
+// Performance run for one game against a production build served by `vite preview`.
+//   node scripts/perf.mjs --game apple|boating|archery --video <file.mjpeg> [--seconds 30] [--headed]
+//        [--scenarios default,workergpu,main,synthetic] [--base http://127.0.0.1:5181] [--label after] [--out file.json]
+// Scenarios (Chromium fake camera fed from the video file → real MediaPipe model + Phaser rendering):
+//   "default"   = the shipped path: inference in a Worker, CPU delegate first (AUTO);
+//   "workergpu" = Worker with the GPU delegate (?delegate=gpu);
+//   "main"      = ?inference=main: inference on the main thread, GPU→CPU — the pre-fix path;
+//   "synthetic" = scripted player, no model.
+// Old builds ignore the unknown query flags, so "default" on an old build measures that build's path.
+//
+// Frame pacing is measured from the page itself, independent of the app's own counters, so the same
+// script measures old and new builds: every requestAnimationFrame interval (→ average FPS, p50/p95/p99/
+// max frame time, frames over 20/33/50 ms) and every long animation frame (LoAF, ≥ 50 ms) / long task.
 // OS CPU / memory are sampled for the launched browser's own process tree only (Win32_Process).
 import { chromium } from '@playwright/test'
 import { execFileSync } from 'node:child_process'
@@ -18,9 +27,11 @@ const VIDEO = opt('video', null)
 const SECONDS = Number(opt('seconds', 30))
 const HEADED = args.includes('--headed')
 const GAME = opt('game', 'apple')
-const OUT = path.resolve(opt('out', `../docs/stage-c-e/perf-${GAME}.json`))
-const SKIP_CPU = args.includes('--skip-cpu')
-const BASE = 'http://127.0.0.1:5181'
+const LABEL = opt('label', 'current')
+const OUT = path.resolve(opt('out', `../docs/round-1-fixes/perf-${GAME}-${LABEL}.json`))
+const SCENARIOS = opt('scenarios', 'default,synthetic').split(',')
+const BASE = opt('base', 'http://127.0.0.1:5181')
+const SHOTS = path.join(path.dirname(OUT), 'screenshots')
 
 function processTree(rootPid) {
   const json = execFileSync('powershell', ['-NoProfile', '-Command',
@@ -41,10 +52,36 @@ function processTree(rootPid) {
   }
 }
 
+const round1 = (v) => (v === null || v === undefined || !Number.isFinite(v) ? null : Math.round(v * 10) / 10)
 const pct = (values, q) => {
   if (!values.length) return null
   const s = [...values].sort((a, b) => a - b)
-  return Math.round(s[Math.floor((s.length - 1) * q)] * 10) / 10
+  return round1(s[Math.floor((s.length - 1) * q)])
+}
+
+/** Installed after the warm-up: records every rAF interval and every long animation frame / task. */
+function installFrameRecorder() {
+  const rec = { deltas: [], loaf: [], longTasks: [], last: 0, on: true }
+  window.__perfRec = rec
+  const loop = (t) => {
+    if (rec.last) rec.deltas.push(t - rec.last)
+    rec.last = t
+    if (rec.on) requestAnimationFrame(loop)
+  }
+  requestAnimationFrame(loop)
+  try {
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries()) {
+        const scripts = (e.scripts ?? []).map((s) => `${s.invokerType}:${s.invoker || s.sourceFunctionName || '?'}`.slice(0, 80))
+        rec.loaf.push({ duration: e.duration, blocking: e.blockingDuration ?? 0, scripts: scripts.slice(0, 3) })
+      }
+    }).observe({ type: 'long-animation-frame', buffered: false })
+  } catch { /* LoAF unsupported */ }
+  try {
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries()) rec.longTasks.push(e.duration)
+    }).observe({ type: 'longtask', buffered: false })
+  } catch { /* unsupported */ }
 }
 
 async function runScenario(name, launchArgs, query) {
@@ -63,10 +100,6 @@ async function runScenario(name, launchArgs, query) {
   await page.getByTestId(`card-${GAME}`).getByRole('button', { name: '开始' }).click()
   await click('下一步')
   await click('打开摄像头')
-  if (name.startsWith('camera-model-gpu') && !name.includes('cap')) {
-    await page.waitForTimeout(6000)
-    await page.screenshot({ path: path.join(path.dirname(OUT), 'screenshots', `perf-${GAME}-camera-check-real-model.png`) })
-  }
   // get into the round: normal path, or the page's own fallbacks if the clip never satisfies framing
   const started = Date.now()
   let startPath = 'calibrated'
@@ -77,7 +110,6 @@ async function runScenario(name, launchArgs, query) {
     if (Date.now() - started > 25_000 && await page.getByRole('button', { name: '跳过这一步' }).isVisible().catch(() => false)) { startPath = 'skipped-calibration-step'; await click('跳过这一步') }
     await page.waitForTimeout(500)
   }
-  const calibration = await page.evaluate(() => window.__mgl?.session?.adapter.calibration().profile ?? null)
   await page.waitForFunction(() => window.__mgl?.controller?.status === 'playing', undefined, { timeout: 30_000 })
   await page.waitForTimeout(5000) // warm-up
   const cdp = await page.context().newCDPSession(page)
@@ -86,15 +118,15 @@ async function runScenario(name, launchArgs, query) {
   const rootPid = server.process().pid
   const os0 = processTree(rootPid)
   const m0 = await metric()
+  await page.evaluate(installFrameRecorder)
   const t0 = Date.now()
-  const before = await page.evaluate(() => ({ longTasks: window.__mgl.perf.longTasks, longTaskMs: window.__mgl.perf.longTaskMs, frames: window.__mgl.perf.frameCount }))
   const samples = []
   const memory = []
   for (let i = 0; i < SECONDS; i += 1) {
     await page.waitForTimeout(1000)
     samples.push(await page.evaluate(() => {
       const d = window.__mgl.diagnostics()
-      return { renderFps: window.__mgl.perf.renderFps(), inferenceFps: d.inferenceFps, tracked: d.tracking.body, status: window.__mgl.controller?.status ?? null }
+      return { inferenceFps: d.inferenceFps, tracked: d.tracking.body, status: window.__mgl.controller?.status ?? null }
     }))
     if (i % 10 === 9) memory.push(processTree(rootPid).workingSetMB)
   }
@@ -102,30 +134,61 @@ async function runScenario(name, launchArgs, query) {
   const m1 = await metric()
   const os1 = processTree(rootPid)
   const end = await page.evaluate(() => {
+    const rec = window.__perfRec
+    rec.on = false
     const c = window.__mgl.controller
     const d = window.__mgl.diagnostics()
     return {
-      frameLatencies: c.frameLatencies, feedbackLatencies: c.feedbackLatencies, inferenceMsP95: d.inferenceMsP95,
+      deltas: rec.deltas, loaf: rec.loaf, longTasks: rec.longTasks,
+      frameLatencies: c.frameLatencies, feedbackLatencies: c.feedbackLatencies,
+      inferenceMsP50: d.inferenceMsP50 ?? null, inferenceMsP95: d.inferenceMsP95, inferenceThread: d.inferenceThread ?? 'main (pre-fix build)',
+      motionMsP95: d.motionMsP95 ?? null, framesDropped: d.framesDropped ?? null,
       delegate: d.source.delegate, camera: `${d.source.cameraWidth}x${d.source.cameraHeight}@${d.source.cameraFrameRate}`,
-      longTasks: window.__mgl.perf.longTasks, longTaskMs: window.__mgl.perf.longTaskMs, frames: window.__mgl.perf.frameCount,
-      heapMB: window.__mgl.perf.heapMB(), events: c.feedbackLatencies.length, score: c.round.score,
+      heapMB: window.__mgl.perf.heapMB(), score: c.round.score,
     }
   })
-  await page.screenshot({ path: path.join(path.dirname(OUT), 'screenshots', `perf-${GAME}-${name}.png`) })
+  fs.mkdirSync(SHOTS, { recursive: true })
+  await page.screenshot({ path: path.join(SHOTS, `perf-${GAME}-${LABEL}-${name}.png`) })
   await browser.close()
   await server.close()
-  const fps = samples.map((s) => s.renderFps)
+  const d = end.deltas
+  const total = d.reduce((a, b) => a + b, 0)
   const inf = samples.map((s) => s.inferenceFps)
+  const over = (ms) => d.filter((x) => x > ms).length
   return {
     scenario: name,
     gpuRenderer: gpu,
     howRoundStarted: startPath,
-    calibration: calibration ? { usedDefaults: calibration.usedDefaults, leftMaxDeg: Math.round(calibration.reach.left.maxElevationDeg), rightMaxDeg: Math.round(calibration.reach.right.maxElevationDeg) } : null,
     seconds: Math.round(wallMs / 1000),
-    renderFps: { mean: Math.round((fps.reduce((a, b) => a + b, 0) / fps.length) * 10) / 10, p05: pct(fps, 0.05), min: Math.round(Math.min(...fps) * 10) / 10 },
-    renderedFrames: end.frames - before.frames,
-    inferenceFps: { mean: Math.round((inf.reduce((a, b) => a + b, 0) / inf.length) * 10) / 10, p05: pct(inf, 0.05) },
-    inferenceMsP95: end.inferenceMsP95 && Math.round(end.inferenceMsP95 * 10) / 10,
+    frames: {
+      count: d.length,
+      averageFps: round1((d.length * 1000) / total),
+      p50Ms: pct(d, 0.5),
+      p95Ms: pct(d, 0.95),
+      p99Ms: pct(d, 0.99),
+      maxMs: round1(Math.max(...d)),
+      over20ms: over(20),
+      over33ms: over(33),
+      over50ms: over(50),
+      /** share of frames taking more than twice the median interval (visible hitches) */
+      hitchShare: Math.round((d.filter((x) => x > 2 * (pct(d, 0.5) ?? 0)).length / Math.max(1, d.length)) * 1000) / 1000,
+    },
+    longAnimationFrames: {
+      count: end.loaf.length,
+      maxMs: end.loaf.length ? round1(Math.max(...end.loaf.map((l) => l.duration))) : 0,
+      blockingMs: round1(end.loaf.reduce((a, l) => a + l.blocking, 0)),
+      topScripts: [...new Set(end.loaf.flatMap((l) => l.scripts))].slice(0, 6),
+    },
+    longTasks: { count: end.longTasks.length, ms: Math.round(end.longTasks.reduce((a, b) => a + b, 0)) },
+    inference: {
+      thread: end.inferenceThread,
+      fpsMean: round1(inf.reduce((a, b) => a + b, 0) / inf.length),
+      fpsP05: pct(inf, 0.05),
+      msP50: round1(end.inferenceMsP50),
+      msP95: round1(end.inferenceMsP95),
+      mainThreadMotionMsP95: round1(end.motionMsP95),
+      framesDroppedWhileBusy: end.framesDropped,
+    },
     delegate: end.delegate,
     camera: end.camera,
     bodyTrackedShare: samples.filter((s) => s.tracked).length / samples.length,
@@ -134,12 +197,10 @@ async function runScenario(name, launchArgs, query) {
     score: end.score,
     mainThreadBusyShare: Math.round(((m1.TaskDuration - m0.TaskDuration) / (wallMs / 1000)) * 1000) / 1000,
     scriptShare: Math.round(((m1.ScriptDuration - m0.ScriptDuration) / (wallMs / 1000)) * 1000) / 1000,
-    longTasks: { count: end.longTasks - before.longTasks, ms: Math.round(end.longTaskMs - before.longTaskMs) },
-    jsHeapMB: Math.round((m1.JSHeapUsedSize / 1048576) * 10) / 10,
+    jsHeapMB: round1(m1.JSHeapUsedSize / 1048576),
     browserCpuPercentOfOneCore: Math.round(((os1.cpu100ns - os0.cpu100ns) / 1e4 / (os1.at - os0.at)) * 1000) / 10,
     browserCpuPercentOfMachine: Math.round(((os1.cpu100ns - os0.cpu100ns) / 1e4 / (os1.at - os0.at) / os.cpus().length) * 1000) / 10,
     browserWorkingSetMB: { start: Math.round(os0.workingSetMB), samples: memory.map(Math.round), end: Math.round(os1.workingSetMB) },
-    browserProcesses: os1.processes,
     pageErrors: errors,
   }
 }
@@ -151,20 +212,24 @@ const power = (() => {
 })()
 const report = {
   game: GAME,
+  label: LABEL,
   date: new Date().toISOString(),
   machine: { cpu: os.cpus()[0].model, logicalCores: os.cpus().length, memoryGB: Math.round(os.totalmem() / 1073741824), power: power === '2' ? 'AC' : power === '1' ? 'battery' : power },
   headed: HEADED,
-  note: 'Fake camera = Chromium --use-file-for-fake-video-capture; it skips real sensor/USB latency, so frameToRender excludes camera exposure/transport. CPU% is the launched browser process tree only.',
+  note: 'Frame times are requestAnimationFrame intervals measured in the page (display refresh 240 Hz → 4.2 ms ideal). Fake camera = Chromium --use-file-for-fake-video-capture; it skips real sensor/USB latency, so frameToRender excludes camera exposure/transport. CPU% is the launched browser process tree only.',
   scenarios: [],
 }
-if (VIDEO) {
-  report.video = path.basename(VIDEO)
-  const fake = ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', `--use-file-for-fake-video-capture=${VIDEO}`]
-  report.scenarios.push(await runScenario('camera-model-gpu', fake, ''))
-  if (!SKIP_CPU) report.scenarios.push(await runScenario('camera-model-cpu', fake, '?delegate=cpu'))
-  if (args.includes('--compare-cap')) report.scenarios.push(await runScenario('camera-model-gpu-cap60', fake, '?fpsLimit=60'))
+const fake = VIDEO ? ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', `--use-file-for-fake-video-capture=${VIDEO}`] : null
+if (VIDEO) report.video = path.basename(VIDEO)
+for (const scenario of SCENARIOS) {
+  if (scenario === 'synthetic') report.scenarios.push(await runScenario('synthetic', [], '?source=synthetic&duration=180&seed=5'))
+  else if (!fake) continue
+  else if (scenario === 'default') report.scenarios.push(await runScenario('camera-model-default', fake, ''))
+  else if (scenario === 'workergpu') report.scenarios.push(await runScenario('camera-model-worker-gpu', fake, '?delegate=gpu'))
+  else if (scenario === 'main') report.scenarios.push(await runScenario('camera-model-main-thread', fake, '?inference=main'))
 }
-report.scenarios.push(await runScenario('synthetic', [], '?source=synthetic&duration=180&seed=5'))
 fs.mkdirSync(path.dirname(OUT), { recursive: true })
 fs.writeFileSync(OUT, JSON.stringify(report, null, 2))
-console.log(JSON.stringify(report, null, 2))
+for (const s of report.scenarios) {
+  console.log(`${GAME} ${LABEL} ${s.scenario}: fps ${s.frames.averageFps} p95 ${s.frames.p95Ms} p99 ${s.frames.p99Ms} max ${s.frames.maxMs} >20ms ${s.frames.over20ms} >33ms ${s.frames.over33ms} hitch ${s.frames.hitchShare} | inf ${s.inference.thread} ${s.inference.fpsMean} fps p95 ${s.inference.msP95} ms | LoAF ${s.longAnimationFrames.count}`)
+}

@@ -61,7 +61,7 @@ export function GameFlow({ gameId, settings, onSettings, onHub }: { gameId: Game
     setError(null)
     setStarting(true)
     try {
-      const next = await startMotionSession({ synthetic: FLAGS.synthetic, bot: game.bot, missEvery: FLAGS.missEvery, delegate: FLAGS.delegate })
+      const next = await startMotionSession({ synthetic: FLAGS.synthetic, bot: game.bot, missEvery: FLAGS.missEvery, delegate: FLAGS.delegate, inference: FLAGS.inference })
       sessionRef.current = next
       setSession(next)
     } catch (e) {

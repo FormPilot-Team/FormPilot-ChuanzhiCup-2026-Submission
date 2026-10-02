@@ -3,6 +3,8 @@
 // string hand on the nock. Drawing pulls the nock back, the limbs flex, a reticle on the target shows
 // where the arrow would land now (driven by the real bow-hand drift and steadiness) and tightens while
 // the hold fills. RELEASE sends the arrow along that line; the hit is exactly the predicted point.
+// Bow flex and reticle are eased every rendered frame (the pose only arrives at ~30 Hz); the hit itself is
+// computed from the unsmoothed release data.
 import * as Phaser from 'phaser'
 import type { Point } from '../../motion/contracts'
 import { sfx } from '../../shared/audio'
@@ -10,6 +12,7 @@ import { HandCursor, paintHandTextures } from '../../shared/handCursor'
 import { perf } from '../../shared/perf'
 import { FONT_FAMILY, paintTexture } from '../../shared/phaserHost'
 import { drawDebugBody } from '../../shared/play/debugOverlay'
+import { Follow1D } from '../../shared/smoothing'
 import { paintSparkle } from '../../shared/world/painters'
 import { paintArrow, paintRangeBackdrop, paintSign, paintTargetFace, paintTargetStand } from '../../shared/world/range'
 import { RINGS, SHOT_TIMING, STAGES } from './config'
@@ -48,6 +51,8 @@ export class ArcheryScene extends Phaser.Scene {
   private snapAt = -Infinity
   private creakLevel = 0
   private resizeTimer?: Phaser.Time.TimerEvent
+  private readonly flexView = new Follow1D(40)
+  private readonly aimView = { x: new Follow1D(60), y: new Follow1D(60) }
 
   constructor() {
     super('archery')
@@ -168,10 +173,12 @@ export class ArcheryScene extends Phaser.Scene {
     const snapT = (now - this.snapAt) / 320
     const snap = snapT >= 0 && snapT < 1 ? Math.sin(snapT * Math.PI * 4) * (1 - snapT) * 0.12 : 0
     const live = playing && (d.phase === 'draw' || d.phase === 'hold' || d.phase === 'armed')
-    const flex = Math.max(0, Math.min(1.15, live ? d.drawRatio : 0)) + snap
+    // after a release the string snaps straight back (no easing), otherwise the flex glides
+    if (sinceShot >= 0 && sinceShot < 60) this.flexView.snap(0, now)
+    const flex = this.flexView.step(Math.max(0, Math.min(1.15, live ? d.drawRatio : 0)), now) + snap
     const g = this.bowGeometry(flex)
     this.drawBow(g, live)
-    this.drawReticle(d.phase, d.holdProgress, live, time)
+    this.drawReticle(d.phase, d.holdProgress, live, time, now)
     // arrow on the string while drawing; hidden while one is in flight
     // the next arrow is nocked once the previous one has landed
     const showArrow = playing && !this.flying && (sinceShot < 0 || sinceShot > SHOT_TIMING.releaseShowMs + SHOT_TIMING.flightMs + SHOT_TIMING.hitShowMs)
@@ -234,14 +241,18 @@ export class ArcheryScene extends Phaser.Scene {
     b.strokePath()
   }
 
-  private drawReticle(phase: string, holdProgress: number, live: boolean, time: number): void {
+  private drawReticle(phase: string, holdProgress: number, live: boolean, time: number, now: number): void {
     const r = this.reticle
     r.clear()
-    if (!live || this.flying) return
+    if (!live || this.flying) {
+      this.aimView.x.reset()
+      this.aimView.y.reset()
+      return
+    }
     const d = this.controller.draw()
     const c = this.targetCenter()
     const offset = aimOffset({ aim: d.aim, stability: d.stability, drawRatio: Math.max(d.drawRatio, phase === 'draw' ? 0 : 1) }, this.controller.round.params, STAGES[this.stageView].offsetScale)
-    const p = { x: c.x + offset.x * this.targetR, y: c.y + offset.y * this.targetR }
+    const p = { x: c.x + this.aimView.x.step(offset.x, now) * this.targetR, y: c.y + this.aimView.y.step(offset.y, now) * this.targetR }
     const armed = phase === 'armed'
     const size = this.targetR * (phase === 'draw' ? 0.55 : 0.18 + 0.32 * (1 - holdProgress))
     const color = armed ? 0xffc94d : 0xffffff

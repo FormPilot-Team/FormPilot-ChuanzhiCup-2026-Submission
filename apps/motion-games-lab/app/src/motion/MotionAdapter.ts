@@ -48,7 +48,14 @@ export interface AdapterDiagnostics {
   samples: number
   inferenceFps: number
   inferenceMsLast: number
+  inferenceMsP50: number
   inferenceMsP95: number
+  /** where pose inference runs: 'worker' (default) or 'main' */
+  inferenceThread: PoseSourceInfo['inferenceThread']
+  /** camera frames skipped while inference was busy (latest-frame-only, no queue) */
+  framesDropped: number
+  /** main-thread cost of turning one pose into a MotionFrame + events (ms, p95) */
+  motionMsP95: number
   frameConfidence: number
   tracking: MotionFrame['tracking']
   posture: PostureFlags
@@ -88,6 +95,7 @@ export class MotionAdapter implements MotionAdapterApi {
   private lastSampleAt = 0
   private sampleTimes: number[] = []
   private inferenceMs: number[] = []
+  private motionMs: number[] = []
   private samples = 0
   private recent: AdapterDiagnostics['recentEvents'] = []
   private detecting = true
@@ -186,13 +194,19 @@ export class MotionAdapter implements MotionAdapterApi {
     const now = performance.now()
     const recentSamples = this.sampleTimes.filter((t) => now - t <= 2000)
     const sorted = [...this.inferenceMs].sort((a, b) => a - b)
+    const motion = [...this.motionMs].sort((a, b) => a - b)
     const m = this.latestMeasures
+    const source = this.source.info()
     return {
-      source: this.source.info(),
+      source,
       samples: this.samples,
       inferenceFps: recentSamples.length > 1 ? ((recentSamples.length - 1) * 1000) / (recentSamples[recentSamples.length - 1] - recentSamples[0]) : 0,
       inferenceMsLast: this.inferenceMs[this.inferenceMs.length - 1] ?? 0,
+      inferenceMsP50: sorted.length ? sorted[Math.floor((sorted.length - 1) * 0.5)] : 0,
       inferenceMsP95: sorted.length ? sorted[Math.floor((sorted.length - 1) * 0.95)] : 0,
+      inferenceThread: source.inferenceThread,
+      framesDropped: source.framesDropped,
+      motionMsP95: motion.length ? motion[Math.floor((motion.length - 1) * 0.95)] : 0,
       frameConfidence: this.latest?.confidence ?? 0,
       tracking: this.latest?.tracking ?? { body: false, left: false, right: false },
       posture: this.latest?.posture ?? { torsoLean: false, shrug: false, shrugSide: null, leanDegrees: null, shrugRatio: { left: null, right: null } },
@@ -210,6 +224,7 @@ export class MotionAdapter implements MotionAdapterApi {
 
   /** Public for synthetic/manual sources and tests; camera sources call it through onSample. */
   process(sample: RawPoseSample): void {
+    const started = performance.now()
     if (!sample.stale) {
       this.lastSampleAt = performance.now()
       this.samples += 1
@@ -256,6 +271,8 @@ export class MotionAdapter implements MotionAdapterApi {
     }
     if (this.recent.length > 14) this.recent.length = 14
     for (const listener of this.listeners) listener(frame, events)
+    this.motionMs.push(performance.now() - started)
+    if (this.motionMs.length > 300) this.motionMs.shift()
   }
 }
 

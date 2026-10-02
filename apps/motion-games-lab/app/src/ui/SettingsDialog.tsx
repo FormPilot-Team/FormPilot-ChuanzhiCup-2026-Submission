@@ -14,7 +14,7 @@ export function SettingsDialog({ settings, onChange, onClose }: { settings: Sett
         <h2>设置</h2>
         <div className="field">
           <div className="option-label">每局时长</div>
-          <div className="seg">
+          <div className="seg even" data-testid="round-options">
             {ROUND_OPTIONS.map((s) => (
               <button key={s} aria-pressed={settings.roundSeconds === s} onClick={() => set({ roundSeconds: s })}>{s / 60} 分钟</button>
             ))}

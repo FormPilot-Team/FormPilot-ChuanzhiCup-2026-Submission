@@ -32,10 +32,14 @@ export function DebugPanel({ session, controller }: { session: MotionSession | n
       <button style={{ float: 'right' }} onClick={() => setOpen(false)}>×</button>
       <h4>performance</h4>
       <table><tbody>
-        <tr><td>render fps</td><td>{f(perf.renderFps(), 1)}</td></tr>
-        <tr><td>frame p95 ms</td><td>{f(perf.frameTimeP95(), 1)}</td></tr>
+        <tr><td>render fps (avg 5 s)</td><td>{f(perf.renderFps(), 1)}</td></tr>
+        <tr><td>frame ms p95 / max (5 s)</td><td data-testid="debug-frame-time">{f(perf.frameTimeP95(), 1)} / {f(perf.frameTimeMax(), 1)}</td></tr>
+        <tr><td>frames &gt;33 ms (5 s)</td><td>{perf.slowFrames(33)}</td></tr>
+        <tr><td>inference thread</td><td data-testid="debug-inference-thread">{d?.inferenceThread ?? '—'}{d?.source.workerFallback ? ` (${d.source.workerFallback})` : ''}</td></tr>
         <tr><td>inference fps</td><td>{f(d?.inferenceFps, 1)}</td></tr>
-        <tr><td>inference ms last / p95</td><td>{f(d?.inferenceMsLast, 1)} / {f(d?.inferenceMsP95, 1)}</td></tr>
+        <tr><td>inference ms last / p50 / p95</td><td>{f(d?.inferenceMsLast, 1)} / {f(d?.inferenceMsP50, 1)} / {f(d?.inferenceMsP95, 1)}</td></tr>
+        <tr><td>main-thread pose ms p95</td><td>{f(d?.motionMsP95, 2)}</td></tr>
+        <tr><td>camera frames skipped</td><td>{d?.framesDropped ?? '—'}</td></tr>
         <tr><td>frame→render ms p50 / p95</td><td>{f(percentile(controller?.frameLatencies ?? [], 0.5), 0)} / {f(percentile(controller?.frameLatencies ?? [], 0.95), 0)}</td></tr>
         <tr><td>event→render ms p50 / p95</td><td>{f(percentile(latency, 0.5), 0)} / {f(percentile(latency, 0.95), 0)}</td></tr>
         <tr><td>long tasks</td><td>{perf.longTasks} ({f(perf.longTaskMs, 0)} ms)</td></tr>
@@ -74,10 +78,11 @@ export function DebugPanel({ session, controller }: { session: MotionSession | n
         <tr><td>lean on/off °</td><td>{POSTURE_CONFIG.leanOnDeg} / {POSTURE_CONFIG.leanOffDeg}</td></tr>
         <tr><td>shrug on/off</td><td>{POSTURE_CONFIG.shrugOnRatio} / {POSTURE_CONFIG.shrugOffRatio}</td></tr>
         <tr><td>calib neutral / hold ms</td><td>{CALIBRATION_CONFIG.neutralMs} / {CALIBRATION_CONFIG.reachHoldMs}</td></tr>
-        <tr><td>stroke start / neutral band</td><td>{STROKE_CONFIG.startBand} / {STROKE_CONFIG.neutralBand}</td></tr>
-        <tr><td>stroke min catch / outside</td><td>{STROKE_CONFIG.minCatchMs} ms / {STROKE_CONFIG.sweepMinOutside}</td></tr>
+        <tr><td>stroke start / return (SW / share)</td><td>{STROKE_CONFIG.startBand} / {STROKE_CONFIG.returnShare}</td></tr>
+        <tr><td>stroke min catch / confirm</td><td>{STROKE_CONFIG.minCatchMs} ms / {STROKE_CONFIG.confirmFrames} frames</td></tr>
         <tr><td>draw start / turn ratio</td><td>{DRAW_CONFIG.startDelta} / {DRAW_CONFIG.turnRatio}</td></tr>
-        <tr><td>bow elbow min° / release</td><td>{DRAW_CONFIG.bowElbowMinDeg} / {DRAW_CONFIG.releaseTravel} in {DRAW_CONFIG.releaseWindowMs} ms</td></tr>
+        <tr><td>bow arm ok° / bent° / sustain</td><td>{DRAW_CONFIG.bowArmOkDeg} / {DRAW_CONFIG.bowArmBentDeg} / {DRAW_CONFIG.guardSustainMs} ms</td></tr>
+        <tr><td>release travel / confirm / window</td><td>≥{DRAW_CONFIG.releaseTravel} · {DRAW_CONFIG.releaseConfirmFrames} fr {DRAW_CONFIG.releaseConfirmMs} ms · {DRAW_CONFIG.releaseWindowMs} ms</td></tr>
       </tbody></table>
       <h4>motion events</h4>
       {d?.recentEvents.map((e, i) => (

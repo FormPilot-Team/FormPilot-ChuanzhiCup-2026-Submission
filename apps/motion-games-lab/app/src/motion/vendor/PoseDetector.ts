@@ -4,7 +4,9 @@
 // - presence is no longer forced to 1 (Phase 0 audit: a constant 1 looks like a real confidence);
 // - detect() skips non-increasing timestamps instead of letting MediaPipe throw;
 // - lastInferenceMs records the synchronous detectForVideo cost for the debug panel;
-// - optional `delegate` forces GPU or CPU (performance comparison) instead of GPU-then-CPU.
+// - optional `delegate` forces GPU or CPU (performance comparison) instead of GPU-then-CPU;
+// - worker-safe (Motion Games Lab round 1): ImageBitmap input, no DOM globals assumed, and the ES-module
+//   WASM loader (`wasmModule`) so it can run inside a module Worker.
 // GPU-first / CPU-fallback order, VIDEO mode, numPoses=1 and confidence options are unchanged.
 import type { PoseFrame, PoseLandmark } from './poseTypes'
 
@@ -13,6 +15,8 @@ export interface PoseDetectorConfig {
   modelAssetPath: string
   minConfidence: number
   delegate?: PoseDelegate
+  /** load the ES-module WASM loader (required inside a module Worker, where importScripts is unavailable) */
+  wasmModule?: boolean
 }
 
 export interface PoseDetectorLike {
@@ -21,7 +25,12 @@ export interface PoseDetectorLike {
   close(): void
 }
 
-export type PoseImageSource = HTMLVideoElement | HTMLImageElement | HTMLCanvasElement
+export type PoseImageSource = HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | ImageBitmap
+
+const isA = <T>(ctor: string, value: unknown): value is T => {
+  const C = (globalThis as Record<string, unknown>)[ctor]
+  return typeof C === 'function' && value instanceof (C as new () => unknown)
+}
 
 export type PoseDelegate = 'GPU' | 'CPU'
 
@@ -91,9 +100,10 @@ export class PoseDetector implements PoseDetectorLike {
   detect(source: PoseImageSource, timestamp: number): PoseFrame | null {
     if (!this.landmarker) return null
     if (timestamp <= this.lastTimestamp) return null
-    if (source instanceof HTMLVideoElement && source.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return null
-    if (source instanceof HTMLImageElement && (!source.complete || source.naturalWidth === 0)) return null
-    if (source instanceof HTMLCanvasElement && (source.width === 0 || source.height === 0)) return null
+    if (isA<HTMLVideoElement>('HTMLVideoElement', source) && source.readyState < 2 /* HAVE_CURRENT_DATA */) return null
+    if (isA<HTMLImageElement>('HTMLImageElement', source) && (!source.complete || source.naturalWidth === 0)) return null
+    if (isA<HTMLCanvasElement>('HTMLCanvasElement', source) && (source.width === 0 || source.height === 0)) return null
+    if (isA<ImageBitmap>('ImageBitmap', source) && (source.width === 0 || source.height === 0)) return null
     this.lastTimestamp = timestamp
     const started = performance.now()
     const result = this.landmarker.detectForVideo(source, timestamp)
@@ -143,7 +153,7 @@ export class PoseDetector implements PoseDetectorLike {
     this.initializationCount += 1
     const { FilesetResolver, PoseLandmarker } = await import('@mediapipe/tasks-vision')
     const model = await this.fetchModel()
-    const vision = await FilesetResolver.forVisionTasks(this.config.wasmRoot)
+    const vision = await FilesetResolver.forVisionTasks(this.config.wasmRoot, this.config.wasmModule === true)
     const create = (delegate: PoseDelegate) => PoseLandmarker.createFromOptions(vision, {
       baseOptions: { modelAssetBuffer: model, delegate },
       runningMode: 'VIDEO',

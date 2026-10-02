@@ -49,7 +49,6 @@ export class ArcheryController extends PlayController<ArcheryRound, ArcheryEffec
   readonly drawSide: Side
   lastShot: Shot | null = null
   private shotAt = -Infinity
-  private guardSince: { guard: DrawGuard; at: number } | null = null
 
   constructor(adapter: MotionAdapterApi, round: ArcheryRound, options: PlayOptions & { drawSide: Side; armLength: number }) {
     super(adapter, round, 'draw', options)
@@ -74,6 +73,7 @@ export class ArcheryController extends PlayController<ArcheryRound, ArcheryEffec
   instruction(now: number = performance.now()): string | null {
     if (this.status !== 'playing') return null
     const d = this.draw()
+    // only a guard that has persisted replaces the step instruction (single frames never do)
     if (d.guard && (d.phase === 'draw' || d.phase === 'hold' || d.phase === 'armed')) return GUARD_TEXT[d.guard]
     switch (this.phase(now)) {
       case 'READY': return d.phase === 'ready' ? COPY.archery.draw : COPY.archery.ready
@@ -82,6 +82,14 @@ export class ArcheryController extends PlayController<ArcheryRound, ArcheryEffec
       case 'RESET': return COPY.archery.reset
       default: return null
     }
+  }
+
+  /** A gentle extra line under the instruction (never blocks the shot), or null. */
+  softHint(): string | null {
+    if (this.status !== 'playing') return null
+    const d = this.draw()
+    if (d.guard || !d.hint || !(d.phase === 'draw' || d.phase === 'hold' || d.phase === 'armed')) return null
+    return COPY.archery.bowArmSoft
   }
 
   tracked(side: Side): boolean {
@@ -95,7 +103,8 @@ export class ArcheryController extends PlayController<ArcheryRound, ArcheryEffec
       ['draw side / goal', `${d.options.drawSide} / ${d.options.drawGoal.toFixed(2)}`],
       ['draw ratio / hold', `${d.drawRatio.toFixed(2)} / ${d.holdProgress.toFixed(2)}`],
       ['stability / aim', `${d.stability.toFixed(2)} / ${d.aim.x.toFixed(3)}, ${d.aim.y.toFixed(3)}`],
-      ['guard', d.guard ?? '—'],
+      ['guard / hint', `${d.guard ?? '—'} / ${d.hint ?? '—'}`],
+      ['peak ratio / release travel', `${d.peakRatio.toFixed(2)} / ${(Math.max(0.2, 0.3 * d.options.drawGoal)).toFixed(2)}`],
       ['shots / hits', `${this.round.shots.length} / ${this.round.hits()}`],
     ]
   }
@@ -105,12 +114,9 @@ export class ArcheryController extends PlayController<ArcheryRound, ArcheryEffec
   }
 
   protected onFrame(frame: MotionFrame, events: readonly MotionEvent[]): void {
-    // a guard that lasts a moment gets a coaching line (the detector cancels if it persists)
+    // a guard has already persisted in the detector (guardSustainMs): one coaching line per cooldown
     const guard = this.draw().guard
-    if (guard) {
-      if (!this.guardSince || this.guardSince.guard !== guard) this.guardSince = { guard, at: frame.timestamp }
-      else if (frame.timestamp - this.guardSince.at > 300) this.coach(guard, GUARD_TEXT[guard], frame.timestamp)
-    } else this.guardSince = null
+    if (guard) this.coach(guard, GUARD_TEXT[guard], frame.timestamp)
     for (const event of events) {
       if (event.type !== 'DRAW_CANCEL') continue
       if (event.reason === 'lowered') this.coach('lowered', COPY.archery.lowered, frame.timestamp)

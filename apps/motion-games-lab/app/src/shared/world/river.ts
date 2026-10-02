@@ -282,7 +282,7 @@ export function paintBoat(ctx: Ctx, w: number, h: number): void {
   ctx.quadraticCurveTo(w * 0.5, h * 0.28, w * 0.96, h * 0.42)
   ctx.stroke()
   // a little flag at the bow-side seat
-  ctx.fillStyle = P.leftHand
+  ctx.fillStyle = P.teal
   ctx.beginPath()
   ctx.moveTo(w * 0.5, h * 0.05)
   ctx.lineTo(w * 0.62, h * 0.11)

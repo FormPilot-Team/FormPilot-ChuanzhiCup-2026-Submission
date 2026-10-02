@@ -21,6 +21,8 @@ export const APPLE_CURSOR = Object.freeze({
 
 export interface CursorView {
   position: Point | null
+  /** capture timestamp of the pose the position comes from (display interpolation) */
+  sampleAt: number | null
   tracked: boolean
   pose: CursorPose
   near: boolean
@@ -62,7 +64,7 @@ export class AppleController extends PlayController<AppleRound, AppleEffect> {
       holding: this.holdingSide === side && this.holdProgress > 0,
       grabbing: now < this.grabUntil[side],
     })
-    return { position, tracked: Boolean(f?.tracking[side]), pose, near }
+    return { position, sampleAt: f?.timestamp ?? null, tracked: Boolean(f?.tracking[side]), pose, near }
   }
 
   target(): AppleTarget | null {

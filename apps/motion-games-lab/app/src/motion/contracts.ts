@@ -104,7 +104,7 @@ export type MotionEvent = EventBase & (
   | { type: 'TARGET_HOLD'; targetId: number; side: Side; attemptId: number; progress: number; completed: boolean }
   | { type: 'TARGET_EXIT'; targetId: number; side: Side; attemptId: number; completed: boolean; reason: 'moved-out' | 'tracking-lost' | 'target-removed' }
   // ---- Boating ----
-  /** one paddle stroke reached its amplitude (the "catch"); the hand must return to neutral before the next */
+  /** one paddle stroke reached its amplitude (the "catch"); `amplitude` = hand travel in shoulder widths */
   | { type: 'STROKE_LEFT'; cycleId: number; amplitude: number; durationMs: number }
   | { type: 'STROKE_RIGHT'; cycleId: number; amplitude: number; durationMs: number }
   | { type: 'STROKE_CANCEL'; side: Side; cycleId: number; reason: StrokeCancelReason }
@@ -168,7 +168,7 @@ export type StrokePhase = 'wait' | 'ready' | 'out' | 'return'
 
 export interface StrokeOptions {
   scheme: StrokeScheme
-  /** displacement from the player's neutral needed for a stroke, torso units */
+  /** hand travel from the player's neutral needed for a stroke, in the player's shoulder widths */
   amplitude: number
 }
 
@@ -185,6 +185,8 @@ export interface StrokeSideState {
 
 export interface StrokeState {
   options: StrokeOptions
+  /** stroke length for this player right now (torso units) = amplitude × shoulder width */
+  reach: number
   left: StrokeSideState
   right: StrokeSideState
 }
@@ -193,7 +195,10 @@ export interface StrokeState {
 
 export type DrawPhase = 'wait-ready' | 'ready' | 'draw' | 'hold' | 'armed' | 'cooldown'
 export type DrawCancelReason = 'lowered' | 'turned' | 'bow-arm-bent' | 'elbow-only' | 'hands-low' | 'tracking-lost' | 'timeout' | 'paused'
+/** A condition that has persisted long enough to pause the hold (turned / hands-low eventually cancel). */
 export type DrawGuard = 'turned' | 'bow-arm-bent' | 'elbow-only' | 'hands-low' | null
+/** A gentle suggestion that never blocks or cancels the shot. */
+export type DrawHint = 'bow-arm-straighter' | null
 
 export interface DrawOptions {
   /** the hand that pulls the string; the other hand holds the bow */
@@ -216,8 +221,11 @@ export interface DrawState {
   /** bow-hand drift from the hold reference (torso units) — drives the aiming reticle */
   aim: Point
   guard: DrawGuard
+  hint: DrawHint
   /** 0..1 progress towards the READY pose (hands together in front of the chest) */
   readyProgress: number
+  /** confirmed peak draw of this attempt / goal (0 before HOLD) — the release is judged against it */
+  peakRatio: number
 }
 
 /**

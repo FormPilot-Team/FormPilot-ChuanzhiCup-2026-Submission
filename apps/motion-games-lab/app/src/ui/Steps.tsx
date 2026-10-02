@@ -62,7 +62,7 @@ export function IntroStep({ game, settings, onChange, onNext, onBack }: { game: 
           )}
           <div>
             <div className="option-label">时长</div>
-            <div className="seg">
+            <div className="seg even" data-testid="round-options">
               {ROUND_OPTIONS.map((s) => (
                 <button key={s} aria-pressed={settings.roundSeconds === s} onClick={() => onChange({ ...settings, roundSeconds: s })}>{s / 60} 分钟</button>
               ))}

@@ -1,7 +1,8 @@
-// Hand cursor art (Canvas 2D, generated in code). Three poses — open, half-closed, fist — per side,
-// in the two hand colours. The look is a friendly flat "mitten" with a white outline: clearly a hand,
-// neither childish nor realistic. Drawn palm-facing in the mirror view, so the right hand's thumb
-// points toward screen centre (left) and the left hand is its mirror image.
+// Hand cursor art (Canvas 2D, generated in code). Three poses — open, half-closed, fist. Round-1
+// playtest: both hands share ONE look — a warm-white hand with a thin warm outline and a soft shadow, a
+// little translucent, sitting quietly in the forest scenes. No colour coding and no 左/右 text: the two
+// hands are told apart by where they are on screen, exactly like a mirror. The only left/right difference
+// is the mirrored shape (the thumb points toward the screen centre, palm facing the player).
 import { PALETTE as P } from './palette'
 
 export type HandPose = 'open' | 'half' | 'grab'
@@ -90,17 +91,11 @@ function palmPath(ctx: Ctx, pose: HandPose, s: number, grow = 0): void {
   ctx.roundRect(x, y, w, h, [0.11 * s + grow, 0.11 * s + grow, 0.16 * s + grow, 0.16 * s + grow])
 }
 
-/**
- * Paint one hand cursor into a square canvas of `size` px. `label` (左/右) is printed on the palm
- * so left and right never rely on colour alone.
- */
-export function paintHand(ctx: Ctx, size: number, pose: HandPose, side: HandSide, label?: string): void {
+/** Paint one hand cursor into a square canvas of `size` px (the same design for both sides). */
+export function paintHand(ctx: Ctx, size: number, pose: HandPose, side: HandSide): void {
   const s = size * 0.9
   const pad = (size - s) / 2
-  const color = side === 'left' ? P.leftHand : P.rightHand
-  const deep = side === 'left' ? '#178a80' : '#d9701b'
-  const light = side === 'left' ? '#8ff0e3' : '#ffd29a'
-  const outline = Math.max(2, s * 0.045)
+  const outline = Math.max(1.5, s * 0.026)
   ctx.save()
   ctx.translate(pad, pad)
   if (side === 'left') {
@@ -110,13 +105,13 @@ export function paintHand(ctx: Ctx, size: number, pose: HandPose, side: HandSide
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
 
-  // 1) soft shadow + white outline (union of all parts)
+  // 1) soft shadow + thin warm outline (union of all parts)
   ctx.save()
-  ctx.shadowColor = 'rgba(20, 45, 35, 0.35)'
-  ctx.shadowBlur = s * 0.06
-  ctx.shadowOffsetY = s * 0.025
-  ctx.strokeStyle = '#ffffff'
-  ctx.fillStyle = '#ffffff'
+  ctx.shadowColor = 'rgba(24, 48, 36, 0.3)'
+  ctx.shadowBlur = s * 0.055
+  ctx.shadowOffsetY = s * 0.022
+  ctx.strokeStyle = P.handLine
+  ctx.fillStyle = P.handLine
   shapes(ctx, pose, s, (w) => {
     ctx.lineWidth = w + outline * 2
     ctx.stroke()
@@ -126,11 +121,11 @@ export function paintHand(ctx: Ctx, size: number, pose: HandPose, side: HandSide
   })
   ctx.restore()
 
-  // 2) colour fill
+  // 2) warm-white fill, a touch of shade toward the wrist
   const grad = ctx.createLinearGradient(0, s * 0.2, 0, s * 0.85)
-  grad.addColorStop(0, light)
-  grad.addColorStop(0.45, color)
-  grad.addColorStop(1, deep)
+  grad.addColorStop(0, P.handLight)
+  grad.addColorStop(0.55, P.handFill)
+  grad.addColorStop(1, P.handShade)
   ctx.strokeStyle = grad
   ctx.fillStyle = grad
   shapes(ctx, pose, s, (w) => {
@@ -141,53 +136,33 @@ export function paintHand(ctx: Ctx, size: number, pose: HandPose, side: HandSide
     ctx.fill()
   })
 
-  // 3) pose details: knuckle creases on the fist, a soft palm highlight otherwise
+  // 3) pose details: finger creases on the fist, a faint palm line otherwise
+  ctx.strokeStyle = 'rgba(120, 88, 62, 0.28)'
+  ctx.lineWidth = Math.max(1.2, s * 0.016)
   if (pose === 'grab') {
-    // curled finger segments
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.16)'
-    ctx.lineWidth = Math.max(1.5, s * 0.02)
     for (let i = 0; i < 3; i += 1) {
       const x = s * (0.433 + i * 0.086)
       ctx.beginPath()
       ctx.moveTo(x, s * 0.47)
-      ctx.lineTo(x, s * 0.6)
+      ctx.lineTo(x, s * 0.58)
       ctx.stroke()
     }
-    // thumb wrapped over the front, with its own outline so it reads as a separate part
+    // thumb wrapped over the front, outlined so it reads as its own part
     capsulePath(ctx, THUMB.grab, s)
-    ctx.strokeStyle = '#ffffff'
-    ctx.lineWidth = THUMB.grab.width * s + outline * 1.4
+    ctx.strokeStyle = P.handLine
+    ctx.lineWidth = THUMB.grab.width * s + outline * 2
     ctx.stroke()
     ctx.strokeStyle = grad
     ctx.lineWidth = THUMB.grab.width * s
     ctx.stroke()
   } else {
-    const shine = ctx.createRadialGradient(s * 0.44, s * 0.55, 0, s * 0.44, s * 0.55, s * 0.18)
-    shine.addColorStop(0, 'rgba(255, 255, 255, 0.45)')
-    shine.addColorStop(1, 'rgba(255, 255, 255, 0)')
-    ctx.fillStyle = shine
     ctx.beginPath()
-    ctx.arc(s * 0.44, s * 0.55, s * 0.18, 0, Math.PI * 2)
-    ctx.fill()
+    ctx.moveTo(s * 0.4, s * 0.62)
+    ctx.quadraticCurveTo(s * 0.5, s * (pose === 'half' ? 0.66 : 0.68), s * 0.6, s * 0.6)
+    ctx.stroke()
   }
   ctx.restore()
-
-  if (label) {
-    // label stays readable (not mirrored): printed after the transform is restored
-    ctx.save()
-    ctx.font = `800 ${Math.round(s * 0.17)}px "PingFang SC", "Microsoft YaHei", system-ui, sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.lineWidth = Math.max(2, s * 0.03)
-    ctx.strokeStyle = deep
-    const cx = pad + (side === 'left' ? s * 0.495 : s * 0.505)
-    const cy = pad + s * (pose === 'grab' ? 0.565 : 0.655)
-    ctx.strokeText(label, cx, cy)
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText(label, cx, cy)
-    ctx.restore()
-  }
 }
 
-/** Small round marker in the hand colour (used in the camera window, not on the playfield). */
-export const HAND_HEX = { left: P.leftHand, right: P.rightHand } as const
+/** Camera-window marker colours (formal mode): the same warm white as the cursor, for both hands. */
+export const HAND_MARKER = { fill: P.handFill, ring: 'rgba(108, 80, 58, 0.75)' } as const

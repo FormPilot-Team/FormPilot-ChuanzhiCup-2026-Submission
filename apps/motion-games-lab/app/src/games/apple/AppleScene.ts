@@ -284,7 +284,7 @@ export class AppleScene extends Phaser.Scene {
       const c = this.controller.cursor(side, now)
       const cursor = this.cursors[side]
       cursor.setSize(size)
-      cursor.update(now, { position: c.position ? this.toScreen(c.position) : null, tracked: c.tracked, pose: c.pose, near: c.near }, 1 / this.layout.s)
+      cursor.update(now, { position: c.position ? this.toScreen(c.position) : null, sampleAt: c.sampleAt ?? undefined, tracked: c.tracked, pose: c.pose, near: c.near }, 1 / this.layout.s)
     }
   }
 

@@ -45,12 +45,14 @@ export function ArcheryPlay({ session, profile, settings, durationMs, onEnd, onR
       instruction={(c: ArcheryController) => {
         const phase = c.phase()
         const text = c.instruction()
+        const soft = c.softHint()
         return (
           <>
             <span className="steps" aria-hidden="true">
               {STEPS.map((s) => <i key={s.label} className={s.phases.includes(phase) ? 'on' : ''}>{s.label}</i>)}
             </span>
             {text && <b data-phase={phase}>{text}</b>}
+            {soft && <small className="soft-hint" data-testid="soft-hint">{soft}</small>}
           </>
         )
       }}

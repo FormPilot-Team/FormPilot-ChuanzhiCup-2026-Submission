@@ -29,9 +29,14 @@ export function createPhaserHost(parent: HTMLElement, key: string, scene: Phaser
     scale: { mode: Phaser.Scale.NONE, width: Math.round(w * dpr), height: Math.round(h * dpr), zoom: 1 / dpr },
     // Uncapped by default: Phaser's limiter skips whole vsync frames (e.g. ~48 fps on a 144 Hz
     // display). ?fpsLimit=N exists for performance comparisons.
-    fps: { smoothStep: true, limit: FLAGS.fpsLimit ?? 0 },
+    // smoothStep off (Round 1): Phaser's delta averaging fed tweens an average delta while frames
+    // actually arrived unevenly, so animations drifted against real time; with inference off the main
+    // thread, frames are even and the true delta keeps every tween in step with the clock.
+    fps: { smoothStep: false, limit: FLAGS.fpsLimit ?? 0 },
   })
   game.scene.add(key, scene, true, data)
+  // Test / debug hook (read-only, like window.__mgl): lets automated checks inspect textures and scene state.
+  ;(window as unknown as { __mglGame?: Phaser.Game }).__mglGame = game
   const observer = new ResizeObserver(() => {
     const next = size()
     game.scale.resize(Math.round(next.w * dpr), Math.round(next.h * dpr))

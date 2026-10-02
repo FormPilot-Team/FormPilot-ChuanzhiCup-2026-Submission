@@ -149,8 +149,8 @@ export function paintArrow(ctx: Ctx, w: number, h: number): void {
   ctx.lineTo(w * 0.13, y + h * 0.34)
   ctx.closePath()
   ctx.fill()
-  // fletching in the left-hand colour
-  ctx.fillStyle = P.leftHand
+  // teal fletching
+  ctx.fillStyle = P.teal
   for (const s of [-1, 1]) {
     ctx.beginPath()
     ctx.moveTo(w * 0.8, y)

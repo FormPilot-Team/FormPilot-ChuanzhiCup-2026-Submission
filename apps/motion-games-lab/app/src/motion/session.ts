@@ -21,11 +21,11 @@ export function directorContext(adapter: MotionAdapter): DirectorContext {
   }
 }
 
-export async function startMotionSession(options: { synthetic: boolean; bot?: BotKind; missEvery?: number | null; delegate?: 'GPU' | 'CPU' | null }): Promise<MotionSession> {
+export async function startMotionSession(options: { synthetic: boolean; bot?: BotKind; missEvery?: number | null; delegate?: 'GPU' | 'CPU' | null; inference?: 'auto' | 'main' }): Promise<MotionSession> {
   const synthetic = options.synthetic ? new SyntheticPoseSource({ seed: 7 }) : null
   if (synthetic && options.bot) synthetic.useBot(options.bot)
   if (synthetic && options.missEvery) synthetic.bot.missEvery = options.missEvery
-  const source: PoseSource = synthetic ?? new CameraPoseSource({ delegate: options.delegate ?? undefined })
+  const source: PoseSource = synthetic ?? new CameraPoseSource({ delegate: options.delegate ?? undefined, inference: options.inference })
   const adapter = new MotionAdapter(source)
   synthetic?.attach(directorContext(adapter))
   await adapter.start()

@@ -1,23 +1,29 @@
 // Archery draw detector. Detector phases (the game adds HIT and RESET around them):
 //
 //   wait-ready ─(hands together in front of the chest, steady)─▶ ready ─(hands move apart)─▶ draw
-//   draw ─(full draw, no guard)─▶ hold ─(steady for holdMs)─▶ armed ─(quick directional return of
-//   the string hand)─▶ RELEASE ─▶ cooldown ─▶ wait-ready
+//   draw ─(full draw)─▶ hold ─(steady for holdMs)─▶ armed ─(confirmed snap back of the string hand)─▶
+//   RELEASE ─▶ cooldown ─▶ wait-ready
 //
-// Guards (all lab engineering parameters awaiting human playtests):
-// - torso rotation: a frontal camera cannot see a twist directly, but the projected shoulder width
-//   shrinks; below turnRatio × the player's frontal width (a slow-adapting reference) the draw does
-//   not progress.
-// - elbow flexion: the bow arm must stay fairly straight; the string-hand elbow must travel outward
-//   (a wrist flick produced by elbow bending alone does not count as drawing).
-// - hands low: the bow is held at chest/shoulder height.
-// A guard that persists for guardCancelMs cancels the attempt (no shot, no penalty). Tracking loss
-// cancels immediately: losing the hands is never interpreted as letting go of the string.
-// Debounce: the draw must exceed startDelta for startFrames frames; one attemptId releases at most
-// once; after a release the hands must return to READY and a cooldown must pass.
-// The release is a pose mapping (string hand returns quickly toward the bow hand), not finger
-// detection. Draw amount is a wrist-separation proxy, never a horizontal-abduction angle.
-import type { DrawCancelReason, DrawGuard, DrawOptions, DrawPhase, DrawState, MotionEvent, MotionFrame, Point, Side } from './contracts'
+// Round-1 playtest fixes:
+// 1. RELEASE is judged against the CONFIRMED peak draw, never a single frame. Both wrists are
+//    median-filtered over three frames (so is every hold / drift / speed check); the peak is the highest filtered draw since HOLD began; a release
+//    needs the filtered draw to fall below `peak − releaseTravel` on `releaseConfirmFrames` consecutive
+//    frames spanning `releaseConfirmMs`, and it must happen within `releaseWindowMs` of leaving the peak
+//    (a slow sink is lowering the bow, not letting go). Coming back above `peak − releaseTravel / 2`
+//    resets the confirmation (hysteresis). Only an ARMED attempt (HOLD fully held = minimum hold time)
+//    can release; one attempt releases at most once; a cooldown follows. Before: the "peak" was the
+//    single highest raw sample of the last 450 ms, so one noisy frame (common when the string hand is
+//    near the face) looked like a 0.22 drop and fired the arrow while the player was still drawing.
+// 2. Guards no longer act on a single frame. A condition must persist (`guardSustainMs` for the elbow
+//    checks, `postureSustainMs` for turned / hands low) before it becomes a guard; a guard pauses the hold instead of cancelling. Only "turned" / "hands low" cancel,
+//    and only after persisting a further `guardCancelMs`. The bow-arm check is tiered: a mildly bent arm
+//    only earns a soft hint (`hint`), a clearly bent arm held for 700 ms pauses the hold — before, any
+//    2D elbow angle under 120° (perspective alone produces that) blocked and then cancelled the shot.
+// Tracking loss cancels at once: losing the hands is never interpreted as letting go of the string.
+// The release is a pose mapping (string hand returns quickly toward the bow hand), not finger detection.
+// The draw amount is a wrist-separation proxy, never a horizontal-abduction angle.
+// All values are lab engineering parameters awaiting more playtests.
+import type { DrawCancelReason, DrawGuard, DrawHint, DrawOptions, DrawPhase, DrawState, MotionEvent, MotionFrame, Point, Side } from './contracts'
 
 export const DRAW_CONFIG = Object.freeze({
   /** wrists this close (signed x separation, torso units) count as "hands together" */
@@ -44,24 +50,45 @@ export const DRAW_CONFIG = Object.freeze({
   /** rms bow/string-hand wobble that maps to stability 0 */
   stabilityScale: 0.09,
   stabilityWindowMs: 600,
-  /** release = separation drops this much... */
-  releaseTravel: 0.22,
-  /** ...within this time, mostly by the string hand moving toward the bow */
+  /** release = the filtered draw falls this far below its confirmed peak (torso units, at least)… */
+  releaseTravel: 0.2,
+  /** …or this share of the draw goal, whichever is larger */
+  releaseTravelShare: 0.3,
+  /** …on this many consecutive frames, spanning at least this long… */
+  releaseConfirmFrames: 2,
+  releaseConfirmMs: 50,
+  /** …within this time after the draw left its peak (slower = the bow was lowered: no shot) */
   releaseWindowMs: 450,
+  /** "at the peak" band used to time the release (torso units below the peak) */
+  peakBand: 0.06,
   armedTimeoutMs: 9000,
   attemptTimeoutMs: 20_000,
   cooldownMs: 900,
+  /** a torso turn: projected shoulder width below this share of the frontal width (unchanged since Stage C–E) */
   turnRatio: 0.8,
-  bowElbowMinDeg: 120,
-  drawElbowOutMin: 0.08,
-  guardCancelMs: 600,
+  /** bow arm (2D elbow angle, deg): at or above `bowArmOkDeg` fine; below it a soft hint; below `bowArmBentDeg` a guard */
+  bowArmOkDeg: 125,
+  bowArmBentDeg: 95,
+  /** the bow-arm check only applies once the bow is mostly drawn (the arm is extended by then) */
+  bowArmFromRatio: 0.6,
+  /** the string elbow must travel at least this far outward over a full draw, else "elbow-only" */
+  drawElbowOutMin: 0.04,
+  /** an elbow condition (bow arm bent, elbow-only draw) must persist this long before it pauses the hold */
+  guardSustainMs: 700,
+  /** a posture condition (turned, hands low) must persist this long (single frames never count) */
+  postureSustainMs: 400,
+  /** turned / hands-low: persisting this much longer cancels the attempt (no shot, no penalty) */
+  guardCancelMs: 800,
 })
 
 type Pending = MotionEvent extends infer E ? (E extends MotionEvent ? Omit<E, 'id' | 'emittedAt'> : never) : never
 
 interface Sample {
   t: number
+  /** median-filtered separation */
   span: number
+  /** unfiltered separation of this frame */
+  raw: number
   bow: Point
   draw: Point
 }
@@ -77,6 +104,11 @@ interface Arms {
 }
 
 const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y)
+const median3 = (values: number[]) => {
+  if (values.length < 3) return values[values.length - 1]
+  const [a, b, c] = values.slice(-3)
+  return Math.max(Math.min(a, b), Math.min(Math.max(a, b), c))
+}
 
 /** Interior angle at the elbow (180 = straight arm). */
 export function elbowAngleDeg(shoulder: Point, elbow: Point, wrist: Point): number {
@@ -90,6 +122,8 @@ export function elbowAngleDeg(shoulder: Point, elbow: Point, wrist: Point): numb
 }
 
 export const DEFAULT_DRAW_OPTIONS: DrawOptions = { drawSide: 'right', drawGoal: 0.6, holdMs: 900 }
+
+type GuardKind = Exclude<DrawGuard, null>
 
 export class DrawDetector {
   private options: DrawOptions = { ...DEFAULT_DRAW_OPTIONS }
@@ -106,20 +140,39 @@ export class DrawDetector {
   private startedAt = 0
   private holdStart = 0
   private holdRef: { bow: Point; draw: Point } | null = null
-  private armedPeak = 0
   private guard: DrawGuard = null
+  private hint: DrawHint = null
+  /** when each raw guard condition started (it only becomes a guard after guardSustainMs) */
+  private conditionSince: Partial<Record<GuardKind, number>> = {}
   private guardSince: number | null = null
+  private bowAngle: number | null = null
   private lastAt: number | null = null
+  private lastRawSpan = 0
   private ratio = 0
   private holdProgress = 0
   private stability = 1
   private aim: Point = { x: 0, y: 0 }
   private samples: Sample[] = []
+  /** last three wrist pairs: every judgement uses their per-coordinate median, so one glitched frame never counts */
+  private wrists: { bow: Point; draw: Point }[] = []
+  // release confirmation
+  private peak = 0
+  private peakSample: Sample | null = null
+  private nearPeakAt = 0
+  /** last sample still at the peak: aim and steadiness are read here, just before the release */
+  private nearPeakSample: Sample | null = null
+  private releaseFrames = 0
+  private releaseSince: number | null = null
 
   configure(options: Partial<DrawOptions>): void {
     const sideChanged = options.drawSide !== undefined && options.drawSide !== this.options.drawSide
     this.options = { ...this.options, ...options }
     if (sideChanged) this.toWaitReady()
+  }
+
+  /** Drop below the confirmed peak that counts as letting go (torso units). */
+  releaseTravel(): number {
+    return Math.max(DRAW_CONFIG.releaseTravel, DRAW_CONFIG.releaseTravelShare * this.options.drawGoal)
   }
 
   state(): DrawState {
@@ -132,9 +185,11 @@ export class DrawDetector {
       stability: this.stability,
       aim: { ...this.aim },
       guard: this.guard,
+      hint: this.hint,
       readyProgress: this.phase === 'wait-ready' && this.readySince !== null && this.lastAt !== null
         ? Math.min(1, (this.lastAt - this.readySince) / DRAW_CONFIG.readyMs)
         : this.phase === 'wait-ready' || this.phase === 'cooldown' ? 0 : 1,
+      peakRatio: this.peak > 0 ? (this.peak - this.readySpan) / this.options.drawGoal : 0,
     }
   }
 
@@ -150,19 +205,31 @@ export class DrawDetector {
     const now = frame.timestamp
     const dt = this.lastAt === null ? 0 : now - this.lastAt
     this.lastAt = now
-    const arms = this.arms(frame)
-    if (!arms) {
+    const rawArms = this.arms(frame)
+    if (!rawArms) {
+      // tracking loss: cancel, never a release
       const events = this.active() ? [this.cancelEvent(now, 'tracking-lost')] : []
       if (this.phase !== 'cooldown') this.toWaitReady()
       this.ratio = 0
+      this.wrists = []
       return events
     }
-    const c = DRAW_CONFIG
+    this.wrists.push({ bow: rawArms.bowWrist, draw: rawArms.drawWrist })
+    if (this.wrists.length > 3) this.wrists.shift()
+    const med = (pick: (w: { bow: Point; draw: Point }) => number) => median3(this.wrists.map(pick))
+    const arms: Arms = {
+      ...rawArms,
+      bowWrist: { x: med((w) => w.bow.x), y: med((w) => w.bow.y) },
+      drawWrist: { x: med((w) => w.draw.x), y: med((w) => w.draw.y) },
+    }
+    this.lastRawSpan = this.span(rawArms)
     const span = this.span(arms)
     this.widthRef = this.widthRef === 0 ? arms.shoulderWidth : this.widthRef + (arms.shoulderWidth > this.widthRef ? 0.2 : 0.002) * (arms.shoulderWidth - this.widthRef)
+    const angle = elbowAngleDeg(arms.bowShoulder, arms.bowElbow, arms.bowWrist)
+    this.bowAngle = this.bowAngle === null ? angle : this.bowAngle + 0.35 * (angle - this.bowAngle)
     switch (this.phase) {
       case 'cooldown':
-        if (now - this.since >= c.cooldownMs) this.toWaitReady()
+        if (now - this.since >= DRAW_CONFIG.cooldownMs) this.toWaitReady()
         return []
       case 'wait-ready':
         return this.updateWaitReady(arms, span, now)
@@ -206,8 +273,12 @@ export class DrawDetector {
     this.startedAt = now
     this.attemptId = ++this.attemptCounter
     this.guard = null
+    this.hint = null
+    this.conditionSince = {}
     this.guardSince = null
     this.samples = []
+    this.peak = 0
+    this.peakSample = null
     return [{ type: 'DRAW_START', timestamp: now, side: this.options.drawSide, attemptId: this.attemptId }]
   }
 
@@ -219,13 +290,14 @@ export class DrawDetector {
     const speed = back && now - back.t >= c.speedWindowMs * 0.5
       ? (Math.max(dist(arms.bowWrist, back.bow), dist(arms.drawWrist, back.draw)) * 1000) / (now - back.t)
       : 0
-    this.samples.push({ t: now, span, bow: { ...arms.bowWrist }, draw: { ...arms.drawWrist } })
-    while (this.samples.length && now - this.samples[0].t > Math.max(c.stabilityWindowMs, c.releaseWindowMs) + 200) this.samples.shift()
+    const sample: Sample = { t: now, span, raw: this.lastRawSpan, bow: { ...arms.bowWrist }, draw: { ...arms.drawWrist } }
+    this.samples.push(sample)
+    while (this.samples.length && now - this.samples[0].t > Math.max(c.stabilityWindowMs, c.releaseWindowMs) + 300) this.samples.shift()
 
     if (now - this.startedAt > c.attemptTimeoutMs) return this.cancel(now, 'timeout')
-    const guard = this.evaluateGuard(arms)
+    const guard = this.evaluateGuard(arms, now)
     this.guard = guard
-    if (guard) {
+    if (guard === 'turned' || guard === 'hands-low') {
       this.guardSince ??= now
       if (now - this.guardSince >= c.guardCancelMs) return this.cancel(now, guard)
     } else this.guardSince = null
@@ -238,6 +310,7 @@ export class DrawDetector {
         this.holdStart = now
         this.holdProgress = 0
         this.holdRef = { bow: { ...arms.bowWrist }, draw: { ...arms.drawWrist } }
+        this.trackPeak(sample, true)
         return [{ type: 'DRAW_HOLD', timestamp: now, side, attemptId: this.attemptId, progress: 0, stability: this.stability }]
       }
       return []
@@ -248,6 +321,7 @@ export class DrawDetector {
     this.stability = this.steadiness(now)
 
     if (this.phase === 'hold') {
+      this.trackPeak(sample, false)
       if (this.ratio < c.holdMinRatio) {
         this.phase = 'draw'
         this.holdProgress = 0
@@ -266,37 +340,66 @@ export class DrawDetector {
       if (this.holdProgress < 1) return []
       this.phase = 'armed'
       this.since = now
-      this.armedPeak = span
+      this.releaseFrames = 0
+      this.releaseSince = null
       return [{ type: 'DRAW_HOLD', timestamp: now, side, attemptId: this.attemptId, progress: 1, stability: this.stability }]
     }
 
-    // armed: wait for a quick, directional return of the string hand
+    // ARMED: wait for a confirmed, quick snap back below the confirmed peak
     this.holdProgress = 1
     if (now - this.since > c.armedTimeoutMs) return this.cancel(now, 'timeout')
-    this.armedPeak = Math.max(this.armedPeak, span)
-    const recent = this.samples.filter((s) => now - s.t <= c.releaseWindowMs)
-    const peakSample = recent.reduce((best, s) => (s.span > best.span ? s : best), recent[0])
-    const quickDrop = peakSample.span - span
-    if (quickDrop >= c.releaseTravel && !guard) {
-      const out = side === 'right' ? 1 : -1
-      const drawMove = out * (peakSample.draw.x - arms.drawWrist.x)
-      if (drawMove >= quickDrop * 0.5) {
-        const holdStability = this.steadiness(peakSample.t)
-        const aim = { x: peakSample.bow.x - ref.bow.x, y: peakSample.bow.y - ref.bow.y }
-        const drawAmount = this.armedPeak - this.readySpan
-        const event: Pending = {
-          type: 'RELEASE', timestamp: now, side, attemptId: this.attemptId, drawAmount, holdStability,
-          drawRatio: drawAmount / this.options.drawGoal, aim, releaseMs: now - peakSample.t,
-        }
-        this.phase = 'cooldown'
-        this.since = now
-        this.holdRef = null
-        return [event]
-      }
+    this.trackPeak(sample, false)
+    const travel = this.releaseTravel()
+    const below = span < this.peak - travel
+    if (below) {
+      this.releaseFrames += 1
+      this.releaseSince ??= now
+    } else if (span > this.peak - travel * 0.5) {
+      this.releaseFrames = 0
+      this.releaseSince = null
     }
-    // the separation sank slowly instead of snapping back: the bow was lowered, no shot
-    if (this.armedPeak - span >= c.releaseTravel && quickDrop < c.releaseTravel * 0.6) return this.cancel(now, 'lowered')
-    return []
+    if (!below || this.releaseFrames < c.releaseConfirmFrames || now - (this.releaseSince ?? now) < c.releaseConfirmMs) return []
+    const peakSample = this.nearPeakSample ?? this.peakSample ?? sample
+    // the string hand (not the bow hand) must have done most of the travel, toward the bow
+    const out = side === 'right' ? 1 : -1
+    const drawMove = out * (peakSample.draw.x - arms.drawWrist.x)
+    const quick = (this.releaseSince ?? now) - this.nearPeakAt <= c.releaseWindowMs
+    if (!quick) return this.cancel(now, 'lowered') // a slow sink: the bow was lowered, no shot
+    if (guard || drawMove < (this.peak - span) * 0.5) {
+      // not a release (e.g. the bow hand dropped); start counting again from here
+      this.releaseFrames = 0
+      this.releaseSince = null
+      return []
+    }
+    const holdStability = this.steadiness(peakSample.t)
+    const aim = { x: peakSample.bow.x - ref.bow.x, y: peakSample.bow.y - ref.bow.y }
+    const drawAmount = this.peak - this.readySpan
+    const event: Pending = {
+      type: 'RELEASE', timestamp: now, side, attemptId: this.attemptId, drawAmount, holdStability,
+      drawRatio: drawAmount / this.options.drawGoal, aim, releaseMs: now - this.nearPeakAt,
+    }
+    this.phase = 'cooldown'
+    this.since = now
+    this.holdRef = null
+    this.peak = 0
+    this.peakSample = null
+    return [event]
+  }
+
+  /**
+   * Confirmed peak = highest median-filtered draw since HOLD began. nearPeakAt / nearPeakSample = the
+   * last frame whose own (unfiltered) draw was still at the peak — the moment just before letting go,
+   * where aim and steadiness are read (the median lags a frame and would already include the snap).
+   */
+  private trackPeak(sample: Sample, reset: boolean): void {
+    if (reset || sample.span >= this.peak) {
+      this.peak = sample.span
+      this.peakSample = sample
+    }
+    if (sample.raw >= this.peak - DRAW_CONFIG.peakBand) {
+      this.nearPeakAt = sample.t
+      this.nearPeakSample = sample
+    }
   }
 
   /** 1 = steady. RMS wobble of both wrists over the window ending at `until`. */
@@ -314,14 +417,30 @@ export class DrawDetector {
     return Math.max(0, Math.min(1, 1 - wobble / c.stabilityScale))
   }
 
-  private evaluateGuard(arms: Arms): DrawGuard {
+  /** Raw conditions → a guard only once one has persisted `guardSustainMs`; also sets the soft hint. */
+  private evaluateGuard(arms: Arms, now: number): DrawGuard {
     const c = DRAW_CONFIG
-    if (this.widthRef > 0 && arms.shoulderWidth < this.widthRef * c.turnRatio) return 'turned'
-    if (arms.bowWrist.y > c.chestBottom + 0.1 && arms.drawWrist.y > c.chestBottom + 0.1) return 'hands-low'
-    if (this.ratio >= 0.6 && elbowAngleDeg(arms.bowShoulder, arms.bowElbow, arms.bowWrist) < c.bowElbowMinDeg) return 'bow-arm-bent'
     const out = this.options.drawSide === 'right' ? 1 : -1
-    if (this.ratio >= 0.8 && out * (arms.drawElbow.x - this.drawElbow0.x) < c.drawElbowOutMin) return 'elbow-only'
-    return null
+    const angle = this.bowAngle ?? 180
+    const armRelevant = this.ratio >= c.bowArmFromRatio
+    const conditions: Record<GuardKind, boolean> = {
+      turned: this.widthRef > 0 && arms.shoulderWidth < this.widthRef * c.turnRatio,
+      'hands-low': arms.bowWrist.y > c.chestBottom + 0.1 && arms.drawWrist.y > c.chestBottom + 0.1,
+      'bow-arm-bent': armRelevant && angle < c.bowArmBentDeg,
+      'elbow-only': this.ratio >= 0.8 && out * (arms.drawElbow.x - this.drawElbow0.x) < c.drawElbowOutMin,
+    }
+    this.hint = armRelevant && angle < c.bowArmOkDeg && !conditions['bow-arm-bent'] ? 'bow-arm-straighter' : null
+    let active: DrawGuard = null
+    for (const kind of ['turned', 'hands-low', 'bow-arm-bent', 'elbow-only'] as const) {
+      if (!conditions[kind]) {
+        delete this.conditionSince[kind]
+        continue
+      }
+      const since = (this.conditionSince[kind] ??= now)
+      const sustain = kind === 'turned' || kind === 'hands-low' ? c.postureSustainMs : c.guardSustainMs
+      if (active === null && now - since >= sustain) active = kind
+    }
+    return active
   }
 
   private readyPose(arms: Arms, span: number): boolean {
@@ -378,9 +497,16 @@ export class DrawDetector {
     this.holdProgress = 0
     this.ratio = 0
     this.guard = null
+    this.hint = null
+    this.conditionSince = {}
     this.guardSince = null
     this.samples = []
     this.stability = 1
     this.aim = { x: 0, y: 0 }
+    this.peak = 0
+    this.peakSample = null
+    this.nearPeakSample = null
+    this.releaseFrames = 0
+    this.releaseSince = null
   }
 }

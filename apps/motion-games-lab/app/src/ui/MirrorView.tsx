@@ -1,11 +1,12 @@
 // Mirrored camera image with a light overlay, drawn in its own rAF loop (no per-frame React state).
-// mode 'hands' (formal): only two small hand markers in the cursor colours — the same language as the
-//   playfield cursors, no body outline.
-// mode 'skeleton' (?debug=1): the full upper-body skeleton and landmarks.
+// mode 'hands' (formal): only two small warm-white hand markers — the same look as the playfield cursors
+//   (identical for both hands, no colour coding, no 左/右 text), no body outline.
+// mode 'skeleton' (?debug=1): the full upper-body skeleton and landmarks, colour-coded per side for developers.
 import { useEffect, useRef } from 'react'
 import type { MotionAdapterApi, SkeletonJoint } from '../motion/contracts'
 import { mapNormalizedLandmarkToCanvas } from '../motion/vendor/fitMapping'
 import { FLAGS } from '../shared/flags'
+import { HAND_MARKER } from '../shared/world/hands'
 
 const BONES: [SkeletonJoint, SkeletonJoint, 'left' | 'right' | 'mid'][] = [
   ['leftShoulder', 'rightShoulder', 'mid'],
@@ -13,6 +14,7 @@ const BONES: [SkeletonJoint, SkeletonJoint, 'left' | 'right' | 'mid'][] = [
   ['rightShoulder', 'rightElbow', 'right'], ['rightElbow', 'rightWrist', 'right'],
   ['leftShoulder', 'leftHip', 'mid'], ['rightShoulder', 'rightHip', 'mid'], ['leftHip', 'rightHip', 'mid'],
 ]
+/** debug skeleton only: developer colours per side */
 const COLOR = { left: '#2bb5a8', right: '#ff9a3c', mid: 'rgba(255,255,255,0.9)' }
 
 export type MirrorMode = 'hands' | 'skeleton'
@@ -69,20 +71,15 @@ export function MirrorView({ adapter, stream, label, className, showVideo = true
           const px = elbow?.visible ? wrist.x + (wrist.x - elbow.x) * 0.3 : wrist.x
           const py = elbow?.visible ? wrist.y + (wrist.y - elbow.y) * 0.3 : wrist.y
           const P = map(px, py)
-          const r = Math.max(7, w / 26)
-          ctx.fillStyle = 'rgba(255,255,255,0.95)'
+          const r = Math.max(6, w / 30)
+          ctx.fillStyle = HAND_MARKER.ring
           ctx.beginPath()
-          ctx.arc(P.x, P.y, r + 3, 0, Math.PI * 2)
+          ctx.arc(P.x, P.y, r + 2, 0, Math.PI * 2)
           ctx.fill()
-          ctx.fillStyle = COLOR[side]
+          ctx.fillStyle = HAND_MARKER.fill
           ctx.beginPath()
           ctx.arc(P.x, P.y, r, 0, Math.PI * 2)
           ctx.fill()
-          ctx.fillStyle = '#fff'
-          ctx.font = `800 ${Math.round(r * 1.15)}px "PingFang SC", "Microsoft YaHei", sans-serif`
-          ctx.textAlign = 'center'
-          ctx.textBaseline = 'middle'
-          ctx.fillText(side === 'left' ? '左' : '右', P.x, P.y + 1)
         }
         return
       }

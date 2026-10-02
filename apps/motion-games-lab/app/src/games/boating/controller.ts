@@ -24,6 +24,10 @@ export interface OarView {
   pose: CursorPose
   /** this side has a lantern to collect right now */
   cued: boolean
+  /** strokes counted on this side so far (the scene stops demonstrating once the player has got it) */
+  strokes: number
+  /** the hand is on its way back after a stroke */
+  returning: boolean
 }
 
 /**
@@ -32,7 +36,7 @@ export interface OarView {
  */
 export function oarHandPose(input: { phase: 'wait' | 'ready' | 'out' | 'return'; progress: number; sinceCatchMs: number }): CursorPose {
   if (input.sinceCatchMs >= 0 && input.sinceCatchMs < BOAT_CURSOR.catchShowMs) return 'grab'
-  if (input.phase === 'out' && input.progress > 0.15) return 'half'
+  if ((input.phase === 'out' || input.phase === 'ready') && input.progress > 0.15) return 'half'
   return 'open'
 }
 
@@ -53,13 +57,15 @@ export class BoatController extends PlayController<BoatRound, BoatEffect> {
       progress: this.status === 'playing' ? state.progress : 0,
       pose: this.status === 'playing' ? oarHandPose({ phase: state.phase, progress: state.progress, sinceCatchMs: sinceCatch }) : 'open',
       cued: Boolean(cue && cue.inWindow && cue.lantern.side === side),
+      strokes: state.strokes,
+      returning: state.phase === 'return',
     }
   }
 
   override debugRows(): [string, string][] {
     const s = this.adapter.strokeState()
     return [
-      ['scheme / amp', `${s.options.scheme} / ${s.options.amplitude}`],
+      ['scheme / amp (SW) / reach', `${s.options.scheme} / ${s.options.amplitude} / ${s.reach.toFixed(2)}`],
       ['L phase / disp', `${s.left.phase} / ${s.left.displacement?.toFixed(2) ?? '—'}`],
       ['R phase / disp', `${s.right.phase} / ${s.right.displacement?.toFixed(2) ?? '—'}`],
       ['distance / speed', `${this.round.distance.toFixed(1)} m / ${this.round.speed.toFixed(2)} m/s`],
@@ -76,7 +82,6 @@ export class BoatController extends PlayController<BoatRound, BoatEffect> {
       if (event.type !== 'STROKE_CANCEL') continue
       if (event.reason === 'too-small') this.coach('too-small', COPY.boating.tooSmall, frame.timestamp)
       else if (event.reason === 'raised') this.coach('raised', COPY.boating.raised, frame.timestamp)
-      else if (event.reason === 'turned') this.coach('turned', COPY.boating.turned, frame.timestamp)
     }
     this.handle(this.round.handleMotion(frame, events))
   }

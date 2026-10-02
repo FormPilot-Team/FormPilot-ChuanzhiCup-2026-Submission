@@ -2,8 +2,17 @@
 const INK = '#1f3a2e'
 const SKIN = '#f3c7a6'
 const SHIRT = '#4f9a55'
-const LEFT = '#2bb5a8'
-const RIGHT = '#ff9a3c'
+/** hands: the same warm white as the in-game hand cursor, for both hands (no left/right colours) */
+const HAND = '#fbf2e6'
+const HAND_LINE = '#8a6d55'
+const ACCENT = '#e0a21b'
+const PANTS = '#3c5a8a'
+const CHAIR = '#c08a55'
+const CHAIR_DARK = '#8a5a32'
+
+function Hand({ x, y, r = 8 }: { x: number; y: number; r?: number }) {
+  return <circle cx={x} cy={y} r={r} fill={HAND} stroke={HAND_LINE} strokeWidth="2" />
+}
 
 function Apple({ x, y, r = 16 }: { x: number; y: number; r?: number }) {
   return (
@@ -31,16 +40,27 @@ function Person({ x, y, armL, armR, seated = false, elbowL, elbowR }: {
   const sr = { x: x + 22, y: y }
   return (
     <g strokeLinecap="round" strokeLinejoin="round">
-      {seated && <rect x={x - 34} y={y + 58} width="68" height="10" rx="5" fill="#c08a55" />}
-      {seated && <rect x={x - 30} y={y + 66} width="8" height="40" fill="#8a5a32" />}
-      {seated && <rect x={x + 22} y={y + 66} width="8" height="40" fill="#8a5a32" />}
+      {/* seated, facing the camera: the chair sits behind the player, its legs outside the player's legs */}
+      {seated && <rect x={x - 48} y={y + 54} width="96" height="11" rx="5" fill={CHAIR} />}
+      {seated && <rect x={x - 46} y={y + 63} width="8" height="44" rx="2" fill={CHAIR_DARK} />}
+      {seated && <rect x={x + 38} y={y + 63} width="8" height="44" rx="2" fill={CHAIR_DARK} />}
       <path d={`M${x - 26} ${y - 4} Q${x} ${y - 12} ${x + 26} ${y - 4} L${x + 20} ${y + 60} L${x - 20} ${y + 60} Z`} fill={SHIRT} />
-      {!seated && <path d={`M${x - 14} ${y + 60} L${x - 16} ${y + 120} M${x + 14} ${y + 60} L${x + 16} ${y + 120}`} stroke="#3c5a8a" strokeWidth="14" />}
-      {seated && <path d={`M${x - 14} ${y + 60} L${x - 14} ${y + 64} L${x - 40} ${y + 66} L${x - 42} ${y + 110} M${x + 14} ${y + 60} L${x + 14} ${y + 64}`} stroke="#3c5a8a" strokeWidth="14" />}
+      {!seated && <path d={`M${x - 14} ${y + 60} L${x - 16} ${y + 120} M${x + 14} ${y + 60} L${x + 16} ${y + 120}`} stroke={PANTS} strokeWidth="14" />}
+      {seated && (
+        <g data-testid="seated-legs">
+          {/* thighs come toward the camera (short), knees a little apart, shins straight down, feet on the floor */}
+          <path d={`M${x - 11} ${y + 60} L${x - 19} ${y + 74} L${x - 20} ${y + 108}`} stroke={PANTS} strokeWidth="14" fill="none" />
+          <path d={`M${x + 11} ${y + 60} L${x + 19} ${y + 74} L${x + 20} ${y + 108}`} stroke={PANTS} strokeWidth="14" fill="none" />
+          <circle cx={x - 19} cy={y + 74} r="7.5" fill="#4a6aa0" />
+          <circle cx={x + 19} cy={y + 74} r="7.5" fill="#4a6aa0" />
+          <ellipse cx={x - 23} cy={y + 113} rx="11" ry="5" fill="#3a3a44" />
+          <ellipse cx={x + 23} cy={y + 113} rx="11" ry="5" fill="#3a3a44" />
+        </g>
+      )}
       <polyline points={`${sl.x},${sl.y} ${elbowL ? `${sl.x + elbowL[0]},${sl.y + elbowL[1]} ` : ''}${sl.x + armL[0]},${sl.y + armL[1]}`} stroke={SKIN} strokeWidth="11" fill="none" />
       <polyline points={`${sr.x},${sr.y} ${elbowR ? `${sr.x + elbowR[0]},${sr.y + elbowR[1]} ` : ''}${sr.x + armR[0]},${sr.y + armR[1]}`} stroke={SKIN} strokeWidth="11" fill="none" />
-      <circle cx={sl.x + armL[0]} cy={sl.y + armL[1]} r="8" fill={LEFT} />
-      <circle cx={sr.x + armR[0]} cy={sr.y + armR[1]} r="8" fill={RIGHT} />
+      <Hand x={sl.x + armL[0]} y={sl.y + armL[1]} />
+      <Hand x={sr.x + armR[0]} y={sr.y + armR[1]} />
       <circle cx={x} cy={y - 26} r="17" fill={SKIN} />
       <path d={`M${x - 17} ${y - 30} q17 -20 34 0 q-2 -18 -17 -18 q-15 0 -17 18z`} fill="#8a6a55" />
     </g>
@@ -66,7 +86,7 @@ export function HowHold() {
       <Apple x={120} y={74} r={30} />
       <circle cx="120" cy="74" r="48" fill="none" stroke="#d9e3dc" strokeWidth="10" />
       <path d="M120 26 A48 48 0 1 1 72 74" fill="none" stroke="#ffc94d" strokeWidth="10" strokeLinecap="round" />
-      <circle cx="146" cy="96" r="14" fill="none" stroke={RIGHT} strokeWidth="5" />
+      <Hand x={146} y={96} r={13} />
     </svg>
   )
 }
@@ -150,17 +170,31 @@ export function HowPaddleReady() {
 }
 
 export function HowPaddleSweep() {
+  // one stroke in three beats: ① hand in front of the body → ② sweep outward → ③ back in front
   return (
-    <svg viewBox="0 0 240 150" role="img" aria-label="手向外侧划开，再收回">
+    <svg viewBox="0 0 240 150" role="img" aria-label="从身前向外划开，再回到身前">
       <rect width="240" height="150" rx="18" fill="#e8f6fb" />
       <Water />
-      <Person x={120} y={50} elbowL={[-6, 34]} armL={[14, 52]} elbowR={[8, 34]} armR={[52, 44]} />
-      <path d="M140 104 Q168 108 186 96" fill="none" stroke={RIGHT} strokeWidth="4" strokeDasharray="5 6" markerEnd="url(#sweep)" />
       <defs>
-        <marker id="sweep" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0 0 L10 5 L0 10 z" fill={RIGHT} />
+        <marker id="sweep-out" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill={ACCENT} />
+        </marker>
+        <marker id="sweep-back" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="#2f6b4f" />
         </marker>
       </defs>
+      {/* where the right hand starts: a faint arm in front of the body */}
+      <g opacity="0.38">
+        <polyline points="142,50 148,84 130,100" stroke={SKIN} strokeWidth="11" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <Hand x={130} y={100} />
+      </g>
+      <Person x={120} y={50} elbowL={[-6, 34]} armL={[14, 52]} elbowR={[8, 34]} armR={[54, 42]} />
+      <path d="M134 108 Q162 116 190 102" fill="none" stroke={ACCENT} strokeWidth="4.5" strokeLinecap="round" markerEnd="url(#sweep-out)" />
+      <path d="M192 120 Q164 132 138 124" fill="none" stroke="#2f6b4f" strokeWidth="3.5" strokeDasharray="5 5" strokeLinecap="round" markerEnd="url(#sweep-back)" />
+      <g fontSize="14" fontWeight="800" fill="#1f3a2e" textAnchor="middle">
+        <rect x="58" y="7" width="176" height="22" rx="11" fill="#fffaf0" opacity="0.92" />
+        <text x="146" y="23">身前 → 向外 → 回到身前</text>
+      </g>
     </svg>
   )
 }
@@ -231,7 +265,7 @@ export function HowBowRelease() {
       <path d="M40 66 L182 64" stroke="#553623" strokeWidth="4" strokeLinecap="round" />
       <path d="M182 64 l-12 -6 l2 6 l-2 6 z" fill="#553623" />
       <path d="M40 66 l-10 -8 M40 66 l-10 8" stroke="#fffaf0" strokeWidth="4" strokeLinecap="round" />
-      <path d="M60 104 q30 -12 60 0" fill="none" stroke={RIGHT} strokeWidth="4" strokeDasharray="5 6" />
+      <path d="M60 104 q30 -12 60 0" fill="none" stroke={ACCENT} strokeWidth="4" strokeDasharray="5 6" />
       <text x="98" y="132" fontSize="18" fontWeight="800" fill="#2f6b4f" textAnchor="middle">松手！</text>
     </svg>
   )

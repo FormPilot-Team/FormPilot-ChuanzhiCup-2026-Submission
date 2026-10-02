@@ -31,10 +31,17 @@ export const PALETTE = Object.freeze({
   waterDeep: '#3b8fb3',
   waterLight: '#bfe9f2',
   gold: '#ffc94d',
-  leftHand: '#2bb5a8',
-  rightHand: '#ff9a3c',
+  teal: '#2bb5a8',
+  amber: '#ff9a3c',
+  /** hand cursor: one warm-white design for both hands (left and right differ only by position) */
+  handLight: '#fffdf8',
+  handFill: '#fbf2e6',
+  handShade: '#efdcc6',
+  handLine: 'rgba(108, 80, 58, 0.62)',
   ink: '#1f3a2e',
   cream: '#fffaf0',
 })
 
-export const HAND_COLOR = { left: 0x2bb5a8, right: 0xff9a3c } as const
+/** Accent for hand-related playfield marks (stroke tracks, halos): the same for both hands. */
+export const HAND_ACCENT = 0xffd36b
+export const HAND_HALO = 0xfff4dc
