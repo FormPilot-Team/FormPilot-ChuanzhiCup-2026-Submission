@@ -1,6 +1,7 @@
 // Pose sources feed raw landmarks into the MotionAdapter. Only this layer knows about cameras and
 // MediaPipe; the adapter turns samples into MotionFrames/MotionEvents for games.
 import { BrowserCameraAdapter, cameraErrorPresentation, type CameraErrorPresentation } from './vendor/BrowserCameraAdapter'
+import { IS_DESKTOP } from '../shared/desktop'
 import { PoseDetector, PoseModelError, type PoseDetectorConfig } from './vendor/PoseDetector'
 import type { PoseLandmark } from './vendor/poseTypes'
 import type { PoseWorkerRequest, PoseWorkerResponse, WorkerDelegate } from './poseWorker'
@@ -129,7 +130,8 @@ export class CameraPoseSource implements PoseSource {
     } catch (error) {
       this.closeInference()
       this.video.remove()
-      throw new PoseSourceError(cameraErrorPresentation(error), error)
+      // desktop app: the app's own camera permission is always granted, so a refusal comes from Windows
+      throw new PoseSourceError(cameraErrorPresentation(error, { desktop: IS_DESKTOP }), error)
     }
     this.running = true
     this.usesFrameCallback = typeof this.video.requestVideoFrameCallback === 'function'

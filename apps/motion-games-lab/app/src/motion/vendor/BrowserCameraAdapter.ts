@@ -102,7 +102,7 @@ export function cameraErrorPresentation(error: unknown, context: CameraErrorCont
       return { kind: 'permission_denied', message: '摄像头权限未开启。请在浏览器的网站权限中允许摄像头，然后重新尝试。', guidance: '点地址栏左侧的网站信息图标，把“摄像头”改为允许，然后点“重新检测”。', windowsPrivacy: false }
     }
     if (name === 'SecurityError') {
-      return { kind: 'security', message: '摄像头被安全设置阻止，当前页面不能使用摄像头。', guidance: '请通过 http://127.0.0.1 或 https 地址打开本页面。', windowsPrivacy: false }
+      return { kind: 'security', message: '摄像头被安全设置阻止，当前页面不能使用摄像头。', guidance: context.desktop ? '请关闭程序后重新打开再试。' : '请通过 http://127.0.0.1 或 https 地址打开本页面。', windowsPrivacy: false }
     }
     if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
       return { kind: 'not_found', message: '未检测到可用摄像头，请确认设备已连接。', guidance: '外接摄像头请重新插拔；笔记本请确认摄像头开关或快捷键已打开，然后点“重新检测”。', windowsPrivacy: false }

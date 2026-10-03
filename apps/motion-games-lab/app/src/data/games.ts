@@ -80,7 +80,7 @@ export const INTRO: Record<GameId, IntroCopy> = {
 }
 
 export const COPY = Object.freeze({
-  productName: 'Motion Games Lab',
+  productName: '体感游戏工坊',
   tagline: '跟着身体动起来的森林小游戏',
   safety: '动作慢一点，在舒服的范围内就好。感到不适请立即停止。',
   comingSoon: '敬请期待',

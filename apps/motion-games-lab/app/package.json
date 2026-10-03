@@ -1,7 +1,7 @@
 {
   "name": "motion-games-lab",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "prepare-assets": "node scripts/copy-mediapipe-wasm.mjs",
@@ -12,10 +12,15 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "perf": "node scripts/perf.mjs"
+    "perf": "node scripts/perf.mjs",
+    "desktop:dev": "tauri dev",
+    "desktop:build": "tauri build && node scripts/release.mjs",
+    "desktop:smoke": "node scripts/desktop-smoke.mjs",
+    "desktop:icon": "python scripts/make-icon.py && tauri icon src-tauri/app-icon.png"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "0.10.35",
+    "@tauri-apps/api": "2.12.1",
     "phaser": "3.90.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"
@@ -23,6 +28,7 @@
   "devDependencies": {
     "@eslint/js": "9.39.5",
     "@playwright/test": "1.63.0",
+    "@tauri-apps/cli": "2.12.1",
     "@types/node": "24.13.3",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",

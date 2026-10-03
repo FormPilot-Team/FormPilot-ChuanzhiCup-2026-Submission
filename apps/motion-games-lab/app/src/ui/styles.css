@@ -58,6 +58,7 @@ button { font-family: inherit; }
 /* ---------- Hub ---------- */
 .hub { height: 100%; overflow-y: auto; padding: 36px clamp(16px, 4vw, 56px) 40px; }
 .hub-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; max-width: 1320px; margin: 0 auto 28px; }
+.hub-actions { display: flex; gap: 10px; }
 .brand { display: flex; align-items: center; gap: 16px; }
 .brand-mark { width: 60px; height: 60px; border-radius: 18px; background: linear-gradient(160deg, #6fc178, var(--leaf-deep)); display: grid; place-items: center; box-shadow: var(--shadow-soft); }
 .brand h1 { margin: 0; font-size: 38px; letter-spacing: 0.02em; }

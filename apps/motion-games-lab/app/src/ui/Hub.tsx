@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { COPY, GAMES, type GameCard } from '../data/games'
 import type { GameId } from '../shared/metrics'
 import type { Settings } from '../shared/settings'
+import { toggleFullscreen, useFullscreen } from '../shared/desktop'
 import { SettingsDialog } from './SettingsDialog'
 
 function CardArt({ game }: { game: GameCard }) {
@@ -20,6 +21,7 @@ function CardArt({ game }: { game: GameCard }) {
 
 export function Hub({ onStart, settings, onSettings }: { onStart: (id: GameId) => void; settings: Settings; onSettings: (s: Settings) => void }) {
   const [showSettings, setShowSettings] = useState(false)
+  const fullscreen = useFullscreen()
   return (
     <main className="hub">
       <header className="hub-header">
@@ -32,7 +34,10 @@ export function Hub({ onStart, settings, onSettings }: { onStart: (id: GameId) =
             <p>{COPY.tagline}</p>
           </div>
         </div>
-        <button className="btn btn-secondary btn-small" onClick={() => setShowSettings(true)}>⚙ 设置</button>
+        <div className="hub-actions">
+          <button className="btn btn-secondary btn-small" onClick={() => void toggleFullscreen()} data-testid="fullscreen-button" title="全屏（F11，Esc 退出）">{fullscreen ? '退出全屏' : '⛶ 全屏'}</button>
+          <button className="btn btn-secondary btn-small" onClick={() => setShowSettings(true)}>⚙ 设置</button>
+        </div>
       </header>
       <section className="cards" aria-label="游戏选择">
         {GAMES.map((game) => (

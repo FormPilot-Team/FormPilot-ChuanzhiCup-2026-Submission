@@ -1,7 +1,7 @@
 // Archery through the real UI with the synthetic archer:
 // READY → DRAW → HOLD → RETURN_ARMED → FIRE → HIT → RESET (round 2: the shot = string hand back to the chest).
 import { expect, test } from '@playwright/test'
-import { collectErrors, expectFormalUi, pauseRoundTrip, shot, startGame, trackingLossRoundTrip, type Hook } from './helpers'
+import { collectErrors, expectFormalUi, pauseRoundTrip, shot, SHOTS, startGame, trackingLossRoundTrip, type Hook } from './helpers'
 
 // page-side code is serialised: no closures over Node-side helpers, only these (type-only) shapes
 type Archer = { actor: { goal: Record<'left' | 'right', { x: number; y: number }>; state: { twistDeg: number } }; bot: { paused: boolean } }
@@ -83,7 +83,7 @@ test('Archery: the tutorial teaches draw → aim → bring the string hand back 
   await expect(intro).not.toContainText(/松手|松一|一松/)
   await expect(intro).not.toContainText('伸直')
   await expect(intro.locator('.how-item svg')).toHaveCount(3)
-  await intro.locator('.how').screenshot({ path: '../docs/archery-final/screenshots/archery-tutorial-cards.png' })
+  await intro.locator('.how').screenshot({ path: `${SHOTS}/archery-tutorial-cards.png` })
   await shot(page, 'archery-tutorial')
 })
 
