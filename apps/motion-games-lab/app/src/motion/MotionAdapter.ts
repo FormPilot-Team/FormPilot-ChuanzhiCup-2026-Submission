@@ -289,7 +289,7 @@ function describe(event: MotionEvent): string {
     case 'STROKE_CANCEL': return `${event.side} #${event.cycleId} ${event.reason}`
     case 'DRAW_START': return `${event.side} attempt ${event.attemptId}`
     case 'DRAW_HOLD': return `#${event.attemptId} ${event.progress >= 1 ? 'armed' : 'hold'} stab ${event.stability.toFixed(2)}`
-    case 'RELEASE': return `#${event.attemptId} draw ${event.drawRatio.toFixed(2)} stab ${event.holdStability.toFixed(2)}`
+    case 'FIRE': return `#${event.attemptId} draw ${event.drawRatio.toFixed(2)} stab ${event.holdStability.toFixed(2)} aim ${event.aim.x.toFixed(2)},${event.aim.y.toFixed(2)}`
     case 'DRAW_CANCEL': return `#${event.attemptId} ${event.reason}`
     default: return ''
   }

@@ -1,48 +1,53 @@
 // Archery controller: draw events → ArcheryRound, the visible state machine
-// READY → DRAW → HOLD → RELEASE → HIT → RESET, guard coaching, and the bow / hand view for the scene.
+// READY → DRAW → HOLD → RETURN_ARMED → FIRE → HIT → RESET, step instructions, the first-shot ghost
+// guide, and the bow / hand view for the scene.
 import { COPY } from '../../data/games'
-import type { DrawGuard, DrawState, MotionAdapterApi, MotionEvent, MotionFrame, Side } from '../../motion/contracts'
+import type { DrawState, MotionAdapterApi, MotionEvent, MotionFrame, Side } from '../../motion/contracts'
 import type { CursorPose } from '../../shared/handCursor'
 import { PlayController, type BaseEffect, type PlayOptions } from '../../shared/play/PlayController'
-import { SHOT_TIMING } from './config'
+import { GHOST_GUIDE, SHOT_TIMING } from './config'
 import type { ArcheryRound, ArcheryRoundEvent, Shot } from './round'
 
 export type ArcheryEffect = Exclude<ArcheryRoundEvent, { type: 'end' }>
 export type ArcheryControllerEffect = BaseEffect | ArcheryEffect
 
-export type ArcheryPhase = 'READY' | 'DRAW' | 'HOLD' | 'RELEASE' | 'HIT' | 'RESET'
-
-const GUARD_TEXT: Record<Exclude<DrawGuard, null>, string> = {
-  turned: COPY.archery.turned,
-  'bow-arm-bent': COPY.archery.bowArmBent,
-  'elbow-only': COPY.archery.elbowOnly,
-  'hands-low': COPY.archery.handsLow,
-}
+export type ArcheryPhase = 'READY' | 'DRAW' | 'HOLD' | 'RETURN_ARMED' | 'FIRE' | 'HIT' | 'RESET'
 
 /**
  * Game-facing phase from the detector phase and the shot animation clock.
  * `sinceShotMs` < 0 when no shot is in flight.
  */
 export function archeryPhase(detector: DrawState['phase'], sinceShotMs: number, shotsSoFar: number): ArcheryPhase {
-  if (sinceShotMs >= 0 && sinceShotMs < SHOT_TIMING.releaseShowMs) return 'RELEASE'
-  if (sinceShotMs >= 0 && sinceShotMs < SHOT_TIMING.releaseShowMs + SHOT_TIMING.flightMs + SHOT_TIMING.hitShowMs) return 'HIT'
+  if (sinceShotMs >= 0 && sinceShotMs < SHOT_TIMING.fireShowMs) return 'FIRE'
+  if (sinceShotMs >= 0 && sinceShotMs < SHOT_TIMING.fireShowMs + SHOT_TIMING.flightMs + SHOT_TIMING.hitShowMs) return 'HIT'
   switch (detector) {
     case 'draw': return 'DRAW'
-    case 'hold':
-    case 'armed': return 'HOLD'
+    case 'hold': return 'HOLD'
+    case 'armed': return 'RETURN_ARMED'
     case 'ready': return 'READY'
     case 'cooldown': return 'RESET'
     default: return shotsSoFar > 0 ? 'RESET' : 'READY'
   }
 }
 
-/** Hand poses: the bow hand grips once the bow is up; the string hand pinches while drawing, opens on release. */
+/** Hand poses: the bow hand grips once the bow is up; the string hand pinches while drawing, opens on FIRE. */
 export function archeryHandPoses(phase: ArcheryPhase, detector: DrawState['phase']): { bow: CursorPose; string: CursorPose } {
-  if (phase === 'RELEASE' || phase === 'HIT') return { bow: 'grab', string: 'open' }
+  if (phase === 'FIRE' || phase === 'HIT') return { bow: 'grab', string: 'open' }
   if (detector === 'hold' || detector === 'armed') return { bow: 'grab', string: 'grab' }
   if (detector === 'draw') return { bow: 'grab', string: 'half' }
   if (detector === 'ready') return { bow: 'half', string: 'half' }
   return { bow: 'open', string: 'open' }
+}
+
+/**
+ * Ghost guide (a translucent string hand showing the way back to the chest): only in RETURN_ARMED,
+ * only while the player has not started the return, after 1 s before the first arrow of the round
+ * (4 s for later arrows, as a reminder). It hides the moment the return begins.
+ */
+export function showGhostGuide(d: Pick<DrawState, 'phase' | 'armedMs' | 'returning' | 'returnProgress'>, shotsSoFar: number): boolean {
+  // returnProgress below ~0.25 (a tenth of the way back) is tracking noise around the drawn position
+  if (d.phase !== 'armed' || d.returning || d.returnProgress > 0.25) return false
+  return d.armedMs >= (shotsSoFar === 0 ? GHOST_GUIDE.afterMs : GHOST_GUIDE.laterShotsAfterMs)
 }
 
 export class ArcheryController extends PlayController<ArcheryRound, ArcheryEffect> {
@@ -69,27 +74,35 @@ export class ArcheryController extends PlayController<ArcheryRound, ArcheryEffec
     return Number.isFinite(this.shotAt) ? now - this.shotAt : -1
   }
 
+  ghostGuide(): boolean {
+    return this.status === 'playing' && showGhostGuide(this.draw(), this.round.shots.length)
+  }
+
   /** One short instruction for the current step. */
   instruction(now: number = performance.now()): string | null {
     if (this.status !== 'playing') return null
     const d = this.draw()
-    // only a guard that has persisted replaces the step instruction (single frames never do)
-    if (d.guard && (d.phase === 'draw' || d.phase === 'hold' || d.phase === 'armed')) return GUARD_TEXT[d.guard]
+    if (d.guard === 'hands-low' && (d.phase === 'draw' || d.phase === 'hold' || d.phase === 'armed')) return COPY.archery.handsLow
     switch (this.phase(now)) {
       case 'READY': return d.phase === 'ready' ? COPY.archery.draw : COPY.archery.ready
-      case 'DRAW': return COPY.archery.draw
-      case 'HOLD': return d.phase === 'armed' ? COPY.archery.armed : COPY.archery.hold
+      case 'DRAW':
+        if (d.cue === 'early-return') return COPY.archery.early
+        return d.cue === 'pull-string-out' ? COPY.archery.pullOut : COPY.archery.draw
+      case 'HOLD': return COPY.archery.hold
+      case 'RETURN_ARMED': return d.returning ? COPY.archery.returning : COPY.archery.armed
       case 'RESET': return COPY.archery.reset
       default: return null
     }
   }
 
-  /** A gentle extra line under the instruction (never blocks the shot), or null. */
+  /** A gentle extra line under the instruction (never blocks anything), or null. */
   softHint(): string | null {
     if (this.status !== 'playing') return null
     const d = this.draw()
-    if (d.guard || !d.hint || !(d.phase === 'draw' || d.phase === 'hold' || d.phase === 'armed')) return null
-    return COPY.archery.bowArmSoft
+    if (d.guard || !(d.phase === 'draw' || d.phase === 'hold' || d.phase === 'armed')) return null
+    if (d.hint === 'turned') return COPY.archery.turnedSoft
+    if (d.hint === 'bow-arm-straighter') return COPY.archery.bowArmSoft
+    return null
   }
 
   tracked(side: Side): boolean {
@@ -98,13 +111,15 @@ export class ArcheryController extends PlayController<ArcheryRound, ArcheryEffec
 
   override debugRows(): [string, string][] {
     const d = this.draw()
+    const p = (v: { x: number; y: number } | null) => (v ? `${v.x.toFixed(3)}, ${v.y.toFixed(3)}` : '—')
     return [
       ['phase (game / detector)', `${this.phase()} / ${d.phase}`],
       ['draw side / goal', `${d.options.drawSide} / ${d.options.drawGoal.toFixed(2)}`],
       ['draw ratio / hold', `${d.drawRatio.toFixed(2)} / ${d.holdProgress.toFixed(2)}`],
-      ['stability / aim', `${d.stability.toFixed(2)} / ${d.aim.x.toFixed(3)}, ${d.aim.y.toFixed(3)}`],
-      ['guard / hint', `${d.guard ?? '—'} / ${d.hint ?? '—'}`],
-      ['peak ratio / release travel', `${d.peakRatio.toFixed(2)} / ${(Math.max(0.2, 0.3 * d.options.drawGoal)).toFixed(2)}`],
+      ['stability / aim', `${d.stability.toFixed(2)} / ${p(d.aim)}`],
+      ['return / locked aim', `${d.returnProgress.toFixed(2)} / ${p(d.lockedAim)}`],
+      ['bow elbow° (debug only)', d.bowElbowDeg === null ? '—' : d.bowElbowDeg.toFixed(0)],
+      ['guard / hint / cue', `${d.guard ?? '—'} / ${d.hint ?? '—'} / ${d.cue ?? '—'}`],
       ['shots / hits', `${this.round.shots.length} / ${this.round.hits()}`],
     ]
   }
@@ -114,12 +129,13 @@ export class ArcheryController extends PlayController<ArcheryRound, ArcheryEffec
   }
 
   protected onFrame(frame: MotionFrame, events: readonly MotionEvent[]): void {
-    // a guard has already persisted in the detector (guardSustainMs): one coaching line per cooldown
-    const guard = this.draw().guard
-    if (guard) this.coach(guard, GUARD_TEXT[guard], frame.timestamp)
+    const d = this.draw()
+    if (d.guard === 'hands-low') this.coach('hands-low', COPY.archery.handsLow, frame.timestamp)
+    if (d.cue === 'early-return') this.coach('early', COPY.archery.early, frame.timestamp)
     for (const event of events) {
       if (event.type !== 'DRAW_CANCEL') continue
       if (event.reason === 'lowered') this.coach('lowered', COPY.archery.lowered, frame.timestamp)
+      else if (event.reason === 'early-return') this.coach('early', COPY.archery.early, frame.timestamp)
       else if (event.reason === 'timeout') this.coach('timeout', COPY.archery.timeout, frame.timestamp)
     }
     this.handle(this.round.handleMotion(frame, events))

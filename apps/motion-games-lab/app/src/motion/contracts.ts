@@ -111,7 +111,8 @@ export type MotionEvent = EventBase & (
   // ---- Archery ----
   | { type: 'DRAW_START'; side: Side; attemptId: number }
   | { type: 'DRAW_HOLD'; side: Side; attemptId: number; progress: number; stability: number }
-  | { type: 'RELEASE'; side: Side; attemptId: number; drawAmount: number; holdStability: number; drawRatio: number; aim: Point; releaseMs: number }
+  /** the string hand was brought back toward the chest after the hold: the arrow flies to the locked aim */
+  | { type: 'FIRE'; side: Side; attemptId: number; drawAmount: number; holdStability: number; drawRatio: number; aim: Point; returnMs: number }
   | { type: 'DRAW_CANCEL'; side: Side; attemptId: number; reason: DrawCancelReason }
   // ---- shared ----
   | { type: 'TRACKING_LOST'; scope: 'body' | Side }
@@ -191,14 +192,18 @@ export interface StrokeState {
   right: StrokeSideState
 }
 
-// ---------- Archery: draw → hold → release ----------
+// ---------- Archery: draw → hold → return → fire ----------
 
+/** `armed` = RETURN_ARMED: the hold is complete, bringing the string hand back toward the chest fires. */
 export type DrawPhase = 'wait-ready' | 'ready' | 'draw' | 'hold' | 'armed' | 'cooldown'
-export type DrawCancelReason = 'lowered' | 'turned' | 'bow-arm-bent' | 'elbow-only' | 'hands-low' | 'tracking-lost' | 'timeout' | 'paused'
-/** A condition that has persisted long enough to pause the hold (turned / hands-low eventually cancel). */
-export type DrawGuard = 'turned' | 'bow-arm-bent' | 'elbow-only' | 'hands-low' | null
-/** A gentle suggestion that never blocks or cancels the shot. */
-export type DrawHint = 'bow-arm-straighter' | null
+/** `early-return`: the string hand came back before the hold was complete and then the bow was put down. */
+export type DrawCancelReason = 'lowered' | 'early-return' | 'tracking-lost' | 'timeout' | 'paused'
+/** The only blocking condition left: both hands far below the chest (arms down, not a bow) — pauses the hold, blocks FIRE. */
+export type DrawGuard = 'hands-low' | null
+/** A gentle suggestion that never blocks, pauses or cancels anything. */
+export type DrawHint = 'bow-arm-straighter' | 'turned' | null
+/** A step-level instruction: the string hand has not come out yet / it came back before the hold was complete. */
+export type DrawCue = 'pull-string-out' | 'early-return' | null
 
 export interface DrawOptions {
   /** the hand that pulls the string; the other hand holds the bow */
@@ -218,14 +223,23 @@ export interface DrawState {
   holdProgress: number
   /** 0..1 live steadiness (1 = rock steady) */
   stability: number
-  /** bow-hand drift from the hold reference (torso units) — drives the aiming reticle */
+  /** live aim from the bow hand (torso units): y = height against the bow shoulder (+ = lower); x is 0 (not mapped) */
   aim: Point
+  /** the aim locked when the return began (null while not returning) — the arrow flies here */
+  lockedAim: Point | null
+  /** 0..1 progress of the return toward FIRE (only in `armed`) */
+  returnProgress: number
+  /** the return has begun (aim locked) */
+  returning: boolean
+  /** ms spent in `armed` so far (0 otherwise) */
+  armedMs: number
   guard: DrawGuard
   hint: DrawHint
+  cue: DrawCue
+  /** smoothed 2D bow-arm elbow angle (debug only, never a blocking condition) */
+  bowElbowDeg: number | null
   /** 0..1 progress towards the READY pose (hands together in front of the chest) */
   readyProgress: number
-  /** confirmed peak draw of this attempt / goal (0 before HOLD) — the release is judged against it */
-  peakRatio: number
 }
 
 /**

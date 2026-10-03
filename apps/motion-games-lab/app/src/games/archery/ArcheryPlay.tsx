@@ -1,5 +1,5 @@
 // Archery play screen: the shared GamePlay shell + Archery's round, controller and scene, plus the
-// step strip (准备 → 拉弓 → 稳住 → 放箭) that makes the state machine visible to the player.
+// step strip (准备 → 拉开 → 稳住瞄准 → 收手射出) that makes the state machine visible to the player.
 import { useCallback } from 'react'
 import { DEFAULT_REACH } from '../../motion/calibration'
 import { FLAGS } from '../../shared/flags'
@@ -13,9 +13,9 @@ import { ArcheryScene } from './ArcheryScene'
 
 const STEPS: { label: string; phases: ArcheryPhase[] }[] = [
   { label: '准备', phases: ['READY', 'RESET'] },
-  { label: '拉弓', phases: ['DRAW'] },
-  { label: '稳住', phases: ['HOLD'] },
-  { label: '放箭', phases: ['RELEASE', 'HIT'] },
+  { label: '拉开', phases: ['DRAW'] },
+  { label: '稳住瞄准', phases: ['HOLD'] },
+  { label: '收手射出', phases: ['RETURN_ARMED', 'FIRE', 'HIT'] },
 ]
 
 export function ArcheryPlay({ session, profile, settings, durationMs, onEnd, onRestart, onExit, onController }: PlayProps) {

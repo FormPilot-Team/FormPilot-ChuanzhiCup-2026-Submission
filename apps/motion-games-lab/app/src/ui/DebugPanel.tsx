@@ -80,9 +80,9 @@ export function DebugPanel({ session, controller }: { session: MotionSession | n
         <tr><td>calib neutral / hold ms</td><td>{CALIBRATION_CONFIG.neutralMs} / {CALIBRATION_CONFIG.reachHoldMs}</td></tr>
         <tr><td>stroke start / return (SW / share)</td><td>{STROKE_CONFIG.startBand} / {STROKE_CONFIG.returnShare}</td></tr>
         <tr><td>stroke min catch / confirm</td><td>{STROKE_CONFIG.minCatchMs} ms / {STROKE_CONFIG.confirmFrames} frames</td></tr>
-        <tr><td>draw start / turn ratio</td><td>{DRAW_CONFIG.startDelta} / {DRAW_CONFIG.turnRatio}</td></tr>
-        <tr><td>bow arm ok° / bent° / sustain</td><td>{DRAW_CONFIG.bowArmOkDeg} / {DRAW_CONFIG.bowArmBentDeg} / {DRAW_CONFIG.guardSustainMs} ms</td></tr>
-        <tr><td>release travel / confirm / window</td><td>≥{DRAW_CONFIG.releaseTravel} · {DRAW_CONFIG.releaseConfirmFrames} fr {DRAW_CONFIG.releaseConfirmMs} ms · {DRAW_CONFIG.releaseWindowMs} ms</td></tr>
+        <tr><td>draw start / string out min</td><td>{DRAW_CONFIG.startDelta} / {DRAW_CONFIG.drawHandOutMin}</td></tr>
+        <tr><td>return share / base min / confirm</td><td>{DRAW_CONFIG.returnShare} / {DRAW_CONFIG.returnBaseMin} / {DRAW_CONFIG.returnConfirmFrames} fr</td></tr>
+        <tr><td>soft hints: turn / bow elbow° / sustain</td><td>{DRAW_CONFIG.turnRatio} / {DRAW_CONFIG.bowArmSoftDeg} / {DRAW_CONFIG.softHintSustainMs} ms</td></tr>
       </tbody></table>
       <h4>motion events</h4>
       {d?.recentEvents.map((e, i) => (

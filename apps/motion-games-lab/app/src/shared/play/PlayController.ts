@@ -33,7 +33,7 @@ export type BaseEffect =
   | { type: 'rest-reminder' }
   /** score / combo / game HUD values changed */
   | { type: 'hud' }
-  /** a short game-specific coaching line ("划开一点", "持弓的手臂伸直") */
+  /** a short game-specific coaching line ("划开一点", "把弓抬到胸口的高度") */
   | { type: 'coach'; key: string; text: string }
   | { type: 'end'; result: GameResult }
 

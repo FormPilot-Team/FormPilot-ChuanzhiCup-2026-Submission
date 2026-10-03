@@ -1,7 +1,7 @@
 // Shared steps for the e2e specs: synthetic player, Game Hub → intro → positioning → camera/calibration.
 import { expect, type Page } from '@playwright/test'
 
-export const SHOTS = '../docs/round-1-fixes/screenshots'
+export const SHOTS = '../docs/archery-final/screenshots'
 export const shot = (page: Page, name: string) => page.screenshot({ path: `${SHOTS}/${name}.png` })
 
 export type Hook = {

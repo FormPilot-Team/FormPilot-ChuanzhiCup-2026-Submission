@@ -1,7 +1,7 @@
 // Round-1 playtest regressions that are not detector logic: the hand cursor art, the round lengths and
-// the archery wording tiers (soft hint vs. guard).
+// the archery wording (round 2: no 松 / 伸直, soft hints never replace the step).
 import { afterEach, describe, expect, it } from 'vitest'
-import { COPY } from '../data/games'
+import { COPY, INTRO } from '../data/games'
 import { ArcheryController } from '../games/archery/controller'
 import { ArcheryRound } from '../games/archery/round'
 import type { DrawState, MotionAdapterApi } from '../motion/contracts'
@@ -73,7 +73,8 @@ describe('archery wording: a soft hint never replaces the step, only a persistin
   function controllerWith(state: Partial<DrawState>) {
     const draw: DrawState = {
       options: { drawSide: 'right', drawGoal: 0.7, holdMs: 1000 }, phase: 'hold', attemptId: 1, drawRatio: 1, holdProgress: 0.4,
-      stability: 1, aim: { x: 0, y: 0 }, guard: null, hint: null, readyProgress: 1, peakRatio: 1, ...state,
+      stability: 1, aim: { x: 0, y: 0 }, lockedAim: null, returnProgress: 0, returning: false, armedMs: 0, guard: null, hint: null, cue: null,
+      bowElbowDeg: 150, readyProgress: 1, ...state,
     }
     const adapter = {
       enable: () => undefined, setDetectionActive: () => undefined, subscribe: () => () => undefined, configureDraw: () => undefined, drawState: () => draw,
@@ -83,15 +84,25 @@ describe('archery wording: a soft hint never replaces the step, only a persistin
     return c
   }
 
-  it('slightly bent bow arm: the step stays "稳住…", a gentle line is added underneath', () => {
+  it('a very bent bow arm only adds a gentle line; the step instruction stays (never "再伸直")', () => {
     const c = controllerWith({ hint: 'bow-arm-straighter' })
     expect(c.instruction(0)).toBe(COPY.archery.hold)
     expect(c.softHint()).toBe(COPY.archery.bowArmSoft)
+    expect(Object.values(COPY.archery).some((t) => t.includes('伸直'))).toBe(false)
   })
 
-  it('a clearly bent arm that persisted becomes the instruction; no soft line on top', () => {
-    const c = controllerWith({ guard: 'bow-arm-bent' })
-    expect(c.instruction(0)).toBe(COPY.archery.bowArmBent)
-    expect(c.softHint()).toBeNull()
+  it('no instruction anywhere says 松 (let go): the shot is "bring the string hand back to the chest"', () => {
+    for (const text of [...Object.values(COPY.archery), INTRO.archery.lead, ...INTRO.archery.how.flatMap((h) => [h.title, h.text])]) expect(text).not.toMatch(/松手|松一|一松/)
+    expect(controllerWith({ phase: 'armed', holdProgress: 1 }).instruction(0)).toBe(COPY.archery.armed)
+    expect(COPY.archery.armed).toContain('收回胸前')
+    expect(controllerWith({ phase: 'armed', holdProgress: 1, returning: true, returnProgress: 0.5 }).instruction(0)).toBe(COPY.archery.returning)
+  })
+
+  it('only hands-low replaces the step; turned / bent arm are soft lines; cues explain draw problems', () => {
+    expect(controllerWith({ guard: 'hands-low' }).instruction(0)).toBe(COPY.archery.handsLow)
+    expect(controllerWith({ hint: 'turned' }).instruction(0)).toBe(COPY.archery.hold)
+    expect(controllerWith({ hint: 'turned' }).softHint()).toBe(COPY.archery.turnedSoft)
+    expect(controllerWith({ phase: 'draw', cue: 'pull-string-out' }).instruction(0)).toBe(COPY.archery.pullOut)
+    expect(controllerWith({ phase: 'draw', cue: 'early-return' }).instruction(0)).toBe(COPY.archery.early)
   })
 })

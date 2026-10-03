@@ -239,34 +239,73 @@ export function HowBowReady() {
   )
 }
 
-export function HowBowDraw() {
+/** Bow held in the left (screen-left) hand, string pulled to `nock`. */
+function DrawnBow({ grip, nock }: { grip: [number, number]; nock: [number, number] }) {
+  const [gx, gy] = grip
   return (
-    <svg viewBox="0 0 240 150" role="img" aria-label="向两边拉开弓，稳住">
+    <g>
+      <path d={`M${gx + 6} ${gy - 36} Q${gx - 18} ${gy} ${gx + 6} ${gy + 36}`} fill="none" stroke="#8a5a32" strokeWidth="5" strokeLinecap="round" />
+      <path d={`M${gx + 6} ${gy - 36} L${nock[0]} ${nock[1]} L${gx + 6} ${gy + 36}`} fill="none" stroke="#fffaf0" strokeWidth="2" />
+    </g>
+  )
+}
+
+function SmallTarget({ x, y, r = 17 }: { x: number; y: number; r?: number }) {
+  return (
+    <g>
+      <circle cx={x} cy={y} r={r} fill="#f4ead2" />
+      <circle cx={x} cy={y} r={r * 0.72} fill="#e5483b" />
+      <circle cx={x} cy={y} r={r * 0.46} fill="#f4ead2" />
+      <circle cx={x} cy={y} r={r * 0.22} fill="#ffc94d" />
+    </g>
+  )
+}
+
+function Label({ x, y, text, w }: { x: number; y: number; text: string; w: number }) {
+  return (
+    <g>
+      <rect x={x - w / 2} y={y - 17} width={w} height="24" rx="12" fill="#fffaf0" opacity="0.94" />
+      <text x={x} y={y} fontSize="15" fontWeight="800" fill="#2f6b4f" textAnchor="middle">{text}</text>
+    </g>
+  )
+}
+
+export function HowBowDraw() {
+  // bow hand out to the left (it aims: up / down moves the reticle), string hand pulled out to the right
+  return (
+    <svg viewBox="0 0 240 150" role="img" aria-label="两手向两边拉开弓，用持弓的手上下瞄准，稳住等圆圈转满">
       <rect width="240" height="150" rx="18" fill="#e8f6fb" />
-      <Person x={120} y={60} armL={[-70, 4]} elbowR={[34, 4]} armR={[8, 6]} />
-      <Bow x={52} y={64} bend={30} />
-      <circle cx="198" cy="40" r="20" fill="none" stroke="#d9e3dc" strokeWidth="7" />
-      <path d="M198 20 A20 20 0 1 1 178 40" fill="none" stroke="#ffc94d" strokeWidth="7" strokeLinecap="round" />
+      <Person x={130} y={66} armL={[-66, 0]} elbowR={[22, 12]} armR={[44, -2]} />
+      <DrawnBow grip={[42, 66]} nock={[196, 64]} />
+      {/* up / down aiming arrows beside the bow hand */}
+      <path d="M22 50 v-16 m-6 6 l6 -7 l6 7 M22 82 v16 m-6 -6 l6 7 l6 -7" stroke={ACCENT} strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      {/* the reticle on a small target, with the hold ring */}
+      <SmallTarget x={204} y={28} r={16} />
+      <circle cx="204" cy="28" r="22" fill="none" stroke="#d9e3dc" strokeWidth="5" />
+      <path d="M204 6 A22 22 0 1 1 182 28" fill="none" stroke="#ffc94d" strokeWidth="5" strokeLinecap="round" />
+      <Label x={120} y={140} w={150} text="拉开 · 上下瞄准 · 稳住" />
     </svg>
   )
 }
 
-export function HowBowRelease() {
+export function HowBowReturn() {
+  // the string hand comes back from its drawn position to the chest → the arrow flies to the target
   return (
-    <svg viewBox="0 0 240 150" role="img" aria-label="拉弦的手往回一松，箭飞向靶心">
+    <svg viewBox="0 0 240 150" role="img" aria-label="把拉弦的手从拉开的位置收回胸前，箭就射出去">
       <rect width="240" height="150" rx="18" fill="#e8f6fb" />
-      <g transform="translate(190 64)">
-        <circle r="34" fill="#f4ead2" />
-        <circle r="26" fill="#e5483b" />
-        <circle r="18" fill="#f4ead2" />
-        <circle r="10" fill="#2bb5a8" />
-        <circle r="4" fill="#ffc94d" />
-      </g>
-      <path d="M40 66 L182 64" stroke="#553623" strokeWidth="4" strokeLinecap="round" />
-      <path d="M182 64 l-12 -6 l2 6 l-2 6 z" fill="#553623" />
-      <path d="M40 66 l-10 -8 M40 66 l-10 8" stroke="#fffaf0" strokeWidth="4" strokeLinecap="round" />
-      <path d="M60 104 q30 -12 60 0" fill="none" stroke={ACCENT} strokeWidth="4" strokeDasharray="5 6" />
-      <text x="98" y="132" fontSize="18" fontWeight="800" fill="#2f6b4f" textAnchor="middle">松手！</text>
+      <Person x={130} y={66} armL={[-66, 0]} elbowR={[30, 26]} armR={[-6, 26]} />
+      <DrawnBow grip={[42, 66]} nock={[48, 66]} />
+      {/* where the string hand was: a dashed ghost hand */}
+      <circle cx="196" cy="64" r="9" fill="none" stroke={HAND_LINE} strokeWidth="2" strokeDasharray="3 3" />
+      {/* the direction: from there back to the chest */}
+      <path d="M186 70 Q164 98 136 94" fill="none" stroke={ACCENT} strokeWidth="5" strokeLinecap="round" />
+      <path d="M131 94 l13 -9 l-1 9 l1 9 z" fill={ACCENT} />
+      {/* the arrow flies off the bow to the target */}
+      <SmallTarget x={26} y={24} r={15} />
+      <path d="M60 52 L32 30" stroke="#553623" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M30 28 l3 10 l4 -5 l6 -1 z" fill="#553623" />
+      <path d="M66 50 l6 -2 M70 55 l6 -1" stroke="#fffaf0" strokeWidth="3" strokeLinecap="round" />
+      <Label x={120} y={140} w={176} text="收回胸前 → 箭射出！" />
     </svg>
   )
 }

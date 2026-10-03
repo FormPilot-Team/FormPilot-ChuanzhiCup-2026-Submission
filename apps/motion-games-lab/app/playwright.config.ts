@@ -6,7 +6,7 @@ export default defineConfig({
   timeout: 180_000,
   expect: { timeout: 15_000 },
   workers: 1,
-  reporter: [['list'], ['json', { outputFile: '../docs/round-1-fixes/e2e-results.json' }]],
+  reporter: [['list'], ['json', { outputFile: '../docs/archery-final/e2e-results.json' }]],
   use: {
     channel: 'msedge',
     baseURL: 'http://127.0.0.1:5181',

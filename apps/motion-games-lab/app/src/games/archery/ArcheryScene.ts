@@ -1,14 +1,18 @@
 // Archery renderer (Phaser). Side-on forest range: the target stands down the lane on the bow-hand
 // side; the bow is in the foreground with the two hand cursors on it — the bow hand on the grip, the
 // string hand on the nock. Drawing pulls the nock back, the limbs flex, a reticle on the target shows
-// where the arrow would land now (driven by the real bow-hand drift and steadiness) and tightens while
-// the hold fills. RELEASE sends the arrow along that line; the hit is exactly the predicted point.
+// where the arrow would land now (driven by the bow-hand aim and steadiness) and tightens while the
+// hold fills. In RETURN_ARMED the string hand coming back is visible at once: the nock eases forward,
+// the string brightens and a small ring around the string hand fills toward FIRE; once the return has
+// begun the reticle freezes on the locked aim. Before the first arrow a ghost hand shows the way back
+// to the chest if the player waits. FIRE sends the arrow to the locked aim; the hit is exactly that point.
 // Bow flex and reticle are eased every rendered frame (the pose only arrives at ~30 Hz); the hit itself is
-// computed from the unsmoothed release data.
+// computed from the unsmoothed FIRE data.
 import * as Phaser from 'phaser'
 import type { Point } from '../../motion/contracts'
 import { sfx } from '../../shared/audio'
-import { HandCursor, paintHandTextures } from '../../shared/handCursor'
+import { COPY } from '../../data/games'
+import { HandCursor, handTextureKey, paintHandTextures } from '../../shared/handCursor'
 import { perf } from '../../shared/perf'
 import { FONT_FAMILY, paintTexture } from '../../shared/phaserHost'
 import { drawDebugBody } from '../../shared/play/debugOverlay'
@@ -42,6 +46,11 @@ export class ArcheryScene extends Phaser.Scene {
   private arrow!: Phaser.GameObjects.Image
   private stuck: Phaser.GameObjects.Image[] = []
   private cursors!: { bow: HandCursor; string: HandCursor }
+  private returnRing!: Phaser.GameObjects.Graphics
+  private ghost!: Phaser.GameObjects.Image
+  private ghostPath!: Phaser.GameObjects.Graphics
+  private ghostLabel!: Phaser.GameObjects.Text
+  private ghostSince: number | null = null
   private sparkles!: Phaser.GameObjects.Particles.ParticleEmitter
   private straw!: Phaser.GameObjects.Particles.ParticleEmitter
   private debugBody?: Phaser.GameObjects.Graphics
@@ -86,6 +95,13 @@ export class ArcheryScene extends Phaser.Scene {
     paintHandTextures(this, this.dpr)
     const bowSide = this.controller.drawSide === 'right' ? 'left' : 'right'
     this.cursors = { bow: new HandCursor(this, bowSide, 70), string: new HandCursor(this, this.controller.drawSide, 72) }
+    this.returnRing = this.add.graphics().setDepth(75)
+    this.ghostPath = this.add.graphics().setDepth(68)
+    this.ghost = this.add.image(0, 0, handTextureKey(this.controller.drawSide, 'grab')).setOrigin(0.5, 0.61).setDepth(69).setAlpha(0)
+    this.ghostLabel = this.add.text(0, 0, '', {
+      fontFamily: FONT_FAMILY, fontSize: `${Math.round(30 * this.dpr)}px`, fontStyle: 'bold', color: '#fff6c9',
+      stroke: '#2f6b4f', strokeThickness: Math.round(7 * this.dpr),
+    }).setOrigin(0.5, 1).setDepth(96).setAlpha(0)
     this.sparkles = this.add.particles(0, 0, 'sparkle', {
       speed: { min: 80 * this.dpr, max: 300 * this.dpr }, lifespan: 750, scale: { start: 0.7, end: 0 }, alpha: { start: 1, end: 0 },
       rotate: { min: 0, max: 360 }, blendMode: 'ADD', emitting: false,
@@ -173,15 +189,17 @@ export class ArcheryScene extends Phaser.Scene {
     const snapT = (now - this.snapAt) / 320
     const snap = snapT >= 0 && snapT < 1 ? Math.sin(snapT * Math.PI * 4) * (1 - snapT) * 0.12 : 0
     const live = playing && (d.phase === 'draw' || d.phase === 'hold' || d.phase === 'armed')
-    // after a release the string snaps straight back (no easing), otherwise the flex glides
+    // after FIRE the string snaps straight back (no easing), otherwise the flex glides; while the
+    // string hand comes back in RETURN_ARMED the nock follows it forward (visible "I see you" feedback)
     if (sinceShot >= 0 && sinceShot < 60) this.flexView.snap(0, now)
-    const flex = this.flexView.step(Math.max(0, Math.min(1.15, live ? d.drawRatio : 0)), now) + snap
+    const returning = live && d.phase === 'armed' && d.returnProgress > 0.12 ? (d.returnProgress - 0.12) / 0.88 : 0
+    const flex = this.flexView.step(Math.max(0, Math.min(1.15, live ? d.drawRatio : 0)) * (1 - 0.55 * returning), now) + snap
     const g = this.bowGeometry(flex)
-    this.drawBow(g, live)
+    this.drawBow(g, live, returning)
     this.drawReticle(d.phase, d.holdProgress, live, time, now)
     // arrow on the string while drawing; hidden while one is in flight
     // the next arrow is nocked once the previous one has landed
-    const showArrow = playing && !this.flying && (sinceShot < 0 || sinceShot > SHOT_TIMING.releaseShowMs + SHOT_TIMING.flightMs + SHOT_TIMING.hitShowMs)
+    const showArrow = playing && !this.flying && (sinceShot < 0 || sinceShot > SHOT_TIMING.fireShowMs + SHOT_TIMING.flightMs + SHOT_TIMING.hitShowMs)
     this.arrow.setVisible(showArrow)
     if (showArrow) {
       const aimAt = this.targetCenter()
@@ -204,6 +222,8 @@ export class ArcheryScene extends Phaser.Scene {
     const bowSide = this.controller.drawSide === 'right' ? 'left' : 'right'
     this.cursors.bow.update(now, { position: g.grip, tracked: this.controller.tracked(bowSide), pose: poses.bow, near: d.phase === 'armed' }, scale)
     this.cursors.string.update(now, { position: g.nock, tracked: this.controller.tracked(this.controller.drawSide), pose: poses.string, near: d.phase === 'armed' }, scale)
+    this.drawReturnRing(live && d.phase === 'armed', returning, size, time)
+    this.drawGhost(this.controller.ghostGuide(), size, now)
     if (this.debugBody) {
       const W = this.scale.width
       const s = this.scale.height * 0.16
@@ -211,7 +231,7 @@ export class ArcheryScene extends Phaser.Scene {
     }
   }
 
-  private drawBow(g: ReturnType<ArcheryScene['bowGeometry']>, live: boolean): void {
+  private drawBow(g: ReturnType<ArcheryScene['bowGeometry']>, live: boolean, returning: number): void {
     const b = this.bow
     b.clear()
     const w = Math.max(6, g.L * 0.07)
@@ -232,8 +252,17 @@ export class ArcheryScene extends Phaser.Scene {
     // grip wrap
     b.fillStyle(0x553623, 1)
     b.fillRoundedRect(g.grip.x - w * 0.8, g.grip.y - g.L * 0.12, w * 1.6, g.L * 0.24, w * 0.5)
-    // string
-    b.lineStyle(Math.max(2, 2.5 * this.dpr), live ? 0xfffaf0 : 0xf4ead2, 1)
+    // string (glows gold as the string hand comes back toward FIRE)
+    if (returning > 0.02) {
+      b.lineStyle(Math.max(6, 9 * this.dpr), 0xffd36b, 0.25 + 0.45 * returning)
+      b.beginPath()
+      b.moveTo(g.top.x, g.top.y)
+      b.lineTo(g.nock.x, g.nock.y)
+      b.lineTo(g.bottom.x, g.bottom.y)
+      b.strokePath()
+    }
+    const stringColor = returning > 0.02 ? Phaser.Display.Color.GetColor(255, Math.round(250 - 40 * returning), Math.round(240 - 150 * returning)) : live ? 0xfffaf0 : 0xf4ead2
+    b.lineStyle(Math.max(2, (2.5 + 1.5 * returning) * this.dpr), stringColor, 1)
     b.beginPath()
     b.moveTo(g.top.x, g.top.y)
     b.lineTo(g.nock.x, g.nock.y)
@@ -251,11 +280,12 @@ export class ArcheryScene extends Phaser.Scene {
     }
     const d = this.controller.draw()
     const c = this.targetCenter()
-    const offset = aimOffset({ aim: d.aim, stability: d.stability, drawRatio: Math.max(d.drawRatio, phase === 'draw' ? 0 : 1) }, this.controller.round.params, STAGES[this.stageView].offsetScale)
+    // once the return has begun the reticle freezes on the locked aim: the arrow flies exactly there
+    const offset = aimOffset({ aim: d.lockedAim ?? d.aim, stability: d.stability, drawRatio: Math.max(d.drawRatio, phase === 'draw' ? 0 : 1) }, this.controller.round.params, STAGES[this.stageView].offsetScale)
     const p = { x: c.x + this.aimView.x.step(offset.x, now) * this.targetR, y: c.y + this.aimView.y.step(offset.y, now) * this.targetR }
     const armed = phase === 'armed'
     const size = this.targetR * (phase === 'draw' ? 0.55 : 0.18 + 0.32 * (1 - holdProgress))
-    const color = armed ? 0xffc94d : 0xffffff
+    const color = d.lockedAim ? 0xfff1b0 : armed ? 0xffc94d : 0xffffff
     const alpha = phase === 'draw' ? 0.5 : 0.95
     r.lineStyle(Math.max(3, 4 * this.dpr), 0x1f3a2e, 0.35 * alpha)
     r.strokeCircle(p.x, p.y, size + 2 * this.dpr)
@@ -282,6 +312,75 @@ export class ArcheryScene extends Phaser.Scene {
         r.strokeCircle(p.x, p.y, ringR + (6 + 6 * pulse) * this.dpr)
       }
     }
+  }
+
+  /** RETURN_ARMED: a small ring around the string hand fills as it comes back toward FIRE. */
+  private drawReturnRing(show: boolean, progress: number, handSize: number, time: number): void {
+    const r = this.returnRing
+    r.clear()
+    const at = this.cursors.string.position()
+    if (!show || !at) return
+    const radius = handSize * 0.62
+    const width = Math.max(5, 6 * this.dpr)
+    r.lineStyle(width + 3 * this.dpr, 0x1f3a2e, 0.28)
+    r.strokeCircle(at.x, at.y, radius)
+    // below a small dead-band the progress is tracking noise around the drawn position: no fill
+    const fill = progress > 0.12 ? (progress - 0.12) / 0.88 : 0
+    const pulse = fill > 0 ? 1 : 0.55 + 0.25 * Math.sin(time / 160)
+    r.lineStyle(width, 0xfff6c9, 0.35 * pulse)
+    r.strokeCircle(at.x, at.y, radius)
+    if (fill > 0) {
+      r.lineStyle(width, 0xffc94d, 1)
+      r.beginPath()
+      r.arc(at.x, at.y, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, fill), false)
+      r.strokePath()
+    }
+  }
+
+  /** Ghost guide: a translucent string hand glides from the drawn nock back toward the chest, with an arrow and a label. */
+  private drawGhost(show: boolean, handSize: number, now: number): void {
+    const path = this.ghostPath
+    path.clear()
+    if (!show) {
+      this.ghostSince = null
+      this.ghost.setAlpha(0)
+      this.ghostLabel.setAlpha(0)
+      return
+    }
+    this.ghostSince ??= now
+    const from = this.bowGeometry(1).nock
+    const to = this.bowGeometry(0.2).nock
+    const H = this.scale.height
+    // "the chest": back past the grip side, slightly lower, where the hand was at READY
+    const end = { x: to.x - this.m * H * 0.03, y: to.y + H * 0.05 }
+    const cycle = 1500
+    const t = ((now - this.ghostSince) % cycle) / cycle
+    const u = Math.min(1, t / 0.7)
+    const e = u * u * (3 - 2 * u)
+    const fade = t < 0.1 ? t / 0.1 : t > 0.82 ? Math.max(0, 1 - (t - 0.82) / 0.18) : 1
+    const fadeIn = Math.min(1, (now - this.ghostSince) / 300)
+    this.ghost.setPosition(from.x + (end.x - from.x) * e, from.y + (end.y - from.y) * e)
+      .setDisplaySize(handSize, handSize).setAlpha(0.55 * fade * fadeIn)
+    // dashed guide line with an arrow head toward the chest
+    const dash = 14 * this.dpr
+    const len = Math.hypot(end.x - from.x, end.y - from.y)
+    const ux = (end.x - from.x) / len
+    const uy = (end.y - from.y) / len
+    path.lineStyle(Math.max(4, 5 * this.dpr), 0xfff6c9, 0.85 * fadeIn)
+    for (let s = 0; s < len - dash; s += dash * 1.8) {
+      path.beginPath()
+      path.moveTo(from.x + ux * s, from.y + uy * s)
+      path.lineTo(from.x + ux * (s + dash), from.y + uy * (s + dash))
+      path.strokePath()
+    }
+    const head = 20 * this.dpr
+    path.fillStyle(0xfff6c9, 0.95 * fadeIn)
+    path.fillTriangle(
+      end.x, end.y,
+      end.x - ux * head - uy * head * 0.6, end.y - uy * head + ux * head * 0.6,
+      end.x - ux * head + uy * head * 0.6, end.y - uy * head - ux * head * 0.6,
+    )
+    this.ghostLabel.setText(COPY.archery.ghost).setPosition((from.x + end.x) / 2, Math.min(from.y, end.y) - handSize * 0.85).setAlpha(fadeIn)
   }
 
   // ---------- effects ----------

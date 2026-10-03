@@ -1,5 +1,5 @@
-// One round of Archery: releases become shots, the hit point follows from the motion (bow-hand
-// drift, steadiness, draw completeness), rings give points, consecutive hits build a combo, the target
+// One round of Archery: FIRE events become shots, the hit point follows from the motion (the bow-hand
+// aim locked when the return began, steadiness, draw completeness), rings give points, consecutive hits build a combo, the target
 // steps back as the player gets going. Pure logic (no Phaser, no DOM). A miss or a lowered bow costs
 // nothing.
 import type { DrawCancelReason, MotionEvent, MotionFrame, Point } from '../../motion/contracts'
@@ -30,8 +30,8 @@ export type ArcheryRoundEvent =
   | { type: 'end'; result: GameResult }
 
 /**
- * Where the arrow lands (target-radius units). Deterministic: the bow hand's drift at the moment of
- * release, plus a wobble term that grows as steadiness drops, plus a drop when the bow was not fully
+ * Where the arrow lands (target-radius units). Deterministic: the bow-hand aim (locked when the return
+ * began), plus a wobble term that grows as steadiness drops, plus a drop when the bow was not fully
  * drawn. Larger target distances scale the offset.
  */
 export function aimOffset(input: { aim: Point; stability: number; drawRatio: number }, params: ArcheryParams, offsetScale: number): Point {
@@ -120,7 +120,7 @@ export class ArcheryRound {
       else if (event.type === 'DRAW_CANCEL' && event.reason !== 'paused') {
         this.cancels[event.reason] = (this.cancels[event.reason] ?? 0) + 1
         events.push({ type: 'cancel', reason: event.reason })
-      } else if (event.type === 'RELEASE') {
+      } else if (event.type === 'FIRE') {
         events.push(...this.shoot(event.aim, event.holdStability, event.drawRatio, event.timestamp, frame))
       }
     }
@@ -159,7 +159,7 @@ export class ArcheryRound {
     const stability = mean(this.shots.map((s) => s.stability))
     const draw = mean(this.shots.map((s) => Math.min(1.5, s.drawRatio)))
     const lowered = (this.cancels.lowered ?? 0) + (this.cancels.timeout ?? 0)
-    const guards = (this.cancels.turned ?? 0) + (this.cancels['bow-arm-bent'] ?? 0) + (this.cancels['elbow-only'] ?? 0) + (this.cancels['hands-low'] ?? 0)
+    const early = this.cancels['early-return'] ?? 0
     return {
       gameId: 'archery',
       score: this.score,
@@ -177,22 +177,22 @@ export class ArcheryRound {
         { label: '平均拉弓幅度（相对目标）', value: draw === null ? '—' : `${Math.round(draw * 100)}%` },
         { label: '最远到达', value: STAGES[this.stage].name },
         { label: '收弓重来', value: `${lowered} 次` },
-        { label: '动作提醒（转身 / 手臂）', value: `${guards} 次` },
+        { label: '圆圈转满前就收手', value: `${early} 次` },
         { label: '身体侧倾提醒', value: `${this.leanReminders} 次` },
         { label: '耸肩提醒', value: `${this.shrugReminders} 次` },
       ],
-      tip: archeryTip({ shots: this.shots.length, stability, draw, guards, lowered, lean: this.leanReminders, shrug: this.shrugReminders }),
+      tip: archeryTip({ shots: this.shots.length, stability, draw, early, lowered, lean: this.leanReminders, shrug: this.shrugReminders }),
       difficultyLabel: this.params.label,
       endedBy,
     }
   }
 }
 
-function archeryTip(s: { shots: number; stability: number | null; draw: number | null; guards: number; lowered: number; lean: number; shrug: number }): string {
+function archeryTip(s: { shots: number; stability: number | null; draw: number | null; early: number; lowered: number; lean: number; shrug: number }): string {
   if (s.lean >= 2) return '拉弓时让身体保持正直，只用手臂拉开。'
   if (s.shrug >= 2) return '拉弓时肩膀放松、往下沉，会更稳。'
-  if (s.guards >= 3) return '身体正对屏幕，持弓的手臂伸直，拉弦时手肘一起往外。'
-  if (s.shots < 4 && s.lowered >= 2) return '稳住之后，拉弦的手往回一松就能放箭。'
+  if (s.early >= 2) return '等圆圈转满，再把拉弦的手收回胸前。'
+  if (s.shots < 4 && s.lowered >= 2) return '稳住之后，把拉弦的手收回胸前，箭就射出去。'
   if (s.stability !== null && s.stability < 0.6) return '圆圈转满之前尽量稳住，箭会更靠近靶心。'
   if (s.draw !== null && s.draw < 0.95) return '再拉开一点点，箭会飞得更平更远。'
   return '射得很稳！保持轻松的呼吸，感到不适请随时停下来休息。'

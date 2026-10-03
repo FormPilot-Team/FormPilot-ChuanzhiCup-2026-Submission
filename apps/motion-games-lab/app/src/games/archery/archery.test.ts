@@ -5,7 +5,7 @@ import { directorContext } from '../../motion/session'
 import { SyntheticPoseSource } from '../../motion/synthetic'
 import type { BaseEffect } from '../../shared/play/PlayController'
 import { ARCHERY_DIFFICULTIES, RINGS, SHOT_TIMING, STAGES } from './config'
-import { archeryHandPoses, archeryPhase, ArcheryController, type ArcheryControllerEffect } from './controller'
+import { archeryHandPoses, archeryPhase, ArcheryController, showGhostGuide, type ArcheryControllerEffect } from './controller'
 import { aimOffset, ArcheryRound, ringFor } from './round'
 
 let id = 1
@@ -16,7 +16,7 @@ const frame = (at: number, posture: Partial<MotionFrame['posture']> = {}): Motio
   source: 'synthetic',
 })
 const release = (at: number, aim = { x: 0, y: 0 }, stability = 1, drawRatio = 1.1): MotionEvent => ({
-  id: id++, emittedAt: 0, timestamp: at, type: 'RELEASE', side: 'right', attemptId: id, drawAmount: 0.7, holdStability: stability, drawRatio, aim, releaseMs: 200,
+  id: id++, emittedAt: 0, timestamp: at, type: 'FIRE', side: 'right', attemptId: id, drawAmount: 0.7, holdStability: stability, drawRatio, aim, returnMs: 200,
 })
 
 describe('Archery hit model (deterministic, driven by the motion)', () => {
@@ -65,9 +65,9 @@ describe('ArcheryRound', () => {
   it('cancelled draws are counted for feedback but never cost points; pause freezes the round', () => {
     const round = new ArcheryRound({ difficulty: 'easy', durationMs: 60_000 })
     round.start(0)
-    round.handleMotion(frame(500), [{ id: id++, emittedAt: 0, timestamp: 500, type: 'DRAW_CANCEL', side: 'right', attemptId: 1, reason: 'turned' }])
+    round.handleMotion(frame(500), [{ id: id++, emittedAt: 0, timestamp: 500, type: 'DRAW_CANCEL', side: 'right', attemptId: 1, reason: 'early-return' }])
     expect(round.score).toBe(0)
-    expect(round.cancels.turned).toBe(1)
+    expect(round.cancels['early-return']).toBe(1)
     round.tick(1000)
     round.pause()
     expect(round.handleMotion(frame(2000), [release(2000)])).toEqual([])
@@ -76,16 +76,29 @@ describe('ArcheryRound', () => {
     expect(round.elapsedMs()).toBeLessThan(1200)
   })
 
-  it('visible phases and hand poses follow READY → DRAW → HOLD → RELEASE → HIT → RESET', () => {
+  it('visible phases and hand poses follow READY → DRAW → HOLD → RETURN_ARMED → FIRE → HIT → RESET', () => {
     expect(archeryPhase('wait-ready', -1, 0)).toBe('READY')
     expect(archeryPhase('draw', -1, 0)).toBe('DRAW')
-    expect(archeryPhase('armed', -1, 0)).toBe('HOLD')
-    expect(archeryPhase('cooldown', 50, 1)).toBe('RELEASE')
-    expect(archeryPhase('cooldown', SHOT_TIMING.releaseShowMs + 100, 1)).toBe('HIT')
+    expect(archeryPhase('hold', -1, 0)).toBe('HOLD')
+    expect(archeryPhase('armed', -1, 0)).toBe('RETURN_ARMED')
+    expect(archeryPhase('cooldown', 50, 1)).toBe('FIRE')
+    expect(archeryPhase('cooldown', SHOT_TIMING.fireShowMs + 100, 1)).toBe('HIT')
     expect(archeryPhase('wait-ready', 5000, 1)).toBe('RESET')
     expect(archeryHandPoses('DRAW', 'draw')).toEqual({ bow: 'grab', string: 'half' })
-    expect(archeryHandPoses('HOLD', 'armed')).toEqual({ bow: 'grab', string: 'grab' })
-    expect(archeryHandPoses('RELEASE', 'cooldown').string).toBe('open')
+    expect(archeryHandPoses('RETURN_ARMED', 'armed')).toEqual({ bow: 'grab', string: 'grab' })
+    expect(archeryHandPoses('FIRE', 'cooldown').string).toBe('open')
+  })
+
+  it('ghost guide: only waiting in RETURN_ARMED, after 1 s before the first arrow (4 s later), hidden once the return begins', () => {
+    const at = (armedMs: number, returning = false, returnProgress = 0) => ({ phase: 'armed' as const, armedMs, returning, returnProgress })
+    expect(showGhostGuide(at(500), 0)).toBe(false)
+    expect(showGhostGuide(at(1100), 0)).toBe(true)
+    expect(showGhostGuide(at(1100, false, 0.1), 0)).toBe(true) // tracking noise at the drawn position: keep showing
+    expect(showGhostGuide(at(1100, false, 0.3), 0)).toBe(false) // started coming back: hide at once
+    expect(showGhostGuide(at(1100, true, 0.3), 0)).toBe(false)
+    expect(showGhostGuide(at(1100), 3)).toBe(false) // later arrows: not a permanent replay
+    expect(showGhostGuide(at(4100), 3)).toBe(true)
+    expect(showGhostGuide({ ...at(5000), phase: 'hold' }, 0)).toBe(false)
   })
 })
 
@@ -133,6 +146,8 @@ describe('Synthetic replay: Archery from calibration to the result', () => {
     expect(end.result.successRate!).toBeGreaterThan(0.7)
     expect(end.result.maxCombo).toBeGreaterThanOrEqual(3)
     expect(['wait-ready', 'ready', 'draw', 'hold', 'armed', 'cooldown'].every((p) => phases.has(p))).toBe(true)
+    // the round never cancelled a draw for posture: every attempt that reached the hold fired
+    expect(round.cancels['early-return'] ?? 0).toBe(0)
     expect(effects.some((e) => e.type === 'status' && e.status === 'paused' && e.reason === 'tracking')).toBe(true)
     expect(effects.filter((e) => e.type === 'end')).toHaveLength(1)
     expect(new Set(shots.map((s) => s.id)).size).toBe(shots.length)

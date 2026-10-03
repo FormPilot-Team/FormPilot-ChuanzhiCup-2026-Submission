@@ -1,6 +1,6 @@
 // Archery parameters (lab design choices awaiting playtests). The hit point is computed from the
-// player's own motion — bow-hand drift during the hold, steadiness, how fully the bow was drawn —
-// never from a random number.
+// player's own motion — where the bow hand aimed when the return began, steadiness, how fully the bow
+// was drawn — never from a random number. Round 2: holds are shorter (the shot is the return now).
 import type { Difficulty } from '../../shared/settings'
 
 export interface ArcheryParams {
@@ -9,7 +9,7 @@ export interface ArcheryParams {
   /** full draw = this share of the player's arm length (wrist separation increase) */
   drawFraction: number
   holdMs: number
-  /** target-radius units of aim offset per torso unit of bow-hand drift */
+  /** target-radius units of aim offset per torso unit of bow-hand aim (height against the shoulder, small sideways part) */
   aimGain: number
   /** extra offset at stability 0 (target-radius units) */
   wobbleGain: number
@@ -18,9 +18,9 @@ export interface ArcheryParams {
 }
 
 export const ARCHERY_DIFFICULTIES: Record<Difficulty, ArcheryParams> = {
-  easy: { label: '轻松', description: '拉开一点就够，靶子大，稳住的时间短', drawFraction: 0.5, holdMs: 800, aimGain: 2.2, wobbleGain: 0.75, shotsPerStage: 5 },
-  standard: { label: '标准', description: '适中的拉弓幅度和稳住时间', drawFraction: 0.62, holdMs: 1000, aimGain: 2.8, wobbleGain: 0.9, shotsPerStage: 4 },
-  challenge: { label: '挑战', description: '拉得更开、稳得更久，靶子会越来越远', drawFraction: 0.75, holdMs: 1200, aimGain: 3.4, wobbleGain: 1.05, shotsPerStage: 3 },
+  easy: { label: '轻松', description: '拉开一点就够，靶子大，稳住的时间短', drawFraction: 0.5, holdMs: 500, aimGain: 2.2, wobbleGain: 0.75, shotsPerStage: 5 },
+  standard: { label: '标准', description: '适中的拉弓幅度和稳住时间', drawFraction: 0.62, holdMs: 700, aimGain: 2.8, wobbleGain: 0.9, shotsPerStage: 4 },
+  challenge: { label: '挑战', description: '拉得更开、稳得更久，靶子会越来越远', drawFraction: 0.75, holdMs: 900, aimGain: 3.4, wobbleGain: 1.05, shotsPerStage: 3 },
 }
 
 /** Rings in target-radius units (1 = outer edge). */
@@ -45,5 +45,8 @@ export const ARCHERY_SCORING = Object.freeze({
   milestones: [3, 5, 8, 12] as readonly number[],
 })
 
-/** Visual timing after a release (ms): the arrow flies, lands, the score shows, then RESET. */
-export const SHOT_TIMING = Object.freeze({ releaseShowMs: 220, flightMs: 520, hitShowMs: 1100 })
+/** Visual timing after FIRE (ms): the arrow leaves, flies, lands, the score shows, then RESET. */
+export const SHOT_TIMING = Object.freeze({ fireShowMs: 220, flightMs: 520, hitShowMs: 1100 })
+
+/** First-shot guide: a ghost hand shows the return after this long in RETURN_ARMED without a return… */
+export const GHOST_GUIDE = Object.freeze({ afterMs: 1000, laterShotsAfterMs: 4000 })

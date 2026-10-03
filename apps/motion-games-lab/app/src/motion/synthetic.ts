@@ -249,7 +249,7 @@ export class BoatBot implements Bot {
   }
 }
 
-/** Archery: hands together → draw apart (bow arm straight, string elbow out) → hold → snap back. */
+/** Archery: hands together → draw apart (bow arm straight, string elbow out) → hold → string hand back to the chest. */
 export class ArcheryBot implements Bot {
   paused = false
   /** every Nth shot wobbles during the hold (lower stability → outer rings) */
@@ -291,8 +291,8 @@ export class ArcheryBot implements Bot {
         if (state.phase === 'hold') return
         this.releaseAt ??= now + 250
         if (now >= this.releaseAt) {
-          actor.speed[draw] = 1.8
-          actor.goal[draw] = { x: -out * 0.2, y: 0.12 }
+          // RETURN: bring the string hand back to the chest at an ordinary arm speed
+          actor.goal[draw] = { x: out * 0.05, y: 0.3 }
           actor.elbowGoal[draw] = null
         }
         return

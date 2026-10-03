@@ -1,11 +1,13 @@
 // Boating stroke detector and Archery draw detector: state machines, guards, debounce, pause gating.
-// Round 1 (first human playtest): strokes must accept natural, imprecise sweeps; archery must not fire
-// while the player is still drawing, and a slightly bent bow arm must not block the game.
+// Round 1 (first human playtest): strokes must accept natural, imprecise sweeps.
+// Round 2 (Archery final playtest): the shot is "bring the string hand back to the chest" after the hold;
+// the bow arm (elbow angle, aiming moves) and a turned torso never block, pause or cancel anything.
 import { describe, expect, it } from 'vitest'
-import type { MotionEvent, MotionFrame, Point, Side } from './contracts'
-import { DrawDetector, elbowAngleDeg } from './drawDetector'
+import type { DrawState, MotionEvent, MotionFrame, Point, Side } from './contracts'
+import { DRAW_CONFIG, DrawDetector, elbowAngleDeg } from './drawDetector'
 import { MotionAdapter } from './MotionAdapter'
 import { directorContext } from './session'
+import { humanArcherFrames } from './humanArcher.fixture'
 import { StrokeDetector } from './strokeDetector'
 import { SyntheticPoseSource } from './synthetic'
 
@@ -206,15 +208,25 @@ describe('StrokeDetector (Boating, scheme A outward sweep)', () => {
   })
 })
 
-// ---------- Archery ----------
+// ---------- Archery (round 2: READY → DRAW → HOLD → RETURN_ARMED → FIRE) ----------
 
 const R = { x: 0.375, y: 0 }
 const Lsh = { x: -0.375, y: 0 }
 const TOGETHER: Record<Side, Point> = { left: { x: -0.08, y: 0.38 }, right: { x: 0.08, y: 0.38 } }
 const DRAWN: Record<Side, Point> = { left: { x: -1.3, y: 0.06 }, right: { x: 0.5, y: 0.04 } }
+/** where the string hand comes back to: in front of the chest */
+const CHEST = { x: 0.05, y: 0.3 }
 const DRAW_ELBOW = { x: 0.98, y: 0.08 }
+const HANGING: Record<Side, Point> = { left: { x: -0.5, y: 0.95 }, right: { x: 0.5, y: 0.95 } }
+/** aim.y for a bow wrist at height y (bow shoulder at 0) */
+const aimY = (y: number) => y - DRAW_CONFIG.aimRefBelowShoulder
 
-/** Archery frame: bow = left (straight arm), string = right with an explicit elbow. */
+type Fire = Extract<MotionEvent, { type: 'FIRE' }>
+const firesOf = (events: Pending[]) => events.filter((e) => e.type === 'FIRE') as unknown as Fire[]
+const cancelsOf = (events: Pending[]) => events.filter((e) => e.type === 'DRAW_CANCEL') as unknown as Extract<MotionEvent, { type: 'DRAW_CANCEL' }>[]
+const lerp = (a: Point, b: Point, u: number) => ({ x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u })
+
+/** Archery frame: bow = left, string = right with an explicit elbow. */
 function arms(at: number, left: Point, right: Point, opts: { rightElbow?: Point; leftElbow?: Point; shoulders?: [Point, Point] } = {}): MotionFrame {
   const f = frame(at, { left, right })
   f.leftElbow = opts.leftElbow ?? { x: (Lsh.x + left.x) / 2, y: (Lsh.y + left.y) / 2 + 0.02 }
@@ -230,228 +242,226 @@ function bowElbowFor(angleDeg: number): Point {
   return { x: (Lsh.x + DRAWN.left.x) / 2, y: (Lsh.y + DRAWN.left.y) / 2 + d }
 }
 
-function shoot(d: DrawDetector, opts: { wobble?: number; slowRelease?: boolean; bentBow?: boolean; bowAngle?: number; twist?: boolean; noElbow?: boolean; drawJitter?: number; holdMs?: number } = {}) {
-  const events: Pending[] = []
-  let t = 0
-  const lerp = (a: Point, b: Point, u: number) => ({ x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u })
-  const push = (f: MotionFrame) => events.push(...d.update(f))
-  const rightElbowAt = (u: number) => (opts.noElbow ? undefined : lerp({ x: 0.3, y: 0.22 }, DRAW_ELBOW, u))
-  const leftElbowAt = () => (opts.bentBow ? { x: -0.55, y: 0.6 } : opts.bowAngle ? bowElbowFor(opts.bowAngle) : undefined)
-  const shoulders = (u: number): [Point, Point] | undefined => (opts.twist ? [{ x: -0.375 + 0.15 * u, y: 0 }, { x: 0.375 - 0.15 * u, y: 0 }] : undefined)
-  for (; t < 700; t += 33) push(arms(t, TOGETHER.left, TOGETHER.right))
-  for (let u = 0; u <= 1; u += 0.08, t += 33) push(arms(t, lerp(TOGETHER.left, DRAWN.left, u), lerp(TOGETHER.right, DRAWN.right, u), { rightElbow: rightElbowAt(u), leftElbow: u > 0.5 ? leftElbowAt() : undefined, shoulders: shoulders(u) }))
-  const end = t + (opts.holdMs ?? 1600)
-  for (; t < end; t += 33) {
-    const w = opts.wobble ? opts.wobble * Math.sin(t / 60) : 0
-    const j = opts.drawJitter ? opts.drawJitter * (((Math.round(t / 33) * 7919) % 11) / 11 - 0.5) * 2 : 0
-    push(arms(t, { x: DRAWN.left.x, y: DRAWN.left.y + w }, { x: DRAWN.right.x + j, y: DRAWN.right.y }, { rightElbow: rightElbowAt(1), leftElbow: leftElbowAt(), shoulders: shoulders(1) }))
-  }
-  const releaseSteps = opts.slowRelease ? 60 : 8
-  for (let i = 1; i <= releaseSteps; i += 1, t += 33) push(arms(t, DRAWN.left, lerp(DRAWN.right, { x: -0.2, y: 0.12 }, i / releaseSteps), { rightElbow: rightElbowAt(1 - i / releaseSteps) }))
-  for (let i = 0; i < 20; i += 1, t += 33) push(arms(t, DRAWN.left, { x: -0.2, y: 0.12 }))
-  return { events, t }
+interface ShootOptions {
+  /** bow-hand wobble amplitude during the hold */
+  wobble?: number
+  /** bow elbow angle (deg) from half-way through the draw on */
+  bowAngle?: number
+  /** time spent drawn before the return (ms) */
+  holdMs?: number
+  /** the return: duration (ms), destination, and how far toward it (1 = all the way) */
+  returnMs?: number
+  returnTo?: Point
+  returnShare?: number
+  /** bow wrist during the hold (aiming), default DRAWN.left (+ wobble) */
+  bowAt?: (t: number) => Point
+  /** bow wrist while returning (default: wherever it was at the end of the hold) */
+  bowOnReturn?: Point
+  /** turn the torso during the hold */
+  twist?: boolean
+  /** state probe called after every frame */
+  probe?: (d: DrawDetector, t: number) => void
 }
 
-describe('DrawDetector (Archery READY → DRAW → HOLD → RELEASE)', () => {
-  it('runs the full sequence and releases exactly once with a steady, full draw', () => {
-    const d = new DrawDetector()
-    d.configure({ drawSide: 'right', drawGoal: 0.9, holdMs: 800 })
+/** A scripted archer: READY → draw apart → hold → bring the string hand back toward the chest. */
+function shoot(d: DrawDetector, opts: ShootOptions = {}) {
+  const events: Pending[] = []
+  let t = 0
+  const push = (f: MotionFrame) => {
+    events.push(...d.update(f))
+    opts.probe?.(d, t)
+  }
+  const leftElbow = (u: number) => (opts.bowAngle && u > 0.5 ? bowElbowFor(opts.bowAngle) : undefined)
+  const shoulders = (on: boolean): [Point, Point] | undefined => (opts.twist && on ? [{ x: -0.25, y: 0 }, { x: 0.25, y: 0 }] : undefined)
+  for (; t < 700; t += 33) push(arms(t, TOGETHER.left, TOGETHER.right))
+  for (let u = 0; u <= 1; u += 0.08, t += 33) push(arms(t, lerp(TOGETHER.left, DRAWN.left, u), lerp(TOGETHER.right, DRAWN.right, u), { rightElbow: lerp({ x: 0.3, y: 0.22 }, DRAW_ELBOW, u), leftElbow: leftElbow(u) }))
+  const holdStart = t
+  const end = t + (opts.holdMs ?? 1600)
+  let bow = DRAWN.left
+  for (; t < end; t += 33) {
+    const w = opts.wobble ? opts.wobble * Math.sin(t / 60) : 0
+    const at = opts.bowAt ? opts.bowAt(t - holdStart) : DRAWN.left
+    bow = { x: at.x, y: at.y + w }
+    push(arms(t, bow, DRAWN.right, { rightElbow: DRAW_ELBOW, leftElbow: leftElbow(1), shoulders: shoulders(true) }))
+  }
+  const returnStart = t
+  const to = lerp(DRAWN.right, opts.returnTo ?? CHEST, opts.returnShare ?? 1)
+  const steps = Math.max(1, Math.round((opts.returnMs ?? 270) / 33))
+  const bowFrom = bow
+  for (let i = 1; i <= steps; i += 1, t += 33) {
+    const u = i / steps
+    push(arms(t, opts.bowOnReturn ? lerp(bowFrom, opts.bowOnReturn, u) : bowFrom, lerp(DRAWN.right, to, u), { leftElbow: leftElbow(1), shoulders: shoulders(true) }))
+  }
+  for (let i = 0; i < 20; i += 1, t += 33) push(arms(t, opts.bowOnReturn ?? bowFrom, to, { leftElbow: leftElbow(1), shoulders: shoulders(true) }))
+  return { events, t, returnStart }
+}
+
+function detector(holdMs = 800): DrawDetector {
+  const d = new DrawDetector()
+  d.configure({ drawSide: 'right', drawGoal: 0.9, holdMs })
+  return d
+}
+
+/** Record every distinct value a DrawState field takes while shooting. */
+function seen<K extends keyof DrawState>(key: K) {
+  const values: DrawState[K][] = []
+  return { values, probe: (d: DrawDetector) => values.push(d.state()[key]) }
+}
+
+describe('DrawDetector — FIRE by bringing the string hand back to the chest', () => {
+  it('runs READY → DRAW → HOLD → RETURN_ARMED → FIRE and fires exactly once', () => {
+    const d = detector()
     const { events } = shoot(d)
-    const types = events.map((e) => e.type)
-    expect(types).toEqual(['DRAW_START', 'DRAW_HOLD', 'DRAW_HOLD', 'RELEASE'])
-    const release = events.find((e) => e.type === 'RELEASE') as Extract<MotionEvent, { type: 'RELEASE' }>
-    expect(release.drawRatio).toBeGreaterThan(1)
-    expect(release.holdStability).toBeGreaterThan(0.9)
-    expect(Math.hypot(release.aim.x, release.aim.y)).toBeLessThan(0.03)
+    expect(events.map((e) => e.type)).toEqual(['DRAW_START', 'DRAW_HOLD', 'DRAW_HOLD', 'FIRE'])
+    const fire = firesOf(events)[0]
+    expect(fire.drawRatio).toBeGreaterThan(1)
+    expect(fire.holdStability).toBeGreaterThan(0.9)
+    expect(Math.abs(fire.aim.x)).toBeLessThan(0.02)
+    expect(Math.abs(fire.aim.y - aimY(DRAWN.left.y))).toBeLessThan(0.02)
     expect(d.state().phase).toBe('cooldown')
   })
 
-  it('a wobbly hold lowers stability and moves the aim (hit depends on the motion, not chance)', () => {
-    const steady = new DrawDetector()
-    steady.configure({ drawGoal: 0.9, holdMs: 800 })
-    const wobbly = new DrawDetector()
-    wobbly.configure({ drawGoal: 0.9, holdMs: 800 })
-    const a = shoot(steady).events.find((e) => e.type === 'RELEASE') as Extract<MotionEvent, { type: 'RELEASE' }>
-    const b = shoot(wobbly, { wobble: 0.05 }).events.find((e) => e.type === 'RELEASE') as Extract<MotionEvent, { type: 'RELEASE' }>
-    expect(b).toBeDefined()
-    expect(b.holdStability).toBeLessThan(a.holdStability - 0.2)
-  })
-
-  it('torso rotation guard: a "draw" made by turning the body is cancelled, never released', () => {
-    const d = new DrawDetector()
-    d.configure({ drawGoal: 0.9, holdMs: 800 })
-    const { events } = shoot(d, { twist: true, holdMs: 2600 })
-    expect(events.some((e) => e.type === 'RELEASE')).toBe(false)
-    expect(events.find((e) => e.type === 'DRAW_CANCEL')).toMatchObject({ reason: 'turned' })
-  })
-
-  it('a player already turned at READY is caught too (the frontal width is remembered)', () => {
-    const d = new DrawDetector()
-    d.configure({ drawGoal: 0.9, holdMs: 800 })
-    let t = 0
-    const events: Pending[] = []
-    for (; t < 1500; t += 33) events.push(...d.update(arms(t, TOGETHER.left, TOGETHER.right)))
-    const turned: [Point, Point] = [{ x: -0.25, y: 0 }, { x: 0.25, y: 0 }]
-    for (; t < 3000; t += 33) events.push(...d.update(arms(t, TOGETHER.left, TOGETHER.right, { shoulders: turned })))
-    for (let i = 0; i < 60; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, DRAWN.right, { rightElbow: DRAW_ELBOW, shoulders: turned })))
-    expect(events.some((e) => e.type === 'RELEASE')).toBe(false)
-    expect(events.find((e) => e.type === 'DRAW_CANCEL')).toMatchObject({ reason: 'turned' })
-  })
-
-  it('a clearly bent bow arm held for a while pauses the hold (no shot) — never an instant block', () => {
-    const bent = new DrawDetector()
-    bent.configure({ drawGoal: 0.9, holdMs: 800 })
-    expect(elbowAngleDeg({ x: -0.375, y: 0 }, { x: -0.55, y: 0.6 }, DRAWN.left)).toBeLessThan(95)
-    const a = shoot(bent, { bentBow: true }).events
-    expect(a.some((e) => e.type === 'RELEASE')).toBe(false)
-    expect(armed(a)).toBe(false)
-    // the bent arm itself never cancels the attempt
-    expect(a.some((e) => e.type === 'DRAW_CANCEL' && (e as Extract<MotionEvent, { type: 'DRAW_CANCEL' }>).reason === 'bow-arm-bent')).toBe(false)
-  })
-
-  it('a slightly bent bow arm (perspective, a relaxed elbow) does not block: the shot goes, with only a soft hint', () => {
-    for (const angle of [118, 108, 100]) {
-      const d = new DrawDetector()
-      d.configure({ drawGoal: 0.9, holdMs: 800 })
-      expect(Math.round(elbowAngleDeg(Lsh, bowElbowFor(angle), DRAWN.left))).toBe(angle)
-      const hints: (string | null)[] = []
-      const original = d.update.bind(d)
-      d.update = (f) => {
-        const out = original(f)
-        hints.push(d.state().hint)
-        return out
-      }
-      const { events } = shoot(d, { bowAngle: angle })
-      expect(events.filter((e) => e.type === 'RELEASE'), `${angle}°`).toHaveLength(1)
-      expect(hints).toContain('bow-arm-straighter')
-      expect(events.some((e) => e.type === 'DRAW_CANCEL')).toBe(false)
+  it('a slow, natural return fires too — there is no 450 ms window and no speed threshold', () => {
+    for (const returnMs of [1200, 2500, 6000]) {
+      const d = detector()
+      const { events, returnStart } = shoot(d, { returnMs })
+      const fires = firesOf(events)
+      expect(fires, `${returnMs} ms return`).toHaveLength(1)
+      expect(fires[0].timestamp - returnStart, `${returnMs} ms return`).toBeGreaterThan(450)
+      expect(cancelsOf(events)).toHaveLength(0)
     }
   })
 
-  it('a moment of clearly bent arm (shorter than the 700 ms sustain) does not stop the shot', () => {
-    const d = new DrawDetector()
-    d.configure({ drawGoal: 0.9, holdMs: 800 })
+  it('a partial return is enough: half of the way back fires, a quarter does not', () => {
+    expect(firesOf(shoot(detector(), { returnShare: 0.25 }).events)).toHaveLength(0)
+    expect(firesOf(shoot(detector(), { returnShare: 0.5 }).events)).toHaveLength(1)
+  })
+
+  it('tolerant return: drifting up or down a little, a bent elbow, the bow hand still aiming', () => {
+    for (const returnTo of [{ x: 0.0, y: -0.15 }, { x: 0.05, y: 0.45 }, { x: 0.15, y: 0.2 }]) {
+      const d = detector()
+      const { events } = shoot(d, { returnTo, bowOnReturn: { x: -1.25, y: 0.12 } })
+      expect(firesOf(events), JSON.stringify(returnTo)).toHaveLength(1)
+    }
+  })
+
+  it('no FIRE before HOLD: coming back before the circle is full is not a shot, and says why', () => {
+    const d = detector()
+    const cues = seen('cue')
+    const { events, t } = shoot(d, { holdMs: 200, probe: cues.probe })
+    expect(firesOf(events)).toHaveLength(0)
+    expect(armed(events)).toBe(false)
+    expect(cues.values).toContain('early-return')
+    // putting the bow down after that ends the attempt with the same reason (no penalty)
+    const after: Pending[] = []
+    let u = t
+    for (let i = 0; i < 20; i += 1, u += 33) after.push(...d.update(arms(u, TOGETHER.left, TOGETHER.right)))
+    expect(cancelsOf(after)[0]).toMatchObject({ reason: 'early-return' })
+    expect(firesOf(after)).toHaveLength(0)
+  })
+
+  it('an early return can be corrected without starting over: pull out again, hold, return → one shot', () => {
+    const d = detector()
     const events: Pending[] = []
     let t = 0
-    const lerp = (a: Point, b: Point, u: number) => ({ x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u })
     for (; t < 700; t += 33) events.push(...d.update(arms(t, TOGETHER.left, TOGETHER.right)))
-    for (let u = 0; u <= 1; u += 0.08, t += 33) events.push(...d.update(arms(t, lerp(TOGETHER.left, DRAWN.left, u), lerp(TOGETHER.right, DRAWN.right, u), { rightElbow: lerp({ x: 0.3, y: 0.22 }, DRAW_ELBOW, u) })))
-    const blip = t + 400
-    for (const end = t + 1600; t < end; t += 33) events.push(...d.update(arms(t, DRAWN.left, DRAWN.right, { rightElbow: DRAW_ELBOW, leftElbow: t < blip && t > blip - 300 ? bowElbowFor(70) : undefined })))
-    for (let i = 1; i <= 8; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, lerp(DRAWN.right, { x: -0.2, y: 0.12 }, i / 8), { rightElbow: lerp(DRAW_ELBOW, { x: 0.3, y: 0.22 }, i / 8) })))
-    expect(events.filter((e) => e.type === 'RELEASE')).toHaveLength(1)
+    for (let u = 0; u <= 1; u += 0.08, t += 33) events.push(...d.update(arms(t, lerp(TOGETHER.left, DRAWN.left, u), lerp(TOGETHER.right, DRAWN.right, u))))
+    for (let i = 0; i < 6; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, DRAWN.right)))
+    for (let i = 1; i <= 8; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, lerp(DRAWN.right, CHEST, i / 8))))
+    expect(d.state().phase).toBe('draw')
+    for (let i = 1; i <= 8; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, lerp(CHEST, DRAWN.right, i / 8))))
+    for (let i = 0; i < 50; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, DRAWN.right)))
+    for (let i = 1; i <= 10; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, lerp(DRAWN.right, CHEST, i / 10))))
+    expect(firesOf(events)).toHaveLength(1)
+    expect(new Set(events.filter((e) => e.type === 'DRAW_START').map((e) => (e as unknown as { attemptId: number }).attemptId)).size).toBe(1)
   })
 
-  it('a string hand without the elbow moving out (wrist flick) never completes the hold', () => {
-    const flick = new DrawDetector()
-    flick.configure({ drawGoal: 0.9, holdMs: 800 })
-    // string elbow stays where it was at READY while the wrist travels
-    const b: Pending[] = []
-    let t = 0
-    for (; t < 700; t += 33) b.push(...flick.update(arms(t, TOGETHER.left, TOGETHER.right, { rightElbow: { x: 0.3, y: 0.22 } })))
-    for (let i = 0; i < 60; i += 1, t += 33) b.push(...flick.update(arms(t, DRAWN.left, DRAWN.right, { rightElbow: { x: 0.3, y: 0.22 } })))
-    expect(b.some((e) => e.type === 'RELEASE')).toBe(false)
-    expect(armed(b)).toBe(false)
-  })
-
-  it('jitter while drawing and holding never releases (noisy string hand, single-frame dropouts of the draw)', () => {
-    const d = new DrawDetector()
-    d.configure({ drawGoal: 0.9, holdMs: 800 })
+  it('jitter while drawing and holding never fires (±0.05 noise, one-frame glitches toward the bow)', () => {
+    const d = detector()
     const events: Pending[] = []
     let t = 0
-    const lerp = (a: Point, b: Point, u: number) => ({ x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u })
     for (; t < 700; t += 33) events.push(...d.update(arms(t, TOGETHER.left, TOGETHER.right)))
     for (let u = 0; u <= 1; u += 0.05, t += 33) {
       const j = ((Math.round(t / 33) * 7919) % 11) / 11 * 0.1 - 0.05
-      events.push(...d.update(arms(t, lerp(TOGETHER.left, DRAWN.left, u), { x: lerp(TOGETHER.right, DRAWN.right, u).x + j, y: DRAWN.right.y }, { rightElbow: lerp({ x: 0.3, y: 0.22 }, DRAW_ELBOW, u) })))
+      events.push(...d.update(arms(t, lerp(TOGETHER.left, DRAWN.left, u), { x: lerp(TOGETHER.right, DRAWN.right, u).x + j, y: DRAWN.right.y })))
     }
-    // held for 4 s (armed after ~0.8 s) with ±0.05 noise and, every 9th frame, a one-frame glitch that
-    // puts the string hand 0.35 back toward the bow (the old detector fired on exactly this)
-    for (const end = t + 4000; t < end; t += 33) {
+    for (const end = t + 5000; t < end; t += 33) {
       const k = Math.round(t / 33)
       const j = ((k * 7919) % 11) / 11 * 0.1 - 0.05
       const glitch = k % 9 === 0 ? -0.35 : 0
-      events.push(...d.update(arms(t, DRAWN.left, { x: DRAWN.right.x + j + glitch, y: DRAWN.right.y }, { rightElbow: DRAW_ELBOW })))
+      events.push(...d.update(arms(t, { x: DRAWN.left.x + j, y: DRAWN.left.y - j }, { x: DRAWN.right.x + j + glitch, y: DRAWN.right.y + j })))
     }
     expect(armed(events)).toBe(true)
-    expect(events.some((e) => e.type === 'RELEASE')).toBe(false)
+    expect(firesOf(events)).toHaveLength(0)
     expect(d.state().phase).toBe('armed')
   })
 
-  it('no RELEASE before HOLD: drawing and snapping straight back is not a shot', () => {
-    const d = new DrawDetector()
-    d.configure({ drawGoal: 0.9, holdMs: 800 })
+  it('tracking loss while armed cancels and is never a shot, even if the hand reappears at the chest', () => {
+    const d = detector()
     const events: Pending[] = []
     let t = 0
-    const lerp = (a: Point, b: Point, u: number) => ({ x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u })
     for (; t < 700; t += 33) events.push(...d.update(arms(t, TOGETHER.left, TOGETHER.right)))
-    for (let u = 0; u <= 1; u += 0.1, t += 33) events.push(...d.update(arms(t, lerp(TOGETHER.left, DRAWN.left, u), lerp(TOGETHER.right, DRAWN.right, u), { rightElbow: lerp({ x: 0.3, y: 0.22 }, DRAW_ELBOW, u) })))
-    for (let i = 0; i < 6; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, DRAWN.right, { rightElbow: DRAW_ELBOW }))) // 0.2 s, far short of the hold
-    for (let i = 1; i <= 8; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, lerp(DRAWN.right, { x: -0.2, y: 0.12 }, i / 8))))
-    expect(events.some((e) => e.type === 'RELEASE')).toBe(false)
+    for (let k = 0; k <= 1; k += 0.08, t += 33) events.push(...d.update(arms(t, lerp(TOGETHER.left, DRAWN.left, k), lerp(TOGETHER.right, DRAWN.right, k))))
+    for (const end = t + 1600; t < end; t += 33) events.push(...d.update(arms(t, DRAWN.left, DRAWN.right)))
+    expect(d.state().phase).toBe('armed')
+    events.push(...d.update(frame(t, { left: DRAWN.left }))) // string hand lost
+    for (let i = 0; i < 20; i += 1) events.push(...d.update(arms((t += 33), DRAWN.left, CHEST)))
+    expect(firesOf(events)).toHaveLength(0)
+    expect(cancelsOf(events)[0]).toMatchObject({ reason: 'tracking-lost' })
   })
 
-  it('one draw shoots at most one arrow, and losing tracking while armed is never a release', () => {
-    const d = new DrawDetector()
-    d.configure({ drawGoal: 0.9, holdMs: 800 })
+  it('one draw shoots one arrow; no second arrow before the hands are back together (RESET)', () => {
+    const d = detector()
     const first = shoot(d)
     let t = first.t
     const after: Pending[] = []
-    // the string hand flaps back and forth after the shot: no second arrow without a new READY
-    for (let i = 0; i < 60; i += 1, t += 33) after.push(...d.update(arms(t, DRAWN.left, i % 10 < 5 ? DRAWN.right : { x: -0.2, y: 0.12 }, { rightElbow: DRAW_ELBOW })))
-    expect([...first.events, ...after].filter((e) => e.type === 'RELEASE')).toHaveLength(1)
-
-    const lost = new DrawDetector()
-    lost.configure({ drawGoal: 0.9, holdMs: 800 })
-    const events: Pending[] = []
-    let u = 0
-    const lerp = (a: Point, b: Point, k: number) => ({ x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k })
-    for (; u < 700; u += 33) events.push(...lost.update(arms(u, TOGETHER.left, TOGETHER.right)))
-    for (let k = 0; k <= 1; k += 0.08, u += 33) events.push(...lost.update(arms(u, lerp(TOGETHER.left, DRAWN.left, k), lerp(TOGETHER.right, DRAWN.right, k), { rightElbow: lerp({ x: 0.3, y: 0.22 }, DRAW_ELBOW, k) })))
-    for (const end = u + 1400; u < end; u += 33) events.push(...lost.update(arms(u, DRAWN.left, DRAWN.right, { rightElbow: DRAW_ELBOW })))
-    expect(lost.state().phase).toBe('armed')
-    events.push(...lost.update(frame(u, { left: DRAWN.left }))) // string hand lost
-    // it comes back where a release would have ended: still no shot
-    for (let i = 0; i < 20; i += 1) events.push(...lost.update(arms((u += 33), DRAWN.left, { x: -0.2, y: 0.12 })))
-    expect(events.some((e) => e.type === 'RELEASE')).toBe(false)
-    expect(events.find((e) => e.type === 'DRAW_CANCEL')).toMatchObject({ reason: 'tracking-lost' })
+    // the string hand flaps out and back, the bow stays up: no new draw, no second arrow
+    for (let i = 0; i < 90; i += 1, t += 33) after.push(...d.update(arms(t, DRAWN.left, i % 12 < 6 ? DRAWN.right : CHEST)))
+    expect(firesOf([...first.events, ...after])).toHaveLength(1)
+    expect(after.some((e) => e.type === 'DRAW_START')).toBe(false)
+    // hands together again → the next arrow works
+    for (let i = 0; i < 30; i += 1, t += 33) after.push(...d.update(arms(t, TOGETHER.left, TOGETHER.right)))
+    for (let k = 0; k <= 1; k += 0.08, t += 33) after.push(...d.update(arms(t, lerp(TOGETHER.left, DRAWN.left, k), lerp(TOGETHER.right, DRAWN.right, k))))
+    for (let i = 0; i < 50; i += 1, t += 33) after.push(...d.update(arms(t, DRAWN.left, DRAWN.right)))
+    for (let i = 1; i <= 10; i += 1, t += 33) after.push(...d.update(arms(t, DRAWN.left, lerp(DRAWN.right, CHEST, i / 10))))
+    expect(firesOf(after)).toHaveLength(1)
   })
 
-  it('slowly lowering the bow after the hold is not a release (no shot, no penalty)', () => {
-    const d = new DrawDetector()
-    d.configure({ drawGoal: 0.9, holdMs: 800 })
-    const { events } = shoot(d, { slowRelease: true })
-    expect(events.some((e) => e.type === 'RELEASE')).toBe(false)
-    expect(events.find((e) => e.type === 'DRAW_CANCEL')).toMatchObject({ reason: 'lowered' })
-  })
-
-  it('tracking loss mid-draw cancels; the next shot needs READY again; cooldown debounces', () => {
-    const d = new DrawDetector()
-    d.configure({ drawGoal: 0.9, holdMs: 800 })
+  it('tracking loss mid-draw cancels; the next draw needs READY again', () => {
+    const d = detector()
     let t = 0
     for (; t < 700; t += 33) d.update(arms(t, TOGETHER.left, TOGETHER.right))
     const events: Pending[] = []
-    for (let u = 0; u <= 0.6; u += 0.1, t += 33) events.push(...d.update(arms(t, { x: -0.08 - 1.2 * u, y: 0.3 }, { x: 0.08 + 0.4 * u, y: 0.3 }, { rightElbow: { x: 0.3 + 0.6 * u, y: 0.2 } })))
+    for (let u = 0; u <= 0.6; u += 0.1, t += 33) events.push(...d.update(arms(t, lerp(TOGETHER.left, DRAWN.left, u), lerp(TOGETHER.right, DRAWN.right, u))))
     expect(events.some((e) => e.type === 'DRAW_START')).toBe(true)
     events.push(...d.update(frame(t, { left: DRAWN.left })))
-    expect(events.find((e) => e.type === 'DRAW_CANCEL')).toMatchObject({ reason: 'tracking-lost' })
+    expect(cancelsOf(events)[0]).toMatchObject({ reason: 'tracking-lost' })
     expect(d.state().phase).toBe('wait-ready')
-    // hands come back already drawn apart: no new attempt until they go back together
     const later: Pending[] = []
-    for (let i = 0; i < 40; i += 1, t += 33) later.push(...d.update(arms(t, DRAWN.left, DRAWN.right, { rightElbow: DRAW_ELBOW })))
+    for (let i = 0; i < 40; i += 1, t += 33) later.push(...d.update(arms(t, DRAWN.left, DRAWN.right)))
     expect(later.some((e) => e.type === 'DRAW_START')).toBe(false)
-
-    // after a release, the cooldown + READY requirement block an immediate second shot
-    const e2 = new DrawDetector()
-    e2.configure({ drawGoal: 0.9, holdMs: 800 })
-    const first = shoot(e2)
-    const again: Pending[] = []
-    let t2 = first.t
-    for (let i = 0; i < 10; i += 1, t2 += 33) again.push(...e2.update(arms(t2, DRAWN.left, DRAWN.right, { rightElbow: DRAW_ELBOW })))
-    expect(again.some((e) => e.type === 'DRAW_START')).toBe(false)
   })
 
-  it('pause gating through the adapter cancels the attempt and no release can happen while paused', () => {
+  it('arms dropped to the sides are not a draw, and raising them back to the chest is not a shot', () => {
+    const d = new DrawDetector()
+    d.configure({ drawSide: 'right', drawGoal: 0.55, holdMs: 800 }) // a real goal: hanging arms span more than it
+    const events: Pending[] = []
+    let t = 0
+    for (; t < 700; t += 33) events.push(...d.update(arms(t, TOGETHER.left, TOGETHER.right)))
+    for (let k = 0; k <= 1; k += 0.1, t += 33) events.push(...d.update(arms(t, lerp(TOGETHER.left, HANGING.left, k), lerp(TOGETHER.right, HANGING.right, k))))
+    for (const end = t + 2500; t < end; t += 33) events.push(...d.update(arms(t, HANGING.left, HANGING.right)))
+    for (let k = 0; k <= 1; k += 0.1, t += 33) events.push(...d.update(arms(t, lerp(HANGING.left, TOGETHER.left, k), lerp(HANGING.right, TOGETHER.right, k))))
+    expect(firesOf(events)).toHaveLength(0)
+    expect(armed(events)).toBe(false)
+  })
+
+  it('dropping the string arm down to the side after the hold is not a shot (the return must be mostly sideways)', () => {
+    const d = detector()
+    const { events } = shoot(d, { returnTo: { x: 0.2, y: 0.9 }, returnMs: 700 })
+    expect(firesOf(events)).toHaveLength(0)
+  })
+
+  it('pause gating through the adapter cancels the attempt and nothing fires while paused', () => {
     const source = new SyntheticPoseSource({ manual: true, seed: 5 })
     const adapter = new MotionAdapter(source, { watchdog: false })
     source.attach(directorContext(adapter))
@@ -466,13 +476,142 @@ describe('DrawDetector (Archery READY → DRAW → HOLD → RELEASE)', () => {
     expect(adapter.drawState().phase).toBe('hold')
     adapter.setDetectionActive(false)
     for (let i = 0; i < 90; i += 1) source.emit((t += 33))
-    expect(events.some((e) => e.type === 'RELEASE')).toBe(false)
+    expect(events.some((e) => e.type === 'FIRE')).toBe(false)
     expect(events.find((e) => e.type === 'DRAW_CANCEL')).toMatchObject({ reason: 'paused' })
     adapter.setDetectionActive(true)
-    while (!events.some((e) => e.type === 'RELEASE') && t < 30_000) source.emit((t += 33))
-    const releases = events.filter((e) => e.type === 'RELEASE')
-    expect(releases).toHaveLength(1)
-    // every attempt id releases at most once
-    expect(new Set(releases.map((e) => (e as Extract<MotionEvent, { type: 'RELEASE' }>).attemptId)).size).toBe(releases.length)
+    while (!events.some((e) => e.type === 'FIRE') && t < 30_000) source.emit((t += 33))
+    const fires = events.filter((e) => e.type === 'FIRE') as Fire[]
+    expect(fires).toHaveLength(1)
+    expect(new Set(fires.map((e) => e.attemptId)).size).toBe(fires.length)
+  })
+})
+
+describe('DrawDetector — the bow arm is never a blocking condition', () => {
+  it('slightly and moderately bent bow arms change nothing: same shot, no guard, no hint', () => {
+    for (const angle of [150, 118, 100, 88]) {
+      const d = detector()
+      expect(Math.round(elbowAngleDeg(Lsh, bowElbowFor(angle), DRAWN.left))).toBe(angle)
+      const guards = seen('guard')
+      const hints = seen('hint')
+      const { events } = shoot(d, { bowAngle: angle, probe: (x) => { guards.probe(x); hints.probe(x) } })
+      expect(firesOf(events), `${angle}°`).toHaveLength(1)
+      expect(cancelsOf(events), `${angle}°`).toHaveLength(0)
+      expect(guards.values.every((g) => g === null), `${angle}°`).toBe(true)
+      expect(hints.values.every((h) => h === null), `${angle}°`).toBe(true)
+    }
+  })
+
+  it('a very bent bow arm held for a long time earns at most a soft hint — the hold and the shot are unaffected', () => {
+    const straight = shoot(detector())
+    const d = detector()
+    const hints = seen('hint')
+    const holds = seen('holdProgress')
+    const { events } = shoot(d, { bowAngle: 60, holdMs: 4000, probe: (x) => { hints.probe(x); holds.probe(x) } })
+    expect(firesOf(events)).toHaveLength(1)
+    expect(cancelsOf(events)).toHaveLength(0)
+    expect(hints.values).toContain('bow-arm-straighter')
+    // hint only after it persisted (≥ 3 s): never in the first second of the hold
+    expect(hints.values.slice(0, 50).every((h) => h === null)).toBe(true)
+    // the hold completed as fast as with a straight arm
+    const armedAt = (ev: Pending[]) => ev.find((e) => e.type === 'DRAW_HOLD' && (e as unknown as { progress: number }).progress >= 1)!.timestamp
+    expect(armedAt(events)).toBe(armedAt(straight.events))
+    expect(holds.values.some((p) => p >= 1)).toBe(true)
+  })
+
+  it('a turned torso is only a soft hint (no pause, no cancel); the shot still goes', () => {
+    const d = detector()
+    const hints = seen('hint')
+    const { events } = shoot(d, { twist: true, holdMs: 4000, probe: hints.probe })
+    expect(firesOf(events)).toHaveLength(1)
+    expect(cancelsOf(events)).toHaveLength(0)
+    expect(hints.values).toContain('turned')
+  })
+
+  it('a string hand that never moves out (bow arm alone) holds nothing and says "pull the string hand out"', () => {
+    const d = detector()
+    const events: Pending[] = []
+    const cues: DrawState['cue'][] = []
+    let t = 0
+    for (; t < 700; t += 33) events.push(...d.update(arms(t, TOGETHER.left, TOGETHER.right)))
+    for (let k = 0; k <= 1; k += 0.08, t += 33) events.push(...d.update(arms(t, lerp(TOGETHER.left, DRAWN.left, k), TOGETHER.right)))
+    for (let i = 0; i < 60; i += 1, t += 33) {
+      events.push(...d.update(arms(t, DRAWN.left, TOGETHER.right)))
+      cues.push(d.state().cue)
+    }
+    expect(armed(events)).toBe(false)
+    expect(cues).toContain('pull-string-out')
+    // pulling it out then works normally
+    for (let i = 1; i <= 8; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, lerp(TOGETHER.right, DRAWN.right, i / 8))))
+    for (let i = 0; i < 50; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, DRAWN.right)))
+    for (let i = 1; i <= 10; i += 1, t += 33) events.push(...d.update(arms(t, DRAWN.left, lerp(DRAWN.right, CHEST, i / 10))))
+    expect(firesOf(events)).toHaveLength(1)
+  })
+})
+
+describe('DrawDetector — aiming with the bow hand, and aim locking', () => {
+  it('moving the bow hand moves the aim (its height) and never pauses, resets or cancels the hold', () => {
+    const still = shoot(detector())
+    const d = detector()
+    const samples: { t: number; aim: Point; phase: string; guard: unknown; cue: unknown }[] = []
+    // slow aiming sweep: up 0.15, down 0.2, sideways a little
+    const bowAt = (ms: number) => ({ x: DRAWN.left.x + 0.08 * Math.sin(ms / 400), y: DRAWN.left.y + 0.18 * Math.sin(ms / 300) })
+    const { events } = shoot(d, { bowAt, probe: (x, t) => { const s = x.state(); samples.push({ t, aim: s.aim, phase: s.phase, guard: s.guard, cue: s.cue }) } })
+    const armedAt = (ev: Pending[]) => ev.find((e) => e.type === 'DRAW_HOLD' && (e as unknown as { progress: number }).progress >= 1)!.timestamp
+    expect(armedAt(events)).toBe(armedAt(still.events))
+    expect(firesOf(events)).toHaveLength(1)
+    expect(cancelsOf(events)).toHaveLength(0)
+    expect(samples.every((s) => s.guard === null && s.cue === null)).toBe(true)
+    const aiming = samples.filter((s) => s.phase === 'hold' || s.phase === 'armed')
+    const ys = aiming.map((s) => s.aim.y)
+    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(0.25) // the reticle really travels with the hand
+    // the reticle height follows the hand all the way: its extremes are the hand's extremes
+    expect(Math.abs(Math.max(...ys) - aimY(DRAWN.left.y + 0.18))).toBeLessThan(0.03)
+    expect(Math.abs(Math.min(...ys) - aimY(DRAWN.left.y - 0.18))).toBeLessThan(0.03)
+    expect(aiming.every((s) => s.aim.x === 0)).toBe(true) // sideways is not mapped (side-on range)
+  })
+
+  it('the arrow uses the aim locked when the return began, not where the bow hand went while returning', () => {
+    // aim high during the hold, then the bow hand sags while the string hand comes back
+    const high = { x: DRAWN.left.x, y: -0.12 }
+    const d = detector()
+    const locked = seen('lockedAim')
+    const { events } = shoot(d, { bowAt: () => high, bowOnReturn: { x: -1.2, y: 0.45 }, returnMs: 600, probe: locked.probe })
+    const fire = firesOf(events)[0]
+    expect(fire).toBeDefined()
+    expect(Math.abs(fire.aim.y - aimY(high.y))).toBeLessThan(0.03)
+    expect(locked.values.some((v) => v !== null)).toBe(true)
+    // without the lock the sag would have moved the aim by far more than a ring
+    expect(aimY(0.45) - aimY(high.y)).toBeGreaterThan(0.5)
+  })
+
+  it('a wobbly hold lowers stability; a slow deliberate aiming glide does not', () => {
+    const steady = firesOf(shoot(detector()).events)[0]
+    const wobbly = firesOf(shoot(detector(), { wobble: 0.05 }).events)[0]
+    const glide = firesOf(shoot(detector(), { bowAt: (ms) => ({ x: DRAWN.left.x, y: DRAWN.left.y - 0.12 * Math.min(1, ms / 1600) }) }).events)[0]
+    expect(wobbly.holdStability).toBeLessThan(steady.holdStability - 0.2)
+    expect(glide.holdStability).toBeGreaterThan(0.9)
+  })
+})
+
+describe('DrawDetector — a first-time player (human-like replay of the round-2 playtest)', () => {
+  it('20 seeded sessions × 5 arrows: every arrow fires, nothing nags about the bow arm, nothing blocks', () => {
+    // bow arm at its limit and bent 112–145°, aiming moves, ±0.02 jitter, a short string-hand pull,
+    // slow (0.7–2 s) imperfect returns with a sagging bow hand, a slightly turned torso on every 2nd arrow.
+    // The round-1 detector fired 31 / 100 of these (3 sessions with no arrow at all, every miss a
+    // "slow sink = lowered" cancel) and showed the bow-arm hint on 41 % of active frames.
+    for (let seed = 1; seed <= 20; seed += 1) {
+      const d = new DrawDetector()
+      d.configure({ drawSide: 'right', drawGoal: 0.55, holdMs: 700 })
+      const { frames } = humanArcherFrames(seed, 5)
+      const events: Pending[] = []
+      let nagged = 0
+      for (const f of frames) {
+        events.push(...d.update(f))
+        if (d.state().hint === 'bow-arm-straighter' || d.state().guard) nagged += 1
+      }
+      expect(firesOf(events), `seed ${seed}`).toHaveLength(5)
+      expect(cancelsOf(events), `seed ${seed}`).toHaveLength(0)
+      expect(nagged, `seed ${seed}`).toBe(0)
+    }
   })
 })
