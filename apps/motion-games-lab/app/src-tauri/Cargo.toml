@@ -1,0 +1,25 @@
+[package]
+name = "motion-games-lab"
+version = "1.0.0"
+description = "体感游戏工坊 (Motion Games Lab) desktop shell"
+authors = ["Motion Games Lab"]
+license = ""
+edition = "2024"
+rust-version = "1.90"
+
+[lib]
+name = "motion_games_lab_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7.1", features = [] }
+
+[dependencies]
+tauri = { version = "2.12.1", features = [] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true
