@@ -13,7 +13,13 @@
     "test:e2e": "playwright test",
     "calibration:analyze": "node scripts/analyze-calibration.mjs",
     "assets:measure-pose": "node scripts/measure-pose-assets.mjs",
-    "reference:video": "node scripts/extract-video-reference.mjs"
+    "reference:video": "node scripts/extract-video-reference.mjs",
+    "jev:server": "node --env-file-if-exists=.env.jev.local server/jevProxy.ts",
+    "jev:evaluate": "node scripts/jev-evaluate.ts",
+    "competition:dev": "vite --host 127.0.0.1",
+    "adaptive:evaluate": "node --experimental-transform-types scripts/adaptive-evaluate.ts",
+    "competition:build": "tsc -b && vite build --outDir dist-competition",
+    "competition:preview": "vite preview --outDir dist-competition --host 127.0.0.1 --port 4175"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.22-rc.20250304",

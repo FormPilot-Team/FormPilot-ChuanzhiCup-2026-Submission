@@ -5,12 +5,13 @@ import { AICoachDock } from '../coach/AICoachDock'
 interface AICoachFeedbackDockProps {
   state: CoachDockState
   metrics: ReactNode
+  adaptive?: ReactNode
 }
 
-export function AICoachFeedbackDock({ state, metrics }: AICoachFeedbackDockProps) {
+export function AICoachFeedbackDock({ state, metrics, adaptive }: AICoachFeedbackDockProps) {
   return (
     <aside className="min-h-[600px] min-w-0 xl:min-h-0" aria-label="AI Coach 与实时反馈" data-testid="ai-coach-feedback-dock">
-      <AICoachDock state={state} metrics={metrics} />
+      <AICoachDock state={state} metrics={metrics} adaptive={adaptive} />
     </aside>
   )
 }

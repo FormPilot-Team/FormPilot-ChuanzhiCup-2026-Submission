@@ -7,3 +7,4 @@ test-results
 *.local
 release
 reviewer_exe/app-dist
+dist-competition

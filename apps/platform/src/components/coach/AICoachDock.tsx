@@ -20,9 +20,10 @@ const statusTone: Record<CoachDockState['severity'], string> = {
 interface AICoachDockProps {
   state: CoachDockState
   metrics: ReactNode
+  adaptive?: ReactNode
 }
 
-export function AICoachDock({ state, metrics }: AICoachDockProps) {
+export function AICoachDock({ state, metrics, adaptive }: AICoachDockProps) {
   return (
     <section className="panel flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl" aria-labelledby="ai-coach-title" data-testid="ai-coach-dock" data-coach-state={state.visualState}>
       <div className="flex min-w-0 items-center gap-2 px-4 pt-4">
@@ -63,6 +64,7 @@ export function AICoachDock({ state, metrics }: AICoachDockProps) {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto border-t border-slate-100 p-3" data-testid="detailed-metrics">
+        {adaptive}
         {metrics}
       </div>
     </section>

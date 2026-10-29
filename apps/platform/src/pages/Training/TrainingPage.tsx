@@ -14,6 +14,9 @@ import { resolveCoachDockFeedback, resolveCoachDockState } from '../../features/
 import { shouldShowPoseOverlay } from '../../features/pose/poseOverlayVisibility'
 import { warmUpExitPhase } from '../../features/training/trainingExit'
 import { SMART_TRAINING_PATH } from '../../app/routes'
+import { useAdaptiveTraining } from '../../features/adaptiveTraining/useAdaptiveTraining'
+import { AdaptiveDecisionPanel } from '../../components/training/AdaptiveDecisionPanel'
+import { switchedCue } from '../../features/adaptiveTraining/localGuidance'
 
 type TrainingRuntime = ReturnType<typeof useTrainingRuntime>
 
@@ -76,6 +79,28 @@ export function TrainingPage() {
     : runtime.cameraMode === 'live' || runtime.cameraMode === 'demo'
       ? demonstrationSnapshot.state
       : undefined
+  const active = demonstrationSnapshot.state === 'ACTIVE' && runtime.session.status !== 'paused'
+    && (runtime.cameraMode === 'live' || runtime.cameraMode === 'demo')
+  const poseValid = !runtime.poseUnavailable && Boolean(runtime.features?.bodyInFrame)
+    && (runtime.features?.confidence ?? 0) >= .65
+    && !runtime.result.errors.some(e => e.code === 'POSE_LOW_CONFIDENCE' || e.code === 'BODY_OUT_OF_FRAME')
+  const adaptive = useAdaptiveTraining({
+    exerciseId: definition.id, phase: runtime.result.phase,
+    trainingState: runtime.session.status === 'completed' ? 'COMPLETE' : runtime.session.status === 'paused' ? 'PAUSED' : active ? 'ACTIVE' : 'PREPARING',
+    poseValid, poseReliability: runtime.features?.confidence ?? 0,
+    score: runtime.result.confidence >= .65 && definition.id !== 'shoulder_rotation' ? runtime.result.currentScore : null,
+    errors: runtime.result.exerciseId === definition.id ? runtime.result.errors
+      .filter(e => e.severity >= .8 || e.code === 'KNEE_VALGUS' || e.code === runtime.confirmedPrimaryFeedback?.code)
+      .map(e => ({ code: e.code, severity: e.severity })) : [],
+    feedback: runtime.feedback?.exerciseId === definition.id ? runtime.feedback : undefined,
+    elapsedSeconds: (Date.now() - runtime.session.startedAt) / 1000,
+    completion: runtime.courseTarget > 0 ? runtime.courseProgress / runtime.courseTarget : 0,
+    completedReps: runtime.exerciseState.repCount,
+  })
+  const adaptiveDockState = adaptive.decision.strategy === 'SWITCH_CUE'
+    ? { ...coachDockState, primaryMessage: switchedCue(adaptive.input?.errors[0]?.code) }
+    : coachDockState
+  const canPause = active && poseValid && ['START', 'CENTER', 'STANDING', 'READY', 'COMPLETE'].includes(runtime.result.phase)
 
   return (
     <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900">
@@ -123,7 +148,8 @@ export function TrainingPage() {
             onStart={runtime.startCamera}
           />
           <AICoachFeedbackDock
-            state={coachDockState}
+            state={adaptiveDockState}
+            adaptive={<AdaptiveDecisionPanel decision={adaptive.decision} input={adaptive.input} definition={definition} onPause={runtime.togglePause} canPause={canPause} />}
             metrics={(
               <MetricsPanel result={runtime.result} presentation={definition.presentation} advice={runtime.feedback?.message} guidanceOnly={runtime.courseEnabled && definition.id === 'shoulder_rotation'} trackingState={runtime.session.status === 'paused' ? 'paused' : runtime.poseUnavailable ? 'adjust' : (runtime.cameraMode === 'live' || runtime.cameraMode === 'demo') && runtime.features ? 'normal' : 'preparing'} />
             )}

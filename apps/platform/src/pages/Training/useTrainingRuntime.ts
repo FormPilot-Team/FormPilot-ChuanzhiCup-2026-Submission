@@ -12,7 +12,7 @@ import type { BaseMotionFeatures } from '../../features/motion/types'
 import type { ExerciseDefinition } from '../../features/exercises/contract'
 import { EXERCISE_ORDER, getExerciseDefinition, isRegisteredExerciseId } from '../../features/exercises/registry'
 import { createExerciseRuntime, type ExerciseRuntime } from '../../features/exercises/runtime'
-import { isKneeRaiseRep, isSquatRep, type ExerciseId, type ExerciseState, type RuleResult } from '../../features/exercises/types'
+import { isKneeRaiseRep, isSquatRep, type ExerciseId, type ExerciseState, type RuleResult, type MotionError } from '../../features/exercises/types'
 import type { FeedbackEvent } from '../../features/feedback/types'
 import { TrainingSession } from '../../features/training/TrainingSession'
 import { LocalStorageTrainingSessionRepository } from '../../features/training/LocalStorageTrainingSessionRepository'
@@ -205,6 +205,7 @@ export function useTrainingRuntime() {
   const [result, setResult] = useState(() => initialResult(initialDefinition))
   const [features, setFeatures] = useState<BaseMotionFeatures>()
   const [feedback, setFeedback] = useState<FeedbackEvent>()
+  const [confirmedPrimaryFeedback, setConfirmedPrimaryFeedback] = useState<MotionError>()
   const [remainingSeconds, setRemainingSeconds] = useState(initialDefinition.presentation.durationSeconds)
   const [session, setSession] = useState<TrainingSessionState>(() => sessionRef.current.start())
   const [performanceData, setPerformanceData] = useState(emptyPerformance)
@@ -521,6 +522,7 @@ export function useTrainingRuntime() {
       setFeatures(output.features)
       setFramingAssist(assist)
       setResult(output.result)
+      setConfirmedPrimaryFeedback(output.confirmedPrimaryFeedback)
       setExerciseState(output.state)
       setRemainingSeconds(courseEnabled && course.steps[courseAfter.stepIndex].target.type === 'duration'
         ? Math.max(0, resolveCourseTarget(course.steps[courseAfter.stepIndex], fast) - Math.floor((activeMotionDurationMs(output.state) ?? courseAfter.elapsedMs) / 1000))
@@ -860,6 +862,7 @@ export function useTrainingRuntime() {
     result,
     features,
     feedback,
+    confirmedPrimaryFeedback,
     remainingSeconds,
     session,
     persistFailed,
