@@ -8,6 +8,8 @@ export interface CoachOrchestratorOptions {
   provider: CoachProvider
   /** Explicit trusted-application opt-in; not a prompt or model-controlled value. */
   remoteEnabled?: boolean
+  /** Independent local opt-in. Remote authorization never enables a local adapter. */
+  localEnabled?: boolean
   maxTurns?: number
   /** Whole-run deadline, including planning, dispatch and answer selection. */
   timeoutMs?: number
@@ -16,6 +18,7 @@ export interface CoachOrchestratorOptions {
 export function createCoachOrchestrator(options: CoachOrchestratorOptions) {
   const { dispatcher, provider } = options
   const remoteEnabled = options.remoteEnabled === true
+  const localEnabled = options.localEnabled === true
   const maxTurns = options.maxTurns ?? 4
   const timeoutMs = options.timeoutMs ?? 5_000
   if (!Number.isSafeInteger(maxTurns) || maxTurns < 1 || maxTurns > 8
@@ -25,7 +28,8 @@ export function createCoachOrchestrator(options: CoachOrchestratorOptions) {
     run(question: string, runOptions: { signal?: AbortSignal } = {}): Promise<CoachAnswer> {
       const receipts: DispatchReceipt[] = []
       const failure = (code: string, status: CoachAnswer['status'] = 'failed') => coachFailure(provider.id, receipts, code, status, provider.kind)
-      if (provider.kind !== 'mock' && !(provider.kind === 'remote' && remoteEnabled)) return Promise.resolve(failure('PROVIDER_NOT_ALLOWED'))
+      if (provider.kind !== 'mock' && !(provider.kind === 'remote' && remoteEnabled)
+        && !(provider.kind === 'local' && localEnabled)) return Promise.resolve(failure('PROVIDER_NOT_ALLOWED'))
       if (typeof question !== 'string' || !question.trim() || question.length > 4096) {
         return Promise.resolve(failure('INVALID_INPUT'))
       }

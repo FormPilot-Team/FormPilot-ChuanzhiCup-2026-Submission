@@ -1,14 +1,44 @@
 import { randomBytes } from 'node:crypto'
+import { mkdir } from 'node:fs/promises'
 import { test, expect, type Page } from '@playwright/test'
 import { createLabSyntheticFixture } from '../../src/features/coachAgent/lab/fixtures'
 import { SESSION_STORAGE_KEY } from '../../src/features/training/LocalStorageTrainingSessionRepository'
-import { startFakeCoachLab } from '../support/coach-agent-lab-fake-http'
+import { startFakeLocalCoachLab } from '../support/coach-agent-lab-local-http'
 
 const labUrl = process.env.COACH_LAB_BASE_URL ?? 'http://127.0.0.1:4173/coach-agent-lab.html'
 const origin = new URL(labUrl).origin
 const fixture = createLabSyntheticFixture()
 const syntheticRecords = fixture.storage.getItem(SESSION_STORAGE_KEY)!
 const currentId = (JSON.parse(syntheticRecords) as Array<{ id: string; startedAt: number }>).sort((a, b) => b.startedAt - a.startedAt)[0].id
+const evidenceDirectory = 'test-results/phase-1f'
+const browserChecks = new WeakMap<Page, { externalRequests: string[]; pageErrors: string[] }>()
+
+async function capture(page: Page, name: string) {
+  await mkdir(evidenceDirectory, { recursive: true })
+  await page.screenshot({ path: `${evidenceDirectory}/${name}.png`, fullPage: true })
+}
+
+test.beforeEach(async ({ page }) => {
+  const externalRequests: string[] = []
+  const pageErrors: string[] = []
+  browserChecks.set(page, { externalRequests, pageErrors })
+  page.on('pageerror', error => pageErrors.push(error.message))
+  await page.route('**/*', async route => {
+    const url = new URL(route.request().url())
+    if ((url.protocol === 'http:' || url.protocol === 'https:') && url.hostname !== '127.0.0.1') {
+      externalRequests.push(`${url.protocol}//${url.hostname}`)
+      await route.abort('blockedbyclient')
+      return
+    }
+    await route.continue()
+  })
+})
+
+test.afterEach(async ({ page }) => {
+  const checks = browserChecks.get(page)!
+  expect(checks.externalRequests).toEqual([])
+  expect(checks.pageErrors).toEqual([])
+})
 
 async function open(page: Page) {
   await page.goto(labUrl)
@@ -21,18 +51,18 @@ async function ask(page: Page, preset: string) {
   await expect(page.getByTestId('lab-result')).toHaveAttribute('aria-busy', 'false')
 }
 
-async function configureRemote(page: Page, endpoint: string, bootstrapToken: string) {
-  await page.getByRole('button', { name: 'Remote 远程规划', exact: true }).click()
+async function configureLocal(page: Page, endpoint: string, bootstrapToken: string) {
+  await page.getByRole('button', { name: '本地模型（零 API 费用）', exact: true }).click()
   await page.getByRole('checkbox', { name: /^同意发送最小规划字段/u }).check()
-  await page.getByRole('checkbox', { name: /^启用可能产生费用的调用/u }).check()
-  await page.getByLabel('本机代理地址', { exact: true }).fill(endpoint)
+  await page.getByRole('checkbox', { name: /^确认硬件、模型许可与资源占用并启用本地推理/u }).check()
+  await page.getByLabel('本地规划服务地址', { exact: true }).fill(endpoint)
   await page.getByLabel('本机一次性 bootstrap token', { exact: true }).fill(bootstrapToken)
   await page.getByRole('button', { name: '建立本机会话', exact: true }).click()
   await expect(page.getByLabel('本机一次性 bootstrap token', { exact: true })).toHaveValue('')
   // Configuration collapses its details; expand them to inspect the revoked/configured controls.
-  const details = page.locator('details.lab-remote')
+  const details = page.locator('details.lab-local-connection')
   if (!await details.evaluate(element => (element as HTMLDetailsElement).open)) {
-    await page.getByText('配置本机 Remote 代理', { exact: true }).click()
+    await page.getByText('配置本地模型连接', { exact: true }).click()
   }
   await expect(page.getByRole('button', { name: '建立本机会话', exact: true })).toBeDisabled()
 }
@@ -58,6 +88,7 @@ test.describe('independent Coach Lab browser interaction', () => {
     await expect(page.getByTestId('lab-evidence')).toContainText('synthetic')
     expect(remoteRequests).toEqual([])
     expect(await page.evaluate(key => localStorage.getItem(key), SESSION_STORAGE_KEY)).toBeNull()
+    await capture(page, 'mock-squat')
   })
 
   test('history question displays the original provenance gate and never claims synthetic progress', async ({ page }) => {
@@ -68,6 +99,7 @@ test.describe('independent Coach Lab browser interaction', () => {
     await expect(page.getByTestId('lab-comparison')).toContainText('gate = NONE')
     await expect(page.getByTestId('lab-comparison')).toContainText('CURRENT_PROVENANCE_NOT_VERIFIED_LIVE_NORMAL')
     await expect(page.getByTestId('lab-result').locator('.lab-answer-text')).not.toContainText('已经进步')
+    await capture(page, 'mock-history')
   })
 
   test('routine question selects the routine fixture and shows similarity rather than standardized score', async ({ page }) => {
@@ -78,6 +110,7 @@ test.describe('independent Coach Lab browser interaction', () => {
     await expect(page.getByTestId('lab-evidence')).toContainText('follow-along-v1')
     await expect(page.getByTestId('lab-evidence')).toContainText('0.8')
     await expect(page.getByTestId('lab-result').locator('.lab-answer-text')).toContainText('相似度不能证明动作规范')
+    await capture(page, 'mock-routine')
   })
 
   test('requires local consent, load and Session selection while preserving synthetic browser fixture bytes', async ({ page }) => {
@@ -128,39 +161,71 @@ test.describe('independent Coach Lab browser interaction', () => {
     })
   }
 
-  test('keeps Remote disabled until disclosure, possible cost and configuration are explicit', async ({ page }) => {
+  test('offers only Mock and Local Model modes with no paid Remote controls', async ({ page }) => {
     const requests: string[] = []
     page.on('request', request => { if (request.url().includes('/v1/coach/')) requests.push(request.url()) })
     await open(page)
-    await page.getByRole('button', { name: 'Remote 远程规划', exact: true }).click()
-    await expect(page.getByRole('checkbox', { name: /^同意发送最小规划字段/u })).not.toBeChecked()
-    await expect(page.getByRole('checkbox', { name: /^启用可能产生费用的调用/u })).not.toBeChecked()
-    await expect(page.getByRole('button', { name: '建立本机会话', exact: true })).toBeDisabled()
-    await expect(page.getByText('LIVE_API_TEST NOT RUN', { exact: true })).toBeVisible()
+    const modes = page.getByRole('group', { name: 'Agent 模式', exact: true })
+    await expect(modes.getByRole('button')).toHaveCount(2)
+    await expect(page.getByRole('button', { name: 'Remote 远程规划', exact: true })).toHaveCount(0)
+    await expect(page.getByRole('checkbox', { name: /^启用可能产生费用的调用/u })).toHaveCount(0)
+    await page.getByRole('button', { name: '本地模型（零 API 费用）', exact: true }).click()
+    await expect(page.getByText('本地模型不可用（尚未连接）。请先准备获准的本地模型服务，或返回 Mock。', { exact: false })).toBeVisible()
+    expect(requests).toEqual([])
+  })
+
+  test('reports a missing local service accurately and lets the user return to Mock', async ({ page }) => {
+    const requests: string[] = []
+    page.on('request', request => { if (request.url().includes('/v1/coach/')) requests.push(request.url()) })
+    await page.route('http://127.0.0.1:4320/v1/coach/local/session', route => route.abort('connectionrefused'))
+    await open(page)
+    await configureLocal(page, 'http://127.0.0.1:4320/v1/coach/local/step', 'fake_local_missing_service_bootstrap_0123456789')
     await page.getByRole('button', { name: '发送问题', exact: true }).click()
-    await expect(page.getByRole('alert')).toContainText('REMOTE_DISABLED')
+    await expect(page.getByRole('alert')).toContainText('本地模型不可用')
+    await expect(page.getByTestId('lab-result')).toContainText('本地规划未完成')
+    await expect(page.getByTestId('lab-result')).not.toContainText('本地规划已完成并校验')
+    await expect(page.getByTestId('lab-evidence')).toContainText('0 条本地引用')
+    expect(requests).toEqual(['http://127.0.0.1:4320/v1/coach/local/session'])
+    await capture(page, 'local-unavailable')
+    await page.getByRole('button', { name: 'Mock 规则演示', exact: true }).click()
+    await ask(page, '深蹲评分为什么不高？')
+    await expect(page.getByTestId('lab-result')).toContainText('MOCK · 确定性规则')
+  })
+
+  test('keeps local inference unavailable until disclosure, resource consent and configuration are explicit', async ({ page }) => {
+    const requests: string[] = []
+    page.on('request', request => { if (request.url().includes('/v1/coach/')) requests.push(request.url()) })
+    await open(page)
+    await page.getByRole('button', { name: '本地模型（零 API 费用）', exact: true }).click()
+    await expect(page.getByRole('checkbox', { name: /^同意发送最小规划字段/u })).not.toBeChecked()
+    await expect(page.getByRole('checkbox', { name: /^确认硬件、模型许可与资源占用并启用本地推理/u })).not.toBeChecked()
+    await expect(page.getByRole('button', { name: '建立本机会话', exact: true })).toBeDisabled()
+    await expect(page.getByText('本地模型不可用（尚未连接）。请先准备获准的本地模型服务，或返回 Mock。', { exact: true })).toBeVisible()
+    await page.getByRole('button', { name: '发送问题', exact: true }).click()
+    await expect(page.getByRole('alert')).toContainText('LOCAL_DISABLED')
     await page.getByRole('checkbox', { name: /^同意发送最小规划字段/u }).check()
     await page.getByRole('button', { name: '发送问题', exact: true }).click()
-    await expect(page.getByRole('alert')).toContainText('REMOTE_DISABLED')
+    await expect(page.getByRole('alert')).toContainText('LOCAL_DISABLED')
     await page.getByRole('checkbox', { name: /^同意发送最小规划字段/u }).uncheck()
     expect(requests).toEqual([])
     await expect(page.getByTestId('lab-evidence')).toHaveCount(0)
   })
 
-  test('uses Fake HTTP through the unchanged local safety proxy for all three questions and never sends training facts', async ({ page }) => {
+  test('uses Fake Local HTTP through the independent local bridge for all three questions and never sends training facts', async ({ page }) => {
     const bootstrapToken = randomBytes(32).toString('base64url')
-    const fake = await startFakeCoachLab({ bootstrapToken, origin, port: 0 })
+    const fake = await startFakeLocalCoachLab({ bootstrapToken, origin, port: 0 })
     try {
       await open(page)
-      await configureRemote(page, fake.endpoint, bootstrapToken)
+      await configureLocal(page, fake.endpoint, bootstrapToken)
       expect(fake.getModelRequests()).toBe(0)
       await page.getByLabel('训练问题', { exact: true }).fill('为什么我这次深蹲评分不高？私密姓名13800000000，视频video，关键点landmarks。')
       await page.getByRole('button', { name: '发送问题', exact: true }).click()
-      await expect(page.getByTestId('lab-result')).toContainText('远端规划已完成并校验')
+      await expect(page.getByTestId('lab-result')).toContainText('本地规划已完成并校验')
       await expect(page.getByTestId('lab-evidence')).toContainText('67')
       expect(fake.getModelRequests()).toBe(2)
+      await capture(page, 'fake-local-squat')
       await ask(page, '最近深蹲有进步吗？')
-      await expect(page.getByTestId('lab-result')).toContainText('远端规划已完成并校验')
+      await expect(page.getByTestId('lab-result')).toContainText('本地规划已完成并校验')
       await expect(page.getByTestId('lab-comparison')).toContainText('gate = NONE')
       expect(fake.getModelRequests()).toBe(4)
       await page.getByRole('button', { name: '八段锦跟练表现如何？', exact: true }).click()
@@ -172,11 +237,11 @@ test.describe('independent Coach Lab browser interaction', () => {
       expect(warmupWire).not.toContain(currentId)
       expect(warmupWire).not.toContain(bootstrapToken)
       const routineBootstrap = randomBytes(32).toString('base64url')
-      const routineFake = await startFakeCoachLab({ bootstrapToken: routineBootstrap, origin, port: 0 })
+      const routineFake = await startFakeLocalCoachLab({ bootstrapToken: routineBootstrap, origin, port: 0 })
       try {
-        await configureRemote(page, routineFake.endpoint, routineBootstrap)
+        await configureLocal(page, routineFake.endpoint, routineBootstrap)
         await page.getByRole('button', { name: '发送问题', exact: true }).click()
-        await expect(page.getByTestId('lab-result')).toContainText('远端规划已完成并校验')
+        await expect(page.getByTestId('lab-result')).toContainText('本地规划已完成并校验')
         await expect(page.getByTestId('lab-evidence')).toContainText('follow-along-similarity')
         await expect(page.getByTestId('lab-evidence')).toContainText('0.8')
         expect(routineFake.getModelRequests()).toBe(2)
@@ -193,7 +258,7 @@ test.describe('independent Coach Lab browser interaction', () => {
 
   test('cancelled and late HTTP responses cannot replace a new history answer', async ({ page }) => {
     const bootstrapToken = randomBytes(32).toString('base64url')
-    const fake = await startFakeCoachLab({ bootstrapToken, origin, port: 0 })
+    const fake = await startFakeLocalCoachLab({ bootstrapToken, origin, port: 0 })
     let release!: () => void
     const gate = new Promise<void>(resolve => { release = resolve })
     let delivered!: () => void
@@ -208,7 +273,7 @@ test.describe('independent Coach Lab browser interaction', () => {
     })
     try {
       await open(page)
-      await configureRemote(page, fake.endpoint, bootstrapToken)
+      await configureLocal(page, fake.endpoint, bootstrapToken)
       await page.getByRole('button', { name: '发送问题', exact: true }).click()
       await expect.poll(() => intercepted).toBe(true)
       await expect(page.getByRole('button', { name: '取消任务', exact: true })).toBeEnabled()
@@ -230,7 +295,7 @@ test.describe('independent Coach Lab browser interaction', () => {
 
   test('shows a deadline failure and cancels the pending HTTP plan without inventing an answer', async ({ page }) => {
     const bootstrapToken = randomBytes(32).toString('base64url')
-    const fake = await startFakeCoachLab({ bootstrapToken, origin, port: 0 })
+    const fake = await startFakeLocalCoachLab({ bootstrapToken, origin, port: 0 })
     let release!: () => void
     const gate = new Promise<void>(resolve => { release = resolve })
     let intercepted = false
@@ -242,13 +307,13 @@ test.describe('independent Coach Lab browser interaction', () => {
     })
     try {
       await open(page)
-      await configureRemote(page, fake.endpoint, bootstrapToken)
+      await configureLocal(page, fake.endpoint, bootstrapToken)
       await page.getByRole('button', { name: '发送问题', exact: true }).click()
       await expect.poll(() => intercepted).toBe(true)
       await page.clock.runFor(10_001)
       await expect(page.getByRole('alert')).toContainText('TIMEOUT')
       await expect(page.getByTestId('lab-result')).toContainText('已超时')
-      await expect(page.getByTestId('lab-result')).toContainText('远端规划未完成')
+      await expect(page.getByTestId('lab-result')).toContainText('本地规划未完成')
       await expect(page.getByTestId('lab-evidence')).toContainText('0 条本地引用')
       await expect(page.getByRole('button', { name: '取消任务', exact: true })).toBeDisabled()
       expect(fake.getModelRequests()).toBe(0)
@@ -263,5 +328,6 @@ test.describe('independent Coach Lab browser interaction', () => {
     const sizes = await page.evaluate(() => ({ width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }))
     expect(sizes.scroll).toBeLessThanOrEqual(sizes.width)
     await expect(page.getByRole('button', { name: '发送问题', exact: true })).toBeVisible()
+    await capture(page, 'mobile-mock')
   })
 })

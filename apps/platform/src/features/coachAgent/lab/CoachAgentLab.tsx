@@ -7,7 +7,7 @@ const STATUS: Record<LabStatus, string> = {
   idle: '等待提问', ready: '准备就绪', running: '正在处理', answered: '已回答',
   insufficient: '证据不足', failed: '未完成', cancelled: '已取消', timeout: '已超时',
 }
-const PLANNING = { mock: 'Mock 规则演示', completed: '远端规划已完成并校验', not_completed: '远端规划未完成' }
+const PLANNING = { mock: 'Mock 规则演示', completed: '本地规划已完成并校验', not_completed: '本地规划未完成' }
 const PROMPTS = [
   { label: '深蹲评分为什么不高？', question: '为什么我这次深蹲评分不高？', kind: 'warmup' },
   { label: '最近深蹲有进步吗？', question: '我最近几次深蹲有没有进步？', kind: 'warmup' },
@@ -45,10 +45,17 @@ function Citation({ citation }: { citation: CoachCitation }) {
 export function CoachAgentLab({ controller }: { controller: CoachLabController }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getSnapshot)
   const tokenInput = useRef<HTMLInputElement>(null)
-  const [endpoint, setEndpoint] = useState('http://127.0.0.1:4319/v1/coach/step')
+  const [endpoint, setEndpoint] = useState('http://127.0.0.1:4320/v1/coach/local/step')
   const running = state.status === 'running'
   const selectedSession = state.sessions.find(session => session.id === state.currentSessionId)
   const result = state.result
+  const connectionStatus = result?.providerKind === 'local'
+    ? result.modelPlanning === 'completed'
+      ? '本地规划已完成并通过校验。评分与历史比较继续使用本机原始记录。'
+      : '本地模型不可用或规划未完成。请检查本机服务，也可切回 Mock 演示。'
+    : state.localConfigured
+      ? '连接待验证。发送问题时才握手并尝试规划；配置成功不代表模型已安装或推理成功。'
+      : '本地模型不可用（尚未连接）。请先准备获准的本地模型服务，或返回 Mock。'
 
   useEffect(() => {
     const leave = () => {
@@ -61,12 +68,12 @@ export function CoachAgentLab({ controller }: { controller: CoachLabController }
 
   useEffect(() => {
     if (tokenInput.current) tokenInput.current.value = ''
-  }, [state.mode, state.kind, state.dataSource, state.currentSessionId, state.allowedSessionIds, state.disclosureConsent, state.paidConsent])
+  }, [state.mode, state.kind, state.dataSource, state.currentSessionId, state.allowedSessionIds, state.disclosureConsent, state.inferenceConsent])
 
-  const configureRemote = (event: FormEvent) => {
+  const configureLocal = (event: FormEvent) => {
     event.preventDefault()
     const token = tokenInput.current?.value ?? ''
-    try { controller.configureRemote({ endpoint, bootstrapToken: token }) }
+    try { controller.configureLocal({ endpoint, bootstrapToken: token }) }
     finally { if (tokenInput.current) tokenInput.current.value = '' }
   }
   const submit = (event: FormEvent) => { event.preventDefault(); void controller.run() }
@@ -104,25 +111,25 @@ export function CoachAgentLab({ controller }: { controller: CoachLabController }
 
         <section className="lab-workspace" aria-label="问答工作区">
           <div className="lab-toolbar">
-            <div className="lab-mode-tabs" role="group" aria-label="Agent 模式"><button className="lab-mode-tab" aria-pressed={state.mode === 'mock'} onClick={() => controller.setMode('mock')}>Mock 规则演示</button><button className="lab-mode-tab" aria-pressed={state.mode === 'remote'} onClick={() => controller.setMode('remote')}>Remote 远程规划</button></div>
-            <span className="lab-mode-note">{state.mode === 'mock' ? <><Unplug size={12} aria-hidden="true" />不调用远程模型</> : <><ShieldCheck size={12} aria-hidden="true" />需要显式授权</>}</span>
+            <div className="lab-mode-tabs" role="group" aria-label="Agent 模式"><button className="lab-mode-tab" aria-pressed={state.mode === 'mock'} onClick={() => controller.setMode('mock')}>Mock 规则演示</button><button className="lab-mode-tab" aria-pressed={state.mode === 'local'} onClick={() => controller.setMode('local')}>本地模型（零 API 费用）</button></div>
+            <span className="lab-mode-note">{state.mode === 'mock' ? <><Unplug size={12} aria-hidden="true" />不调用模型</> : <><ShieldCheck size={12} aria-hidden="true" />本机推理 · 默认关闭</>}</span>
           </div>
           <div className="lab-body">
-            {state.mode === 'remote' && <details className="lab-remote" open={!state.remoteConfigured}>
-              <summary>配置本机 Remote 代理</summary>
-              <div className="lab-remote-content">
-                <p className="lab-remote-warning">本机开发选项。此处仅接收负责人在本机生成的一次性 bootstrap token，绝不要填写模型 API Key。代理不适用于公网或多人付费服务。</p>
+            {state.mode === 'local' && <details className="lab-local-connection" open={!state.localConfigured}>
+              <summary>配置本地模型连接</summary>
+              <div className="lab-local-connection-content">
+                <p className="lab-local-connection-warning">仅连接本机已安装的开源权重模型。此处只接收本地规划服务生成的一次性令牌。需先检查硬件与模型许可；配置连接不会安装或下载模型。</p>
                 <div className="lab-disclosure"><strong>即将发送的最小范围</strong><ul><li>问题分类、剩余调用次数、临时匿名 Session / 证据编号。</li><li>工具成功状态、固定错误码、评分种类、动作类别与比较 gate。</li></ul><p>不发送原问题、原始 Session ID、分数、姓名、视频、关键点或完整记录。最终事实仍在本机生成。</p></div>
                 <label className="lab-check"><input type="checkbox" checked={state.disclosureConsent} onChange={event => controller.setDisclosureConsent(event.target.checked)} /><span>同意发送最小规划字段<small>只同意上述固定范围，随时可撤销。</small></span></label>
-                <label className="lab-check"><input type="checkbox" checked={state.paidConsent} onChange={event => controller.setPaidConsent(event.target.checked)} /><span>启用可能产生费用的调用<small>代理还必须由负责人配置模型与预算；失败不会自动重试。</small></span></label>
-                <form onSubmit={configureRemote} autoComplete="off">
-                  <div className="lab-remote-fields">
-                    <div className="lab-field"><label htmlFor="lab-endpoint">本机代理地址</label><input id="lab-endpoint" className="lab-text-input lab-mono" value={endpoint} onChange={event => { setEndpoint(event.target.value); if (state.remoteConfigured) controller.setDisclosureConsent(false) }} spellCheck={false} autoComplete="off" /></div>
-                    <div className="lab-field"><label htmlFor="lab-bootstrap">本机一次性 bootstrap token</label><input ref={tokenInput} id="lab-bootstrap" type="password" className="lab-text-input" autoComplete="off" spellCheck={false} autoCapitalize="none" disabled={state.remoteConfigured || !state.disclosureConsent || !state.paidConsent} placeholder="只在当前内存中使用，提交后清空" /></div>
+                <label className="lab-check"><input type="checkbox" checked={state.inferenceConsent} onChange={event => controller.setInferenceConsent(event.target.checked)} /><span>确认硬件、模型许可与资源占用并启用本地推理<small>已确认本机模型合法可用，允许占用 CPU / GPU / 内存与电量。零 API 费用；失败不自动重试。</small></span></label>
+                <form onSubmit={configureLocal} autoComplete="off">
+                  <div className="lab-local-connection-fields">
+                    <div className="lab-field"><label htmlFor="lab-endpoint">本地规划服务地址</label><input id="lab-endpoint" className="lab-text-input lab-mono" value={endpoint} onChange={event => { setEndpoint(event.target.value); if (state.localConfigured) controller.setDisclosureConsent(false) }} spellCheck={false} autoComplete="off" /></div>
+                    <div className="lab-field"><label htmlFor="lab-bootstrap">本机一次性 bootstrap token</label><input ref={tokenInput} id="lab-bootstrap" type="password" className="lab-text-input" autoComplete="off" spellCheck={false} autoCapitalize="none" disabled={state.localConfigured || !state.disclosureConsent || !state.inferenceConsent} placeholder="只在当前内存中使用，提交后清空" /></div>
                   </div>
-                  <button className="lab-button" disabled={!state.disclosureConsent || !state.paidConsent || state.remoteConfigured || running} type="submit"><LockKeyhole size={13} aria-hidden="true" />建立本机会话</button>
+                  <button className="lab-button" disabled={!state.disclosureConsent || !state.inferenceConsent || state.localConfigured || running} type="submit"><LockKeyhole size={13} aria-hidden="true" />建立本机会话</button>
                 </form>
-                <div className="lab-remote-status" role="status"><Info size={13} aria-hidden="true" /><p>{state.remoteConfigured ? '配置已驻留内存。发送问题时才发起一次性握手；会话有效期 5 分钟，失效后需重新准备本机会话。' : 'Remote 尚未启用，不会发起模型请求。'}<br /><span className="lab-mono">LIVE_API_TEST NOT RUN</span> · 当前没有已验收的真实付费模型调用。</p></div>
+                <div className="lab-local-connection-status" role="status"><Info size={13} aria-hidden="true" /><p>{connectionStatus}</p></div>
               </div>
             </details>}
 
@@ -137,7 +144,7 @@ export function CoachAgentLab({ controller }: { controller: CoachLabController }
               <div className="lab-result-top"><div className="lab-result-title"><MessageSquareText size={16} aria-hidden="true" /><h2 id="lab-result-title">回答与依据</h2></div><span className="lab-status-badge" data-status={state.status} role="status">{state.status === 'answered' && <Check size={11} aria-hidden="true" />}{STATUS[state.status]}</span></div>
               {state.problem && <div className="lab-notice" role="alert"><strong>{state.problem.code}</strong><br />{state.problem.message}</div>}
               {running ? <div className="lab-running"><p>正在规划工具并核验授权证据，可随时取消。</p><div className="lab-skeleton" /><div className="lab-skeleton" /><div className="lab-skeleton" /></div> : result ? <>
-                <div className="lab-result-meta"><span>{result.providerKind === 'mock' ? 'MOCK · 确定性规则' : 'REMOTE · 受控规划'}</span><span>{PLANNING[result.modelPlanning]}</span><span>{state.dataSource === 'synthetic' ? 'synthetic · 合成数据' : '本机授权记录'}</span></div>
+                <div className="lab-result-meta"><span>{result.providerKind === 'mock' ? 'MOCK · 确定性规则' : 'LOCAL · 受控规划'}</span><span>{PLANNING[result.modelPlanning]}</span><span>{state.dataSource === 'synthetic' ? 'synthetic · 合成数据' : '本机授权记录'}</span></div>
                 <p className="lab-answer-text">{result.text}</p>
                 {!!state.comparisons.length && <div className="lab-comparison" data-testid="lab-comparison"><h3><History size={14} aria-hidden="true" />历史比较门禁</h3>{state.comparisons.map(comparison => <p key={comparison.requestId}><strong>gate = {comparison.gate}</strong><br /><code>{comparison.reason ?? '已通过当前范围的比较门禁'}</code></p>)}</div>}
                 <div className="lab-evidence" data-testid="lab-evidence"><div className="lab-evidence-heading"><h3>评分证据</h3><span>{result.citations.length} 条本地引用</span></div>{result.citations.length ? result.citations.map(citation => <Citation citation={citation} key={citation.requestId + citation.evidenceId} />) : <p className="lab-evidence-empty">本次没有有效证据引用，不会用模型输出补造成绩。</p>}</div>
@@ -149,7 +156,7 @@ export function CoachAgentLab({ controller }: { controller: CoachLabController }
           </div>
         </section>
       </div>
-      <footer className="lab-footer"><span><FlaskConical size={11} aria-hidden="true" /> 开发实验台独立运行，不控制训练、不修改已有成绩，也不写入训练历史。</span><span>Phase 1E · 本机只读实验</span></footer>
+      <footer className="lab-footer"><span><FlaskConical size={11} aria-hidden="true" /> 开发实验台独立运行，不控制训练、不修改已有成绩，也不写入训练历史。</span><span>Phase 1F · 零 API 费用</span></footer>
     </main>
   </div>
 }

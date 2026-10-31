@@ -60,7 +60,7 @@ describe('Coach Lab synthetic experiments and evidence', () => {
     vi.stubGlobal('fetch', fetch)
     const lab = controller({ getLocalStorage })
     expect(lab.getSnapshot()).toMatchObject({ mode: 'mock', dataSource: 'synthetic', kind: 'warmup',
-      localConsent: false, disclosureConsent: false, paidConsent: false, remoteConfigured: false })
+      localConsent: false, disclosureConsent: false, inferenceConsent: false, localConfigured: false })
     expect(lab.getSnapshot().sessions.every(session => session.source === 'synthetic')).toBe(true)
     await lab.run()
     expect(lab.getSnapshot().result?.modelPlanning).toBe('mock')
@@ -288,18 +288,18 @@ describe('Coach Lab cancellation, deadlines and stale result protection', () => 
     expect(lab.getSnapshot().question).toBe(LAB_QUESTIONS.history)
   })
 
-  it.each(['session', 'kind', 'source', 'mode', 'disclosure', 'paid', 'clear', 'dispose'] as const)('invalidates pending work on %s change', async change => {
+  it.each(['session', 'kind', 'source', 'mode', 'disclosure', 'inference', 'clear', 'dispose'] as const)('invalidates pending work on %s change', async change => {
     const deferred = deferredProvider()
     const lab = controller({ providerFactory: () => deferred.provider })
     if (change === 'disclosure') lab.setDisclosureConsent(true)
-    if (change === 'paid') lab.setPaidConsent(true)
+    if (change === 'inference') lab.setInferenceConsent(true)
     const pending = lab.run()
     if (change === 'session') lab.selectCurrentSession(lab.getSnapshot().sessions[1].id)
     else if (change === 'kind') lab.setKind('routine')
     else if (change === 'source') lab.setDataSource('local')
-    else if (change === 'mode') lab.setMode('remote')
+    else if (change === 'mode') lab.setMode('local')
     else if (change === 'disclosure') lab.setDisclosureConsent(false)
-    else if (change === 'paid') lab.setPaidConsent(false)
+    else if (change === 'inference') lab.setInferenceConsent(false)
     else if (change === 'clear') lab.clear()
     else lab.dispose()
     const replacement = lab.getSnapshot()
@@ -324,34 +324,60 @@ describe('Coach Lab cancellation, deadlines and stale result protection', () => 
   })
 })
 
-describe('Coach Lab Remote gates and anonymous transport', () => {
-  const bootstrap = 'fake_lab_bootstrap_for_unit_test_only_012345'
+describe('Coach Lab Local model gates and anonymous transport', () => {
+  const bootstrap = 'fake_local_bootstrap_for_unit_test_only_012345'
   const token = 'fake_lab_session_for_unit_test_only_0123456789'
-  const endpoint = 'http://127.0.0.1:4319/v1/coach/step'
+  const endpoint = 'http://127.0.0.1:4319/v1/coach/local/step'
   function enable(lab: CoachLabController) {
-    lab.setMode('remote')
+    lab.setMode('local')
     lab.setDisclosureConsent(true)
-    lab.setPaidConsent(true)
-    return lab.configureRemote({ endpoint, bootstrapToken: bootstrap })
+    lab.setInferenceConsent(true)
+    return lab.configureLocal({ endpoint, bootstrapToken: bootstrap })
   }
 
-  it.each(['none', 'disclosure', 'paid', 'both'] as const)('does not request HTTP before consent and explicit configuration: %s', async consent => {
+  it.each(['none', 'disclosure', 'inference', 'both'] as const)('does not request HTTP before consent and explicit configuration: %s', async consent => {
     const fetch = vi.fn(async () => { throw new Error('should not call') })
     vi.stubGlobal('fetch', fetch)
     const lab = controller()
-    lab.setMode('remote')
+    lab.setMode('local')
     if (consent === 'disclosure' || consent === 'both') lab.setDisclosureConsent(true)
-    if (consent === 'paid' || consent === 'both') lab.setPaidConsent(true)
+    if (consent === 'inference' || consent === 'both') lab.setInferenceConsent(true)
     await lab.run()
-    expect(lab.getSnapshot().problem?.code).toBe(consent === 'both' ? 'REMOTE_NOT_CONFIGURED' : 'REMOTE_DISABLED')
+    expect(lab.getSnapshot().problem?.code).toBe(consent === 'both' ? 'LOCAL_NOT_CONFIGURED' : 'LOCAL_DISABLED')
     expect(fetch).not.toHaveBeenCalled()
   })
 
-  it('refuses bootstrap configuration until both Remote decisions are explicit', () => {
+  it('removes legacy paid configuration and refuses a runtime request for Remote', async () => {
+    const factory = vi.fn(mock)
+    const fetch = vi.fn(async () => { throw new Error('must stay offline') })
+    vi.stubGlobal('fetch', fetch)
+    const lab = controller({ providerFactory: factory })
+    expect('configureRemote' in lab).toBe(false)
+    expect('setPaidConsent' in lab).toBe(false)
+    lab.setMode('remote' as Parameters<CoachLabController['setMode']>[0])
+    expect(lab.getSnapshot()).toMatchObject({ mode: 'mock', status: 'failed', problem: { code: 'MODE_UNAVAILABLE' } })
+    expect(factory).not.toHaveBeenCalled()
+    expect(fetch).not.toHaveBeenCalled()
+    await lab.run()
+    expect(lab.getSnapshot().result?.providerKind).toBe('mock')
+    expect(factory.mock.calls.every(([configuration]) => configuration.mode === 'mock')).toBe(true)
+  })
+
+  it('rejects an injected historical Remote provider before it can make any call', async () => {
+    const next = vi.fn(async () => { throw new Error('must stay offline') })
+    const lab = controller({ providerFactory: () => ({ kind: 'remote', id: 'historical-remote', next }) })
+    expect(enable(lab)).toBe(false)
+    expect(lab.getSnapshot().problem?.code).toBe('LOCAL_CONFIGURATION')
+    await lab.run()
+    expect(lab.getSnapshot().problem?.code).toBe('LOCAL_NOT_CONFIGURED')
+    expect(next).not.toHaveBeenCalled()
+  })
+
+  it('refuses bootstrap configuration until both local model decisions are explicit', () => {
     const lab = controller()
-    lab.setMode('remote')
-    expect(lab.configureRemote({ endpoint, bootstrapToken: bootstrap })).toBe(false)
-    expect(lab.getSnapshot().remoteConfigured).toBe(false)
+    lab.setMode('local')
+    expect(lab.configureLocal({ endpoint, bootstrapToken: bootstrap })).toBe(false)
+    expect(lab.getSnapshot().localConfigured).toBe(false)
     expect(JSON.stringify(lab.getSnapshot())).not.toContain(bootstrap)
   })
 
@@ -373,7 +399,7 @@ describe('Coach Lab Remote gates and anonymous transport', () => {
     const privateQuestion = '深蹲评分为什么不高？我的名字是私密姓名，电话13800000000，上传video和landmarks。'
     lab.setQuestion(privateQuestion)
     await lab.run()
-    expect(lab.getSnapshot().result).toMatchObject({ providerKind: 'remote', modelPlanning: 'completed', status: 'answered' })
+    expect(lab.getSnapshot().result).toMatchObject({ providerKind: 'local', modelPlanning: 'completed', status: 'answered' })
     expect(bodies).toHaveLength(2)
     const serialized = JSON.stringify(bodies)
     for (const excluded of [privateQuestion, '私密姓名', '13800000000', 'video', 'landmarks', 'synthetic-squat', 'source', 'scoringVersion',
@@ -383,24 +409,24 @@ describe('Coach Lab Remote gates and anonymous transport', () => {
     expect(lab.getSnapshot().result!.citations[0].score.value).toBe(67)
   })
 
-  it.each(['disclosure', 'paid', 'session', 'clear'] as const)('drops the configured capability on %s change', change => {
+  it.each(['disclosure', 'inference', 'session', 'clear'] as const)('drops the configured capability on %s change', change => {
     const lab = controller()
     expect(enable(lab)).toBe(true)
     if (change === 'disclosure') lab.setDisclosureConsent(false)
-    else if (change === 'paid') lab.setPaidConsent(false)
+    else if (change === 'inference') lab.setInferenceConsent(false)
     else if (change === 'session') lab.selectCurrentSession(lab.getSnapshot().sessions[1].id)
     else lab.clear()
-    expect(lab.getSnapshot()).toMatchObject({ remoteConfigured: false, disclosureConsent: false, paidConsent: false, result: null })
+    expect(lab.getSnapshot()).toMatchObject({ localConfigured: false, disclosureConsent: false, inferenceConsent: false, result: null })
   })
 
-  it('shows a failed remote plan without echoing diagnostics or silently falling back to Mock', async () => {
+  it('shows a failed local plan without echoing diagnostics or silently falling back to Mock', async () => {
     const fetch = vi.fn(async () => { throw new Error(`private server error ${bootstrap}`) })
     vi.stubGlobal('fetch', fetch)
     const lab = controller()
     expect(enable(lab)).toBe(true)
     await lab.run()
     expect(lab.getSnapshot()).toMatchObject({ status: 'failed', problem: { code: 'PROVIDER_FAILURE' } })
-    expect(lab.getSnapshot().result).toMatchObject({ providerKind: 'remote', modelPlanning: 'not_completed', mock: false })
+    expect(lab.getSnapshot().result).toMatchObject({ providerKind: 'local', modelPlanning: 'not_completed', mock: false })
     expect(JSON.stringify(lab.getSnapshot())).not.toContain('private server error')
     expect(JSON.stringify(lab.getSnapshot())).not.toContain(bootstrap)
     expect(fetch).toHaveBeenCalledTimes(1)

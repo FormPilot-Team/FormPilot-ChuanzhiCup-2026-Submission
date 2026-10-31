@@ -98,17 +98,17 @@ button, label, select { line-height: 1.45; }
 .lab-button-primary:disabled { color: #fff; background: #8b7770; border-color: #8b7770; }
 .lab-button-quiet { border-color: transparent; background: transparent; color: #536978; }
 .lab-button-quiet:hover { background: #edf2f5; border-color: transparent; }
-.lab-remote { border-top: 1px solid #d7dfe6; border-bottom: 1px solid #d7dfe6; padding: 15px 0 18px; margin: 19px 0; }
-.lab-remote summary { cursor: pointer; font-size: 14px; color: #354f61; font-weight: 650; }
-.lab-remote-content { padding-top: 10px; }
-.lab-remote-warning { color: #85442a; background: #fff3eb; border: 1px solid #e6c9b6; border-radius: 6px; font-size: 14px; line-height: 1.75; padding: 10px; }
-.lab-remote-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 15px 0; }
-.lab-remote-fields .lab-field { margin: 0; }
+.lab-local-connection { border-top: 1px solid #d7dfe6; border-bottom: 1px solid #d7dfe6; padding: 15px 0 18px; margin: 19px 0; }
+.lab-local-connection summary { cursor: pointer; font-size: 14px; color: #354f61; font-weight: 650; }
+.lab-local-connection-content { padding-top: 10px; }
+.lab-local-connection-warning { color: #85442a; background: #fff3eb; border: 1px solid #e6c9b6; border-radius: 6px; font-size: 14px; line-height: 1.75; padding: 10px; }
+.lab-local-connection-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 15px 0; }
+.lab-local-connection-fields .lab-field { margin: 0; }
 .lab-disclosure { color: #4f6575; font-size: 14px; line-height: 1.8; padding: 12px 0; }
 .lab-disclosure strong { color: #304b5f; font-weight: 650; }
 .lab-disclosure ul { margin: 6px 0 0; padding-left: 16px; }
-.lab-remote-status { display: flex; align-items: flex-start; gap: 7px; font-size: 13px; color: #546a79; line-height: 1.7; margin-top: 12px; }
-.lab-remote-status svg { flex: none; margin-top: 2px; }
+.lab-local-connection-status { display: flex; align-items: flex-start; gap: 7px; font-size: 13px; color: #546a79; line-height: 1.7; margin-top: 12px; }
+.lab-local-connection-status svg { flex: none; margin-top: 2px; }
 .lab-result-section { margin-top: 27px; border-top: 1px solid var(--line); padding-top: 24px; }
 .lab-result-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .lab-result-title { display: flex; align-items: center; gap: 9px; }

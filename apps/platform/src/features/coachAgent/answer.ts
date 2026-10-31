@@ -23,7 +23,7 @@ export interface CoachAnswer {
   status: 'answered' | 'insufficient' | 'failed' | 'cancelled' | 'timeout'
   mock: boolean
   providerKind: CoachProvider['kind']
-  /** A completed remote plan is separate from a locally grounded factual answer. */
+  /** A validated provider plan is separate from a locally grounded factual answer. */
   modelPlanning: 'mock' | 'completed' | 'not_completed'
   providerId: string
   text: string
@@ -89,7 +89,8 @@ export function coachFailure(providerId: string, receipts: DispatchReceipt[], co
   status: CoachAnswer['status'] = 'failed', providerKind: CoachProvider['kind'] = 'mock'): CoachAnswer {
   return freezeCoachValue({ status, mock: providerKind === 'mock', providerKind,
     modelPlanning: providerKind === 'mock' ? 'mock' : 'not_completed', providerId,
-    text: `${providerKind === 'mock' ? '[MOCK / 确定性规则演示]' : '[REMOTE / 未完成可信模型规划]'} ${FAILURE_TEXT[code] ?? '未取得可信答复，数据不足，无法回答训练表现。'}`,
+    text: `${providerKind === 'mock' ? '[MOCK / 确定性规则演示]'
+      : providerKind === 'local' ? '[LOCAL / 本地规划未完成]' : '[REMOTE / 未完成可信模型规划]'} ${FAILURE_TEXT[code] ?? '未取得可信答复，数据不足，无法回答训练表现。'}`,
     citations: [], findings: [], limitations: [], calls: receipts.map(receipt => ({
       requestId: receipt.requestId, tool: receipt.tool, ok: receipt.ok, problemCode: receipt.problem?.code ?? null,
     })), problemCode: code })
@@ -155,7 +156,9 @@ export function renderCoachAnswer(providerId: string, mode: AnswerMode, refs: An
   if (limitations.length) body.push(`数据限制：${limitations.join('；')}`)
   return freezeCoachValue({ status, mock: providerKind === 'mock', providerKind,
     modelPlanning: providerKind === 'mock' ? 'mock' : 'completed', providerId,
-    text: `${providerKind === 'mock' ? '[MOCK / 确定性规则演示]' : '[REMOTE / 模型规划已验证，事实由本地证据生成]'} ${body.join('\n')}`,
+    text: `${providerKind === 'mock' ? '[MOCK / 确定性规则演示]'
+      : providerKind === 'local' ? '[LOCAL / 本机规划已校验，事实由本地证据生成]'
+        : '[REMOTE / 模型规划已验证，事实由本地证据生成]'} ${body.join('\n')}`,
     citations, findings, limitations, calls: receipts.map(receipt => ({
       requestId: receipt.requestId, tool: receipt.tool, ok: receipt.ok, problemCode: receipt.problem?.code ?? null,
     })), problemCode: null })

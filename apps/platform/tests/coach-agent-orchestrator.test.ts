@@ -211,6 +211,38 @@ describe('Coach provider trust boundary', () => {
     expect(getItem).not.toHaveBeenCalled()
   })
 
+  it('requires an independent local opt-in and never treats Remote opt-in as local consent', async () => {
+    const next = vi.fn(async () => ({ type: 'answer', mode: 'insufficient', evidenceRefs: [] }))
+    const provider: CoachProvider = { kind: 'local', id: 'local-gate-fixture', next }
+    const { dispatcher, getItem } = setup(provider)
+    for (const remoteEnabled of [false, true]) {
+      const agent = createCoachOrchestrator({ dispatcher, provider, remoteEnabled })
+      const answer = await agent.run('深蹲评分')
+      expect(answer.problemCode).toBe('PROVIDER_NOT_ALLOWED')
+      expect(answer.providerKind).toBe('local')
+      expect(answer.modelPlanning).toBe('not_completed')
+      expect(answer.text).toContain('[LOCAL / 本地规划未完成]')
+    }
+    expect(next).not.toHaveBeenCalled()
+    expect(getItem).not.toHaveBeenCalled()
+    const enabled = createCoachOrchestrator({ dispatcher, provider, localEnabled: true })
+    const answer = await enabled.run('深蹲评分')
+    expect(answer.status).toBe('insufficient')
+    expect(answer.mock).toBe(false)
+    expect(answer.modelPlanning).toBe('completed')
+    expect(answer.text).toContain('[LOCAL / 本机规划已校验')
+    expect(next).toHaveBeenCalledTimes(1)
+  })
+
+  it('local consent cannot enable the historical Remote adapter', async () => {
+    const next = vi.fn(async () => ({ type: 'answer', mode: 'insufficient', evidenceRefs: [] }))
+    const provider: CoachProvider = { kind: 'remote', id: 'remote-gate-fixture', next }
+    const { dispatcher } = setup(provider)
+    const agent = createCoachOrchestrator({ dispatcher, provider, localEnabled: true })
+    expect((await agent.run('深蹲评分')).problemCode).toBe('PROVIDER_NOT_ALLOWED')
+    expect(next).not.toHaveBeenCalled()
+  })
+
   it('sanitizes provider failures and invalid user input', async () => {
     const next = vi.fn(async () => { throw new Error('private-token-and-raw-storage') })
     const { orchestrator } = setup(adapter(next))

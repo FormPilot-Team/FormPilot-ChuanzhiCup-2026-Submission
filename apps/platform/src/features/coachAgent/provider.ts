@@ -28,7 +28,7 @@ export interface ProviderContext {
 
 /** Remote model calls belong in a separately authorized server process. */
 export interface CoachProvider {
-  readonly kind: 'mock' | 'remote'
+  readonly kind: 'mock' | 'remote' | 'local'
   readonly id: string
   next(context: ProviderContext, options: { signal: AbortSignal }): Promise<unknown>
 }

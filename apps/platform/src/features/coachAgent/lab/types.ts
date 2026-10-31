@@ -3,7 +3,7 @@ import type { CoachProvider } from '../provider'
 import type { CoachProvenance, CoachScore } from '../contracts'
 import type { SessionKind } from '../readerTypes'
 
-export type LabMode = 'mock' | 'remote'
+export type LabMode = 'mock' | 'local'
 export type LabDataSource = 'synthetic' | 'local'
 export type LabStatus = 'idle' | 'ready' | 'running' | 'answered' | 'insufficient' | 'failed' | 'cancelled' | 'timeout'
 export interface LabSession {
@@ -29,8 +29,8 @@ export interface CoachLabState {
   allowedSessionIds: readonly string[]
   localConsent: boolean
   disclosureConsent: boolean
-  paidConsent: boolean
-  remoteConfigured: boolean
+  inferenceConsent: boolean
+  localConfigured: boolean
   question: string
   status: LabStatus
   result: CoachAnswer | null
@@ -43,7 +43,7 @@ export interface LabProviderConfiguration {
   kind: SessionKind
   sessionId: string
   historyLimit: number
-  remote?: { endpoint: string; bootstrapToken: string }
+  local?: { endpoint: string; bootstrapToken: string }
 }
 export interface CoachLabDependencies {
   /** Lazy: it must not access window.localStorage before a user explicitly loads it. */
@@ -65,8 +65,8 @@ export interface CoachLabController {
   setAllowedSessions(sessionIds: readonly string[]): void
   setQuestion(question: string): void
   setDisclosureConsent(consent: boolean): void
-  setPaidConsent(consent: boolean): void
-  configureRemote(configuration: { endpoint: string; bootstrapToken: string }): boolean
+  setInferenceConsent(consent: boolean): void
+  configureLocal(configuration: { endpoint: string; bootstrapToken: string }): boolean
   run(): Promise<void>
   cancel(): void
   clear(): void

@@ -2,7 +2,7 @@ import { createCoachSessionReader } from '../sessionReader'
 import { createCoachToolDispatcher } from '../dispatcher'
 import { createCoachOrchestrator } from '../orchestrator'
 import { createMockCoachProvider } from '../mockProvider'
-import { createRemoteCoachProvider } from '../remoteProvider'
+import { createLocalCoachProvider } from '../localProvider'
 import { classifyCoachQuestion, freezeCoachValue, type CoachProvider } from '../provider'
 import type { DispatchReceipt, CoachToolDispatcher } from '../dispatchTypes'
 import type { SessionSnapshot } from '../readerTypes'
@@ -28,13 +28,14 @@ const MESSAGES: Record<string, string> = {
   INVALID_INPUT: '请输入 1–4096 字的训练问题。',
   UNSUPPORTED_QUESTION: '当前仅支持深蹲低分、最近深蹲比较和八段锦跟练这三类问题。',
   QUESTION_SCOPE: '问题与当前记录类型不匹配，请切换热身或功法记录。',
-  REMOTE_DISABLED: 'Remote 默认关闭。请分别同意最小数据披露与可能付费调用，再配置本机连接。',
-  REMOTE_NOT_CONFIGURED: '尚未配置可信本机连接。未发起远程规划。',
-  REMOTE_CONFIGURATION: '本机连接配置无效。只接受 127.0.0.1 的独立代理地址与一次性本机令牌。',
-  REMOTE_PROVIDER_MISMATCH: '规划模式与可信 Provider 不匹配，未采用返回结果。',
+  MODE_UNAVAILABLE: '该模式已停用。实验台只允许 Mock 或本地模型，不能启动付费 Remote。',
+  LOCAL_DISABLED: '本地模型默认关闭。请确认本机硬件、模型许可与资源占用，并授权最小规划字段。',
+  LOCAL_NOT_CONFIGURED: '本地模型不可用：尚未配置本机连接。可返回 Mock 演示。',
+  LOCAL_CONFIGURATION: '本地模型不可用：连接配置无效。只接受 127.0.0.1 的本地规划地址与一次性令牌。',
+  PROVIDER_MODE_MISMATCH: '规划模式与可信 Provider 不匹配，未采用返回结果。',
   CANCELLED: '任务已取消，未采用迟到结果。',
   TIMEOUT: '任务已超时，未采用迟到结果。',
-  PROVIDER_FAILURE: '远端规划未完成，服务可能不可用、授权已过期或预算受限。没有自动重试。',
+  PROVIDER_FAILURE: '本地模型不可用或规划未完成：请检查模型安装、服务与本机会话。没有自动重试，可返回 Mock。',
   INVALID_PROVIDER_OUTPUT: '模型输出未通过校验，未采用不可信内容。',
   INVALID_EVIDENCE_REFERENCE: '证据引用未通过本地校验，未采用模型返回的引用。',
   LAB_FAILURE: '本次实验未完成，未取得可信答复。',
@@ -64,11 +65,11 @@ export function createCoachLabController(dependencies: CoachLabDependencies = {}
   let disposed = false
   let generation = 0
   let pending: AbortController | undefined
-  let remoteProvider: CoachProvider | undefined
+  let localProvider: CoachProvider | undefined
   let state: CoachLabState = freezeCoachValue({
     mode: 'mock', dataSource: 'synthetic', kind: 'warmup', sessions: [], currentSessionId: null,
-    allowedSessionIds: [], localConsent: false, disclosureConsent: false, paidConsent: false,
-    remoteConfigured: false, question: LAB_QUESTIONS.explain, status: 'idle', result: null,
+    allowedSessionIds: [], localConsent: false, disclosureConsent: false, inferenceConsent: false,
+    localConfigured: false, question: LAB_QUESTIONS.explain, status: 'idle', result: null,
     comparisons: [], problem: null, localLoaded: false,
   })
 
@@ -82,11 +83,11 @@ export function createCoachLabController(dependencies: CoachLabDependencies = {}
     pending?.abort()
     pending = undefined
   }
-  const invalidate = (remote = false) => {
+  const invalidate = (local = false) => {
     stop()
-    if (remote) remoteProvider = undefined
+    if (local) localProvider = undefined
     update({ result: null, comparisons: [], problem: null, status: state.sessions.length ? 'ready' : 'idle',
-      ...(remote ? { remoteConfigured: false, disclosureConsent: false, paidConsent: false } : {}) })
+      ...(local ? { localConfigured: false, disclosureConsent: false, inferenceConsent: false } : {}) })
   }
   const deny = (code: string) => {
     stop()
@@ -114,8 +115,8 @@ export function createCoachLabController(dependencies: CoachLabDependencies = {}
     const selected = configuration.kind === 'warmup' ? { warmupSessionId: configuration.sessionId } : { routineSessionId: configuration.sessionId }
     return configuration.mode === 'mock'
       ? createMockCoachProvider({ ...selected, historyLimit: configuration.historyLimit })
-      : createRemoteCoachProvider({ ...selected, enabled: true, consent: true,
-        endpoint: configuration.remote!.endpoint, accessToken: configuration.remote!.bootstrapToken,
+      : createLocalCoachProvider({ ...selected, enabled: true, consent: true,
+        endpoint: configuration.local!.endpoint, accessToken: configuration.local!.bootstrapToken,
         historyLimit: configuration.historyLimit, timeoutMs })
   }
 
@@ -124,7 +125,9 @@ export function createCoachLabController(dependencies: CoachLabDependencies = {}
     getSnapshot: () => state,
     subscribe(listener: () => void) { listeners.add(listener); return () => listeners.delete(listener) },
     setMode(mode) {
-      if (disposed || !['mock', 'remote'].includes(mode) || mode === state.mode) return
+      if (disposed) return
+      if (!['mock', 'local'].includes(mode)) { deny('MODE_UNAVAILABLE'); return }
+      if (mode === state.mode) return
       invalidate(true)
       update({ mode })
     },
@@ -194,28 +197,28 @@ export function createCoachLabController(dependencies: CoachLabDependencies = {}
       invalidate()
       update({ disclosureConsent: true })
     },
-    setPaidConsent(consent) {
-      if (disposed || consent === state.paidConsent) return
+    setInferenceConsent(consent) {
+      if (disposed || consent === state.inferenceConsent) return
       if (!consent) { invalidate(true); return }
       invalidate()
-      update({ paidConsent: true })
+      update({ inferenceConsent: true })
     },
-    configureRemote(configuration) {
+    configureLocal(configuration) {
       if (disposed) return false
       invalidate()
-      remoteProvider = undefined
-      update({ remoteConfigured: false })
-      if (state.mode !== 'remote' || !state.disclosureConsent || !state.paidConsent) { deny('REMOTE_DISABLED'); return false }
+      localProvider = undefined
+      update({ localConfigured: false })
+      if (state.mode !== 'local' || !state.disclosureConsent || !state.inferenceConsent) { deny('LOCAL_DISABLED'); return false }
       if (!state.currentSessionId || !state.allowedSessionIds.includes(state.currentSessionId)) { deny('INVALID_SESSION'); return false }
       try {
         // Validate even an injected provider's connection settings. Construction performs no network.
-        createRemoteCoachProvider({ endpoint: configuration.endpoint, accessToken: configuration.bootstrapToken })
-        remoteProvider = providerFor({ mode: 'remote', kind: state.kind, sessionId: state.currentSessionId,
-          historyLimit: 3, remote: { endpoint: configuration.endpoint, bootstrapToken: configuration.bootstrapToken } })
-        if (remoteProvider.kind !== 'remote') throw new Error('Invalid Provider')
-        update({ remoteConfigured: true, status: 'ready' })
+        createLocalCoachProvider({ endpoint: configuration.endpoint, accessToken: configuration.bootstrapToken })
+        localProvider = providerFor({ mode: 'local', kind: state.kind, sessionId: state.currentSessionId,
+          historyLimit: 3, local: { endpoint: configuration.endpoint, bootstrapToken: configuration.bootstrapToken } })
+        if (localProvider.kind !== 'local') throw new Error('Invalid Provider')
+        update({ localConfigured: true, status: 'ready' })
         return true
-      } catch { remoteProvider = undefined; deny('REMOTE_CONFIGURATION'); return false }
+      } catch { localProvider = undefined; deny('LOCAL_CONFIGURATION'); return false }
     },
     async run() {
       if (disposed || pending) return
@@ -225,8 +228,8 @@ export function createCoachLabController(dependencies: CoachLabDependencies = {}
       const questionMode = classifyCoachQuestion(state.question)
       if (questionMode === 'insufficient') { deny('UNSUPPORTED_QUESTION'); return }
       if ((questionMode === 'routine') !== (state.kind === 'routine')) { deny('QUESTION_SCOPE'); return }
-      if (state.mode === 'remote' && (!state.disclosureConsent || !state.paidConsent)) { deny('REMOTE_DISABLED'); return }
-      if (state.mode === 'remote' && (!remoteProvider || !state.remoteConfigured)) { deny('REMOTE_NOT_CONFIGURED'); return }
+      if (state.mode === 'local' && (!state.disclosureConsent || !state.inferenceConsent)) { deny('LOCAL_DISABLED'); return }
+      if (state.mode === 'local' && (!localProvider || !state.localConfigured)) { deny('LOCAL_NOT_CONFIGURED'); return }
       const runGeneration = ++generation
       const lifetime = new AbortController()
       pending = lifetime
@@ -245,10 +248,10 @@ export function createCoachLabController(dependencies: CoachLabDependencies = {}
             if (!lifetime.signal.aborted && generation === runGeneration) receipts.push(receipt)
             return receipt
           } })
-        const provider = state.mode === 'remote' ? remoteProvider! : providerFor({ mode: 'mock', kind: state.kind,
+        const provider = state.mode === 'local' ? localProvider! : providerFor({ mode: 'mock', kind: state.kind,
           sessionId: state.currentSessionId, historyLimit: 3 })
-        if (provider.kind !== state.mode) { deny('REMOTE_PROVIDER_MISMATCH'); return }
-        const agent = createCoachOrchestrator({ dispatcher: traced, provider, remoteEnabled: state.mode === 'remote', timeoutMs })
+        if (provider.kind !== state.mode) { deny('PROVIDER_MODE_MISMATCH'); return }
+        const agent = createCoachOrchestrator({ dispatcher: traced, provider, localEnabled: state.mode === 'local', timeoutMs })
         const result = await agent.run(state.question, { signal: lifetime.signal })
         if (disposed || lifetime.signal.aborted || generation !== runGeneration) return
         pending = undefined
@@ -269,17 +272,17 @@ export function createCoachLabController(dependencies: CoachLabDependencies = {}
     },
     clear() {
       if (disposed) return
-      stop(); remoteProvider = undefined
+      stop(); localProvider = undefined
       update({ mode: 'mock', dataSource: 'synthetic', kind: 'warmup', sessions: [], currentSessionId: null,
-        allowedSessionIds: [], localConsent: false, disclosureConsent: false, paidConsent: false,
-        remoteConfigured: false, question: LAB_QUESTIONS.explain, status: 'idle', result: null,
+        allowedSessionIds: [], localConsent: false, disclosureConsent: false, inferenceConsent: false,
+        localConfigured: false, question: LAB_QUESTIONS.explain, status: 'idle', result: null,
         comparisons: [], problem: null, localLoaded: false })
       loadSynthetic()
     },
     dispose() {
-      stop(); remoteProvider = undefined
+      stop(); localProvider = undefined
       state = freezeCoachValue({ ...state, sessions: [], currentSessionId: null, allowedSessionIds: [],
-        localConsent: false, disclosureConsent: false, paidConsent: false, remoteConfigured: false,
+        localConsent: false, disclosureConsent: false, inferenceConsent: false, localConfigured: false,
         question: '', status: 'idle', result: null, comparisons: [], problem: null, localLoaded: false })
       disposed = true
       listeners.clear()
