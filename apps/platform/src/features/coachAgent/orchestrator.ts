@@ -6,6 +6,8 @@ import { classifyCoachQuestion, freezeCoachValue, parseProviderStep, type CoachP
 export interface CoachOrchestratorOptions {
   dispatcher: CoachToolDispatcher
   provider: CoachProvider
+  /** Explicit trusted-application opt-in; not a prompt or model-controlled value. */
+  remoteEnabled?: boolean
   maxTurns?: number
   /** Whole-run deadline, including planning, dispatch and answer selection. */
   timeoutMs?: number
@@ -13,6 +15,7 @@ export interface CoachOrchestratorOptions {
 
 export function createCoachOrchestrator(options: CoachOrchestratorOptions) {
   const { dispatcher, provider } = options
+  const remoteEnabled = options.remoteEnabled === true
   const maxTurns = options.maxTurns ?? 4
   const timeoutMs = options.timeoutMs ?? 5_000
   if (!Number.isSafeInteger(maxTurns) || maxTurns < 1 || maxTurns > 8
@@ -21,9 +24,10 @@ export function createCoachOrchestrator(options: CoachOrchestratorOptions) {
   return Object.freeze({
     run(question: string, runOptions: { signal?: AbortSignal } = {}): Promise<CoachAnswer> {
       const receipts: DispatchReceipt[] = []
-      if (provider.kind !== 'mock') return Promise.resolve(coachFailure(provider.id, receipts, 'PROVIDER_NOT_ALLOWED'))
+      const failure = (code: string, status: CoachAnswer['status'] = 'failed') => coachFailure(provider.id, receipts, code, status, provider.kind)
+      if (provider.kind !== 'mock' && !(provider.kind === 'remote' && remoteEnabled)) return Promise.resolve(failure('PROVIDER_NOT_ALLOWED'))
       if (typeof question !== 'string' || !question.trim() || question.length > 4096) {
-        return Promise.resolve(coachFailure(provider.id, receipts, 'INVALID_INPUT'))
+        return Promise.resolve(failure('INVALID_INPUT'))
       }
       return new Promise(resolve => {
         const controller = new AbortController()
@@ -39,11 +43,11 @@ export function createCoachOrchestrator(options: CoachOrchestratorOptions) {
         }
         const cancel = () => {
           controller.abort()
-          finish(coachFailure(provider.id, receipts, 'CANCELLED', 'cancelled'))
+          finish(failure('CANCELLED', 'cancelled'))
         }
         const expire = () => {
           controller.abort()
-          finish(coachFailure(provider.id, receipts, 'TIMEOUT', 'timeout'))
+          finish(failure('TIMEOUT', 'timeout'))
         }
         const stopped = () => {
           if (!settled && performance.now() >= deadline) expire()
@@ -67,50 +71,50 @@ export function createCoachOrchestrator(options: CoachOrchestratorOptions) {
               })) })
             let raw: unknown
             try { raw = await provider.next(context, { signal: controller.signal }) }
-            catch { if (!settled) finish(coachFailure(provider.id, receipts, 'PROVIDER_FAILURE')); return }
+            catch { if (!settled) finish(failure('PROVIDER_FAILURE')); return }
             // JavaScript cannot preempt a synchronous adapter. Reject output that exceeded
             // the monotonic deadline even if its microtask beats the timeout callback.
             if (stopped()) return
             let step: ReturnType<typeof parseProviderStep>
             try { step = parseProviderStep(raw) }
-            catch { finish(coachFailure(provider.id, receipts, 'INVALID_PROVIDER_OUTPUT')); return }
+            catch { finish(failure('INVALID_PROVIDER_OUTPUT')); return }
             if (step.type === 'answer') {
               if (step.mode !== 'insufficient' && step.mode !== classifyCoachQuestion(question)) {
-                finish(coachFailure(provider.id, receipts, 'INVALID_ANSWER_SCOPE')); return
+                finish(failure('INVALID_ANSWER_SCOPE')); return
               }
               try {
-                const answer = renderCoachAnswer(provider.id, step.mode, step.evidenceRefs, receipts)
+                const answer = renderCoachAnswer(provider.id, step.mode, step.evidenceRefs, receipts, provider.kind)
                 if (!stopped()) finish(answer)
               }
-              catch { finish(coachFailure(provider.id, receipts, 'INVALID_EVIDENCE_REFERENCE')) }
+              catch { finish(failure('INVALID_EVIDENCE_REFERENCE')) }
               return
             }
             // Validate a whole proposed batch before any read. A malformed later intent cannot
             // make an earlier intent take effect. Authorization remains exclusively in Dispatcher.
             const intents = step.calls.map(call => parseToolIntent(call))
             if (intents.some(intent => intent === null)) {
-              finish(coachFailure(provider.id, receipts, 'INVALID_PROVIDER_OUTPUT')); return
+              finish(failure('INVALID_PROVIDER_OUTPUT')); return
             }
             for (const intent of intents) {
               if (stopped()) return
               let receipt: DispatchReceipt
               try { receipt = await dispatcher.dispatch(intent, { signal: controller.signal }) }
-              catch { if (!settled) finish(coachFailure(provider.id, receipts, 'DISPATCHER_FAILURE')); return }
+              catch { if (!settled) finish(failure('DISPATCHER_FAILURE')); return }
               if (stopped()) return
-              if (!dispatcher.owns(receipt)) { finish(coachFailure(provider.id, receipts, 'UNTRUSTED_TOOL_RESULT')); return }
+              if (!dispatcher.owns(receipt)) { finish(failure('UNTRUSTED_TOOL_RESULT')); return }
               receipts.push(receipt)
               if (receipt.problem?.code === 'CANCELLED' || receipt.problem?.code === 'TIMEOUT') {
                 controller.abort()
-                finish(coachFailure(provider.id, receipts, receipt.problem.code,
+                finish(failure(receipt.problem.code,
                   receipt.problem.code === 'CANCELLED' ? 'cancelled' : 'timeout'))
                 return
               }
             }
           }
-          if (!settled) finish(coachFailure(provider.id, receipts, 'TURN_BUDGET_EXCEEDED'))
+          if (!settled) finish(failure('TURN_BUDGET_EXCEEDED'))
         }
         // Application-injected adapters remain trusted code, but failures never expose their text.
-        void work().catch(() => finish(coachFailure(provider.id, receipts, 'ORCHESTRATOR_FAILURE')))
+        void work().catch(() => finish(failure('ORCHESTRATOR_FAILURE')))
       })
     },
   })

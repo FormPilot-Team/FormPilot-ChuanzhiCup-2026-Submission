@@ -26,7 +26,7 @@ export interface ProviderContext {
   remainingCalls: number
 }
 
-/** A future remote implementation belongs in a separately authorized server process. */
+/** Remote model calls belong in a separately authorized server process. */
 export interface CoachProvider {
   readonly kind: 'mock' | 'remote'
   readonly id: string

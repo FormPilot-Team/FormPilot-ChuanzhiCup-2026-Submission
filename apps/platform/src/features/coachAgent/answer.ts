@@ -1,6 +1,6 @@
 import type { ScoringEvidence } from './contracts'
 import type { DispatchReceipt } from './dispatchTypes'
-import { freezeCoachValue, type AnswerMode, type AnswerReference } from './provider'
+import { freezeCoachValue, type AnswerMode, type AnswerReference, type CoachProvider } from './provider'
 
 export interface CoachCitation extends AnswerReference {
   sessionId: string
@@ -21,7 +21,10 @@ export interface CoachFinding extends AnswerReference {
 }
 export interface CoachAnswer {
   status: 'answered' | 'insufficient' | 'failed' | 'cancelled' | 'timeout'
-  mock: true
+  mock: boolean
+  providerKind: CoachProvider['kind']
+  /** A completed remote plan is separate from a locally grounded factual answer. */
+  modelPlanning: 'mock' | 'completed' | 'not_completed'
   providerId: string
   text: string
   citations: CoachCitation[]
@@ -83,16 +86,18 @@ function scoreText(citation: CoachCitation): string {
 }
 
 export function coachFailure(providerId: string, receipts: DispatchReceipt[], code: string,
-  status: CoachAnswer['status'] = 'failed'): CoachAnswer {
-  return freezeCoachValue({ status, mock: true, providerId,
-    text: `[MOCK / 确定性规则演示] ${FAILURE_TEXT[code] ?? '未取得可信答复，数据不足，无法回答训练表现。'}`,
+  status: CoachAnswer['status'] = 'failed', providerKind: CoachProvider['kind'] = 'mock'): CoachAnswer {
+  return freezeCoachValue({ status, mock: providerKind === 'mock', providerKind,
+    modelPlanning: providerKind === 'mock' ? 'mock' : 'not_completed', providerId,
+    text: `${providerKind === 'mock' ? '[MOCK / 确定性规则演示]' : '[REMOTE / 未完成可信模型规划]'} ${FAILURE_TEXT[code] ?? '未取得可信答复，数据不足，无法回答训练表现。'}`,
     citations: [], findings: [], limitations: [], calls: receipts.map(receipt => ({
       requestId: receipt.requestId, tool: receipt.tool, ok: receipt.ok, problemCode: receipt.problem?.code ?? null,
     })), problemCode: code })
 }
 
 /** Scores and factual copy are rendered locally; the provider can select references, never write facts. */
-export function renderCoachAnswer(providerId: string, mode: AnswerMode, refs: AnswerReference[], receipts: DispatchReceipt[]): CoachAnswer {
+export function renderCoachAnswer(providerId: string, mode: AnswerMode, refs: AnswerReference[], receipts: DispatchReceipt[],
+  providerKind: CoachProvider['kind'] = 'mock'): CoachAnswer {
   const selected = refs.map(ref => {
     const receipt = receipts.find(item => item.requestId === ref.requestId)
     const evidence = receipt && receiptEvidence(receipt).find(item => item.id === ref.evidenceId)
@@ -148,7 +153,9 @@ export function renderCoachAnswer(providerId: string, mode: AnswerMode, refs: An
     } else body.push('跟练相似度与动作规范评分分别呈现；相似度不能证明动作规范，guidance 不计分。')
   }
   if (limitations.length) body.push(`数据限制：${limitations.join('；')}`)
-  return freezeCoachValue({ status, mock: true, providerId, text: `[MOCK / 确定性规则演示] ${body.join('\n')}`,
+  return freezeCoachValue({ status, mock: providerKind === 'mock', providerKind,
+    modelPlanning: providerKind === 'mock' ? 'mock' : 'completed', providerId,
+    text: `${providerKind === 'mock' ? '[MOCK / 确定性规则演示]' : '[REMOTE / 模型规划已验证，事实由本地证据生成]'} ${body.join('\n')}`,
     citations, findings, limitations, calls: receipts.map(receipt => ({
       requestId: receipt.requestId, tool: receipt.tool, ok: receipt.ok, problemCode: receipt.problem?.code ?? null,
     })), problemCode: null })
