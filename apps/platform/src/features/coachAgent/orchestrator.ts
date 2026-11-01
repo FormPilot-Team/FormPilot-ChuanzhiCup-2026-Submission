@@ -1,7 +1,8 @@
 import type { CoachToolDispatcher, DispatchReceipt } from './dispatchTypes'
 import { parseToolIntent } from './toolQuery'
 import { coachFailure, receiptEvidence, renderCoachAnswer, type CoachAnswer } from './answer'
-import { classifyCoachQuestion, freezeCoachValue, parseProviderStep, type CoachProvider, type ProviderContext } from './provider'
+import { classifyCoachQuestion, freezeCoachValue, parseLocalProviderPlan, parseProviderStep, type CoachProvider, type ProviderContext,
+  type LocalProviderPlan, type ProviderStep } from './provider'
 
 export interface CoachOrchestratorOptions {
   dispatcher: CoachToolDispatcher
@@ -79,8 +80,8 @@ export function createCoachOrchestrator(options: CoachOrchestratorOptions) {
             // JavaScript cannot preempt a synchronous adapter. Reject output that exceeded
             // the monotonic deadline even if its microtask beats the timeout callback.
             if (stopped()) return
-            let step: ReturnType<typeof parseProviderStep>
-            try { step = parseProviderStep(raw) }
+            let step: ProviderStep | LocalProviderPlan
+            try { step = provider.kind === 'local' && provider.protocol === 'intent-v2' ? parseLocalProviderPlan(raw) : parseProviderStep(raw) }
             catch { finish(failure('INVALID_PROVIDER_OUTPUT')); return }
             if (step.type === 'answer') {
               if (step.mode !== 'insufficient' && step.mode !== classifyCoachQuestion(question)) {
@@ -113,6 +114,18 @@ export function createCoachOrchestrator(options: CoachOrchestratorOptions) {
                   receipt.problem.code === 'CANCELLED' ? 'cancelled' : 'timeout'))
                 return
               }
+            }
+            if (step.type === 'plan') {
+              // Only owned receipts can supply references. The model is never asked to
+              // select/generate an ID, inspect an observation, or write factual text.
+              const refs = receipts.flatMap(receipt => receiptEvidence(receipt).map(evidence => ({
+                requestId: receipt.requestId, evidenceId: evidence.id,
+              })))
+              try {
+                const answer = renderCoachAnswer(provider.id, step.mode, refs, receipts, provider.kind)
+                if (!stopped()) finish(answer)
+              } catch { finish(failure('INVALID_EVIDENCE_REFERENCE')) }
+              return
             }
           }
           if (!settled) finish(failure('TURN_BUDGET_EXCEEDED'))

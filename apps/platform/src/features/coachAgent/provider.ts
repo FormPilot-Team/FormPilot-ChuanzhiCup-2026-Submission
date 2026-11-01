@@ -1,5 +1,6 @@
 import type { MotionSubject, ScoringEvidence } from './contracts'
 import type { DispatcherTool } from './dispatchTypes'
+import { parseToolIntent } from './toolQuery.ts'
 
 /** Only an authorized, minimal projection is visible to the planner. No raw reader sidecars. */
 export interface ProviderEvidence {
@@ -30,6 +31,8 @@ export interface ProviderContext {
 export interface CoachProvider {
   readonly kind: 'mock' | 'remote' | 'local'
   readonly id: string
+  /** Trusted adapter capability. Untrusted output cannot opt itself into v2. */
+  readonly protocol?: 'intent-v2'
   next(context: ProviderContext, options: { signal: AbortSignal }): Promise<unknown>
 }
 
@@ -45,6 +48,30 @@ export interface AnswerReference { requestId: string; evidenceId: string }
 export type ProviderStep =
   | { type: 'tools'; calls: unknown[] }
   | { type: 'answer'; mode: AnswerMode; evidenceRefs: AnswerReference[] }
+
+/** Internal adapter result: session IDs are bound by trusted local configuration. */
+export interface LocalProviderPlan { type: 'plan'; mode: AnswerMode; calls: unknown[] }
+
+export function parseLocalProviderPlan(value: unknown): LocalProviderPlan {
+  const raw = fields(value, ['type', 'mode', 'calls'])
+  if (raw.type !== 'plan' || !['explain', 'history', 'routine', 'insufficient'].includes(raw.mode as string)) throw new Error('INVALID_PROVIDER_OUTPUT')
+  const mode = raw.mode as AnswerMode
+  const calls = list(raw.calls, 1)
+  if (mode === 'insufficient') {
+    if (calls.length) throw new Error('INVALID_PROVIDER_OUTPUT')
+    return { type: 'plan', mode, calls }
+  }
+  if (calls.length !== 1) throw new Error('INVALID_PROVIDER_OUTPUT')
+  fields(calls[0], ['tool', 'query'])
+  const intent = parseToolIntent(calls[0])
+  if (!intent || !intent.query.sessionId
+    || (mode === 'history' ? intent.tool !== 'read_history' || intent.query.limit === undefined : intent.tool !== 'read_scoring_evidence')
+    || (mode === 'routine' ? intent.query.kind !== 'routine' || intent.query.subject?.kind !== 'routine' || intent.query.subject.id !== 'baduanjin'
+      : intent.query.kind !== 'warmup' || intent.query.subject?.kind !== 'exercise' || intent.query.subject.id !== 'squat')) {
+    throw new Error('INVALID_PROVIDER_OUTPUT')
+  }
+  return { type: 'plan', mode, calls: [intent] }
+}
 
 /** No getters, custom prototypes, symbols or extra fields may cross the untrusted boundary. */
 function fields(value: unknown, keys: readonly string[]): Record<string, unknown> {

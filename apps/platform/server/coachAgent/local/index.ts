@@ -8,6 +8,10 @@ export type { LocalCoachServerConfig } from './config.ts'
 
 /** Isolated allowlist; never consumes legacy COACH_AGENT_*, VITE_*, API keys or Jev settings. */
 export function loadLocalCoachConfig(env: NodeJS.ProcessEnv = process.env): LocalCoachServerConfig {
+  const planningProtocol = env.LOCAL_COACH_PLANNING_PROTOCOL
+  if (planningProtocol !== undefined && !['provider-step-v1', 'simple-json', 'native-tools', 'structured-output'].includes(planningProtocol)) {
+    throw new Error('INVALID_LOCAL_CONFIG')
+  }
   return {
     enabled: env.LOCAL_COACH_ENABLED === 'true',
     resourcesConfirmed: env.LOCAL_COACH_RESOURCES_CONFIRMED === 'true',
@@ -15,6 +19,7 @@ export function loadLocalCoachConfig(env: NodeJS.ProcessEnv = process.env): Loca
     origin: env.LOCAL_COACH_ORIGIN,
     model: env.LOCAL_COACH_MODEL,
     modelDigest: env.LOCAL_COACH_MODEL_DIGEST,
+    planningProtocol: planningProtocol as LocalCoachServerConfig['planningProtocol'],
   }
 }
 
