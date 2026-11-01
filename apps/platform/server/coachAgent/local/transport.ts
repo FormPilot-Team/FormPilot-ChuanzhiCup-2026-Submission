@@ -69,4 +69,7 @@ export async function verifyInstalledModel(config: ResolvedLocalConfig, signal: 
     || !Array.isArray(shown.capabilities) || !shown.capabilities.includes('completion')) {
     throw new LocalCoachError('LOCAL_MODEL_NOT_LOCAL')
   }
+  if (config.planningProtocol === 'native-tools' && !shown.capabilities.includes('tools')) {
+    throw new LocalCoachError('LOCAL_TOOLS_NOT_SUPPORTED')
+  }
 }
