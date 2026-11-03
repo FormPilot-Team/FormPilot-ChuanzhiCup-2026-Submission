@@ -17,7 +17,11 @@ export interface LocalCoachServerConfig {
   testModelPort?: number
 }
 
-export const LOCAL_MODELS = ['qwen2.5:0.5b-instruct-q4_K_M', 'qwen2.5:1.5b-instruct-q4_K_M', 'qwen3:0.6b-q4_K_M'] as const
+/** Retained asset identity; adding this tag never enables the adapter or downloads weights. */
+export const QWEN3_4B_MODEL = 'qwen3:4b-instruct-2507-q4_K_M'
+export const QWEN3_4B_DIGEST = '0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0'
+export const QWEN3_4B_OLLAMA_VERSION = '0.40.13'
+export const LOCAL_MODELS = ['qwen2.5:0.5b-instruct-q4_K_M', 'qwen2.5:1.5b-instruct-q4_K_M', 'qwen3:0.6b-q4_K_M', QWEN3_4B_MODEL] as const
 
 function integer(value: number | undefined, fallback: number, min: number, max: number): number {
   const result = value ?? fallback
@@ -36,6 +40,7 @@ export function resolveLocalConfig(input: LocalCoachServerConfig) {
     || !['provider-step-v1', 'simple-json', 'native-tools', 'structured-output'].includes(planningProtocol)
     || (model && !LOCAL_MODELS.includes(model as typeof LOCAL_MODELS[number]))
     || (modelDigest && !/^(?:sha256:)?[a-f0-9]{64}$/u.test(modelDigest))
+    || (model === QWEN3_4B_MODEL && modelDigest.replace(/^sha256:/u, '') !== QWEN3_4B_DIGEST)
     || (accessToken && !/^[A-Za-z0-9_-]{32,256}$/u.test(accessToken))) throw new Error('INVALID_LOCAL_CONFIG')
   return Object.freeze({
     enabled: input.enabled === true && input.resourcesConfirmed === true,

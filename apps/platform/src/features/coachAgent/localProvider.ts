@@ -2,7 +2,12 @@ import { classifyCoachQuestion, type CoachProvider, type ProviderContext } from 
 import { boundedId, parseToolIntent, plainFields } from './toolQuery.ts'
 import { parseRemoteContext, validateRemoteStep, REMOTE_CONTEXT_MAX_BYTES, REMOTE_STEP_MAX_BYTES,
   REMOTE_PROBLEM_CODES, type RemoteCoachContext } from './remoteProtocol.ts'
-import { minimizeCoachQuestion, parseLocalPlanContext, validateLocalPlanCandidate, type LocalInputProjection } from './localProtocolV2.ts'
+import { minimizeCoachQuestion, parseLocalPlanContext, validateLocalPlanCandidate, type LocalInputProjection, type LocalPlanContext } from './localProtocolV2.ts'
+
+export interface AdmittedLocalCoachProvider extends CoachProvider {
+  /** Trusted composition only: a previously admitted context may narrow, never expand, configured scope. */
+  nextAdmitted(context: LocalPlanContext, options: { signal: AbortSignal }): Promise<unknown>
+}
 
 export interface LocalCoachProviderOptions {
   /** These are trusted application decisions, never values from a prompt or model. */
@@ -77,13 +82,18 @@ function projection(context: ProviderContext, options: LocalCoachProviderOptions
   } }
 }
 
-function planProjection(context: ProviderContext, options: LocalCoachProviderOptions) {
+function planProjection(context: ProviderContext, options: LocalCoachProviderOptions, admitted?: LocalPlanContext) {
   const inputProjection = options.inputProjection ?? 'question-scope'
-  const wire = parseLocalPlanContext({ protocol: 'coach-plan-v2', inputProjection,
+  const wire = parseLocalPlanContext(admitted ?? { protocol: 'coach-plan-v2', inputProjection,
     ...(inputProjection === 'structured' ? { mode: classifyCoachQuestion(context.question) }
       : { question: minimizeCoachQuestion(context.question) }),
     scope: { warmup: !!options.warmupSessionId, routine: !!options.routineSessionId, historyLimit: options.historyLimit ?? 3 },
     remainingCalls: context.remainingCalls })
+  if (admitted && ((wire.inputProjection === 'question-scope' && wire.question !== context.question)
+    || (wire.scope.warmup && !options.warmupSessionId) || (wire.scope.routine && !options.routineSessionId)
+    || wire.scope.historyLimit > (options.historyLimit ?? 3) || wire.remainingCalls > context.remainingCalls)) {
+    throw new Error('INVALID_ADMITTED_SCOPE')
+  }
   return { wire, decode(value: unknown) {
     const candidate = validateLocalPlanCandidate(value, wire)
     if (candidate.intent === 'insufficient') return { type: 'plan', mode: 'insufficient', calls: [] }
@@ -128,7 +138,7 @@ async function responseValue(response: Response): Promise<unknown> {
 
 /** Independent loopback-only provider. Shares only the historical minimal wire grammar.
  * No network, storage, API credentials or model downloads occur during construction. */
-export function createLocalCoachProvider(input: LocalCoachProviderOptions): CoachProvider {
+export function createLocalCoachProvider(input: LocalCoachProviderOptions): AdmittedLocalCoachProvider {
   const options = Object.freeze({ ...input })
   const url = endpoint(options.endpoint)
   if (!/^[A-Za-z0-9_-]{32,256}$/u.test(options.accessToken)
@@ -161,11 +171,9 @@ export function createLocalCoachProvider(input: LocalCoachProviderOptions): Coac
     })()
     return sessionPromise
   }
-  return Object.freeze({ kind: 'local' as const, id: options.protocol === 'intent-v2' ? 'local-coach-ollama-v2' : 'local-coach-ollama-v1',
-    ...(options.protocol === 'intent-v2' ? { protocol: 'intent-v2' as const } : {}),
-    next(context: ProviderContext, lifetime: { signal: AbortSignal }): Promise<unknown> {
+  const next = (context: ProviderContext, lifetime: { signal: AbortSignal }, admitted?: LocalPlanContext): Promise<unknown> => {
       if (options.enabled !== true || options.consent !== true || lifetime.signal.aborted) return Promise.reject(new Error('LOCAL_NOT_ENABLED'))
-      const projected = options.protocol === 'intent-v2' ? planProjection(context, options) : projection(context, options)
+      const projected = options.protocol === 'intent-v2' ? planProjection(context, options, admitted) : projection(context, options)
       const body = JSON.stringify(projected.wire)
       if (new TextEncoder().encode(body).byteLength > REMOTE_CONTEXT_MAX_BYTES) return Promise.reject(new Error('LOCAL_CONTEXT_TOO_LARGE'))
       return new Promise((resolve, reject) => {
@@ -196,6 +204,13 @@ export function createLocalCoachProvider(input: LocalCoachProviderOptions): Coac
         }
         void work().catch(() => finish(false))
       })
+  }
+  return Object.freeze({ kind: 'local' as const, id: options.protocol === 'intent-v2' ? 'local-coach-ollama-v2' : 'local-coach-ollama-v1',
+    ...(options.protocol === 'intent-v2' ? { protocol: 'intent-v2' as const } : {}), next,
+    nextAdmitted(context: LocalPlanContext, lifetime: { signal: AbortSignal }): Promise<unknown> {
+      if (options.protocol !== 'intent-v2') return Promise.reject(new Error('TRUSTED_LOCAL_V2_REQUIRED'))
+      const wire = parseLocalPlanContext(context)
+      return next({ question: wire.question ?? '', observations: [], remainingCalls: wire.remainingCalls }, lifetime, wire)
     },
   })
 }

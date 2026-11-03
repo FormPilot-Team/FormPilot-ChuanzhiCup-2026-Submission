@@ -1,5 +1,5 @@
 import { request } from 'node:http'
-import type { ResolvedLocalConfig } from './config.ts'
+import { QWEN3_4B_MODEL, QWEN3_4B_OLLAMA_VERSION, type ResolvedLocalConfig } from './config.ts'
 
 export class LocalCoachError extends Error {
   readonly code: string
@@ -8,10 +8,10 @@ export class LocalCoachError extends Error {
 }
 
 /** Native HTTP to a literal IP: no DNS lookup, environment proxy, redirect or global fetch. */
-export function localJson(config: ResolvedLocalConfig, path: '/api/tags' | '/api/show' | '/api/chat',
+export function localJson(config: ResolvedLocalConfig, path: '/api/version' | '/api/tags' | '/api/show' | '/api/chat',
   body: string | undefined, signal: AbortSignal): Promise<unknown> {
   return new Promise((resolve, reject) => {
-    if (!['/api/tags', '/api/show', '/api/chat'].includes(path)) { reject(new LocalCoachError('LOCAL_TARGET_NOT_ALLOWED')); return }
+    if (!['/api/version', '/api/tags', '/api/show', '/api/chat'].includes(path)) { reject(new LocalCoachError('LOCAL_TARGET_NOT_ALLOWED')); return }
     if (signal.aborted) { reject(new LocalCoachError('CANCELLED', 499)); return }
     const req = request({ hostname: '127.0.0.1', family: 4, port: config.modelPort, path,
       method: body === undefined ? 'GET' : 'POST', agent: false, signal,
@@ -52,6 +52,12 @@ function localRecord(value: unknown): Record<string, unknown> {
 
 /** Read-only installed-model verification. Never pulls, creates or loads a model. */
 export async function verifyInstalledModel(config: ResolvedLocalConfig, signal: AbortSignal) {
+  // Only the new asset is pinned to the already accepted portable runtime. Metadata
+  // checks do not load a model, upgrade Ollama, or prove real planning capability.
+  if (config.model === QWEN3_4B_MODEL) {
+    const runtime = localRecord(await localJson(config, '/api/version', undefined, signal))
+    if (runtime.version !== QWEN3_4B_OLLAMA_VERSION) throw new LocalCoachError('LOCAL_RUNTIME_VERSION_MISMATCH')
+  }
   const raw = localRecord(await localJson(config, '/api/tags', undefined, signal))
   if (!Array.isArray(raw.models) || raw.models.length > 256) throw new LocalCoachError('LOCAL_MODEL_UNAVAILABLE')
   const matches = raw.models.filter(item => item && typeof item === 'object' && item.name === config.model).map(localRecord)
@@ -68,6 +74,9 @@ export async function verifyInstalledModel(config: ResolvedLocalConfig, signal: 
     || typeof details.quantization_level !== 'string' || !/^Q4_/u.test(details.quantization_level)
     || !Array.isArray(shown.capabilities) || !shown.capabilities.includes('completion')) {
     throw new LocalCoachError('LOCAL_MODEL_NOT_LOCAL')
+  }
+  if (config.model === QWEN3_4B_MODEL && (details.family !== 'qwen3' || details.quantization_level !== 'Q4_K_M')) {
+    throw new LocalCoachError('LOCAL_MODEL_IDENTITY_MISMATCH')
   }
   if (config.planningProtocol === 'native-tools' && !shown.capabilities.includes('tools')) {
     throw new LocalCoachError('LOCAL_TOOLS_NOT_SUPPORTED')
