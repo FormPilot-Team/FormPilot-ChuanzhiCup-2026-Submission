@@ -68,7 +68,7 @@ function usableEvidence(context: RecommendationContext): CoachEvidence[] {
   return CATEGORIES.flatMap(category => validated.filter(item => item.category === category).slice(0, limits[category]))
 }
 
-export function recommendCoach(profile: CoachProfile, context: RecommendationContext): CoachRecommendationResult {
+export function recommendCoach(profile: unknown, context: RecommendationContext): CoachRecommendationResult {
   const empty = (status: CoachRecommendationResult['status'], message: string): CoachRecommendationResult => ({ status, message, routines: [], chapters: [], games: [], focus: [], evidence: [], limitations: [] })
   if (!validCoachProfile(profile)) return empty('profile_required', '请完整填写目标、困难、关注部位、偏好与风险信息，并确认风险提示。')
   if (profile.risk !== 'none') return empty('safety_hold', '你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。')
