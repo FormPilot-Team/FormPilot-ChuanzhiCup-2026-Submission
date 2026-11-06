@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "set": "fp-coach-decision-personas/dev-v1",
+  "labelSource": "CC-authored development personas (synthetic). Used freely while developing the ranker; not an evaluation of real recommendation quality.",
+  "personas": [
+    { "id": "D01", "profile": { "version": 1, "goals": ["mobility"], "difficulties": ["none"], "regions": ["shoulders"], "preference": "routine", "risk": "none", "acknowledged": true },
+      "expect": { "status": "ready", "coverRegions": ["shoulders"], "topKind": "chapter" } },
+    { "id": "D02", "profile": { "version": 1, "goals": ["daily"], "difficulties": ["sedentary"], "regions": ["arms", "legs"], "preference": "game", "risk": "none", "acknowledged": true },
+      "expect": { "status": "ready", "coverRegions": ["arms", "legs"], "topKind": "game" } },
+    { "id": "D03", "profile": { "version": 1, "goals": ["rehab_support"], "difficulties": ["reach_difficulty"], "regions": ["shoulders"], "preference": "routine", "risk": "none", "acknowledged": true },
+      "expect": { "status": "ready", "noCautionTags": true, "coverRegions": ["shoulders"] } },
+    { "id": "D04", "profile": { "version": 1, "goals": ["upper_limb"], "difficulties": ["soreness"], "regions": ["neck", "arms"], "preference": "mixed", "risk": "none", "acknowledged": true },
+      "expect": { "status": "ready", "noCautionTags": true, "discloseGaps": ["neck"], "coverRegions": ["arms"] } },
+    { "id": "D05", "profile": { "version": 1, "goals": ["daily"], "difficulties": ["none"], "regions": ["trunk"], "preference": "routine", "risk": "none", "acknowledged": true },
+      "expect": { "status": "ready", "coverRegions": ["trunk"] } },
+    { "id": "D06", "profile": { "version": 1, "goals": ["mobility", "daily"], "difficulties": ["stiffness", "sedentary"], "regions": ["shoulders", "trunk", "legs"], "preference": "mixed", "risk": "none", "acknowledged": true },
+      "expect": { "status": "ready", "coverRegions": ["shoulders", "trunk", "legs"], "minDistinctPrograms": 2 } },
+    { "id": "D07", "profile": { "version": 1, "goals": ["upper_limb"], "difficulties": ["none"], "regions": ["arms"], "preference": "game", "risk": "acute_pain", "acknowledged": true },
+      "expect": { "status": "safety_hold" } },
+    { "id": "D08", "profile": { "version": 1, "goals": ["daily"], "difficulties": ["none"], "regions": ["legs"], "preference": "routine", "risk": "none", "acknowledged": true },
+      "availability": { "unavailableIds": ["baduanjin", "taijiquan"] },
+      "expect": { "status": "ready", "excludeIds": ["baduanjin", "taijiquan"], "coverRegions": ["legs"] } },
+    { "id": "D09", "profile": { "version": 1, "goals": ["rehab_support", "daily"], "difficulties": ["soreness"], "regions": ["legs"], "preference": "game", "risk": "none", "acknowledged": true },
+      "expect": { "status": "ready", "noCautionTags": true, "topKind": "game", "coverRegions": ["legs"] } },
+    { "id": "D10", "profile": { "version": 1, "goals": ["mobility"], "difficulties": ["stiffness"], "regions": ["shoulders", "arms"], "preference": "routine", "risk": "none", "acknowledged": true },
+      "expect": { "status": "ready", "coverRegions": ["shoulders", "arms"], "minChapterRegionPrecision": 0.5 } },
+    { "id": "D11", "profile": { "version": 1, "goals": ["upper_limb"], "difficulties": ["reach_difficulty", "soreness"], "regions": ["shoulders", "arms", "trunk"], "preference": "mixed", "risk": "none", "acknowledged": true },
+      "expect": { "status": "ready", "noCautionTags": true, "coverRegions": ["shoulders", "arms", "trunk"] } },
+    { "id": "D12", "profile": { "version": 1, "goals": ["daily"], "difficulties": ["none"], "regions": ["neck"], "preference": "game", "risk": "none", "acknowledged": true },
+      "expect": { "status": "ready", "coverRegions": ["neck"], "topKind": "game" } }
+  ]
+}
