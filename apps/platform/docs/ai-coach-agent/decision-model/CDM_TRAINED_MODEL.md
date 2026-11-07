@@ -10,6 +10,7 @@
 | M2 偏好排序模型 `fp-cdm-m2` | **流水线、运行时、Guard 已完成；权重等待人工标注** | 两名独立标注者对 72 个合成场景（720 条/人）分级 |
 | E1 / E3 / E6 | 需要人工标签，**尚未产生结果** | `train_m2.py --labels human` 一条命令完成 |
 | E2 | 需要训练后的 M2 权重 | `evaluate-cdm.ts --weights …` |
+| AI 标注弱监督实验 | 已完成。单一 AI 标注者（负责人 11-07 授权），只作为实验报告，权重不打包；见 [AI_LABEL_ROUND.md](AI_LABEL_ROUND.md) | 不是人工验证 |
 | E4 安全 / E5 性能 | **已完成**（与权重无关；用固定 fixture 权重及对抗性权重测试） | `evidence/e2-e4-e5` |
 
 M2 训练前，运行时内置的是 `status: AWAITING_LABELS` 占位权重，任何模式下都回退规则（`MODEL_NOT_TRAINED`），不会冒充训练模型。

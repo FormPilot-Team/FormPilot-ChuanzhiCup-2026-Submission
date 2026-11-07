@@ -1,0 +1,7229 @@
+{
+ "schemaVersion": 1,
+ "id": "fp-cdm-ai-labels/v1",
+ "scenarioSetId": "fp-cdm-scenarios/v1",
+ "scenarioSha256": "11ad3c42124f063d3909daa4bebc2ecdc498d93309095feaf9cefb6a736db2c2",
+ "annotator": {
+  "kind": "ai",
+  "id": "AI-claude-opus-5.5",
+  "model": "Claude Opus 5.5 (claude-opus-5-5)",
+  "tool": "Claude Code (desktop app)",
+  "role": "ai_independent_annotator (not human, not clinical)",
+  "date": "2026-11-07",
+  "guidelines": "fp-cdm GUIDELINES v1.1",
+  "conflictOfInterest": "same agent that designed the PR #49 ranker and the fp-cdm feature set; not independent of the systems being compared",
+  "procedure": "blinded worksheet (no pool provenance, split or system ranks); three conditions of each family processed sequentially"
+ },
+ "rawBatches": {
+  "batch-01.json": "4b18a0f94e411b0ab69cee0c1b3f7365dfc826c46e06876234390f6053f42462",
+  "batch-02.json": "8a35d36dce8e6a5abad015a44fda43e4520586ad4ebba64a1d857929b07415a6",
+  "batch-03.json": "d716ed8e9281772b0e811decc112a9a4be0da71e59cbdc603be2dca5260b0867",
+  "batch-04.json": "4354bb9bcb7c50845fdb953e5f8219db3ab5bd97f065b68a165c34411b3db38c",
+  "batch-05.json": "049e135514e3b4044ce75642ddcc8ef9a59208e01c7b64a617b6e44baad55a17",
+  "batch-06.json": "3209fe9187454dc361c161300a2d8e4d1cd17101699c05b098d1adb6cd5f3ef0"
+ },
+ "labelOrigin": "AI annotator judgments on synthetic scenarios; NOT human, NOT expert, NOT clinical",
+ "complete": true,
+ "labels": [
+  {
+   "scenarioId": "F01-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "对应上肢目标，静态温和；不含所选下肢"
+  },
+  {
+   "scenarioId": "F01-A",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持续侧平举对酸痛者负担偏大；不含下肢"
+  },
+  {
+   "scenarioId": "F01-A",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一含下肢的温和动作，前平举也照顾上肢目标"
+  },
+  {
+   "scenarioId": "F01-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势动作量小，训练价值低"
+  },
+  {
+   "scenarioId": "F01-A",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "胸前交叉静态，不含下肢，与目标弱相关"
+  },
+  {
+   "scenarioId": "F01-A",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "推掌温和，对应上肢目标；不含下肢"
+  },
+  {
+   "scenarioId": "F01-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏且对应上肢目标；不含下肢"
+  },
+  {
+   "scenarioId": "F01-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，节奏温和，对应上肢；不含下肢"
+  },
+  {
+   "scenarioId": "F01-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和上肢备选，可替代吃力的二势"
+  },
+  {
+   "scenarioId": "F01-B",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练5次仅完成3次且分数下降，提示吃力"
+  },
+  {
+   "scenarioId": "F01-B",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一含下肢的温和动作，尚未练过"
+  },
+  {
+   "scenarioId": "F01-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势训练价值低"
+  },
+  {
+   "scenarioId": "F01-B",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "与下肢及目标关联弱"
+  },
+  {
+   "scenarioId": "F01-B",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和推掌，可作二势的替代"
+  },
+  {
+   "scenarioId": "F01-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新游戏，可增加变化；对应上肢"
+  },
+  {
+   "scenarioId": "F01-B",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "3局全部完成，接受度好；对应上肢"
+  },
+  {
+   "scenarioId": "F01-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态，适合在幅度/配合问题下稳住基础"
+  },
+  {
+   "scenarioId": "F01-C",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告该式幅度与配合均偏低且历史下降，暂不优先"
+  },
+  {
+   "scenarioId": "F01-C",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢，前平举兼顾配合，温和"
+  },
+  {
+   "scenarioId": "F01-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势训练价值低"
+  },
+  {
+   "scenarioId": "F01-C",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态动作，对配合问题帮助有限"
+  },
+  {
+   "scenarioId": "F01-C",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以较低负担练习前伸幅度"
+  },
+  {
+   "scenarioId": "F01-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "游戏中练配合与伸展，偏好匹配"
+  },
+  {
+   "scenarioId": "F01-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "左右交替有助配合，已证明能完成"
+  },
+  {
+   "scenarioId": "F02-A",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一含下肢的温和动作，兼顾肩臂活动"
+  },
+  {
+   "scenarioId": "F02-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "对应上肢功能，混合偏好可接受"
+  },
+  {
+   "scenarioId": "F02-A",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持续侧平举对酸痛者负担偏大"
+  },
+  {
+   "scenarioId": "F02-A",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含下肢，与多项目标弱相关"
+  },
+  {
+   "scenarioId": "F02-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态，适合康复辅助意向起步"
+  },
+  {
+   "scenarioId": "F02-A",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和推掌，对应上肢与活动目标"
+  },
+  {
+   "scenarioId": "F02-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势动作量小"
+  },
+  {
+   "scenarioId": "F02-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "节奏温和，适合日常锻炼"
+  },
+  {
+   "scenarioId": "F02-B",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一含下肢，均分83仍可继续巩固"
+  },
+  {
+   "scenarioId": "F02-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新游戏，增加变化"
+  },
+  {
+   "scenarioId": "F02-B",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持续侧平举负担偏大"
+  },
+  {
+   "scenarioId": "F02-B",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含下肢"
+  },
+  {
+   "scenarioId": "F02-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态，可作补充"
+  },
+  {
+   "scenarioId": "F02-B",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和推掌，新内容"
+  },
+  {
+   "scenarioId": "F02-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练3次均分55，价值低"
+  },
+  {
+   "scenarioId": "F02-B",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "5局全部完成，接受度好"
+  },
+  {
+   "scenarioId": "F02-C",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告该式配合下降，继续练并关注配合，且含下肢"
+  },
+  {
+   "scenarioId": "F02-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "可在游戏中练配合"
+  },
+  {
+   "scenarioId": "F02-C",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担偏大，与配合问题无直接关系"
+  },
+  {
+   "scenarioId": "F02-C",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态，对配合帮助有限"
+  },
+  {
+   "scenarioId": "F02-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和补充"
+  },
+  {
+   "scenarioId": "F02-C",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和补充"
+  },
+  {
+   "scenarioId": "F02-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F02-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "左右交替可练配合，已能完成"
+  },
+  {
+   "scenarioId": "F03-A",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和全身起势，契合日常锻炼；不含躯干"
+  },
+  {
+   "scenarioId": "F03-A",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持续侧平举对酸痛者负担大，不含躯干"
+  },
+  {
+   "scenarioId": "F03-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "保持中正，契合康复辅助的温和起步"
+  },
+  {
+   "scenarioId": "F03-A",
+   "candidateId": "boating",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好功法，游戏不含躯干"
+  },
+  {
+   "scenarioId": "F03-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F03-A",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干，与目标弱相关"
+  },
+  {
+   "scenarioId": "F03-A",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一含躯干，身体中正、负担低"
+  },
+  {
+   "scenarioId": "F03-A",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好功法，游戏不含躯干"
+  },
+  {
+   "scenarioId": "F03-B",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和全身，可增加变化"
+  },
+  {
+   "scenarioId": "F03-B",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大且不含躯干"
+  },
+  {
+   "scenarioId": "F03-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态补充"
+  },
+  {
+   "scenarioId": "F03-B",
+   "candidateId": "boating",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好功法，不含躯干"
+  },
+  {
+   "scenarioId": "F03-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "两次均未完成，价值低"
+  },
+  {
+   "scenarioId": "F03-B",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F03-B",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一含躯干，分数上升，宜继续"
+  },
+  {
+   "scenarioId": "F03-B",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已完成4局但偏好功法且不含躯干"
+  },
+  {
+   "scenarioId": "F03-C",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和全身补充"
+  },
+  {
+   "scenarioId": "F03-C",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大且不含躯干"
+  },
+  {
+   "scenarioId": "F03-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以中正站姿练稳定，契合报告关注点"
+  },
+  {
+   "scenarioId": "F03-C",
+   "candidateId": "boating",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F03-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告该式稳定在改善，但本身价值低"
+  },
+  {
+   "scenarioId": "F03-C",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F03-C",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干并以稳定为主，衔接报告"
+  },
+  {
+   "scenarioId": "F03-C",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F04-A",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，但不含颈/躯干"
+  },
+  {
+   "scenarioId": "F04-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F04-A",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一含躯干，中正姿势负担低"
+  },
+  {
+   "scenarioId": "F04-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "肩肘放松、身体中正，与颈部姿态间接相关；所选颈部无可用内容"
+  },
+  {
+   "scenarioId": "F04-A",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含颈/躯干"
+  },
+  {
+   "scenarioId": "F04-A",
+   "candidateId": "boating",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，但不含颈/躯干"
+  },
+  {
+   "scenarioId": "F04-A",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持续侧平举对酸痛者负担大"
+  },
+  {
+   "scenarioId": "F04-A",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和全身起势，契合日常锻炼"
+  },
+  {
+   "scenarioId": "F04-B",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含颈/躯干"
+  },
+  {
+   "scenarioId": "F04-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F04-B",
+   "candidateId": "tjq-23",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练6次且分数下降，仍是唯一躯干内容，但需变化"
+  },
+  {
+   "scenarioId": "F04-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "新内容，姿态中正；颈部仍无可用内容"
+  },
+  {
+   "scenarioId": "F04-B",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "3次仅完成1次"
+  },
+  {
+   "scenarioId": "F04-B",
+   "candidateId": "boating",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含颈/躯干"
+  },
+  {
+   "scenarioId": "F04-B",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大"
+  },
+  {
+   "scenarioId": "F04-B",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "分数88且上升，可继续"
+  },
+  {
+   "scenarioId": "F04-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏且可练配合，但不含颈/躯干"
+  },
+  {
+   "scenarioId": "F04-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F04-C",
+   "candidateId": "tjq-23",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告配合下降，可继续练并关注配合"
+  },
+  {
+   "scenarioId": "F04-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "姿态中正补充；颈部无可用内容"
+  },
+  {
+   "scenarioId": "F04-C",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "完成率低"
+  },
+  {
+   "scenarioId": "F04-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，左右交替练配合；不含颈/躯干"
+  },
+  {
+   "scenarioId": "F04-C",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大"
+  },
+  {
+   "scenarioId": "F04-C",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以配合为主的温和动作，分数良好"
+  },
+  {
+   "scenarioId": "F05-A",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "对应上肢目标，温和；不含躯干/下肢"
+  },
+  {
+   "scenarioId": "F05-A",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干与上肢，负担低"
+  },
+  {
+   "scenarioId": "F05-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F05-A",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢与上肢，温和"
+  },
+  {
+   "scenarioId": "F05-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和上肢游戏，混合偏好可接受"
+  },
+  {
+   "scenarioId": "F05-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态，适合康复辅助起步"
+  },
+  {
+   "scenarioId": "F05-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢功能游戏"
+  },
+  {
+   "scenarioId": "F05-A",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持续侧平举对酸痛者负担大"
+  },
+  {
+   "scenarioId": "F05-B",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新内容，温和推掌"
+  },
+  {
+   "scenarioId": "F05-B",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干，未练过"
+  },
+  {
+   "scenarioId": "F05-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一一次未完成，价值低"
+  },
+  {
+   "scenarioId": "F05-B",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢，未练过"
+  },
+  {
+   "scenarioId": "F05-B",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "5局完成4局，接受度好"
+  },
+  {
+   "scenarioId": "F05-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练4次完成2次，可保留作补充"
+  },
+  {
+   "scenarioId": "F05-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新游戏"
+  },
+  {
+   "scenarioId": "F05-B",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大"
+  },
+  {
+   "scenarioId": "F05-C",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和补充"
+  },
+  {
+   "scenarioId": "F05-C",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干，以稳定与配合为主，衔接报告"
+  },
+  {
+   "scenarioId": "F05-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告该式配合偏低，但收势本身价值低"
+  },
+  {
+   "scenarioId": "F05-C",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢，以配合为主"
+  },
+  {
+   "scenarioId": "F05-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "左右交替练配合"
+  },
+  {
+   "scenarioId": "F05-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和补充"
+  },
+  {
+   "scenarioId": "F05-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "游戏中练配合"
+  },
+  {
+   "scenarioId": "F05-C",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大"
+  },
+  {
+   "scenarioId": "F06-A",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部，推掌温和"
+  },
+  {
+   "scenarioId": "F06-A",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一含躯干，中正姿势，负担低"
+  },
+  {
+   "scenarioId": "F06-A",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部；无酸痛，侧平举保持可接受"
+  },
+  {
+   "scenarioId": "F06-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部、有节奏，适合久坐；偏好功法略降"
+  },
+  {
+   "scenarioId": "F06-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部；偏好功法略降"
+  },
+  {
+   "scenarioId": "F06-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F06-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部，温和静态"
+  },
+  {
+   "scenarioId": "F06-A",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部，温和全身起势，适合久坐"
+  },
+  {
+   "scenarioId": "F06-B",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新内容，含肩部"
+  },
+  {
+   "scenarioId": "F06-B",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干，未练过"
+  },
+  {
+   "scenarioId": "F06-B",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "仅练1次，可继续建立"
+  },
+  {
+   "scenarioId": "F06-B",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "2局完成1局，尚可"
+  },
+  {
+   "scenarioId": "F06-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新游戏，含肩部"
+  },
+  {
+   "scenarioId": "F06-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F06-B",
+   "candidateId": "yjj-1",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练5次均分89，较熟练且新价值有限"
+  },
+  {
+   "scenarioId": "F06-B",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和全身补充"
+  },
+  {
+   "scenarioId": "F06-C",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以稳定为主，可补充"
+  },
+  {
+   "scenarioId": "F06-C",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以稳定为主且含躯干，衔接报告"
+  },
+  {
+   "scenarioId": "F06-C",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告该式稳定下降，继续练并关注稳定"
+  },
+  {
+   "scenarioId": "F06-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "节奏游戏补充"
+  },
+  {
+   "scenarioId": "F06-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持弓瞄准可练稳定"
+  },
+  {
+   "scenarioId": "F06-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F06-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态中正，有助稳定基础"
+  },
+  {
+   "scenarioId": "F06-C",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和全身补充"
+  },
+  {
+   "scenarioId": "F07-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F07-A",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含上肢与下肢，温和"
+  },
+  {
+   "scenarioId": "F07-A",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含上肢与躯干，负担低"
+  },
+  {
+   "scenarioId": "F07-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏、对应上肢；拉弓对抬手困难者有一定负担"
+  },
+  {
+   "scenarioId": "F07-A",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和推掌，位置低于肩"
+  },
+  {
+   "scenarioId": "F07-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态"
+  },
+  {
+   "scenarioId": "F07-A",
+   "candidateId": "boating",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，温和上肢、动作在身前"
+  },
+  {
+   "scenarioId": "F07-A",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "侧平举保持对抬手困难/酸痛者负担大"
+  },
+  {
+   "scenarioId": "F07-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F07-B",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含上肢与下肢，未练过"
+  },
+  {
+   "scenarioId": "F07-B",
+   "candidateId": "tjq-23",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一一次未完成，先降一级观察"
+  },
+  {
+   "scenarioId": "F07-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新游戏；拉弓有一定负担"
+  },
+  {
+   "scenarioId": "F07-B",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和推掌"
+  },
+  {
+   "scenarioId": "F07-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态"
+  },
+  {
+   "scenarioId": "F07-B",
+   "candidateId": "boating",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "3局完成2局，偏好游戏"
+  },
+  {
+   "scenarioId": "F07-B",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大"
+  },
+  {
+   "scenarioId": "F07-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F07-C",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以配合为主，含上肢与下肢"
+  },
+  {
+   "scenarioId": "F07-C",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告配合在改善，含躯干，宜继续"
+  },
+  {
+   "scenarioId": "F07-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "游戏练配合；拉弓有负担"
+  },
+  {
+   "scenarioId": "F07-C",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和补充"
+  },
+  {
+   "scenarioId": "F07-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和补充"
+  },
+  {
+   "scenarioId": "F07-C",
+   "candidateId": "boating",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "左右交替练配合，偏好游戏"
+  },
+  {
+   "scenarioId": "F07-C",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大"
+  },
+  {
+   "scenarioId": "F08-A",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩高侧平举保持，对抬手困难者负担大"
+  },
+  {
+   "scenarioId": "F08-A",
+   "candidateId": "tjq-23",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含上肢与躯干，负担低"
+  },
+  {
+   "scenarioId": "F08-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态，日常可做"
+  },
+  {
+   "scenarioId": "F08-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F08-A",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "覆盖肩、臂、下肢，前平举可在舒适高度完成"
+  },
+  {
+   "scenarioId": "F08-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "身前节奏动作，温和"
+  },
+  {
+   "scenarioId": "F08-A",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "前推低于肩高，温和"
+  },
+  {
+   "scenarioId": "F08-A",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "拉弓需肩高展开，对抬手困难者负担较大"
+  },
+  {
+   "scenarioId": "F08-B",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练6次均分仅57，仍吃力"
+  },
+  {
+   "scenarioId": "F08-B",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新内容，温和且覆盖躯干，可增加变化"
+  },
+  {
+   "scenarioId": "F08-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态"
+  },
+  {
+   "scenarioId": "F08-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F08-B",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练4次均分86，较熟练，可保持"
+  },
+  {
+   "scenarioId": "F08-B",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和游戏补充"
+  },
+  {
+   "scenarioId": "F08-B",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "5次完成3次且分数下降"
+  },
+  {
+   "scenarioId": "F08-B",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "拉弓负担较大"
+  },
+  {
+   "scenarioId": "F08-C",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告幅度在改善，可在舒适范围内继续；仍需注意抬手困难"
+  },
+  {
+   "scenarioId": "F08-C",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和新内容"
+  },
+  {
+   "scenarioId": "F08-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态"
+  },
+  {
+   "scenarioId": "F08-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F08-C",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "较熟练，可保持"
+  },
+  {
+   "scenarioId": "F08-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和游戏补充"
+  },
+  {
+   "scenarioId": "F08-C",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "完成率低且下降"
+  },
+  {
+   "scenarioId": "F08-C",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "拉弓负担较大"
+  },
+  {
+   "scenarioId": "F09-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "对应上肢；偏好功法略降"
+  },
+  {
+   "scenarioId": "F09-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F09-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态，肩颈放松"
+  },
+  {
+   "scenarioId": "F09-A",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和推掌，对应上肢"
+  },
+  {
+   "scenarioId": "F09-A",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含上肢与下肢，温和，适合僵硬与久坐"
+  },
+  {
+   "scenarioId": "F09-A",
+   "candidateId": "tjq-23",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含上肢，负担低"
+  },
+  {
+   "scenarioId": "F09-A",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持续侧平举对酸痛者负担大"
+  },
+  {
+   "scenarioId": "F09-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "节奏温和，适合久坐"
+  },
+  {
+   "scenarioId": "F09-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "3局完成2局，尚可"
+  },
+  {
+   "scenarioId": "F09-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F09-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和补充"
+  },
+  {
+   "scenarioId": "F09-B",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和补充"
+  },
+  {
+   "scenarioId": "F09-B",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢，未练过"
+  },
+  {
+   "scenarioId": "F09-B",
+   "candidateId": "tjq-23",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "分数上升，可继续"
+  },
+  {
+   "scenarioId": "F09-B",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大"
+  },
+  {
+   "scenarioId": "F09-B",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "节奏温和"
+  },
+  {
+   "scenarioId": "F09-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持弓瞄准练稳定与配合"
+  },
+  {
+   "scenarioId": "F09-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F09-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态练稳定"
+  },
+  {
+   "scenarioId": "F09-C",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "推掌稍停练稳定"
+  },
+  {
+   "scenarioId": "F09-C",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以配合为主且含下肢，回应报告"
+  },
+  {
+   "scenarioId": "F09-C",
+   "candidateId": "tjq-23",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告该式稳定/配合偏低，继续练并关注"
+  },
+  {
+   "scenarioId": "F09-C",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大"
+  },
+  {
+   "scenarioId": "F09-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "左右交替练配合"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "bdj-8",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "下肢为主、动作简单有节奏，适合久坐"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "wqx-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "下肢与躯干的节律晃动"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "bdj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身，对僵硬者冷启动不优先"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "tjq-16",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "仆步深屈膝加独立，对僵硬/久坐者偏难"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "马步含下肢，负荷中等"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏但不含下肢"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "tjq-8",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "转体换向连贯动作较复杂"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "wqx-10",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "单腿独立，平衡要求高"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含下肢，含过顶"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "bdj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "马步冲拳，含下肢且有节奏"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "tjq-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "退步动作含下肢，节奏连贯"
+  },
+  {
+   "scenarioId": "F10-A",
+   "candidateId": "racing",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏且唯一含下肢的游戏；身体模式含平衡/上举，需在舒适范围内"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "bdj-8",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "简单下肢节奏动作"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "wqx-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "节律晃动"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "bdj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "tjq-16",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "难度高"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "马步中等负荷"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含下肢"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "tjq-8",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练4次且分数上升，可继续"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "wqx-10",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "单腿平衡要求高"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含下肢"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "bdj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢有节奏"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "tjq-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "同属太极、含下肢，可衔接"
+  },
+  {
+   "scenarioId": "F10-B",
+   "candidateId": "racing",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏且含下肢"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "bdj-8",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "简单下肢动作"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "wqx-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "节律晃动"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "bdj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "tjq-16",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "难度高"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含配合与幅度，马步负荷中等"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含下肢"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "tjq-8",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告配合下降，继续练并关注"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "wqx-10",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "单腿平衡要求高"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含下肢"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "bdj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "左右交替练配合"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "tjq-6",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "太极中较简单的左右交替，练配合且含下肢"
+  },
+  {
+   "scenarioId": "F10-C",
+   "candidateId": "racing",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，练配合且含下肢"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "wqx-3",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "转腰侧屈加弓步，对僵硬者偏难"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "对应上肢功能"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "伸手触达，对应活动与上肢目标"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "bdj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢与上肢伸展，契合多项目标"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "bdj-8",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "下肢简单动作"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "bdj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "马步冲拳，含下肢与上肢"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身插掌"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "tjq-13",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "提膝蹬脚单腿支撑，难度高"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "tjq-12",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢与上肢，负荷中等"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢的游戏"
+  },
+  {
+   "scenarioId": "F11-A",
+   "candidateId": "tjq-16",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "仆步深屈膝加独立，难度高"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "wqx-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已能完成卧虎扑食等高难动作，可尝试"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "伸手触达"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "bdj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢与上肢伸展"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "bdj-8",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "下肢简单动作"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "bdj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢与上肢"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练6次均分57，进步停滞"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "tjq-13",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "能力足够（白鹤亮翅等完成良好），可尝试"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "tjq-12",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "太极衔接、含下肢、负荷适中"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢的游戏"
+  },
+  {
+   "scenarioId": "F11-B",
+   "candidateId": "tjq-16",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "能力足够，但深屈膝对僵硬者仍需谨慎"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "wqx-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "可尝试"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "伸手触达"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "bdj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢与稳定要求"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "bdj-8",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以稳定为主的下肢动作，衔接报告的稳定改善"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "bdj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢与上肢"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "进步停滞"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "tjq-13",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "单腿稳定练习，可尝试"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "tjq-12",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "太极衔接，以稳定为主"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢的游戏"
+  },
+  {
+   "scenarioId": "F11-C",
+   "candidateId": "tjq-16",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "稳定练习但深屈膝需谨慎"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "bdj-5",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干摇转侧摆，契合躯干活动"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "tjq-23",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干，以姿态为主、活动量小"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "yjj-9",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "转腰探爪，躯干活动并兼顾上肢"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "racing",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好功法"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "tjq-13",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "bdj-8",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "yjj-11",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干逐节卷屈，无困难者可做"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "tjq-19",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干前屈与上肢"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "tjq-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "转腰带手，躯干与上肢配合"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干前屈与上肢伸展"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好功法且不含躯干"
+  },
+  {
+   "scenarioId": "F12-A",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好功法且不含躯干"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "bdj-5",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干摇转"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练6次，躯干活动量小，宜换更有针对性的内容"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "yjj-9",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干转动与伸展"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "racing",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好功法"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "tjq-13",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "bdj-8",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "yjj-11",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干卷屈"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "tjq-19",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干前屈"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "tjq-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "太极衔接，转腰带手"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干前屈"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F12-B",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已玩2局，但偏好功法且不含躯干"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "bdj-5",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干摇转，兼顾稳定"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "tjq-23",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告该式稳定偏低，可继续练姿态稳定"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "yjj-9",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干转动与伸展"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "racing",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好功法"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "tjq-13",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "bdj-8",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "yjj-11",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干卷屈，含稳定要求"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "tjq-19",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干前屈"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "tjq-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以稳定与配合为主的躯干动作"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干前屈"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F12-C",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "apple",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，肩部伸手触达，契合活动目标"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部，马步负荷中等"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "archery",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，肩臂展开"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "云手：肩部与躯干、有节奏，适合久坐"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "yjj-1",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态动作，活动价值有限"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "wqx-4",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩与躯干，弓步负荷中等"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "yjj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩部绕头与转体，强度较高"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部推掌"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "bdj-8",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含肩/躯干"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "wqx-9",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上举与后伸，含肩与躯干；平衡要求较高"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "yjj-10",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "撑地负荷，对久坐者冷启动偏重"
+  },
+  {
+   "scenarioId": "F13-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏、有节奏，含肩部"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "apple",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，肩部伸展"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "archery",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩与躯干节奏动作"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "yjj-1",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "wqx-4",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩与躯干"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "yjj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "强度较高"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "bdj-8",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含所选部位"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "wqx-9",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "平衡要求较高"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "yjj-10",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负荷偏重"
+  },
+  {
+   "scenarioId": "F13-B",
+   "candidateId": "boating",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "4局全部完成，接受度好"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "apple",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，含配合"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部与配合"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "archery",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，练配合"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "配合与节奏为主，回应报告"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "yjj-1",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "wqx-4",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩与躯干"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "yjj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "强度较高"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "bdj-8",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含所选部位"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "wqx-9",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "平衡要求较高"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "yjj-10",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负荷偏重"
+  },
+  {
+   "scenarioId": "F13-C",
+   "candidateId": "boating",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "节奏与配合，已能完成"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢伸展，含俯身"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢伸手游戏"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "bdj-7",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢冲拳与马步，配合与节奏"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢，含幅度，契合活动目标"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含上肢与下肢的游戏"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "tjq-22",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢，负荷适中"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "tjq-12",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "tjq-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢交替"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "tjq-21",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢，含转体"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "tjq-20",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢，含上架"
+  },
+  {
+   "scenarioId": "F14-A",
+   "candidateId": "tjq-13",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢；单腿蹬脚要求较高"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "伸展补充"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "bdj-7",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "八段锦衔接，上肢与下肢"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "八段锦衔接，含幅度"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含上肢与下肢的游戏"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "tjq-22",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练5次完成3次，均分72，可继续"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "tjq-12",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "tjq-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "tjq-21",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "可在已掌握的闪通臂基础上进阶"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "tjq-20",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "均分85且上升，较熟练"
+  },
+  {
+   "scenarioId": "F14-B",
+   "candidateId": "tjq-13",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "单腿要求较高"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含前伸幅度，但有俯身"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "apple",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "伸手触达直接练幅度，回应报告"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "bdj-7",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢配合"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含幅度，回应报告"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "游戏补充"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "tjq-22",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "可继续"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "tjq-12",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "tjq-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "tjq-21",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "进阶衔接"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "tjq-20",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "一手上架一手前推，练幅度且已较熟练"
+  },
+  {
+   "scenarioId": "F14-C",
+   "candidateId": "tjq-13",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "单腿要求较高"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "wqx-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢上举下拉，契合上肢功能"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏；偏好功法略降"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢节奏游戏；偏好功法略降"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身，以下肢与躯干为主"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "yjj-4",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含颈与上肢，目视掌心带动颈部"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态上肢"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "wqx-7",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含颈、肩、上肢，耸肩缩颈"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "yjj-12",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身，含转体"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "yjj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢绕头与转体，强度较高"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "tjq-16",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含颈/上肢重点"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "yjj-11",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F15-A",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢伸手游戏；偏好功法略降"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "wqx-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢功能"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "yjj-4",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "易筋经衔接，含颈与上肢"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和静态"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "wqx-7",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含颈与上肢"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "yjj-12",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "yjj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "强度较高"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "tjq-16",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含所选部位重点"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "yjj-11",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F15-B",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "wqx-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢功能"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持弓练稳定"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "yjj-4",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以稳定为主，含颈与上肢"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态练稳定"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "wqx-7",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以稳定为主，含颈与上肢"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "yjj-12",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "yjj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "强度较高"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "tjq-16",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含所选部位重点"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "yjj-11",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F15-C",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩与上肢"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "wqx-4",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩、上肢、躯干"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "云手覆盖肩、上肢、躯干，节奏好"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩与上肢，简单"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "yjj-10",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "撑地负荷重，日常锻炼不优先"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "tjq-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与躯干转动"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "boating",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，肩臂节奏动作"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "wqx-9",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上举后伸，平衡要求较高"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "tjq-22",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩与上肢推收"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "yjj-1",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态，活动价值有限"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "racing",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，含上肢与躯干"
+  },
+  {
+   "scenarioId": "F16-A",
+   "candidateId": "yjj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "强度较高"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩与上肢"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "wqx-4",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩与躯干"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "覆盖所选部位"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "多次未完成，提示先做更简单的动作"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "yjj-10",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负荷重"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "tjq-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与躯干"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "2局完成1局，略降"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "wqx-9",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "平衡要求较高"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "tjq-22",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩与上肢"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "yjj-1",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "racing",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏"
+  },
+  {
+   "scenarioId": "F16-B",
+   "candidateId": "yjj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "强度较高"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含配合"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "wqx-4",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含配合"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "配合与节奏为主，回应报告"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "简单的配合动作"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "yjj-10",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负荷重"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "tjq-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "转腰带手练配合"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "练配合；完成率一般"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "wqx-9",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "平衡要求较高"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "tjq-22",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "练配合"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "yjj-1",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "静态"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "racing",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，练配合"
+  },
+  {
+   "scenarioId": "F16-C",
+   "candidateId": "yjj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "强度较高"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "覆盖肩、臂、下肢，温和，适合僵硬与久坐"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩部伸手触达；过顶对僵硬者需在舒适范围内"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩臂展开游戏"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "wqx-10",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "单腿独立，平衡要求高"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "tjq-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩臂与下肢；虚步与上提有一定难度"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "bdj-7",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "马步冲拳，含上肢与下肢"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩臂展开与马步，含幅度，契合活动目标"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "节奏游戏，适合久坐"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩臂侧平举，无酸痛可保持"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "yjj-3",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "过顶上托加提踵保持，对僵硬者偏难"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身"
+  },
+  {
+   "scenarioId": "F17-A",
+   "candidateId": "yjj-9",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "转腰屈身下探，不含下肢"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和覆盖所选部位"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "过顶需在舒适范围内"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "游戏补充"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "wqx-10",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已稳定完成转身蹬脚，可尝试单腿动作"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "tjq-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "太极衔接"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "bdj-7",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "4次完成3次且分数下降"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "八段锦中幅度更好的选择"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "boating",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "最近3局全部完成，偏好与接受度好"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩臂侧平举"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "yjj-3",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏难"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身"
+  },
+  {
+   "scenarioId": "F17-B",
+   "candidateId": "yjj-9",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含下肢"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以配合为主且温和，回应报告"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含配合；过顶需注意"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "练配合"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "wqx-10",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "可尝试"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "tjq-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含配合"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "bdj-7",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "分数下降"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "左右交替练配合并含幅度"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "boating",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "左右交替练配合"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩臂侧平举"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "yjj-3",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏难"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身"
+  },
+  {
+   "scenarioId": "F17-C",
+   "candidateId": "yjj-9",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含下肢"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "tjq-20",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢，含上架"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好功法且仅上肢"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "bdj-4",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "颈肩转动，不含所选部位"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "覆盖上肢、躯干、下肢；偏好功法略降"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "wqx-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢前伸、躯干屈伸、下肢，契合全部所选部位"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "wqx-4",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "覆盖上肢、躯干、下肢，含前伸"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好功法且仅上肢"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "云手覆盖上肢、躯干、下肢"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "tjq-19",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含上肢、躯干、下肢，有俯身"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "tjq-8",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "覆盖所选部位，较复杂"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢"
+  },
+  {
+   "scenarioId": "F18-A",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干前屈与上肢，含俯身"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "tjq-20",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "仅上肢"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "bdj-4",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含所选部位"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "racing",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一一局未完成，且偏好功法"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "wqx-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "五禽戏衔接，覆盖所选部位"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "wqx-4",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "昨天刚练且分数下降，可隔天再练"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "仅上肢"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "覆盖所选部位"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "tjq-19",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "tjq-8",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "较复杂"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢与下肢"
+  },
+  {
+   "scenarioId": "F18-B",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "tjq-20",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "一手上架一手前推，练幅度"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "仅上肢"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "bdj-4",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含所选部位"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "racing",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "未完成且偏好功法"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "wqx-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "前伸幅度，回应报告"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "wqx-4",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告该式幅度在改善，宜继续"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "仅上肢"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "覆盖所选部位"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "tjq-19",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含前伸幅度，有俯身"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "tjq-8",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "较复杂"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "bdj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含幅度"
+  },
+  {
+   "scenarioId": "F18-C",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含前伸幅度，有俯身"
+  },
+  {
+   "scenarioId": "F19-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "肩颈放松、身体中正，与颈部间接相关；颈部无直接可用内容"
+  },
+  {
+   "scenarioId": "F19-A",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "持续侧平举对酸痛者负担大"
+  },
+  {
+   "scenarioId": "F19-A",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏但不含颈/下肢"
+  },
+  {
+   "scenarioId": "F19-A",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含颈/下肢"
+  },
+  {
+   "scenarioId": "F19-A",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含颈/下肢"
+  },
+  {
+   "scenarioId": "F19-A",
+   "candidateId": "boating",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏但不含颈/下肢"
+  },
+  {
+   "scenarioId": "F19-A",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一含下肢的温和动作"
+  },
+  {
+   "scenarioId": "F19-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F19-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "姿态中正补充；颈部无直接内容"
+  },
+  {
+   "scenarioId": "F19-B",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "负担大"
+  },
+  {
+   "scenarioId": "F19-B",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含所选部位"
+  },
+  {
+   "scenarioId": "F19-B",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含所选部位"
+  },
+  {
+   "scenarioId": "F19-B",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含所选部位"
+  },
+  {
+   "scenarioId": "F19-B",
+   "candidateId": "boating",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一一局未完成"
+  },
+  {
+   "scenarioId": "F19-B",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "唯一含下肢，均分86"
+  },
+  {
+   "scenarioId": "F19-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F19-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "姿态补充；颈部无直接内容"
+  },
+  {
+   "scenarioId": "F19-C",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告幅度问题，但对酸痛者负担大"
+  },
+  {
+   "scenarioId": "F19-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，可练配合与伸展；不含所选部位"
+  },
+  {
+   "scenarioId": "F19-C",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以较低负担练前伸幅度"
+  },
+  {
+   "scenarioId": "F19-C",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含所选部位"
+  },
+  {
+   "scenarioId": "F19-C",
+   "candidateId": "boating",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "此前未完成"
+  },
+  {
+   "scenarioId": "F19-C",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告幅度偏低，继续练并关注，含下肢"
+  },
+  {
+   "scenarioId": "F19-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F20-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F20-A",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "肩高侧平举保持，对抬手困难者负担大"
+  },
+  {
+   "scenarioId": "F20-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，身前节奏动作温和，适合久坐"
+  },
+  {
+   "scenarioId": "F20-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "肩颈放松姿态；所选颈部无可用内容"
+  },
+  {
+   "scenarioId": "F20-A",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和全身起势"
+  },
+  {
+   "scenarioId": "F20-A",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "拉弓需展开，对抬手困难者负担较大"
+  },
+  {
+   "scenarioId": "F20-A",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "与颈部及目标关联弱"
+  },
+  {
+   "scenarioId": "F20-A",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "与颈部关联弱"
+  },
+  {
+   "scenarioId": "F20-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F20-B",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "2次均未完成"
+  },
+  {
+   "scenarioId": "F20-B",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，温和"
+  },
+  {
+   "scenarioId": "F20-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "肩颈放松；颈部无可用内容"
+  },
+  {
+   "scenarioId": "F20-B",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和全身"
+  },
+  {
+   "scenarioId": "F20-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "4局完成3局，证明可接受；拉弓仍需舒适范围"
+  },
+  {
+   "scenarioId": "F20-B",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "关联弱"
+  },
+  {
+   "scenarioId": "F20-B",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "关联弱"
+  },
+  {
+   "scenarioId": "F20-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F20-C",
+   "candidateId": "yjj-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "未完成"
+  },
+  {
+   "scenarioId": "F20-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "左右交替练配合"
+  },
+  {
+   "scenarioId": "F20-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "肩颈放松；颈部无可用内容"
+  },
+  {
+   "scenarioId": "F20-C",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以配合为主的温和动作"
+  },
+  {
+   "scenarioId": "F20-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": true,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "练配合，已能完成"
+  },
+  {
+   "scenarioId": "F20-C",
+   "candidateId": "tjq-23",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "关联弱"
+  },
+  {
+   "scenarioId": "F20-C",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "关联弱"
+  },
+  {
+   "scenarioId": "F21-A",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部；无酸痛可保持"
+  },
+  {
+   "scenarioId": "F21-A",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "节奏温和，适合久坐"
+  },
+  {
+   "scenarioId": "F21-A",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "收势价值低"
+  },
+  {
+   "scenarioId": "F21-A",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "温和姿态，肩颈放松；颈部无直接内容"
+  },
+  {
+   "scenarioId": "F21-A",
+   "candidateId": "yjj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部"
+  },
+  {
+   "scenarioId": "F21-A",
+   "candidateId": "tjq-23",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干，负担低"
+  },
+  {
+   "scenarioId": "F21-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含肩部游戏"
+  },
+  {
+   "scenarioId": "F21-A",
+   "candidateId": "tjq-1",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "覆盖肩与下肢，温和，适合僵硬与久坐"
+  },
+  {
+   "scenarioId": "F21-B",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新内容，含肩部"
+  },
+  {
+   "scenarioId": "F21-B",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "节奏游戏"
+  },
+  {
+   "scenarioId": "F21-B",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F21-B",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "温和姿态；颈部无直接内容"
+  },
+  {
+   "scenarioId": "F21-B",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练4次均分87，较熟练"
+  },
+  {
+   "scenarioId": "F21-B",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新内容，补充躯干覆盖"
+  },
+  {
+   "scenarioId": "F21-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "游戏补充"
+  },
+  {
+   "scenarioId": "F21-B",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练6次且分数下降，宜保持但不必优先"
+  },
+  {
+   "scenarioId": "F21-C",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "新内容"
+  },
+  {
+   "scenarioId": "F21-C",
+   "candidateId": "boating",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "左右交替练配合"
+  },
+  {
+   "scenarioId": "F21-C",
+   "candidateId": "tjq-24",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "价值低"
+  },
+  {
+   "scenarioId": "F21-C",
+   "candidateId": "yjj-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": true,
+   "safetyConcern": false,
+   "reason": "温和姿态；颈部无直接内容"
+  },
+  {
+   "scenarioId": "F21-C",
+   "candidateId": "yjj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "较熟练"
+  },
+  {
+   "scenarioId": "F21-C",
+   "candidateId": "tjq-23",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "配合与稳定为主，含躯干"
+  },
+  {
+   "scenarioId": "F21-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "练配合"
+  },
+  {
+   "scenarioId": "F21-C",
+   "candidateId": "tjq-1",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "报告配合下降，可继续练但需变化"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上身侧倾含躯干，混合偏好可接受"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "yjj-11",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "逐节深度前屈，对僵硬者冷启动偏难"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "bdj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身，对僵硬者冷启动不优先"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "tjq-13",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干，单腿要求高"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "yjj-9",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "转腰探爪，躯干活动；有屈身"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "wqx-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干由屈到伸并含上肢"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以腰带手画圆，温和的躯干活动"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "wqx-5",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "腰腹带动画圆，温和，适合躯干僵硬"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "tjq-20",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F22-A",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "游戏补充"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "yjj-11",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏难"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "bdj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "tjq-13",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "yjj-9",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干活动"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "wqx-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已练5次完成3次且分数下降"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和躯干活动，未练过"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "wqx-5",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "已完成且分数尚可，宜继续"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "tjq-20",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F22-B",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含稳定要求的游戏"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "yjj-11",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏难"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "bdj-6",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "tjq-13",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "yjj-9",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干活动"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "wqx-2",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "分数下降"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和躯干活动"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "tjq-19",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含俯身"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "wqx-5",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "温和躯干活动"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "tjq-20",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F22-C",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢与上肢伸展，契合活动与上肢目标"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "tjq-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢与上肢"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢伸手游戏"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢的游戏"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "bdj-5",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含颈与下肢"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "yjj-8",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "下肢下蹲，含深屈膝"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "tjq-13",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢；单腿要求较高"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "对应上肢目标，不含颈/下肢"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "wqx-7",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含颈、肩与下肢"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "wqx-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢"
+  },
+  {
+   "scenarioId": "F23-A",
+   "candidateId": "yjj-11",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身，不含颈/下肢重点"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "契合目标"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "tjq-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢与上肢"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢的游戏"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "bdj-5",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含颈与下肢"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "yjj-8",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "tjq-13",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "训练很少且未完成，单腿动作暂不优先"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "wqx-7",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含颈与下肢"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢游戏"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "wqx-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢"
+  },
+  {
+   "scenarioId": "F23-B",
+   "candidateId": "yjj-11",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "bdj-2",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "练配合并含幅度"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "tjq-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含配合"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "apple",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含配合"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "racing",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "练配合"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "bdj-5",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含颈与下肢，练配合"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "yjj-8",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以稳定为主"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "tjq-13",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "单腿动作暂不优先"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "yjj-2",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "上肢"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "wqx-7",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "配合与稳定，含颈与下肢"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "archery",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "练配合"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "wqx-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含下肢"
+  },
+  {
+   "scenarioId": "F23-C",
+   "candidateId": "yjj-11",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "明显俯身"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "yjj-5",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "弓步转腰，含躯干"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏但不含躯干"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "yjj-9",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "转腰探爪，躯干活动并含伸展"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "racing",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏且含躯干"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干前屈伸展"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "tjq-5",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "wqx-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "转腰侧屈，含躯干"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "yjj-11",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干卷屈"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "以腰带手，躯干活动、节奏好"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "tjq-12",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "tjq-19",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干前屈"
+  },
+  {
+   "scenarioId": "F24-A",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏但不含躯干"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "yjj-5",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "易筋经衔接，含躯干"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "yjj-9",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干活动"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "racing",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏且含躯干"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干伸展"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "tjq-5",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "wqx-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "yjj-11",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干卷屈"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干活动"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "tjq-12",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "tjq-19",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干"
+  },
+  {
+   "scenarioId": "F24-B",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "yjj-5",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干与配合"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "archery",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "yjj-9",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干活动，含配合"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "racing",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "偏好游戏，练配合"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "bdj-6",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干伸展"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "tjq-5",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "wqx-3",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含配合"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "yjj-11",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "躯干卷屈"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "tjq-10",
+   "grade": 3,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "配合与节奏为主"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "tjq-12",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "tjq-19",
+   "grade": 2,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "含躯干"
+  },
+  {
+   "scenarioId": "F24-C",
+   "candidateId": "apple",
+   "grade": 1,
+   "abstain": false,
+   "uncertain": false,
+   "needsReview": false,
+   "safetyConcern": false,
+   "reason": "不含躯干"
+  }
+ ]
+}

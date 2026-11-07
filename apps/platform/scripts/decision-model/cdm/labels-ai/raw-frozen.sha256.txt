@@ -1,0 +1,9 @@
+frozen_at: 2026-11-07T20:59:00+08:00
+note: raw AI annotation batches frozen BEFORE validation/statistics/training; must not be edited afterwards
+4b18a0f94e411b0ab69cee0c1b3f7365dfc826c46e06876234390f6053f42462 *raw/batch-01.json
+8a35d36dce8e6a5abad015a44fda43e4520586ad4ebba64a1d857929b07415a6 *raw/batch-02.json
+d716ed8e9281772b0e811decc112a9a4be0da71e59cbdc603be2dca5260b0867 *raw/batch-03.json
+4354bb9bcb7c50845fdb953e5f8219db3ab5bd97f065b68a165c34411b3db38c *raw/batch-04.json
+049e135514e3b4044ce75642ddcc8ef9a59208e01c7b64a617b6e44baad55a17 *raw/batch-05.json
+3209fe9187454dc361c161300a2d8e4d1cd17101699c05b098d1adb6cd5f3ef0 *raw/batch-06.json
+e2cc8d73868e90585098bae8b1b8c29dca28c416f3a76e5744f73f409993f67b *worksheet-blinded.txt

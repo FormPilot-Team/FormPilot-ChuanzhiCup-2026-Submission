@@ -46,6 +46,8 @@ describe('fp-cdm bundled state and weight loading', () => {
   it('refuses fixture, planted or malformed weights; accepts only human-label artefacts of this feature set', () => {
     expect(loadWeights(fixtureWeights())).toEqual({ ok: false, reason: 'WEIGHTS_INVALID' })
     expect(loadWeights({ ...fixtureWeights(), trainedOn: { matrixSha256: 'x', labels: { kind: 'planted_random_linear_signal' }, devFamilies: [] } }).ok).toBe(false)
+    // AI-label (single AI annotator) weights are an offline weak-supervision experiment, never a product model.
+    expect(loadWeights({ ...fixtureWeights(), trainedOn: { matrixSha256: 'x', labels: { kind: 'ai_single_annotator' }, devFamilies: [] } }).ok).toBe(false)
     expect(loadWeights({ ...fixtureWeights(), featureSet: 'other' }).ok).toBe(false)
     expect(loadWeights({ ...fixtureWeights(), coef: [Number.NaN, ...fixtureWeights().coef.slice(1)] }).ok).toBe(false)
     const human = { ...fixtureWeights(), trainedOn: { matrixSha256: 'x', labels: { kind: 'human' }, devFamilies: [] } }

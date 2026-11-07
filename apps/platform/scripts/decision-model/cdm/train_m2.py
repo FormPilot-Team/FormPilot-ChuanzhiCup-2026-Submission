@@ -124,7 +124,8 @@ def bootstrap(per_fn, families, n=2000, seed=SEED):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--labels', choices=['human', 'planted', 'null'], required=True)
+    ap.add_argument('--labels', choices=['human', 'ai', 'planted', 'null'], required=True)
+    ap.add_argument('--ai-labels', help='fp-cdm-ai-labels-v1.json (single AI annotator; weak-supervision experiment only)')
     ap.add_argument('--labels-dir')
     ap.add_argument('--seed', type=int, default=1)
     ap.add_argument('--out', required=True)
@@ -149,6 +150,15 @@ def main():
         a_ids = list(L['annotatorFiles'])
         per_annot = {a: np.array([lab[(s, c)][a] for s, c in zip(scen, cand)], float) for a in a_ids}
         label_info = {'kind': 'human', 'file_sha256': sha(os.path.join(args.labels_dir, 'final-labels.v1.json')), 'annotators': L['annotatorFiles'], 'unresolvedAdjudications': L['unresolvedAdjudications']}
+    elif args.labels == 'ai':
+        A = json.load(open(args.ai_labels, encoding='utf-8'))
+        if A['scenarioSha256'] != M['scenarioSha256'] or A['annotator'].get('kind') != 'ai' or not A['complete']:
+            sys.exit('AI label file invalid or incomplete')
+        lab = {(l['scenarioId'], l['candidateId']): l['grade'] for l in A['labels']}
+        if any(lab[(s, c)] is None for s, c in zip(scen, cand)):
+            sys.exit('abstained AI labels present: drop rows before training')
+        y = np.array([lab[(s, c)] for s, c in zip(scen, cand)], float)
+        label_info = {'kind': 'ai_single_annotator', 'file_sha256': sha(args.ai_labels), 'annotator': A['annotator']}
     else:
         rng = np.random.default_rng(args.seed)
         if args.labels == 'planted':
@@ -294,24 +304,24 @@ def main():
                            'p0Top1': cand[k][np.argmin(p0[k])], 'p0Top1Label': float(y[k][np.argmin(p0[k])])})
 
     weights = None
-    if args.labels == 'human' and mC.coef is not None:
+    if args.labels in ('human', 'ai') and mC.coef is not None:
         weights = {'schemaVersion': 1, 'id': 'fp-cdm-m2', 'version': '1.0.0', 'family': fam_c, 'hyperparameter': hp_c, 'featureSet': M['featureSet'],
                    'featureNames': [names[i] for i in cC], 'mean': mC.scaler.mean_.tolist(), 'scale': mC.scaler.scale_.tolist(), 'coef': mC.coef.tolist(),
                    'pairTemperature': T, 'platt': {'a': float(platt.coef_[0][0]), 'b': float(platt.intercept_[0])}, 'abstainSuitabilityBelow': tau,
                    'trainedOn': {'matrixSha256': sha(mpath), 'labels': label_info, 'devFamilies': dev_fams}}
-        with open(os.path.join(args.out, 'fp-cdm-m2.weights.json'), 'w', encoding='utf-8') as f:
+        with open(os.path.join(args.out, 'fp-cdm-m2.weights.json' if args.labels == 'human' else 'fp-cdm-m2.ai-experiment.weights.json'), 'w', encoding='utf-8') as f:
             json.dump(weights, f)
     coefs = None
     if mC.coef is not None:
         coefs = sorted(({'feature': names[i], 'weight': float(w)} for i, w in zip(cC, mC.coef)), key=lambda d: -abs(d['weight']))[:20]
     report = {'schemaVersion': 1, 'generatedAt': time.strftime('%Y-%m-%dT%H:%M:%S%z'), 'labels': label_info,
-              'resultKind': 'MODEL_EVALUATION' if args.labels == 'human' else 'PIPELINE_VALIDATION_ONLY (not a model result)',
+              'resultKind': {'human': 'MODEL_EVALUATION', 'ai': 'AI_LABEL_WEAK_SUPERVISION_EXPERIMENT (single AI annotator; not human validation)'}.get(args.labels, 'PIPELINE_VALIDATION_ONLY (not a model result)'),
               'matrix': {'sha256': sha(mpath), 'rows': len(rows), 'features': len(names)}, 'splits': {'devFamilies': len(dev_fams), 'testFamilies': len(tfams), 'testScenarios': int(len(np.unique(scen[test])))},
               'devSelection': {k: v for k, v in selection.items() if not k.endswith('_oof')}, 'calibration': {'pairTemperature': T, 'platt': {'a': float(platt.coef_[0][0]), 'b': float(platt.intercept_[0])},
               'abstainSuitabilityBelow': tau, 'devTop1Coverage': coverage}, 'test': test_report, 'bootstrap95': cis, 'e6CrossAnnotator': e6,
               'errorAnalysisTop1': errors, 'topCoefficients': coefs, 'seconds': round(time.time() - t0, 1),
               'versions': {'python': sys.version.split()[0], 'sklearn': __import__('sklearn').__version__, 'numpy': np.__version__}}
-    name = 'fp-cdm-m2.report.json' if args.labels == 'human' else f'pipeline-validation-{args.labels}-seed{args.seed}.json'
+    name = {'human': 'fp-cdm-m2.report.json', 'ai': 'fp-cdm-m2.ai-experiment.report.json'}.get(args.labels, f'pipeline-validation-{args.labels}-seed{args.seed}.json')
     with open(os.path.join(args.out, name), 'w', encoding='utf-8') as f:
         json.dump(report, f, indent=1)
     t = test_report

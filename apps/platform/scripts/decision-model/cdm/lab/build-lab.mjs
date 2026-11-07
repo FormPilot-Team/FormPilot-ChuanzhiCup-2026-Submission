@@ -17,8 +17,11 @@ const readJson = path => (path ? JSON.parse(readFileSync(path, 'utf8')) : null)
 const out = opt('--out'); if (!out) throw new Error('--out required')
 const weights = readJson(opt('--weights'))
 const preview = flag('--fixture-preview')
+const aiExperiment = flag('--ai-label-experiment')
 const weightsHuman = weights?.trainedOn?.labels?.kind === 'human' && weights?.status !== 'AWAITING_LABELS'
-if (weights && !weightsHuman && !preview) throw new Error('weights are not human-label trained; refusing (use --fixture-preview only for layout checks)')
+const weightsAi = weights?.trainedOn?.labels?.kind === 'ai_single_annotator'
+if (aiExperiment && !weightsAi) throw new Error('--ai-label-experiment requires weights trained on AI labels')
+if (weights && !weightsHuman && !preview && !aiExperiment) throw new Error('weights are not human-label trained; refusing (use --fixture-preview only for layout checks, --ai-label-experiment for the stamped AI-label experiment page)')
 
 const esbuild = await import(pathToFileURL(resolve('node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js')).href)
 const built = await esbuild.build({ entryPoints: [resolve(import.meta.dirname, 'entry.ts')], bundle: true, minify: true, format: 'iife', globalName: 'FPLab', platform: 'browser', write: false, logLevel: 'silent' })
@@ -26,7 +29,7 @@ const bundle = built.outputFiles[0].text
 const scenarioText = readFileSync(resolve(import.meta.dirname, '../data/scenarios.v1.json'), 'utf8')
 const scenarios = JSON.parse(scenarioText).scenarios.map(s => ({ id: s.id, familyId: s.familyId, condition: s.condition, split: s.split, profile: s.profile, history: s.history, report: s.report, candidates: s.candidates }))
 const data = {
-  generatedAt: new Date().toISOString(), preview, weightsHuman, weights,
+  generatedAt: new Date().toISOString(), preview, aiExperiment, weightsHuman, weights,
   scenarioSha256: createHash('sha256').update(scenarioText).digest('hex'), scenarios,
   m2: readJson(opt('--m2-report')), m1: readJson(opt('--m1-metrics')), e245: readJson(opt('--e245')), cold: readJson(opt('--cold')),
 }
@@ -67,7 +70,7 @@ details summary{cursor:pointer;color:var(--fg2)}
 <div id="results"></div>
 <h2>3. 局限</h2>
 <div class="card"><ul>
-<li>M2 的标签来自两名<strong>团队标注者</strong>（非临床专家）对合成场景的分级判断，指标衡量的是与团队判断的一致程度，不是专家有效性、真实用户泛化能力或康复效果。</li>
+<li id="labelLimit">M2 的标签来自两名<strong>团队标注者</strong>（非临床专家）对合成场景的分级判断，指标衡量的是与团队判断的一致程度，不是专家有效性、真实用户泛化能力或康复效果。</li>
 <li>冻结测试只有 6 个场景族（18 个场景），区间较宽；请看 bootstrap 95% CI，不要只看点估计。</li>
 <li>M1 来自单一示范者的二维姿态，共 59 章、4 个功法；weight_bearing 不可学习。</li>
 <li>安全筛选在模型前后独立执行；模型分数不能解除任何限制。不做诊断、不承诺疗效、不提供剂量。</li></ul></div>
@@ -82,12 +85,14 @@ const L = {goals:{mobility:'肩颈活动',upper_limb:'上肢功能练习',daily:
  regions:{shoulders:'肩部',neck:'颈部',arms:'上肢',trunk:'躯干',legs:'下肢'},preference:{routine:'功法优先',game:'游戏优先',mixed:'混合'},group:{P:'画像×内容',H:'历史×内容',R:'报告×内容'},
  cond:{A_profile:'仅画像',B_history:'画像+历史',C_history_report:'画像+历史+报告'}};
 const byId = new Map(FPLab.COACH_KNOWLEDGE.map(e => [e.id, e]));
-const weightsStatus = D.weights ? (D.preview && !D.weightsHuman ? {ok:true, weights:D.weights} : FPLab.loadWeights(D.weights)) : {ok:false, reason:'MODEL_NOT_TRAINED'};
+const weightsStatus = D.weights ? ((D.preview || D.aiExperiment) && !D.weightsHuman ? {ok:true, weights:D.weights} : FPLab.loadWeights(D.weights)) : {ok:false, reason:'MODEL_NOT_TRAINED'};
+const LABEL_SRC = D.aiExperiment ? 'AI 标注（单一 AI 标注者 Claude Opus 5.5，非人工、非专家）' : '团队标注者（非临床）';
 const svc = FPLab.createCdmService({catalogue:FPLab.COACH_KNOWLEDGE, rules:FPLab.getCoachWebRecommendation, weights:weightsStatus, now:() => Date.UTC(2026,10,8)});
 const st = [];
 if (D.preview) st.push('<div class="banner"><strong>FIXTURE PREVIEW</strong>：本页用测试 fixture 权重检查版面，<strong>不是训练模型</strong>，不得用于展示或汇报。</div>');
+if (D.aiExperiment) st.push('<div class="banner"><strong>AI 标注弱监督实验</strong>：模型权重由单一 AI 标注者（Claude Opus 5.5，与 PR #49 设计者为同一智能体）对合成场景的分级训练。<strong>不是人工验证结果，不是专家判断</strong>，不得作为真实推荐质量或康复效果的证据；模型未接入正式产品。</div>');
 if (!weightsStatus.ok) st.push('<div class="banner">M2 偏好排序模型尚未训练（' + esc(weightsStatus.reason) + '），等待两名团队标注者完成标注。下方只展示规则引擎与 PR #49 的结果，以及模型的安全前置与候选池。</div>');
-else if (!D.preview) st.push('<div class="card">模型 <strong>' + esc(D.weights.id + '@' + D.weights.version) + '</strong>（' + esc(D.weights.family) + '，' + D.weights.featureNames.length + ' 个特征），标签文件 SHA256 ' + esc((D.weights.trainedOn.labels.file_sha256 || '').slice(0, 12)) + '…，矩阵 ' + esc(D.weights.trainedOn.matrixSha256.slice(0, 12)) + '…；标注者为团队成员（非临床）。</div>');
+else if (!D.preview && !D.aiExperiment) st.push('<div class="card">模型 <strong>' + esc(D.weights.id + '@' + D.weights.version) + '</strong>（' + esc(D.weights.family) + '，' + D.weights.featureNames.length + ' 个特征），标签文件 SHA256 ' + esc((D.weights.trainedOn.labels.file_sha256 || '').slice(0, 12)) + '…，矩阵 ' + esc(D.weights.trainedOn.matrixSha256.slice(0, 12)) + '…；标注者为团队成员（非临床）。</div>');
 $('status').innerHTML = st.join('');
 $('scen').innerHTML = D.scenarios.map(s => '<option value="' + s.id + '">' + s.id + ' · ' + L.cond[s.condition] + (s.split === 'test' ? ' · 冻结测试族' : '') + '</option>').join('');
 
@@ -142,10 +147,10 @@ function hbars(rows, max, opts){ // rows: [{label, value, color, ci?}]
   card.appendChild(det); return card }
 const res = $('results'); const grid = document.createElement('div'); grid.className = 'grid2'; res.appendChild(grid);
 const SYS = [['rules_p0', '规则引擎 P0', 'var(--s1)'], ['pr49_manual_ranker', 'PR #49 手工权重', 'var(--s2)'], ['C_profile_history_report', '训练模型 fp-cdm', 'var(--s3)']];
-if (D.m2 && D.m2.resultKind === 'MODEL_EVALUATION') {
+if (D.m2 && (D.m2.resultKind === 'MODEL_EVALUATION' || (D.aiExperiment && D.m2.resultKind.startsWith('AI_LABEL')))) {
   const t = D.m2.test, ci = D.m2.bootstrap95;
   const ciOf = {rules_p0:ci['rules_p0_ndcg@5'], pr49_manual_ranker:ci['pr49_ndcg@5'], C_profile_history_report:ci['model_C_ndcg@5']};
-  grid.appendChild(hbars(SYS.map(([k, l, c]) => ({label:l, value:t[k].all['ndcg@5'], color:c, ci:ciOf[k]})), 1, {title:'E1 冻结测试 NDCG@5（家族级 bootstrap 95% CI）', note:D.m2.splits.testScenarios + ' 个测试场景 / ' + D.m2.splits.testFamilies + ' 个族；标签 = 团队标注者'}));
+  grid.appendChild(hbars(SYS.map(([k, l, c]) => ({label:l, value:t[k].all['ndcg@5'], color:c, ci:ciOf[k]})), 1, {title:'E1 冻结测试 NDCG@5（家族级 bootstrap 95% CI）', note:D.m2.splits.testScenarios + ' 个测试场景 / ' + D.m2.splits.testFamilies + ' 个族；标签 = ' + LABEL_SRC}));
   grid.appendChild(hbars(SYS.map(([k, l, c]) => ({label:l, value:t[k].all['pairwise_acc'], color:c})), 1, {title:'E1 成对排序准确率'}));
   grid.appendChild(hbars(SYS.map(([k, l, c]) => ({label:l, value:t[k].all['p@3'], color:c})), 1, {title:'E1 Precision@3（适合 = 分级 ≥ 2）'}));
   grid.appendChild(hbars([['A_profile', 'A 仅画像'], ['B_profile_history', 'B 画像+历史'], ['C_profile_history_report', 'C 画像+历史+报告']].map(([k, l]) => ({label:l, value:t[k].C_history_report['ndcg@5'], color:'var(--s3)'})), 1, {title:'E3 消融：含历史与报告的场景上的 NDCG@5', note:'同一模型族在不同特征组上训练；只在条件 C 的测试场景上比较'}));
@@ -173,6 +178,7 @@ if (D.m2 && D.m2.errorAnalysisTop1) {
   c.innerHTML = '<h3>误差案例（测试集中 top-1 不是最优的场景）</h3><table><tr><th>场景</th><th>模型 top-1（分级）</th><th>最优候选（分级）</th><th>规则 top-1（分级）</th></tr>' + D.m2.errorAnalysisTop1.map(e => '<tr><td>' + e.scenarioId + '</td><td>' + esc(byId.get(e.modelTop1).title) + '（' + e.top1Label + '）</td><td>' + e.bestCandidates.map(id => esc(byId.get(id).title)).join('、') + '（' + e.bestLabel + '）</td><td>' + esc(byId.get(e.p0Top1).title) + '（' + e.p0Top1Label + '）</td></tr>').join('') + '</table>';
   res.appendChild(c);
 }
+if (D.aiExperiment) $('labelLimit').innerHTML = '本页 M2 标签来自<strong>单一 AI 标注者</strong>：没有标注者间一致性；标注者与 PR #49 的设计者为同一智能体，基线对照存在偏差风险。指标只说明模型能学到该 AI 标注者的偏好，不说明推荐对真实用户有效。';
 $('foot').textContent = '生成 ' + D.generatedAt + ' · 场景 SHA ' + D.scenarioSha256.slice(0, 12) + '… · 合成场景，不是真实用户';
 </script></body></html>
 `
