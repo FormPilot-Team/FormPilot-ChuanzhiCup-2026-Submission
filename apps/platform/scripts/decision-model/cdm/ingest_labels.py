@@ -46,6 +46,10 @@ def main():
         with open(path, encoding='utf-8') as f:
             j = json.load(f)
         aid = j['annotator']['id']
+        # AI annotations (fp-cdm-ai-labels/*) are never counted as a human annotator.
+        if j.get('kitId') != 'fp-cdm-annotation/v1' or str(j['annotator'].get('kind', '')).lower() == 'ai' or str(j['annotator'].get('role', '')).lower().startswith('ai'):
+            problems.append(f'{os.path.basename(path)}: not a human annotation export (rejected)')
+            continue
         if j.get('scenarioSha256') != scen_sha:
             problems.append(f'{os.path.basename(path)}: scenario sha mismatch')
             continue

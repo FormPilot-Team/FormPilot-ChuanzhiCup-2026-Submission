@@ -54,7 +54,7 @@ CoachWebRequest ──► P0 规则服务（不变；始终可回退）
 - M1 LOPO：各功法留出时的逐标签 AUC 见证据 `m1/fp-cdm-m1.metrics.json`。最难的留出功法是太极拳。weight_bearing 只有 1 个正例章节，留一法下不可学习，单独报告。
 - M2 流水线对照：植入信号测试 NDCG@5 为 0.88，成对准确率 0.82；随机标签测试分别为 0.51 和 0.48，模型与基线差值的置信区间跨 0。说明流水线能学到可学的信号、学不到噪声，**不代表模型效果**。
 - E4 安全：13,392 个风险画像全部暂停，模型执行 0 次；22,320 个画像中受限 caution 泄漏 0、不可启动章节 0；对抗权重泄漏 0；不可用内容 0；低适配与分布外输入正确弃权；未训练时回退。
-- E5 性能（CPU、单线程 Node）：单次 p50 0.59 ms / p95 2.83 ms；批量 1.16 ms/次；打包后冷启动导入 4.1 ms，首次调用 7.6 ms，堆内存 4.8 MB；包体 137 KB min；参数 337 个；不用 GPU。
+- E5 性能（CPU、单线程 Node）：单次 p50 0.59 ms / p95 2.83 ms；批量 1.16 ms/次；打包后冷启动导入 3.6 ms，首次调用 7.3 ms（中位数，7 个新进程），堆内存 4.8 MB；包体 137,298 B min；参数 337 个；不用 GPU。
 
 ## Web 集成接口（与 PR #49 相同的请求契约）
 
@@ -67,6 +67,10 @@ const r = getCoachCdmRecommendation(request, { mode: 'shadow' | 'active', availa
 ```
 
 `state` 只能由可信宿主根据 Reader 构建，且其 profile 必须与请求一致，否则回退 `STATE_PROFILE_MISMATCH`。默认 `off`；PR 不修改任何页面、路由或构建入口。
+
+## Coach Decision Lab（独立离线页面）
+
+`scripts/decision-model/cdm/lab/build-lab.mjs` 生成单文件 HTML，把真实的 P0、PR #49 与 fp-cdm 模块打包进页面，在浏览器内实时计算。它不是 Vite 入口或应用路由，也不改动 Web 构建。生成器拒绝非人工标签的权重；`--fixture-preview` 只用于检查版面，页面会加上 FIXTURE PREVIEW 水印。
 
 ## 比赛演示方案（拿到标签并训练后）
 
