@@ -8,6 +8,8 @@ import bundled from './fp-cdm-m2.weights.json'
 
 export const CDM_MODEL_ID = 'fp-cdm-m2' as const
 export const CDM_MODEL_VERSION = '1.0.0'
+/** Runtime behaviour version: 1.1.0 = stage-1 retrieval (K=12) + top-candidate OOD rule with training ranges. */
+export const CDM_RUNTIME_VERSION = '1.1.0'
 
 /** Trained artefact exported by scripts/decision-model/cdm/train_m2.py (linear pairwise/pointwise model). */
 export interface CdmWeights {
@@ -68,7 +70,7 @@ export interface CdmCandidateScore {
 }
 
 export interface CdmOutput {
-  model: { id: typeof CDM_MODEL_ID; version: string; kind: 'trained_linear_preference_ranker'; trainedWeights: true; family: string; labelsSha256: string | null; matrixSha256: string; featureSet: string }
+  model: { id: typeof CDM_MODEL_ID; version: string; runtimeVersion: string; kind: 'trained_linear_preference_ranker'; trainedWeights: true; family: string; labelsSha256: string | null; matrixSha256: string; featureSet: string }
   status: 'ready' | 'abstain' | 'empty'
   abstainReason: null | 'LOW_SUITABILITY' | 'OUT_OF_DISTRIBUTION' | 'NO_CANDIDATES'
   /** Calibrated probability that the top item is preferred over the runner-up. */
@@ -131,7 +133,7 @@ export function inferCdm(weights: CdmWeights, state: DecisionState, catalogue: r
     }
   }).sort((a, b) => b.score - a.score || a.id.localeCompare(b.id))
   const base = {
-    model: { id: CDM_MODEL_ID, version: weights.version, kind: 'trained_linear_preference_ranker' as const, trainedWeights: true as const, family: weights.family,
+    model: { id: CDM_MODEL_ID, version: weights.version, runtimeVersion: CDM_RUNTIME_VERSION, kind: 'trained_linear_preference_ranker' as const, trainedWeights: true as const, family: weights.family,
       labelsSha256: weights.trainedOn.labels.file_sha256 ?? null, matrixSha256: weights.trainedOn.matrixSha256, featureSet: weights.featureSet },
     candidates: scored,
     stateOrigin: { history: state.history.status === 'present' ? state.history.origin : 'missing', report: state.report.status === 'present' ? state.report.origin : 'missing' },

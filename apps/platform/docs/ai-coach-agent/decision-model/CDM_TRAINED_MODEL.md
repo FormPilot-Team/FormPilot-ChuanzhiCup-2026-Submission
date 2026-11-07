@@ -1,5 +1,7 @@
 # FormPilot Competition Decision Model V1（fp-cdm）
 
+> 最新完整结果、版本与结论状态以 [MODEL_REPORT.md](MODEL_REPORT.md) 为准。运行时 1.1.0 改为“两阶段检索 + 重排”，并采用新的 OOD 规则；Web 接口见 [WEB_INTEGRATION_CDM.md](WEB_INTEGRATION_CDM.md)。本文件保留第一轮的设计记录。
+
 日期：2026-11-07。分支 `feat/coach-decision-model-trained`，叠加在 PR #49（`feat/coach-decision-model-v1`）之上；PR #49 的手工权重排序器 fp-coach-ranker 原样保留，作为对照基线（只新增了一个只读评测导出）。
 
 ## 当前状态

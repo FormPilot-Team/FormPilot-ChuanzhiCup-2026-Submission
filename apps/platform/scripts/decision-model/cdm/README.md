@@ -52,6 +52,35 @@ node $VN scripts/decision-model/cdm/evaluate-cdm.ts --out <dir>                 
 node scripts/decision-model/cdm/cold-start.mjs <tmpDir> 7                                 # 冷启动
 ```
 
+## 5. 第二轮研究（2026-11-07 晚）
+
+```bash
+node $VN scripts/decision-model/cdm/export-window-features.ts --v2       # v2 姿态特征（负结果，未采用）
+$PY -I -B scripts/decision-model/cdm/train_m1_v11.py --out scripts/decision-model/cdm/artifacts/m1-v11     # 嵌套 LOPO
+$PY -I -B scripts/decision-model/cdm/robustness_m1.py --out scripts/decision-model/cdm/artifacts/m1-v11    # 噪声 / 缺失鲁棒性
+$PY -I -B scripts/decision-model/cdm/research_m2.py --matrix scripts/decision-model/cdm/data/m2-matrix.v1.json --labels ai --ai-labels scripts/decision-model/cdm/labels-ai/fp-cdm-ai-labels-v1.json --out <dir>
+$PY -I -B scripts/decision-model/cdm/train_m2.py --labels ai --ai-labels scripts/decision-model/cdm/labels-ai/fp-cdm-ai-labels-v1.json --out <dir>
+$PY -I -B scripts/decision-model/cdm/attach_feature_ranges.py --weights <w.json> --matrix scripts/decision-model/cdm/data/m2-matrix.v1.json --out <w+ranges.json>
+node $VN scripts/decision-model/cdm/evaluate-cdm.ts --out <dir> --weights <w+ranges.json> --ai-label-experiment
+```
+
+- `research_m2.py` 只用开发集。
+- `train_m2.py --labels ai` 是 AI 标签弱监督实验，冻结测试只评一次。
+- `evaluate-cdm.ts` 这一步产出 E2 / E4 / E5。
+
+Lab（全部输入来自仓库内 artifacts，可复现）：
+
+```bash
+A=scripts/decision-model/cdm/artifacts
+node scripts/decision-model/cdm/lab/build-lab.mjs --out <lab.html> --ai-label-experiment \
+  --weights $A/m2-ai-experiment/fp-cdm-m2.ai-experiment.weights+ranges.json --m2-report $A/m2-ai-experiment/fp-cdm-m2.ai-experiment.report.json \
+  --research $A/m2-research/m2-research-ai-v1-features.json --m1-metrics $A/m1/fp-cdm-m1.metrics.json --m1v11 $A/m1-v11/fp-cdm-m1-v11.report.json \
+  --m1-robustness $A/m1-v11/fp-cdm-m1-robustness.json --ai-quality scripts/decision-model/cdm/labels-ai/ai-label-quality.json \
+  --e245 $A/m2-ai-experiment/cdm-e2-e4-e5-ai_single_annotator.json --cold $A/m2-ai-experiment/cold-start.json
+```
+
+完整结果、版本与结论状态见 `docs/ai-coach-agent/decision-model/MODEL_REPORT.md`。
+
 ## 禁止事项
 
 - 不用规则、PR #49 输出、persona、画像枚举或标为 do-not-train 的数据作 M2 标签。

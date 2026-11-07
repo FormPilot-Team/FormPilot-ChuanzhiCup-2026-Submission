@@ -35,7 +35,7 @@ const data = {
   generatedAt: new Date().toISOString(), preview, aiExperiment, weightsHuman, weights,
   scenarioSha256: createHash('sha256').update(scenarioText).digest('hex'), scenarios,
   m2: readJson(opt('--m2-report')), research: readJson(opt('--research')), m1: readJson(opt('--m1-metrics')), m1v11: readJson(opt('--m1v11')),
-  aiq: readJson(opt('--ai-quality')), e245: readJson(opt('--e245')), cold: readJson(opt('--cold')),
+  aiq: readJson(opt('--ai-quality')), e245: readJson(opt('--e245')), cold: readJson(opt('--cold')), m1robust: readJson(opt('--m1-robustness')),
 }
 const json = JSON.stringify(data).replace(/</g, '\\u003c')
 
@@ -248,6 +248,10 @@ if (D.m1v11) {
   const lr = []; for (const [k, v] of Object.entries(r.m1_v11_nested.perLabel)) { if (!v.learnable) continue; lr.push({label:lab(k) + ' · M1', value:v.auc, color:'var(--s3)'}); lr.push({label:lab(k) + ' · 描述符', value:r.pr49_descriptors_baseline.perLabel[k].auc, color:'var(--s2)'}) }
   gn.appendChild(hbars(lr, 1, {min:0.3, title:'M1 各标签 AUC（嵌套 LOPO）', note:'v2 新增姿态特征未带来提升（负结果，未采用）；weight_bearing 只有 1 个正例章节，不可学习'}));
 }
+if (D.m1robust) {
+  const R = D.m1robust.macroAuc, row = (l, v) => ({label:l, value:typeof v === 'number' ? v : v.mean, color:'var(--s3)'});
+  gn.appendChild(hbars([row('无扰动', R.clean), row('高斯噪声 0.1 SD', R['gaussian_0.1sd']), row('高斯噪声 0.25 SD', R['gaussian_0.25sd']), row('高斯噪声 0.5 SD', R['gaussian_0.5sd']), row('20% 特征缺失', R.missing_20pct), row('40% 特征缺失', R.missing_40pct)], 1, {min:0.5, title:'M1 鲁棒性：留出功法的测试特征加入跟踪抖动或缺失', note:'只扰动测试特征；每种条件 5 个随机种子取平均；可部署配置 v1 特征 / HGB 深度 2'}));
+}
 if (D.research && D.research.crossProgrammeRanker) {
   const X = D.research.crossProgrammeRanker; const rows = [];
   for (const [p, v] of Object.entries(X)) { rows.push({label:L.prog[p] + ' · 规则', value:v.rules_p0_ndcg5, color:'var(--s1)'}); rows.push({label:L.prog[p] + ' · PR #49', value:v.pr49_ndcg5, color:'var(--s2)'}); rows.push({label:L.prog[p] + ' · 模型', value:v.model_ndcg5, color:'var(--s3)'}) }
@@ -275,4 +279,4 @@ $('foot').textContent = '生成 ' + D.generatedAt + ' · 场景 SHA ' + D.scenar
 </script></body></html>
 `
 writeFileSync(out, html)
-console.log(JSON.stringify({ out, bytes: Buffer.byteLength(html), bundleBytes: bundle.length, preview, aiExperiment, weightsHuman, inputs: Object.fromEntries(Object.entries(data).filter(([k]) => ['m2', 'research', 'm1', 'm1v11', 'aiq', 'e245', 'cold'].includes(k)).map(([k, v]) => [k, !!v])) }))
+console.log(JSON.stringify({ out, bytes: Buffer.byteLength(html), bundleBytes: bundle.length, preview, aiExperiment, weightsHuman, inputs: Object.fromEntries(Object.entries(data).filter(([k]) => ['m2', 'research', 'm1', 'm1v11', 'aiq', 'e245', 'cold', 'm1robust'].includes(k)).map(([k, v]) => [k, !!v])) }))

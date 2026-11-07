@@ -1,0 +1,46 @@
+{
+ "schemaVersion": 1,
+ "generatedAt": "2026-11-07T21:40:55+0800",
+ "config": "v1 features / HGB depth 2 (M1 v1.1 deployable)",
+ "protocol": "LOPO; only held-out programme features perturbed; 5 seeds per condition",
+ "learnableLabels": [
+  "region:shoulders",
+  "region:neck",
+  "region:arms",
+  "region:trunk",
+  "region:legs",
+  "caution:overhead",
+  "caution:balance",
+  "caution:twist",
+  "caution:bending"
+ ],
+ "macroAuc": {
+  "clean": 0.7909413690929379,
+  "gaussian_0.1sd": {
+   "mean": 0.7920586398023712,
+   "min": 0.7882231030440718,
+   "max": 0.7968532711077272
+  },
+  "gaussian_0.25sd": {
+   "mean": 0.7792621823404554,
+   "min": 0.7668131597526099,
+   "max": 0.7871923063419618
+  },
+  "gaussian_0.5sd": {
+   "mean": 0.7548762850073396,
+   "min": 0.7490332782745712,
+   "max": 0.7624674796635437
+  },
+  "missing_20pct": {
+   "mean": 0.7512889512722638,
+   "min": 0.7350458571978288,
+   "max": 0.7680874031348044
+  },
+  "missing_40pct": {
+   "mean": 0.6795866420394205,
+   "min": 0.6649306240497815,
+   "max": 0.6929149495784512
+  }
+ },
+ "seconds": 7.9
+}
