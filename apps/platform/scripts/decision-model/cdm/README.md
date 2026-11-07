@@ -79,6 +79,16 @@ node scripts/decision-model/cdm/lab/build-lab.mjs --out <lab.html> --ai-label-ex
   --e245 $A/m2-ai-experiment/cdm-e2-e4-e5-ai_single_annotator.json --cold $A/m2-ai-experiment/cold-start.json
 ```
 
+## 6. 最小人工检验（仅 6 个冻结测试族，约 180 条/人）
+
+```bash
+node $VN scripts/decision-model/cdm/build-annotation-kit.ts --subset-test    # annotation-kit/fp-cdm-annotation-v1-testfamilies.html
+$PY -I -B scripts/decision-model/cdm/ingest_labels.py --labels-dir <dir> --subset test
+$PY -I -B scripts/decision-model/cdm/evaluate_human_test.py --labels-dir <dir> --out <dir>
+```
+
+最后一步的输出包括：人工之间的一致性、AI 标注者与每位人工的一致性，以及在人工标签上重新计算的 E1（规则 P0 / PR #49 / AI 标签训练的 fp-cdm）。不重新训练，也不调参。
+
 完整结果、版本与结论状态见 `docs/ai-coach-agent/decision-model/MODEL_REPORT.md`。
 
 ## 禁止事项

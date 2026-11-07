@@ -13,7 +13,10 @@ const DIR = resolve(import.meta.dirname)
 const scenarioText = readFileSync(resolve(DIR, 'data/scenarios.v1.json'), 'utf8')
 const file = JSON.parse(scenarioText) as ScenarioFile
 const scenarioSha = createHash('sha256').update(scenarioText).digest('hex')
-const used = new Set(file.scenarios.flatMap(s => s.candidates))
+// --subset-test: kit with only the 6 frozen test families (18 scenarios, ~180 ratings) for the minimum human check.
+const SUBSET_TEST = process.argv.includes('--subset-test')
+const selected = SUBSET_TEST ? file.scenarios.filter(s => s.split === 'test') : file.scenarios
+const used = new Set(selected.flatMap(s => s.candidates))
 const PROGRAM: Record<string, string> = { baduanjin: '八段锦', taijiquan: '太极拳', wuqinxi: '五禽戏', yijinjing: '易筋经' }
 const content = Object.fromEntries(COACH_KNOWLEDGE.filter(e => used.has(e.id)).map(e => [e.id, {
   title: e.title, kind: e.kind, programme: e.programId ? PROGRAM[e.programId] : null, movement: e.movement,
@@ -21,7 +24,7 @@ const content = Object.fromEntries(COACH_KNOWLEDGE.filter(e => used.has(e.id)).m
 }]))
 const data = {
   kitId: 'fp-cdm-annotation/v1', scenarioSetId: file.id, scenarioSha256: scenarioSha,
-  scenarios: file.scenarios.map(s => ({ id: s.id, profile: s.profile, history: s.history, report: s.report, candidates: s.candidates })),
+  scenarios: selected.map(s => ({ id: s.id, profile: s.profile, history: s.history, report: s.report, candidates: s.candidates })),
   content,
 }
 
@@ -114,5 +117,6 @@ function render(){
 start();
 </script></body></html>
 `
-writeFileSync(resolve(DIR, 'annotation-kit/fp-cdm-annotation-v1.html'), html)
-console.log(JSON.stringify({ html: 'annotation-kit/fp-cdm-annotation-v1.html', bytes: Buffer.byteLength(html), scenarioSha256: scenarioSha, candidates: Object.keys(content).length }))
+const outName = SUBSET_TEST ? 'annotation-kit/fp-cdm-annotation-v1-testfamilies.html' : 'annotation-kit/fp-cdm-annotation-v1.html'
+writeFileSync(resolve(DIR, outName), html)
+console.log(JSON.stringify({ html: outName, scenarios: selected.length, judgments: selected.reduce((n, s) => n + s.candidates.length, 0), bytes: Buffer.byteLength(html), scenarioSha256: scenarioSha, candidates: Object.keys(content).length }))

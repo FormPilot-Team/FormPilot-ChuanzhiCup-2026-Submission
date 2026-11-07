@@ -33,11 +33,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--labels-dir', required=True)
     ap.add_argument('--adjudication')
+    ap.add_argument('--subset', choices=['all', 'test'], default='all', help='test = only the 6 frozen test families (minimum human check)')
     args = ap.parse_args()
     with open(os.path.join(HERE, 'data', 'scenarios.v1.json'), 'rb') as f:
         raw = f.read()
     scen_sha = hashlib.sha256(raw).hexdigest()
-    scenarios = json.loads(raw)['scenarios']
+    scenarios = [s for s in json.loads(raw)['scenarios'] if args.subset == 'all' or s['split'] == 'test']
     expected = {(s['id'], c) for s in scenarios for c in s['candidates']}
     files = sorted(glob.glob(os.path.join(args.labels_dir, 'fp-cdm-labels-v1-*.json')))
     annot = {}
@@ -100,7 +101,7 @@ def main():
             grade, source = (A[k]['grade'] + B[k]['grade']) / 2, 'mean_of_two'
         final.append({'scenarioId': k[0], 'candidateId': k[1], 'grade': grade, 'source': source, a_id: A[k]['grade'], b_id: B[k]['grade'],
                       'safetyConcern': bool(A[k]['safetyConcern'] or B[k]['safetyConcern'])})
-    out = {'schemaVersion': 1, 'id': 'fp-cdm-labels/v1', 'scenarioSha256': scen_sha, 'annotatorFiles': {a: {'file': annot[a]['file'], 'sha256': annot[a]['sha256'], 'meta': annot[a]['meta']} for a in (a_id, b_id)},
+    out = {'schemaVersion': 1, 'id': 'fp-cdm-labels/v1', 'subset': args.subset, 'scenarioSha256': scen_sha, 'annotatorFiles': {a: {'file': annot[a]['file'], 'sha256': annot[a]['sha256'], 'meta': annot[a]['meta']} for a in (a_id, b_id)},
            'labelOrigin': 'human graded judgments on synthetic scenarios (two independent annotators); qualification as declared in meta.role',
            'unresolvedAdjudications': unresolved, 'labels': final}
     for name, obj in (('final-labels.v1.json', out), ('agreement.v1.json', agreement), ('adjudication-queue.v1.json', {'items': queue})):
