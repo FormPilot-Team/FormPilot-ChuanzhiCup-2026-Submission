@@ -63,7 +63,7 @@ export function readRecommendationContext(storage: { getItem(key: string): strin
   const training: CoachEvidence[] = [], reportCandidates: CoachEvidence[] = []
   let latestSessionAt = -Infinity
   let latestSessionRef: string | null = null
-  const limitations = ['游戏历史未接入：MotionLab 无持久历史仓储，独立游戏与平台尚无跨应用可信适配。', 'StartLux 未接入：当前没有实际模型输出，规则继续兜底。', '只读取最近各 8 条热身/功法记录；未执行历史进步比较。']
+  const limitations = ['游戏历史未接入：MotionLab 无持久历史仓储，独立游戏与平台尚无跨应用可信适配。', 'StartLux 未接入：当前没有实际模型输出，规则继续兜底。', '读取热身/功法两类本机仓储的完整 JSON，逐条校验后仅投影最近各 8 个会话；未执行历史进步比较。']
   for (const kind of ['warmup', 'routine'] as const) {
     const result = reader.readHistory({ kind, limit: 8 })
     if (!result.ok) { limitations.push(`${kind} 历史读取失败：${result.error.code}；不能断言没有历史。`); continue }
