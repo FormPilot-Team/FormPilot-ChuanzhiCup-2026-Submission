@@ -1,0 +1,6985 @@
+{
+ "schemaVersion": 1,
+ "id": "fp-cdm-scenarios/v1",
+ "seed": 20261107,
+ "generatedBy": "scripts/decision-model/cdm/build-scenarios.ts",
+ "dataOrigin": "synthetic_scenarios_for_human_annotation",
+ "families": 24,
+ "scenarios": [
+  {
+   "id": "F01-A",
+   "familyId": "F01",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "upper_limb",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "yjj-1",
+    "yjj-2",
+    "tjq-1",
+    "tjq-24",
+    "tjq-23",
+    "yjj-6",
+    "archery",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F01-B",
+   "familyId": "F01",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "upper_limb",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 8,
+    "routines": [
+     {
+      "chapterId": "yjj-2",
+      "programId": "yijinjing",
+      "sessions": 5,
+      "completedSessions": 3,
+      "lastDaysAgo": 5,
+      "meanScore": 79,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 3,
+      "completedPlays": 3,
+      "lastDaysAgo": 11
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "yjj-1",
+    "yjj-2",
+    "tjq-1",
+    "tjq-24",
+    "tjq-23",
+    "yjj-6",
+    "archery",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F01-C",
+   "familyId": "F01",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "upper_limb",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 8,
+    "routines": [
+     {
+      "chapterId": "yjj-2",
+      "programId": "yijinjing",
+      "sessions": 5,
+      "completedSessions": 3,
+      "lastDaysAgo": 5,
+      "meanScore": 79,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 3,
+      "completedPlays": 3,
+      "lastDaysAgo": 11
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "yjj-2",
+    "daysAgo": 5,
+    "findings": [
+     {
+      "focus": "reach",
+      "subjectId": "yjj-2",
+      "score": 54,
+      "trend": "same",
+      "label": "易筋经 · 韦驮献杵第二势：动作幅度待关注"
+     },
+     {
+      "focus": "coordination",
+      "subjectId": "yjj-2",
+      "score": 53,
+      "trend": "same",
+      "label": "易筋经 · 韦驮献杵第二势：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "yjj-1",
+    "yjj-2",
+    "tjq-1",
+    "tjq-24",
+    "tjq-23",
+    "yjj-6",
+    "archery",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F02-A",
+   "familyId": "F02",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "soreness"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "tjq-1",
+    "archery",
+    "yjj-2",
+    "tjq-23",
+    "yjj-1",
+    "yjj-6",
+    "tjq-24",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F02-B",
+   "familyId": "F02",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "soreness"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 14,
+    "routines": [
+     {
+      "chapterId": "tjq-24",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 3,
+      "lastDaysAgo": 12,
+      "meanScore": 55,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-1",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 4,
+      "lastDaysAgo": 9,
+      "meanScore": 83,
+      "trend": "flat"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 5,
+      "completedPlays": 5,
+      "lastDaysAgo": 12
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "tjq-1",
+    "archery",
+    "yjj-2",
+    "tjq-23",
+    "yjj-1",
+    "yjj-6",
+    "tjq-24",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F02-C",
+   "familyId": "F02",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "soreness"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 14,
+    "routines": [
+     {
+      "chapterId": "tjq-24",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 3,
+      "lastDaysAgo": 12,
+      "meanScore": 55,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-1",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 4,
+      "lastDaysAgo": 9,
+      "meanScore": 83,
+      "trend": "flat"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 5,
+      "completedPlays": 5,
+      "lastDaysAgo": 12
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-1",
+    "daysAgo": 9,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-1",
+      "score": 70,
+      "trend": "worse",
+      "label": "太极拳 · 起势：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "tjq-1",
+    "archery",
+    "yjj-2",
+    "tjq-23",
+    "yjj-1",
+    "yjj-6",
+    "tjq-24",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F03-A",
+   "familyId": "F03",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "tjq-1",
+    "yjj-2",
+    "yjj-1",
+    "boating",
+    "tjq-24",
+    "yjj-6",
+    "tjq-23",
+    "archery"
+   ],
+   "pooledFrom": {
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F03-B",
+   "familyId": "F03",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 9,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 1,
+      "lastDaysAgo": 8,
+      "meanScore": 66,
+      "trend": "up"
+     },
+     {
+      "chapterId": "tjq-24",
+      "programId": "taijiquan",
+      "sessions": 2,
+      "completedSessions": 0,
+      "lastDaysAgo": 4,
+      "meanScore": 59,
+      "trend": "flat"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "archery",
+      "plays": 4,
+      "completedPlays": 4,
+      "lastDaysAgo": 5
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "tjq-1",
+    "yjj-2",
+    "yjj-1",
+    "boating",
+    "tjq-24",
+    "yjj-6",
+    "tjq-23",
+    "archery"
+   ],
+   "pooledFrom": {
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F03-C",
+   "familyId": "F03",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 9,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 1,
+      "lastDaysAgo": 8,
+      "meanScore": 66,
+      "trend": "up"
+     },
+     {
+      "chapterId": "tjq-24",
+      "programId": "taijiquan",
+      "sessions": 2,
+      "completedSessions": 0,
+      "lastDaysAgo": 4,
+      "meanScore": 59,
+      "trend": "flat"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "archery",
+      "plays": 4,
+      "completedPlays": 4,
+      "lastDaysAgo": 5
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-24",
+    "daysAgo": 4,
+    "findings": [
+     {
+      "focus": "stability",
+      "subjectId": "tjq-24",
+      "score": 69,
+      "trend": "better",
+      "label": "太极拳 · 收势：姿势与支撑稳定待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "tjq-1",
+    "yjj-2",
+    "yjj-1",
+    "boating",
+    "tjq-24",
+    "yjj-6",
+    "tjq-23",
+    "archery"
+   ],
+   "pooledFrom": {
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F04-A",
+   "familyId": "F04",
+   "condition": "A_profile",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "neck",
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "archery",
+    "tjq-24",
+    "tjq-23",
+    "yjj-1",
+    "yjj-6",
+    "boating",
+    "yjj-2",
+    "tjq-1"
+   ],
+   "pooledFrom": {
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F04-B",
+   "familyId": "F04",
+   "condition": "B_history",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "neck",
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 11,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 10,
+      "meanScore": 76,
+      "trend": "down"
+     },
+     {
+      "chapterId": "tjq-1",
+      "programId": "taijiquan",
+      "sessions": 2,
+      "completedSessions": 1,
+      "lastDaysAgo": 17,
+      "meanScore": 88,
+      "trend": "up"
+     },
+     {
+      "chapterId": "yjj-6",
+      "programId": "yijinjing",
+      "sessions": 3,
+      "completedSessions": 1,
+      "lastDaysAgo": 18,
+      "meanScore": 75,
+      "trend": "up"
+     }
+    ],
+    "games": []
+   },
+   "report": null,
+   "candidates": [
+    "archery",
+    "tjq-24",
+    "tjq-23",
+    "yjj-1",
+    "yjj-6",
+    "boating",
+    "yjj-2",
+    "tjq-1"
+   ],
+   "pooledFrom": {
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F04-C",
+   "familyId": "F04",
+   "condition": "C_history_report",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "neck",
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 11,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 10,
+      "meanScore": 76,
+      "trend": "down"
+     },
+     {
+      "chapterId": "tjq-1",
+      "programId": "taijiquan",
+      "sessions": 2,
+      "completedSessions": 1,
+      "lastDaysAgo": 17,
+      "meanScore": 88,
+      "trend": "up"
+     },
+     {
+      "chapterId": "yjj-6",
+      "programId": "yijinjing",
+      "sessions": 3,
+      "completedSessions": 1,
+      "lastDaysAgo": 18,
+      "meanScore": 75,
+      "trend": "up"
+     }
+    ],
+    "games": []
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-23",
+    "daysAgo": 10,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-23",
+      "score": 77,
+      "trend": "worse",
+      "label": "太极拳 · 十字手：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "archery",
+    "tjq-24",
+    "tjq-23",
+    "yjj-1",
+    "yjj-6",
+    "boating",
+    "yjj-2",
+    "tjq-1"
+   ],
+   "pooledFrom": {
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F05-A",
+   "familyId": "F05",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "upper_limb",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "soreness"
+    ],
+    "regions": [
+     "trunk",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "yjj-6",
+    "tjq-23",
+    "tjq-24",
+    "tjq-1",
+    "boating",
+    "yjj-1",
+    "archery",
+    "yjj-2"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F05-B",
+   "familyId": "F05",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "upper_limb",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "soreness"
+    ],
+    "regions": [
+     "trunk",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 10,
+    "routines": [
+     {
+      "chapterId": "yjj-1",
+      "programId": "yijinjing",
+      "sessions": 4,
+      "completedSessions": 2,
+      "lastDaysAgo": 20,
+      "meanScore": 73,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-24",
+      "programId": "taijiquan",
+      "sessions": 1,
+      "completedSessions": 0,
+      "lastDaysAgo": 9,
+      "meanScore": 66,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 5,
+      "completedPlays": 4,
+      "lastDaysAgo": 5
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "yjj-6",
+    "tjq-23",
+    "tjq-24",
+    "tjq-1",
+    "boating",
+    "yjj-1",
+    "archery",
+    "yjj-2"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F05-C",
+   "familyId": "F05",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "upper_limb",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "soreness"
+    ],
+    "regions": [
+     "trunk",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 10,
+    "routines": [
+     {
+      "chapterId": "yjj-1",
+      "programId": "yijinjing",
+      "sessions": 4,
+      "completedSessions": 2,
+      "lastDaysAgo": 20,
+      "meanScore": 73,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-24",
+      "programId": "taijiquan",
+      "sessions": 1,
+      "completedSessions": 0,
+      "lastDaysAgo": 9,
+      "meanScore": 66,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 5,
+      "completedPlays": 4,
+      "lastDaysAgo": 5
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-24",
+    "daysAgo": 9,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-24",
+      "score": 46,
+      "trend": "same",
+      "label": "太极拳 · 收势：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "yjj-6",
+    "tjq-23",
+    "tjq-24",
+    "tjq-1",
+    "boating",
+    "yjj-1",
+    "archery",
+    "yjj-2"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F06-A",
+   "familyId": "F06",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "trunk"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "yjj-6",
+    "tjq-23",
+    "yjj-2",
+    "boating",
+    "archery",
+    "tjq-24",
+    "yjj-1",
+    "tjq-1"
+   ],
+   "pooledFrom": {
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F06-B",
+   "familyId": "F06",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "trunk"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 8,
+    "routines": [
+     {
+      "chapterId": "yjj-1",
+      "programId": "yijinjing",
+      "sessions": 5,
+      "completedSessions": 4,
+      "lastDaysAgo": 19,
+      "meanScore": 89,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "yjj-2",
+      "programId": "yijinjing",
+      "sessions": 1,
+      "completedSessions": 1,
+      "lastDaysAgo": 4,
+      "meanScore": 68,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 2,
+      "completedPlays": 1,
+      "lastDaysAgo": 9
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "yjj-6",
+    "tjq-23",
+    "yjj-2",
+    "boating",
+    "archery",
+    "tjq-24",
+    "yjj-1",
+    "tjq-1"
+   ],
+   "pooledFrom": {
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F06-C",
+   "familyId": "F06",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "trunk"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 8,
+    "routines": [
+     {
+      "chapterId": "yjj-1",
+      "programId": "yijinjing",
+      "sessions": 5,
+      "completedSessions": 4,
+      "lastDaysAgo": 19,
+      "meanScore": 89,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "yjj-2",
+      "programId": "yijinjing",
+      "sessions": 1,
+      "completedSessions": 1,
+      "lastDaysAgo": 4,
+      "meanScore": 68,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 2,
+      "completedPlays": 1,
+      "lastDaysAgo": 9
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "yjj-2",
+    "daysAgo": 4,
+    "findings": [
+     {
+      "focus": "stability",
+      "subjectId": "yjj-2",
+      "score": 74,
+      "trend": "worse",
+      "label": "易筋经 · 韦驮献杵第二势：姿势与支撑稳定待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "yjj-6",
+    "tjq-23",
+    "yjj-2",
+    "boating",
+    "archery",
+    "tjq-24",
+    "yjj-1",
+    "tjq-1"
+   ],
+   "pooledFrom": {
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F07-A",
+   "familyId": "F07",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "reach_difficulty",
+     "soreness"
+    ],
+    "regions": [
+     "arms",
+     "trunk",
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "tjq-24",
+    "tjq-1",
+    "tjq-23",
+    "archery",
+    "yjj-6",
+    "yjj-1",
+    "boating",
+    "yjj-2"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F07-B",
+   "familyId": "F07",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "reach_difficulty",
+     "soreness"
+    ],
+    "regions": [
+     "arms",
+     "trunk",
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 4,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 1,
+      "completedSessions": 0,
+      "lastDaysAgo": 4,
+      "meanScore": 80,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 3,
+      "completedPlays": 2,
+      "lastDaysAgo": 6
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "tjq-24",
+    "tjq-1",
+    "tjq-23",
+    "archery",
+    "yjj-6",
+    "yjj-1",
+    "boating",
+    "yjj-2"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F07-C",
+   "familyId": "F07",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "reach_difficulty",
+     "soreness"
+    ],
+    "regions": [
+     "arms",
+     "trunk",
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 4,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 1,
+      "completedSessions": 0,
+      "lastDaysAgo": 4,
+      "meanScore": 80,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 3,
+      "completedPlays": 2,
+      "lastDaysAgo": 6
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-23",
+    "daysAgo": 4,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-23",
+      "score": 73,
+      "trend": "better",
+      "label": "太极拳 · 十字手：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "tjq-24",
+    "tjq-1",
+    "tjq-23",
+    "archery",
+    "yjj-6",
+    "yjj-1",
+    "boating",
+    "yjj-2"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F08-A",
+   "familyId": "F08",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily"
+    ],
+    "difficulties": [
+     "reach_difficulty"
+    ],
+    "regions": [
+     "shoulders",
+     "neck",
+     "arms",
+     "trunk",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "yjj-2",
+    "tjq-23",
+    "yjj-1",
+    "tjq-24",
+    "tjq-1",
+    "boating",
+    "yjj-6",
+    "archery"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F08-B",
+   "familyId": "F08",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily"
+    ],
+    "difficulties": [
+     "reach_difficulty"
+    ],
+    "regions": [
+     "shoulders",
+     "neck",
+     "arms",
+     "trunk",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 15,
+    "routines": [
+     {
+      "chapterId": "tjq-1",
+      "programId": "taijiquan",
+      "sessions": 4,
+      "completedSessions": 4,
+      "lastDaysAgo": 14,
+      "meanScore": 86,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "yjj-2",
+      "programId": "yijinjing",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 4,
+      "meanScore": 57,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "yjj-6",
+      "programId": "yijinjing",
+      "sessions": 5,
+      "completedSessions": 3,
+      "lastDaysAgo": 13,
+      "meanScore": 78,
+      "trend": "down"
+     }
+    ],
+    "games": []
+   },
+   "report": null,
+   "candidates": [
+    "yjj-2",
+    "tjq-23",
+    "yjj-1",
+    "tjq-24",
+    "tjq-1",
+    "boating",
+    "yjj-6",
+    "archery"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F08-C",
+   "familyId": "F08",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily"
+    ],
+    "difficulties": [
+     "reach_difficulty"
+    ],
+    "regions": [
+     "shoulders",
+     "neck",
+     "arms",
+     "trunk",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 15,
+    "routines": [
+     {
+      "chapterId": "tjq-1",
+      "programId": "taijiquan",
+      "sessions": 4,
+      "completedSessions": 4,
+      "lastDaysAgo": 14,
+      "meanScore": 86,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "yjj-2",
+      "programId": "yijinjing",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 4,
+      "meanScore": 57,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "yjj-6",
+      "programId": "yijinjing",
+      "sessions": 5,
+      "completedSessions": 3,
+      "lastDaysAgo": 13,
+      "meanScore": 78,
+      "trend": "down"
+     }
+    ],
+    "games": []
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "yjj-2",
+    "daysAgo": 4,
+    "findings": [
+     {
+      "focus": "reach",
+      "subjectId": "yjj-2",
+      "score": 50,
+      "trend": "better",
+      "label": "易筋经 · 韦驮献杵第二势：动作幅度待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "yjj-2",
+    "tjq-23",
+    "yjj-1",
+    "tjq-24",
+    "tjq-1",
+    "boating",
+    "yjj-6",
+    "archery"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F09-A",
+   "familyId": "F09",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness",
+     "sedentary"
+    ],
+    "regions": [
+     "neck",
+     "arms",
+     "legs"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "archery",
+    "tjq-24",
+    "yjj-1",
+    "yjj-6",
+    "tjq-1",
+    "tjq-23",
+    "yjj-2",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F09-B",
+   "familyId": "F09",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness",
+     "sedentary"
+    ],
+    "regions": [
+     "neck",
+     "arms",
+     "legs"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 6,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 2,
+      "lastDaysAgo": 11,
+      "meanScore": 77,
+      "trend": "up"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "archery",
+      "plays": 3,
+      "completedPlays": 2,
+      "lastDaysAgo": 9
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "archery",
+    "tjq-24",
+    "yjj-1",
+    "yjj-6",
+    "tjq-1",
+    "tjq-23",
+    "yjj-2",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F09-C",
+   "familyId": "F09",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness",
+     "sedentary"
+    ],
+    "regions": [
+     "neck",
+     "arms",
+     "legs"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 6,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 2,
+      "lastDaysAgo": 11,
+      "meanScore": 77,
+      "trend": "up"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "archery",
+      "plays": 3,
+      "completedPlays": 2,
+      "lastDaysAgo": 9
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-23",
+    "daysAgo": 11,
+    "findings": [
+     {
+      "focus": "stability",
+      "subjectId": "tjq-23",
+      "score": 47,
+      "trend": "same",
+      "label": "太极拳 · 十字手：姿势与支撑稳定待关注"
+     },
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-23",
+      "score": 56,
+      "trend": "worse",
+      "label": "太极拳 · 十字手：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "archery",
+    "tjq-24",
+    "yjj-1",
+    "yjj-6",
+    "tjq-1",
+    "tjq-23",
+    "yjj-2",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F10-A",
+   "familyId": "F10",
+   "condition": "A_profile",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "sedentary"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "bdj-8",
+    "wqx-6",
+    "bdj-6",
+    "tjq-16",
+    "bdj-2",
+    "archery",
+    "tjq-8",
+    "wqx-10",
+    "apple",
+    "bdj-7",
+    "tjq-6",
+    "racing"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-6": [
+     "rules_p0"
+    ],
+    "bdj-7": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "bdj-8": [
+     "pr49_ranker"
+    ],
+    "wqx-6": [
+     "pr49_ranker"
+    ],
+    "tjq-8": [
+     "rules_p0"
+    ],
+    "tjq-6": [
+     "pr49_ranker"
+    ],
+    "tjq-16": [
+     "pr49_ranker"
+    ],
+    "wqx-10": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F10-B",
+   "familyId": "F10",
+   "condition": "B_history",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "sedentary"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 4,
+    "routines": [
+     {
+      "chapterId": "tjq-8",
+      "programId": "taijiquan",
+      "sessions": 4,
+      "completedSessions": 3,
+      "lastDaysAgo": 19,
+      "meanScore": 72,
+      "trend": "up"
+     }
+    ],
+    "games": []
+   },
+   "report": null,
+   "candidates": [
+    "bdj-8",
+    "wqx-6",
+    "bdj-6",
+    "tjq-16",
+    "bdj-2",
+    "archery",
+    "tjq-8",
+    "wqx-10",
+    "apple",
+    "bdj-7",
+    "tjq-6",
+    "racing"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-6": [
+     "rules_p0"
+    ],
+    "bdj-7": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "bdj-8": [
+     "pr49_ranker"
+    ],
+    "wqx-6": [
+     "pr49_ranker"
+    ],
+    "tjq-8": [
+     "rules_p0"
+    ],
+    "tjq-6": [
+     "pr49_ranker"
+    ],
+    "tjq-16": [
+     "pr49_ranker"
+    ],
+    "wqx-10": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F10-C",
+   "familyId": "F10",
+   "condition": "C_history_report",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "sedentary"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 4,
+    "routines": [
+     {
+      "chapterId": "tjq-8",
+      "programId": "taijiquan",
+      "sessions": 4,
+      "completedSessions": 3,
+      "lastDaysAgo": 19,
+      "meanScore": 72,
+      "trend": "up"
+     }
+    ],
+    "games": []
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-8",
+    "daysAgo": 19,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-8",
+      "score": 65,
+      "trend": "worse",
+      "label": "太极拳 · 右揽雀尾：左右/手脚配合待关注"
+     },
+     {
+      "focus": "reach",
+      "subjectId": "tjq-8",
+      "score": 65,
+      "trend": "same",
+      "label": "太极拳 · 右揽雀尾：动作幅度待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "bdj-8",
+    "wqx-6",
+    "bdj-6",
+    "tjq-16",
+    "bdj-2",
+    "archery",
+    "tjq-8",
+    "wqx-10",
+    "apple",
+    "bdj-7",
+    "tjq-6",
+    "racing"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-6": [
+     "rules_p0"
+    ],
+    "bdj-7": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "bdj-8": [
+     "pr49_ranker"
+    ],
+    "wqx-6": [
+     "pr49_ranker"
+    ],
+    "tjq-8": [
+     "rules_p0"
+    ],
+    "tjq-6": [
+     "pr49_ranker"
+    ],
+    "tjq-16": [
+     "pr49_ranker"
+    ],
+    "wqx-10": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F11-A",
+   "familyId": "F11",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "wqx-3",
+    "archery",
+    "apple",
+    "bdj-6",
+    "bdj-2",
+    "bdj-8",
+    "bdj-7",
+    "tjq-19",
+    "tjq-13",
+    "tjq-12",
+    "racing",
+    "tjq-16"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0"
+    ],
+    "bdj-6": [
+     "rules_p0"
+    ],
+    "bdj-7": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "bdj-8": [
+     "pr49_ranker"
+    ],
+    "tjq-13": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-16": [
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "wqx-3": [
+     "random_fill"
+    ],
+    "tjq-12": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F11-B",
+   "familyId": "F11",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 14,
+    "routines": [
+     {
+      "chapterId": "tjq-19",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 10,
+      "meanScore": 57,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "yjj-10",
+      "programId": "yijinjing",
+      "sessions": 3,
+      "completedSessions": 2,
+      "lastDaysAgo": 3,
+      "meanScore": 91,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-3",
+      "programId": "taijiquan",
+      "sessions": 5,
+      "completedSessions": 5,
+      "lastDaysAgo": 18,
+      "meanScore": 75,
+      "trend": "flat"
+     }
+    ],
+    "games": []
+   },
+   "report": null,
+   "candidates": [
+    "wqx-3",
+    "archery",
+    "apple",
+    "bdj-6",
+    "bdj-2",
+    "bdj-8",
+    "bdj-7",
+    "tjq-19",
+    "tjq-13",
+    "tjq-12",
+    "racing",
+    "tjq-16"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0"
+    ],
+    "bdj-6": [
+     "rules_p0"
+    ],
+    "bdj-7": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "bdj-8": [
+     "pr49_ranker"
+    ],
+    "tjq-13": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-16": [
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "wqx-3": [
+     "random_fill"
+    ],
+    "tjq-12": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F11-C",
+   "familyId": "F11",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness"
+    ],
+    "regions": [
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 14,
+    "routines": [
+     {
+      "chapterId": "tjq-19",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 10,
+      "meanScore": 57,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "yjj-10",
+      "programId": "yijinjing",
+      "sessions": 3,
+      "completedSessions": 2,
+      "lastDaysAgo": 3,
+      "meanScore": 91,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-3",
+      "programId": "taijiquan",
+      "sessions": 5,
+      "completedSessions": 5,
+      "lastDaysAgo": 18,
+      "meanScore": 75,
+      "trend": "flat"
+     }
+    ],
+    "games": []
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "yjj-10",
+    "daysAgo": 3,
+    "findings": [
+     {
+      "focus": "stability",
+      "subjectId": "yjj-10",
+      "score": 73,
+      "trend": "better",
+      "label": "易筋经 · 卧虎扑食势：姿势与支撑稳定待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "wqx-3",
+    "archery",
+    "apple",
+    "bdj-6",
+    "bdj-2",
+    "bdj-8",
+    "bdj-7",
+    "tjq-19",
+    "tjq-13",
+    "tjq-12",
+    "racing",
+    "tjq-16"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0"
+    ],
+    "bdj-6": [
+     "rules_p0"
+    ],
+    "bdj-7": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "bdj-8": [
+     "pr49_ranker"
+    ],
+    "tjq-13": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-16": [
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "wqx-3": [
+     "random_fill"
+    ],
+    "tjq-12": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F12-A",
+   "familyId": "F12",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "bdj-5",
+    "tjq-23",
+    "yjj-9",
+    "racing",
+    "tjq-13",
+    "bdj-8",
+    "yjj-11",
+    "tjq-19",
+    "tjq-2",
+    "bdj-6",
+    "archery",
+    "apple"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "bdj-5": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-9": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0"
+    ],
+    "bdj-8": [
+     "random_fill"
+    ],
+    "tjq-2": [
+     "random_fill"
+    ],
+    "tjq-13": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F12-B",
+   "familyId": "F12",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 8,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 11,
+      "meanScore": 68,
+      "trend": "up"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "apple",
+      "plays": 2,
+      "completedPlays": 2,
+      "lastDaysAgo": 4
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "bdj-5",
+    "tjq-23",
+    "yjj-9",
+    "racing",
+    "tjq-13",
+    "bdj-8",
+    "yjj-11",
+    "tjq-19",
+    "tjq-2",
+    "bdj-6",
+    "archery",
+    "apple"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "bdj-5": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-9": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0"
+    ],
+    "bdj-8": [
+     "random_fill"
+    ],
+    "tjq-2": [
+     "random_fill"
+    ],
+    "tjq-13": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F12-C",
+   "familyId": "F12",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 8,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 11,
+      "meanScore": 68,
+      "trend": "up"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "apple",
+      "plays": 2,
+      "completedPlays": 2,
+      "lastDaysAgo": 4
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-23",
+    "daysAgo": 11,
+    "findings": [
+     {
+      "focus": "stability",
+      "subjectId": "tjq-23",
+      "score": 54,
+      "trend": "same",
+      "label": "太极拳 · 十字手：姿势与支撑稳定待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "bdj-5",
+    "tjq-23",
+    "yjj-9",
+    "racing",
+    "tjq-13",
+    "bdj-8",
+    "yjj-11",
+    "tjq-19",
+    "tjq-2",
+    "bdj-6",
+    "archery",
+    "apple"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "bdj-5": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-9": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0"
+    ],
+    "bdj-8": [
+     "random_fill"
+    ],
+    "tjq-2": [
+     "random_fill"
+    ],
+    "tjq-13": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F13-A",
+   "familyId": "F13",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "apple",
+    "bdj-2",
+    "archery",
+    "tjq-10",
+    "yjj-1",
+    "wqx-4",
+    "yjj-7",
+    "yjj-6",
+    "bdj-8",
+    "wqx-9",
+    "yjj-10",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-10": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "wqx-4": [
+     "rules_p0"
+    ],
+    "wqx-9": [
+     "rules_p0"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "pr49_ranker"
+    ],
+    "yjj-7": [
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "pr49_ranker"
+    ],
+    "yjj-10": [
+     "pr49_ranker"
+    ],
+    "bdj-8": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "bdj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F13-B",
+   "familyId": "F13",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 8,
+    "routines": [
+     {
+      "chapterId": "yjj-8",
+      "programId": "yijinjing",
+      "sessions": 4,
+      "completedSessions": 2,
+      "lastDaysAgo": 18,
+      "meanScore": 67,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 4,
+      "completedPlays": 4,
+      "lastDaysAgo": 5
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "apple",
+    "bdj-2",
+    "archery",
+    "tjq-10",
+    "yjj-1",
+    "wqx-4",
+    "yjj-7",
+    "yjj-6",
+    "bdj-8",
+    "wqx-9",
+    "yjj-10",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-10": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "wqx-4": [
+     "rules_p0"
+    ],
+    "wqx-9": [
+     "rules_p0"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "pr49_ranker"
+    ],
+    "yjj-7": [
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "pr49_ranker"
+    ],
+    "yjj-10": [
+     "pr49_ranker"
+    ],
+    "bdj-8": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "bdj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F13-C",
+   "familyId": "F13",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 8,
+    "routines": [
+     {
+      "chapterId": "yjj-8",
+      "programId": "yijinjing",
+      "sessions": 4,
+      "completedSessions": 2,
+      "lastDaysAgo": 18,
+      "meanScore": 67,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 4,
+      "completedPlays": 4,
+      "lastDaysAgo": 5
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "yjj-8",
+    "daysAgo": 18,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "yjj-8",
+      "score": 74,
+      "trend": "same",
+      "label": "易筋经 · 三盘落地势：左右/手脚配合待关注"
+     },
+     {
+      "focus": "rhythm",
+      "subjectId": "yjj-8",
+      "score": 79,
+      "trend": "better",
+      "label": "易筋经 · 三盘落地势：动作节奏待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "apple",
+    "bdj-2",
+    "archery",
+    "tjq-10",
+    "yjj-1",
+    "wqx-4",
+    "yjj-7",
+    "yjj-6",
+    "bdj-8",
+    "wqx-9",
+    "yjj-10",
+    "boating"
+   ],
+   "pooledFrom": {
+    "tjq-10": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "wqx-4": [
+     "rules_p0"
+    ],
+    "wqx-9": [
+     "rules_p0"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "pr49_ranker"
+    ],
+    "yjj-7": [
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "pr49_ranker"
+    ],
+    "yjj-10": [
+     "pr49_ranker"
+    ],
+    "bdj-8": [
+     "random_fill"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "bdj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F14-A",
+   "familyId": "F14",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "arms",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "bdj-6",
+    "apple",
+    "bdj-7",
+    "bdj-2",
+    "racing",
+    "archery",
+    "tjq-22",
+    "tjq-12",
+    "tjq-6",
+    "tjq-21",
+    "tjq-20",
+    "tjq-13"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-6": [
+     "rules_p0"
+    ],
+    "bdj-7": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "tjq-13": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-6": [
+     "pr49_ranker"
+    ],
+    "tjq-20": [
+     "rules_p0"
+    ],
+    "tjq-22": [
+     "rules_p0"
+    ],
+    "tjq-21": [
+     "random_fill"
+    ],
+    "tjq-12": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F14-B",
+   "familyId": "F14",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "arms",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 14,
+    "routines": [
+     {
+      "chapterId": "tjq-20",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 2,
+      "lastDaysAgo": 20,
+      "meanScore": 85,
+      "trend": "up"
+     },
+     {
+      "chapterId": "bdj-3",
+      "programId": "baduanjin",
+      "sessions": 6,
+      "completedSessions": 4,
+      "lastDaysAgo": 4,
+      "meanScore": 85,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-22",
+      "programId": "taijiquan",
+      "sessions": 5,
+      "completedSessions": 3,
+      "lastDaysAgo": 4,
+      "meanScore": 72,
+      "trend": "flat"
+     }
+    ],
+    "games": []
+   },
+   "report": null,
+   "candidates": [
+    "bdj-6",
+    "apple",
+    "bdj-7",
+    "bdj-2",
+    "racing",
+    "archery",
+    "tjq-22",
+    "tjq-12",
+    "tjq-6",
+    "tjq-21",
+    "tjq-20",
+    "tjq-13"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-6": [
+     "rules_p0"
+    ],
+    "bdj-7": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "tjq-13": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-6": [
+     "pr49_ranker"
+    ],
+    "tjq-20": [
+     "rules_p0"
+    ],
+    "tjq-22": [
+     "rules_p0"
+    ],
+    "tjq-21": [
+     "random_fill"
+    ],
+    "tjq-12": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F14-C",
+   "familyId": "F14",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "arms",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 14,
+    "routines": [
+     {
+      "chapterId": "tjq-20",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 2,
+      "lastDaysAgo": 20,
+      "meanScore": 85,
+      "trend": "up"
+     },
+     {
+      "chapterId": "bdj-3",
+      "programId": "baduanjin",
+      "sessions": 6,
+      "completedSessions": 4,
+      "lastDaysAgo": 4,
+      "meanScore": 85,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-22",
+      "programId": "taijiquan",
+      "sessions": 5,
+      "completedSessions": 3,
+      "lastDaysAgo": 4,
+      "meanScore": 72,
+      "trend": "flat"
+     }
+    ],
+    "games": []
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "bdj-3",
+    "daysAgo": 4,
+    "findings": [
+     {
+      "focus": "reach",
+      "subjectId": "bdj-3",
+      "score": 53,
+      "trend": "worse",
+      "label": "八段锦 · 调理脾胃须单举：动作幅度待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "bdj-6",
+    "apple",
+    "bdj-7",
+    "bdj-2",
+    "racing",
+    "archery",
+    "tjq-22",
+    "tjq-12",
+    "tjq-6",
+    "tjq-21",
+    "tjq-20",
+    "tjq-13"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-6": [
+     "rules_p0"
+    ],
+    "bdj-7": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "tjq-13": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-6": [
+     "pr49_ranker"
+    ],
+    "tjq-20": [
+     "rules_p0"
+    ],
+    "tjq-22": [
+     "rules_p0"
+    ],
+    "tjq-21": [
+     "random_fill"
+    ],
+    "tjq-12": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F15-A",
+   "familyId": "F15",
+   "condition": "A_profile",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "upper_limb"
+    ],
+    "difficulties": [
+     "sedentary"
+    ],
+    "regions": [
+     "neck",
+     "arms"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "wqx-1",
+    "archery",
+    "boating",
+    "tjq-19",
+    "yjj-4",
+    "yjj-1",
+    "wqx-7",
+    "yjj-12",
+    "yjj-7",
+    "tjq-16",
+    "yjj-11",
+    "apple"
+   ],
+   "pooledFrom": {
+    "wqx-7": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-4": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "wqx-1": [
+     "rules_p0"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "boating": [
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "random_fill"
+    ],
+    "yjj-1": [
+     "random_fill"
+    ],
+    "yjj-7": [
+     "random_fill"
+    ],
+    "yjj-12": [
+     "random_fill"
+    ],
+    "tjq-16": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F15-B",
+   "familyId": "F15",
+   "condition": "B_history",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "upper_limb"
+    ],
+    "difficulties": [
+     "sedentary"
+    ],
+    "regions": [
+     "neck",
+     "arms"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 10,
+    "routines": [
+     {
+      "chapterId": "yjj-5",
+      "programId": "yijinjing",
+      "sessions": 6,
+      "completedSessions": 5,
+      "lastDaysAgo": 19,
+      "meanScore": 58,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-5",
+      "programId": "taijiquan",
+      "sessions": 4,
+      "completedSessions": 2,
+      "lastDaysAgo": 5,
+      "meanScore": 62,
+      "trend": "down"
+     }
+    ],
+    "games": []
+   },
+   "report": null,
+   "candidates": [
+    "wqx-1",
+    "archery",
+    "boating",
+    "tjq-19",
+    "yjj-4",
+    "yjj-1",
+    "wqx-7",
+    "yjj-12",
+    "yjj-7",
+    "tjq-16",
+    "yjj-11",
+    "apple"
+   ],
+   "pooledFrom": {
+    "wqx-7": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-4": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "wqx-1": [
+     "rules_p0"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "boating": [
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "random_fill"
+    ],
+    "yjj-1": [
+     "random_fill"
+    ],
+    "yjj-7": [
+     "random_fill"
+    ],
+    "yjj-12": [
+     "random_fill"
+    ],
+    "tjq-16": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F15-C",
+   "familyId": "F15",
+   "condition": "C_history_report",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "upper_limb"
+    ],
+    "difficulties": [
+     "sedentary"
+    ],
+    "regions": [
+     "neck",
+     "arms"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 10,
+    "routines": [
+     {
+      "chapterId": "yjj-5",
+      "programId": "yijinjing",
+      "sessions": 6,
+      "completedSessions": 5,
+      "lastDaysAgo": 19,
+      "meanScore": 58,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-5",
+      "programId": "taijiquan",
+      "sessions": 4,
+      "completedSessions": 2,
+      "lastDaysAgo": 5,
+      "meanScore": 62,
+      "trend": "down"
+     }
+    ],
+    "games": []
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-5",
+    "daysAgo": 5,
+    "findings": [
+     {
+      "focus": "stability",
+      "subjectId": "tjq-5",
+      "score": 75,
+      "trend": "worse",
+      "label": "太极拳 · 手挥琵琶：姿势与支撑稳定待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "wqx-1",
+    "archery",
+    "boating",
+    "tjq-19",
+    "yjj-4",
+    "yjj-1",
+    "wqx-7",
+    "yjj-12",
+    "yjj-7",
+    "tjq-16",
+    "yjj-11",
+    "apple"
+   ],
+   "pooledFrom": {
+    "wqx-7": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-4": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "wqx-1": [
+     "rules_p0"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "boating": [
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "random_fill"
+    ],
+    "yjj-1": [
+     "random_fill"
+    ],
+    "yjj-7": [
+     "random_fill"
+    ],
+    "yjj-12": [
+     "random_fill"
+    ],
+    "tjq-16": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F16-A",
+   "familyId": "F16",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "shoulders",
+     "arms",
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "bdj-2",
+    "wqx-4",
+    "tjq-10",
+    "tjq-1",
+    "yjj-10",
+    "tjq-2",
+    "boating",
+    "wqx-9",
+    "tjq-22",
+    "yjj-1",
+    "racing",
+    "yjj-7"
+   ],
+   "pooledFrom": {
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "wqx-4": [
+     "rules_p0"
+    ],
+    "wqx-9": [
+     "rules_p0"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "pr49_ranker"
+    ],
+    "yjj-7": [
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "pr49_ranker"
+    ],
+    "tjq-22": [
+     "random_fill"
+    ],
+    "yjj-10": [
+     "random_fill"
+    ],
+    "bdj-2": [
+     "random_fill"
+    ],
+    "tjq-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F16-B",
+   "familyId": "F16",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "shoulders",
+     "arms",
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 10,
+    "routines": [
+     {
+      "chapterId": "wqx-8",
+      "programId": "wuqinxi",
+      "sessions": 4,
+      "completedSessions": 3,
+      "lastDaysAgo": 10,
+      "meanScore": 66,
+      "trend": "down"
+     },
+     {
+      "chapterId": "tjq-6",
+      "programId": "taijiquan",
+      "sessions": 1,
+      "completedSessions": 0,
+      "lastDaysAgo": 19,
+      "meanScore": 59,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-21",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 2,
+      "lastDaysAgo": 6,
+      "meanScore": 61,
+      "trend": "flat"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 2,
+      "completedPlays": 1,
+      "lastDaysAgo": 7
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "bdj-2",
+    "wqx-4",
+    "tjq-10",
+    "tjq-1",
+    "yjj-10",
+    "tjq-2",
+    "boating",
+    "wqx-9",
+    "tjq-22",
+    "yjj-1",
+    "racing",
+    "yjj-7"
+   ],
+   "pooledFrom": {
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "wqx-4": [
+     "rules_p0"
+    ],
+    "wqx-9": [
+     "rules_p0"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "pr49_ranker"
+    ],
+    "yjj-7": [
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "pr49_ranker"
+    ],
+    "tjq-22": [
+     "random_fill"
+    ],
+    "yjj-10": [
+     "random_fill"
+    ],
+    "bdj-2": [
+     "random_fill"
+    ],
+    "tjq-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F16-C",
+   "familyId": "F16",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "daily"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "shoulders",
+     "arms",
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 10,
+    "routines": [
+     {
+      "chapterId": "wqx-8",
+      "programId": "wuqinxi",
+      "sessions": 4,
+      "completedSessions": 3,
+      "lastDaysAgo": 10,
+      "meanScore": 66,
+      "trend": "down"
+     },
+     {
+      "chapterId": "tjq-6",
+      "programId": "taijiquan",
+      "sessions": 1,
+      "completedSessions": 0,
+      "lastDaysAgo": 19,
+      "meanScore": 59,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-21",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 2,
+      "lastDaysAgo": 6,
+      "meanScore": 61,
+      "trend": "flat"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 2,
+      "completedPlays": 1,
+      "lastDaysAgo": 7
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-21",
+    "daysAgo": 6,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-21",
+      "score": 58,
+      "trend": "same",
+      "label": "太极拳 · 转身搬拦捶：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "bdj-2",
+    "wqx-4",
+    "tjq-10",
+    "tjq-1",
+    "yjj-10",
+    "tjq-2",
+    "boating",
+    "wqx-9",
+    "tjq-22",
+    "yjj-1",
+    "racing",
+    "yjj-7"
+   ],
+   "pooledFrom": {
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "wqx-4": [
+     "rules_p0"
+    ],
+    "wqx-9": [
+     "rules_p0"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "pr49_ranker"
+    ],
+    "yjj-7": [
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "pr49_ranker"
+    ],
+    "tjq-22": [
+     "random_fill"
+    ],
+    "yjj-10": [
+     "random_fill"
+    ],
+    "bdj-2": [
+     "random_fill"
+    ],
+    "tjq-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F17-A",
+   "familyId": "F17",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "arms",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "tjq-1",
+    "apple",
+    "archery",
+    "wqx-10",
+    "tjq-3",
+    "bdj-7",
+    "bdj-2",
+    "boating",
+    "yjj-2",
+    "yjj-3",
+    "tjq-19",
+    "yjj-9"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-7": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "tjq-19": [
+     "random_fill"
+    ],
+    "yjj-3": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "yjj-9": [
+     "random_fill"
+    ],
+    "wqx-10": [
+     "random_fill"
+    ],
+    "tjq-3": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F17-B",
+   "familyId": "F17",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "arms",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 13,
+    "routines": [
+     {
+      "chapterId": "tjq-15",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 18,
+      "meanScore": 76,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "bdj-7",
+      "programId": "baduanjin",
+      "sessions": 4,
+      "completedSessions": 3,
+      "lastDaysAgo": 20,
+      "meanScore": 61,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 3,
+      "completedPlays": 3,
+      "lastDaysAgo": 1
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "tjq-1",
+    "apple",
+    "archery",
+    "wqx-10",
+    "tjq-3",
+    "bdj-7",
+    "bdj-2",
+    "boating",
+    "yjj-2",
+    "yjj-3",
+    "tjq-19",
+    "yjj-9"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-7": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "tjq-19": [
+     "random_fill"
+    ],
+    "yjj-3": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "yjj-9": [
+     "random_fill"
+    ],
+    "wqx-10": [
+     "random_fill"
+    ],
+    "tjq-3": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F17-C",
+   "familyId": "F17",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "arms",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 13,
+    "routines": [
+     {
+      "chapterId": "tjq-15",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 18,
+      "meanScore": 76,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "bdj-7",
+      "programId": "baduanjin",
+      "sessions": 4,
+      "completedSessions": 3,
+      "lastDaysAgo": 20,
+      "meanScore": 61,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 3,
+      "completedPlays": 3,
+      "lastDaysAgo": 1
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-15",
+    "daysAgo": 18,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-15",
+      "score": 48,
+      "trend": "worse",
+      "label": "太极拳 · 转身左蹬脚：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "tjq-1",
+    "apple",
+    "archery",
+    "wqx-10",
+    "tjq-3",
+    "bdj-7",
+    "bdj-2",
+    "boating",
+    "yjj-2",
+    "yjj-3",
+    "tjq-19",
+    "yjj-9"
+   ],
+   "pooledFrom": {
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-7": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "tjq-19": [
+     "random_fill"
+    ],
+    "yjj-3": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ],
+    "yjj-9": [
+     "random_fill"
+    ],
+    "wqx-10": [
+     "random_fill"
+    ],
+    "tjq-3": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F18-A",
+   "familyId": "F18",
+   "condition": "A_profile",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "arms",
+     "trunk",
+     "legs"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "tjq-20",
+    "archery",
+    "bdj-4",
+    "racing",
+    "wqx-2",
+    "wqx-4",
+    "apple",
+    "tjq-10",
+    "tjq-19",
+    "tjq-8",
+    "bdj-2",
+    "bdj-6"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "wqx-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "bdj-2": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "wqx-4": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-4": [
+     "random_fill"
+    ],
+    "tjq-8": [
+     "random_fill"
+    ],
+    "tjq-20": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F18-B",
+   "familyId": "F18",
+   "condition": "B_history",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "arms",
+     "trunk",
+     "legs"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 3,
+    "routines": [
+     {
+      "chapterId": "wqx-4",
+      "programId": "wuqinxi",
+      "sessions": 2,
+      "completedSessions": 2,
+      "lastDaysAgo": 1,
+      "meanScore": 74,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "racing",
+      "plays": 1,
+      "completedPlays": 0,
+      "lastDaysAgo": 3
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "tjq-20",
+    "archery",
+    "bdj-4",
+    "racing",
+    "wqx-2",
+    "wqx-4",
+    "apple",
+    "tjq-10",
+    "tjq-19",
+    "tjq-8",
+    "bdj-2",
+    "bdj-6"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "wqx-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "bdj-2": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "wqx-4": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-4": [
+     "random_fill"
+    ],
+    "tjq-8": [
+     "random_fill"
+    ],
+    "tjq-20": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F18-C",
+   "familyId": "F18",
+   "condition": "C_history_report",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "arms",
+     "trunk",
+     "legs"
+    ],
+    "preference": "routine",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 3,
+    "routines": [
+     {
+      "chapterId": "wqx-4",
+      "programId": "wuqinxi",
+      "sessions": 2,
+      "completedSessions": 2,
+      "lastDaysAgo": 1,
+      "meanScore": 74,
+      "trend": "down"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "racing",
+      "plays": 1,
+      "completedPlays": 0,
+      "lastDaysAgo": 3
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "wqx-4",
+    "daysAgo": 1,
+    "findings": [
+     {
+      "focus": "reach",
+      "subjectId": "wqx-4",
+      "score": 46,
+      "trend": "better",
+      "label": "五禽戏 · 鹿奔：动作幅度待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "tjq-20",
+    "archery",
+    "bdj-4",
+    "racing",
+    "wqx-2",
+    "wqx-4",
+    "apple",
+    "tjq-10",
+    "tjq-19",
+    "tjq-8",
+    "bdj-2",
+    "bdj-6"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "wqx-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "bdj-2": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "wqx-4": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "bdj-4": [
+     "random_fill"
+    ],
+    "tjq-8": [
+     "random_fill"
+    ],
+    "tjq-20": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F19-A",
+   "familyId": "F19",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "neck",
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "yjj-1",
+    "yjj-2",
+    "archery",
+    "yjj-6",
+    "tjq-23",
+    "boating",
+    "tjq-1",
+    "tjq-24"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F19-B",
+   "familyId": "F19",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "neck",
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 5,
+    "routines": [
+     {
+      "chapterId": "tjq-1",
+      "programId": "taijiquan",
+      "sessions": 4,
+      "completedSessions": 2,
+      "lastDaysAgo": 8,
+      "meanScore": 86,
+      "trend": "flat"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 1,
+      "completedPlays": 0,
+      "lastDaysAgo": 13
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "yjj-1",
+    "yjj-2",
+    "archery",
+    "yjj-6",
+    "tjq-23",
+    "boating",
+    "tjq-1",
+    "tjq-24"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F19-C",
+   "familyId": "F19",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness",
+     "soreness"
+    ],
+    "regions": [
+     "neck",
+     "legs"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 5,
+    "routines": [
+     {
+      "chapterId": "tjq-1",
+      "programId": "taijiquan",
+      "sessions": 4,
+      "completedSessions": 2,
+      "lastDaysAgo": 8,
+      "meanScore": 86,
+      "trend": "flat"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "boating",
+      "plays": 1,
+      "completedPlays": 0,
+      "lastDaysAgo": 13
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-1",
+    "daysAgo": 8,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-1",
+      "score": 71,
+      "trend": "better",
+      "label": "太极拳 · 起势：左右/手脚配合待关注"
+     },
+     {
+      "focus": "reach",
+      "subjectId": "tjq-1",
+      "score": 52,
+      "trend": "same",
+      "label": "太极拳 · 起势：动作幅度待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "yjj-1",
+    "yjj-2",
+    "archery",
+    "yjj-6",
+    "tjq-23",
+    "boating",
+    "tjq-1",
+    "tjq-24"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "yjj-6": [
+     "random_fill"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F20-A",
+   "familyId": "F20",
+   "condition": "A_profile",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "reach_difficulty",
+     "sedentary"
+    ],
+    "regions": [
+     "neck"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "tjq-24",
+    "yjj-2",
+    "boating",
+    "yjj-1",
+    "tjq-1",
+    "archery",
+    "tjq-23",
+    "yjj-6"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "yjj-6": [
+     "rules_p0"
+    ],
+    "tjq-24": [
+     "pr49_ranker"
+    ]
+   }
+  },
+  {
+   "id": "F20-B",
+   "familyId": "F20",
+   "condition": "B_history",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "reach_difficulty",
+     "sedentary"
+    ],
+    "regions": [
+     "neck"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 10,
+    "routines": [
+     {
+      "chapterId": "yjj-2",
+      "programId": "yijinjing",
+      "sessions": 2,
+      "completedSessions": 0,
+      "lastDaysAgo": 12,
+      "meanScore": 63,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-24",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 3,
+      "lastDaysAgo": 5,
+      "meanScore": 82,
+      "trend": "down"
+     },
+     {
+      "chapterId": "yjj-6",
+      "programId": "yijinjing",
+      "sessions": 1,
+      "completedSessions": 1,
+      "lastDaysAgo": 11,
+      "meanScore": 63,
+      "trend": "flat"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "archery",
+      "plays": 4,
+      "completedPlays": 3,
+      "lastDaysAgo": 1
+     }
+    ]
+   },
+   "report": null,
+   "candidates": [
+    "tjq-24",
+    "yjj-2",
+    "boating",
+    "yjj-1",
+    "tjq-1",
+    "archery",
+    "tjq-23",
+    "yjj-6"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "yjj-6": [
+     "rules_p0"
+    ],
+    "tjq-24": [
+     "pr49_ranker"
+    ]
+   }
+  },
+  {
+   "id": "F20-C",
+   "familyId": "F20",
+   "condition": "C_history_report",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "reach_difficulty",
+     "sedentary"
+    ],
+    "regions": [
+     "neck"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 10,
+    "routines": [
+     {
+      "chapterId": "yjj-2",
+      "programId": "yijinjing",
+      "sessions": 2,
+      "completedSessions": 0,
+      "lastDaysAgo": 12,
+      "meanScore": 63,
+      "trend": "flat"
+     },
+     {
+      "chapterId": "tjq-24",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 3,
+      "lastDaysAgo": 5,
+      "meanScore": 82,
+      "trend": "down"
+     },
+     {
+      "chapterId": "yjj-6",
+      "programId": "yijinjing",
+      "sessions": 1,
+      "completedSessions": 1,
+      "lastDaysAgo": 11,
+      "meanScore": 63,
+      "trend": "flat"
+     }
+    ],
+    "games": [
+     {
+      "gameId": "archery",
+      "plays": 4,
+      "completedPlays": 3,
+      "lastDaysAgo": 1
+     }
+    ]
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-24",
+    "daysAgo": 5,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-24",
+      "score": 60,
+      "trend": "worse",
+      "label": "太极拳 · 收势：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "tjq-24",
+    "yjj-2",
+    "boating",
+    "yjj-1",
+    "tjq-1",
+    "archery",
+    "tjq-23",
+    "yjj-6"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-2": [
+     "pr49_ranker",
+     "rules_p0"
+    ],
+    "yjj-6": [
+     "rules_p0"
+    ],
+    "tjq-24": [
+     "pr49_ranker"
+    ]
+   }
+  },
+  {
+   "id": "F21-A",
+   "familyId": "F21",
+   "condition": "A_profile",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "neck",
+     "trunk",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "yjj-2",
+    "boating",
+    "tjq-24",
+    "yjj-1",
+    "yjj-6",
+    "tjq-23",
+    "archery",
+    "tjq-1"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F21-B",
+   "familyId": "F21",
+   "condition": "B_history",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "neck",
+     "trunk",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 10,
+    "routines": [
+     {
+      "chapterId": "tjq-1",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 6,
+      "meanScore": 71,
+      "trend": "down"
+     },
+     {
+      "chapterId": "yjj-6",
+      "programId": "yijinjing",
+      "sessions": 4,
+      "completedSessions": 4,
+      "lastDaysAgo": 10,
+      "meanScore": 87,
+      "trend": "down"
+     }
+    ],
+    "games": []
+   },
+   "report": null,
+   "candidates": [
+    "yjj-2",
+    "boating",
+    "tjq-24",
+    "yjj-1",
+    "yjj-6",
+    "tjq-23",
+    "archery",
+    "tjq-1"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F21-C",
+   "familyId": "F21",
+   "condition": "C_history_report",
+   "split": "test",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily",
+     "rehab_support"
+    ],
+    "difficulties": [
+     "stiffness",
+     "sedentary"
+    ],
+    "regions": [
+     "shoulders",
+     "neck",
+     "trunk",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 10,
+    "routines": [
+     {
+      "chapterId": "tjq-1",
+      "programId": "taijiquan",
+      "sessions": 6,
+      "completedSessions": 6,
+      "lastDaysAgo": 6,
+      "meanScore": 71,
+      "trend": "down"
+     },
+     {
+      "chapterId": "yjj-6",
+      "programId": "yijinjing",
+      "sessions": 4,
+      "completedSessions": 4,
+      "lastDaysAgo": 10,
+      "meanScore": 87,
+      "trend": "down"
+     }
+    ],
+    "games": []
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-1",
+    "daysAgo": 6,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-1",
+      "score": 74,
+      "trend": "worse",
+      "label": "太极拳 · 起势：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "yjj-2",
+    "boating",
+    "tjq-24",
+    "yjj-1",
+    "yjj-6",
+    "tjq-23",
+    "archery",
+    "tjq-1"
+   ],
+   "pooledFrom": {
+    "tjq-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-23": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-1": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "archery": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "boating": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "yjj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-24": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F22-A",
+   "familyId": "F22",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "racing",
+    "yjj-11",
+    "bdj-6",
+    "tjq-13",
+    "yjj-9",
+    "wqx-2",
+    "tjq-10",
+    "tjq-19",
+    "archery",
+    "wqx-5",
+    "tjq-20",
+    "apple"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "yjj-9": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "wqx-2": [
+     "rules_p0"
+    ],
+    "wqx-5": [
+     "rules_p0"
+    ],
+    "tjq-20": [
+     "random_fill"
+    ],
+    "tjq-13": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F22-B",
+   "familyId": "F22",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 9,
+    "routines": [
+     {
+      "chapterId": "wqx-2",
+      "programId": "wuqinxi",
+      "sessions": 5,
+      "completedSessions": 3,
+      "lastDaysAgo": 12,
+      "meanScore": 60,
+      "trend": "down"
+     },
+     {
+      "chapterId": "tjq-14",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 2,
+      "lastDaysAgo": 2,
+      "meanScore": 72,
+      "trend": "down"
+     },
+     {
+      "chapterId": "wqx-5",
+      "programId": "wuqinxi",
+      "sessions": 1,
+      "completedSessions": 1,
+      "lastDaysAgo": 7,
+      "meanScore": 73,
+      "trend": "flat"
+     }
+    ],
+    "games": []
+   },
+   "report": null,
+   "candidates": [
+    "racing",
+    "yjj-11",
+    "bdj-6",
+    "tjq-13",
+    "yjj-9",
+    "wqx-2",
+    "tjq-10",
+    "tjq-19",
+    "archery",
+    "wqx-5",
+    "tjq-20",
+    "apple"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "yjj-9": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "wqx-2": [
+     "rules_p0"
+    ],
+    "wqx-5": [
+     "rules_p0"
+    ],
+    "tjq-20": [
+     "random_fill"
+    ],
+    "tjq-13": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F22-C",
+   "familyId": "F22",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb",
+     "daily"
+    ],
+    "difficulties": [
+     "stiffness"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 9,
+    "routines": [
+     {
+      "chapterId": "wqx-2",
+      "programId": "wuqinxi",
+      "sessions": 5,
+      "completedSessions": 3,
+      "lastDaysAgo": 12,
+      "meanScore": 60,
+      "trend": "down"
+     },
+     {
+      "chapterId": "tjq-14",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 2,
+      "lastDaysAgo": 2,
+      "meanScore": 72,
+      "trend": "down"
+     },
+     {
+      "chapterId": "wqx-5",
+      "programId": "wuqinxi",
+      "sessions": 1,
+      "completedSessions": 1,
+      "lastDaysAgo": 7,
+      "meanScore": 73,
+      "trend": "flat"
+     }
+    ],
+    "games": []
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-14",
+    "daysAgo": 2,
+    "findings": [
+     {
+      "focus": "stability",
+      "subjectId": "tjq-14",
+      "score": 60,
+      "trend": "worse",
+      "label": "太极拳 · 双峰贯耳：姿势与支撑稳定待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "racing",
+    "yjj-11",
+    "bdj-6",
+    "tjq-13",
+    "yjj-9",
+    "wqx-2",
+    "tjq-10",
+    "tjq-19",
+    "archery",
+    "wqx-5",
+    "tjq-20",
+    "apple"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "yjj-9": [
+     "pr49_ranker"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "wqx-2": [
+     "rules_p0"
+    ],
+    "wqx-5": [
+     "rules_p0"
+    ],
+    "tjq-20": [
+     "random_fill"
+    ],
+    "tjq-13": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F23-A",
+   "familyId": "F23",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "neck",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "bdj-2",
+    "tjq-3",
+    "apple",
+    "racing",
+    "bdj-5",
+    "yjj-8",
+    "tjq-13",
+    "yjj-2",
+    "wqx-7",
+    "archery",
+    "wqx-6",
+    "yjj-11"
+   ],
+   "pooledFrom": {
+    "bdj-5": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "wqx-7": [
+     "rules_p0"
+    ],
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-13": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "random_fill"
+    ],
+    "wqx-6": [
+     "random_fill"
+    ],
+    "tjq-3": [
+     "random_fill"
+    ],
+    "yjj-8": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F23-B",
+   "familyId": "F23",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "neck",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 1,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 1,
+      "completedSessions": 0,
+      "lastDaysAgo": 3,
+      "meanScore": 75,
+      "trend": "flat"
+     }
+    ],
+    "games": []
+   },
+   "report": null,
+   "candidates": [
+    "bdj-2",
+    "tjq-3",
+    "apple",
+    "racing",
+    "bdj-5",
+    "yjj-8",
+    "tjq-13",
+    "yjj-2",
+    "wqx-7",
+    "archery",
+    "wqx-6",
+    "yjj-11"
+   ],
+   "pooledFrom": {
+    "bdj-5": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "wqx-7": [
+     "rules_p0"
+    ],
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-13": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "random_fill"
+    ],
+    "wqx-6": [
+     "random_fill"
+    ],
+    "tjq-3": [
+     "random_fill"
+    ],
+    "yjj-8": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F23-C",
+   "familyId": "F23",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "upper_limb"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "neck",
+     "legs"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 1,
+    "routines": [
+     {
+      "chapterId": "tjq-23",
+      "programId": "taijiquan",
+      "sessions": 1,
+      "completedSessions": 0,
+      "lastDaysAgo": 3,
+      "meanScore": 75,
+      "trend": "flat"
+     }
+    ],
+    "games": []
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-23",
+    "daysAgo": 3,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-23",
+      "score": 53,
+      "trend": "worse",
+      "label": "太极拳 · 十字手：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "bdj-2",
+    "tjq-3",
+    "apple",
+    "racing",
+    "bdj-5",
+    "yjj-8",
+    "tjq-13",
+    "yjj-2",
+    "wqx-7",
+    "archery",
+    "wqx-6",
+    "yjj-11"
+   ],
+   "pooledFrom": {
+    "bdj-5": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "wqx-7": [
+     "rules_p0"
+    ],
+    "bdj-2": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "tjq-13": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "random_fill"
+    ],
+    "wqx-6": [
+     "random_fill"
+    ],
+    "tjq-3": [
+     "random_fill"
+    ],
+    "yjj-8": [
+     "random_fill"
+    ],
+    "yjj-2": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F24-A",
+   "familyId": "F24",
+   "condition": "A_profile",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": null,
+   "report": null,
+   "candidates": [
+    "yjj-5",
+    "archery",
+    "yjj-9",
+    "racing",
+    "bdj-6",
+    "tjq-5",
+    "wqx-3",
+    "yjj-11",
+    "tjq-10",
+    "tjq-12",
+    "tjq-19",
+    "apple"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "yjj-9": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "tjq-5": [
+     "random_fill"
+    ],
+    "tjq-12": [
+     "random_fill"
+    ],
+    "wqx-3": [
+     "random_fill"
+    ],
+    "yjj-5": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F24-B",
+   "familyId": "F24",
+   "condition": "B_history",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 11,
+    "routines": [
+     {
+      "chapterId": "tjq-15",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 3,
+      "lastDaysAgo": 2,
+      "meanScore": 68,
+      "trend": "down"
+     },
+     {
+      "chapterId": "bdj-8",
+      "programId": "baduanjin",
+      "sessions": 4,
+      "completedSessions": 3,
+      "lastDaysAgo": 12,
+      "meanScore": 80,
+      "trend": "up"
+     },
+     {
+      "chapterId": "yjj-1",
+      "programId": "yijinjing",
+      "sessions": 4,
+      "completedSessions": 3,
+      "lastDaysAgo": 20,
+      "meanScore": 90,
+      "trend": "up"
+     }
+    ],
+    "games": []
+   },
+   "report": null,
+   "candidates": [
+    "yjj-5",
+    "archery",
+    "yjj-9",
+    "racing",
+    "bdj-6",
+    "tjq-5",
+    "wqx-3",
+    "yjj-11",
+    "tjq-10",
+    "tjq-12",
+    "tjq-19",
+    "apple"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "yjj-9": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "tjq-5": [
+     "random_fill"
+    ],
+    "tjq-12": [
+     "random_fill"
+    ],
+    "wqx-3": [
+     "random_fill"
+    ],
+    "yjj-5": [
+     "random_fill"
+    ]
+   }
+  },
+  {
+   "id": "F24-C",
+   "familyId": "F24",
+   "condition": "C_history_report",
+   "split": "dev",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "mobility",
+     "daily"
+    ],
+    "difficulties": [
+     "none"
+    ],
+    "regions": [
+     "trunk"
+    ],
+    "preference": "game",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "history": {
+    "dataOrigin": "synthetic_scenario",
+    "sessionsLast28d": 11,
+    "routines": [
+     {
+      "chapterId": "tjq-15",
+      "programId": "taijiquan",
+      "sessions": 3,
+      "completedSessions": 3,
+      "lastDaysAgo": 2,
+      "meanScore": 68,
+      "trend": "down"
+     },
+     {
+      "chapterId": "bdj-8",
+      "programId": "baduanjin",
+      "sessions": 4,
+      "completedSessions": 3,
+      "lastDaysAgo": 12,
+      "meanScore": 80,
+      "trend": "up"
+     },
+     {
+      "chapterId": "yjj-1",
+      "programId": "yijinjing",
+      "sessions": 4,
+      "completedSessions": 3,
+      "lastDaysAgo": 20,
+      "meanScore": 90,
+      "trend": "up"
+     }
+    ],
+    "games": []
+   },
+   "report": {
+    "dataOrigin": "synthetic_scenario",
+    "subjectId": "tjq-15",
+    "daysAgo": 2,
+    "findings": [
+     {
+      "focus": "coordination",
+      "subjectId": "tjq-15",
+      "score": 79,
+      "trend": "same",
+      "label": "太极拳 · 转身左蹬脚：左右/手脚配合待关注"
+     }
+    ]
+   },
+   "candidates": [
+    "yjj-5",
+    "archery",
+    "yjj-9",
+    "racing",
+    "bdj-6",
+    "tjq-5",
+    "wqx-3",
+    "yjj-11",
+    "tjq-10",
+    "tjq-12",
+    "tjq-19",
+    "apple"
+   ],
+   "pooledFrom": {
+    "bdj-6": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "tjq-10": [
+     "rules_p0"
+    ],
+    "tjq-19": [
+     "rules_p0"
+    ],
+    "racing": [
+     "rules_p0",
+     "pr49_ranker"
+    ],
+    "apple": [
+     "rules_p0"
+    ],
+    "archery": [
+     "pr49_ranker"
+    ],
+    "yjj-9": [
+     "pr49_ranker"
+    ],
+    "yjj-11": [
+     "pr49_ranker"
+    ],
+    "tjq-5": [
+     "random_fill"
+    ],
+    "tjq-12": [
+     "random_fill"
+    ],
+    "wqx-3": [
+     "random_fill"
+    ],
+    "yjj-5": [
+     "random_fill"
+    ]
+   }
+  }
+ ]
+}

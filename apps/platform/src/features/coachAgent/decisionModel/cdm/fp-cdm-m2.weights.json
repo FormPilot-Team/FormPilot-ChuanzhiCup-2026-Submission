@@ -1,0 +1,7 @@
+{
+ "schemaVersion": 1,
+ "id": "fp-cdm-m2",
+ "version": "1.0.0",
+ "status": "AWAITING_LABELS",
+ "note": "No weights until two independent human annotators complete fp-cdm-annotation/v1 and train_m2.py --labels human is run. The runtime refuses to rank while status != TRAINED."
+}

@@ -237,6 +237,22 @@ function unifiedOrder<T>(preference: CoachProfile['preference'], chapters: T[], 
   return out
 }
 
+/**
+ * Offline evaluation only (fp-cdm E1 baselines): the base utility this ranker assigns to each given
+ * candidate before greedy slate selection. Read-only; rankCoachDecision behaviour is unchanged.
+ */
+export function scoreCandidatesForEvaluation(profile: CoachProfile, evidence: CoachEvidence[], catalogue: readonly KnowledgeEntry[], ids: readonly string[]): Record<string, number> {
+  const needs = profileNeeds(profile)
+  const out: Record<string, number> = {}
+  for (const id of ids) {
+    const entry = catalogue.find(e => e.id === id)
+    if (!entry) continue
+    const siblings = catalogue.filter(e => e.kind === entry.kind && (entry.kind !== 'chapter' || e.programId === entry.programId))
+    out[id] = scoreEntry(entry, profile, needs, evidence, siblings.indexOf(entry)).base
+  }
+  return out
+}
+
 export function rankCoachDecision(input: RankerInput, trace?: RankerTrace): DecisionModelOutput {
   const { profile, evidence, catalogue } = input
   const unavailableIds = new Set(input.availability?.unavailableIds ?? [])
