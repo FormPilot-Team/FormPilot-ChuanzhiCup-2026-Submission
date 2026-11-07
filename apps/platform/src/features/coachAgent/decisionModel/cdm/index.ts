@@ -1,8 +1,10 @@
 /**
- * fp-cdm: trained FormPilot coach decision model (M2 pairwise preference ranker + M1 content features).
- * Default mode 'off'. Ranks only when human-label-trained weights are bundled (status TRAINED).
+ * fp-cdm internals: trained FormPilot coach decision model (M2 pairwise preference ranker + M1 content features).
+ * The product entry point is ../engine (recommendCoachDecision); these exports serve the engine, evaluation and the Lab.
  */
-export { getCoachCdmRecommendation, createCdmService, guardCdmOutput, DEFAULT_CDM_MODE, type CdmOptions, type CdmResponse, type CdmFallbackReason } from './adapter'
-export { inferCdm, loadWeights, BUNDLED_WEIGHTS, CDM_MODEL_ID, CDM_MODEL_VERSION, CDM_RUNTIME_VERSION, RETRIEVAL_K, retrieveCandidates, type CdmOutput, type CdmWeights, type CdmCandidateScore } from './model'
-export { buildFeatures, FEATURE_NAMES, FEATURE_GROUPS, FEATURE_SET_VERSION } from './features'
-export { stateFromEvidence, stateFromScenario, type DecisionState } from './state'
+export { guardCdmOutput } from './guard'
+export { inferCdm, loadWeights, tierOf, BUNDLED_WEIGHTS, CDM_MODEL_ID, CDM_MODEL_VERSION, CDM_RUNTIME_VERSION, LABEL_TIER_OF, RETRIEVAL_K, retrieveCandidates,
+  type CdmOutput, type CdmWeights, type CdmWeightsStatus, type CdmWeightsFailure, type CdmLabelTier, type CdmCandidateScore } from './model'
+export { buildFeatures, FEATURE_NAMES, FEATURE_GROUPS, FEATURE_SET_VERSION, type FeatureGroup } from './features'
+export { featureLabel, reasonSentences, GROUP_LABELS } from './explain'
+export { stateFromEvidence, stateFromScenario, type DecisionState, type DataOriginTag } from './state'

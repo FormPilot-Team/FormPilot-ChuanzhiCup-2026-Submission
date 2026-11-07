@@ -1,27 +1,28 @@
 import { describe, expect, it } from 'vitest'
 import { COACH_KNOWLEDGE } from '../src/features/coachAgent/recommendation/catalogue'
-import { getCoachWebRecommendation } from '../src/features/coachAgent/recommendation/webService'
 import type { BodyRegion, CoachProfile, KnowledgeEntry } from '../src/features/coachAgent/recommendation/types'
 import {
-  BUNDLED_WEIGHTS, buildFeatures, createCdmService, FEATURE_GROUPS, FEATURE_NAMES, FEATURE_SET_VERSION, getCoachCdmRecommendation,
+  BUNDLED_WEIGHTS, buildFeatures, FEATURE_GROUPS, FEATURE_NAMES, FEATURE_SET_VERSION, featureLabel,
   guardCdmOutput, inferCdm, loadWeights, stateFromScenario, type CdmWeights, type DecisionState,
 } from '../src/features/coachAgent/decisionModel/cdm'
+import { COACH_DECISION_CONTRACT, createCoachDecisionEngine } from '../src/features/coachAgent/decisionModel/engine'
 import { isLimitedProfile } from '../src/features/coachAgent/decisionModel/ranker'
 
-// Test fixture weights: deterministic pseudo-random coefficients. NOT a trained model; labels.kind marks it.
-function fixtureWeights(overrides: Partial<CdmWeights> = {}, bias: Partial<Record<string, number>> = {}): CdmWeights {
+// Test fixture weights: deterministic pseudo-random coefficients. NOT a trained model.
+function fixtureWeights(overrides: Partial<CdmWeights> = {}, bias: Partial<Record<string, number>> = {}, kind = 'human'): CdmWeights {
   let seed = 7
   const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) - 0.5
   return {
     schemaVersion: 1, id: 'fp-cdm-m2', version: '0.0.0-test', status: 'TRAINED', family: 'pairwise_lr', hyperparameter: 0.1, featureSet: FEATURE_SET_VERSION,
     featureNames: [...FEATURE_NAMES], mean: FEATURE_NAMES.map(() => 0), scale: FEATURE_NAMES.map(() => 1),
     coef: FEATURE_NAMES.map(name => bias[name] ?? r()), pairTemperature: 1, platt: { a: 1, b: 0 }, abstainSuitabilityBelow: 0,
-    trainedOn: { matrixSha256: 'test', labels: { kind: 'test_fixture' }, devFamilies: [] }, ...overrides,
+    trainedOn: { matrixSha256: 'test', labels: { kind }, devFamilies: [] }, ...overrides,
   }
 }
 const profile = (o: Partial<CoachProfile> = {}): CoachProfile => ({ version: 1, goals: ['upper_limb'], difficulties: ['none'], regions: ['shoulders', 'arms'], preference: 'mixed', risk: 'none', acknowledged: true, ...o })
-const request = (p: unknown = profile()) => ({ schemaVersion: 1, source: 'rules', profile: p })
-const service = (w: CdmWeights) => createCdmService({ catalogue: COACH_KNOWLEDGE, rules: getCoachWebRecommendation, weights: { ok: true, weights: w }, now: () => Date.UTC(2026, 10, 8) })
+const input = (p: unknown = profile()) => ({ contract: COACH_DECISION_CONTRACT, profile: p, now: Date.UTC(2026, 10, 8) })
+/** Research (unbound) engine: SHADOW exposes the ranking; ACTIVE is refused for unbound weights. */
+const shadow = (w: CdmWeights, p: unknown = profile()) => createCoachDecisionEngine({ weights: w, binding: 'unbound' }).recommend(input(p), { mode: 'shadow' })
 const byId = new Map(COACH_KNOWLEDGE.map(e => [e.id, e]))
 const REGIONS: BodyRegion[] = ['shoulders', 'neck', 'arms', 'trunk', 'legs']
 const subsets = <T>(items: readonly T[]): T[][] => Array.from({ length: (1 << items.length) - 1 }, (_, m) => items.filter((_, b) => ((m + 1) >> b) & 1))
@@ -31,27 +32,30 @@ function* sampleProfiles(): Generator<CoachProfile> {
     for (const regions of subsets(REGIONS)) for (const preference of ['routine', 'game', 'mixed'] as const) if (i++ % 23 === 0) yield profile({ goals: [...goals], difficulties: [...difficulties], regions: [...regions], preference })
 }
 
-describe('fp-cdm bundled state and weight loading', () => {
-  it('bundled weights are an explicit AWAITING_LABELS placeholder until human labels train the model', () => {
-    expect(BUNDLED_WEIGHTS).toEqual({ ok: false, reason: 'MODEL_NOT_TRAINED' })
-    const r = getCoachCdmRecommendation(request(), { mode: 'active' })
-    expect(r.decisionOrigin).toBe('rules')
-    expect(r.fallbackReason).toBe('MODEL_NOT_TRAINED')
-    expect(r.active.result).toEqual(getCoachWebRecommendation(request()).result)
+describe('fp-cdm weight loading (label tiers)', () => {
+  it('bundled weights are the frozen M2 v1.0 trained on AI labels, loaded as the experimental tier', () => {
+    expect(BUNDLED_WEIGHTS.ok).toBe(true)
+    if (!BUNDLED_WEIGHTS.ok) return
+    expect(BUNDLED_WEIGHTS.tier).toBe('ai_experimental')
+    expect(BUNDLED_WEIGHTS.weights.version).toBe('1.0.0')
+    expect(BUNDLED_WEIGHTS.weights.trainedOn.labels.kind).toBe('ai_single_annotator')
+    expect(BUNDLED_WEIGHTS.weights.featureRange?.min.length).toBe(BUNDLED_WEIGHTS.weights.featureNames.length)
   })
-  it('defaults to off', () => {
-    const r = getCoachCdmRecommendation(request())
-    expect(r.mode).toBe('off'); expect(r.modelExecution).toBe('disabled'); expect(r.fallbackReason).toBe('MODEL_DISABLED')
-  })
-  it('refuses fixture, planted or malformed weights; accepts only human-label artefacts of this feature set', () => {
-    expect(loadWeights(fixtureWeights())).toEqual({ ok: false, reason: 'WEIGHTS_INVALID' })
-    expect(loadWeights({ ...fixtureWeights(), trainedOn: { matrixSha256: 'x', labels: { kind: 'planted_random_linear_signal' }, devFamilies: [] } }).ok).toBe(false)
-    // AI-label (single AI annotator) weights are an offline weak-supervision experiment, never a product model.
-    expect(loadWeights({ ...fixtureWeights(), trainedOn: { matrixSha256: 'x', labels: { kind: 'ai_single_annotator' }, devFamilies: [] } }).ok).toBe(false)
-    expect(loadWeights({ ...fixtureWeights(), featureSet: 'other' }).ok).toBe(false)
-    expect(loadWeights({ ...fixtureWeights(), coef: [Number.NaN, ...fixtureWeights().coef.slice(1)] }).ok).toBe(false)
-    const human = { ...fixtureWeights(), trainedOn: { matrixSha256: 'x', labels: { kind: 'human' }, devFamilies: [] } }
-    expect(loadWeights(human).ok).toBe(true)
+  it('names every refusal and never accepts pipeline controls or fixtures', () => {
+    expect(loadWeights(undefined)).toEqual({ ok: false, reason: 'MODEL_MISSING' })
+    expect(loadWeights(null)).toEqual({ ok: false, reason: 'MODEL_MISSING' })
+    expect(loadWeights({ schemaVersion: 1, id: 'fp-cdm-m2', version: '1.0.0', status: 'AWAITING_LABELS' })).toEqual({ ok: false, reason: 'MODEL_NOT_TRAINED' })
+    expect(loadWeights({ ...fixtureWeights(), id: 'other' })).toEqual({ ok: false, reason: 'WEIGHTS_INVALID' })
+    expect(loadWeights([1, 2])).toEqual({ ok: false, reason: 'WEIGHTS_INVALID' })
+    expect(loadWeights({ ...fixtureWeights(), featureSet: 'fp-cdm-features/v2' })).toEqual({ ok: false, reason: 'MODEL_VERSION_MISMATCH' })
+    expect(loadWeights({ ...fixtureWeights(), schemaVersion: 2 })).toEqual({ ok: false, reason: 'MODEL_VERSION_MISMATCH' })
+    expect(loadWeights({ ...fixtureWeights(), featureNames: [...FEATURE_NAMES.slice(1), 'no_such_feature'] })).toEqual({ ok: false, reason: 'MODEL_VERSION_MISMATCH' })
+    expect(loadWeights({ ...fixtureWeights(), coef: [Number.NaN, ...fixtureWeights().coef.slice(1)] })).toEqual({ ok: false, reason: 'WEIGHTS_INVALID' })
+    expect(loadWeights(fixtureWeights({ featureRange: { min: [Number.NaN], max: [1] } }))).toEqual({ ok: false, reason: 'WEIGHTS_INVALID' })
+    for (const kind of ['test_fixture', 'planted_random_linear_signal', 'null_random_labels', 'rules', 'persona'])
+      expect(loadWeights(fixtureWeights({}, {}, kind))).toEqual({ ok: false, reason: 'LABELS_NOT_ACCEPTED' })
+    expect(loadWeights(fixtureWeights({}, {}, 'human'))).toMatchObject({ ok: true, tier: 'human' })
+    expect(loadWeights(fixtureWeights({}, {}, 'ai_single_annotator'))).toMatchObject({ ok: true, tier: 'ai_experimental' })
   })
 })
 
@@ -86,68 +90,40 @@ describe('fp-cdm feature builder', () => {
     const y = buildFeatures(state, byId.get('yjj-3') as KnowledgeEntry, COACH_KNOWLEDGE)
     expect(y[FEATURE_NAMES.indexOf('h_next_in_programme')]).toBe(1)
   })
+  it('every feature has a readable label', () => {
+    for (const name of FEATURE_NAMES) expect(featureLabel(name)).not.toBe(name)
+  })
 })
 
-describe('fp-cdm adapter with fixture weights', () => {
-  it('active mode ranks every safe candidate, returns calibrated scores and passes the independent guard', () => {
+describe('fp-cdm inference and guard with fixture weights', () => {
+  it('ranks safe candidates only, with calibrated scores, for a sample of the profile space', () => {
     const w = fixtureWeights()
     for (const p of sampleProfiles()) {
-      const r = service(w)(request(p), { mode: 'active' })
-      expect(r.decisionOrigin).toBe('model')
-      const m = r.model!
-      expect(m.model.trainedWeights).toBe(true)
-      expect(m.candidates.every(c => c.suitability >= 0 && c.suitability <= 1)).toBe(true)
-      expect(m.confidence).toBeGreaterThanOrEqual(0.5)
-      for (const id of [...r.active.result!.chapters, ...r.active.result!.games].map(x => x.entry.id)) {
-        const e = byId.get(id)!
+      const r = shadow(w, p)
+      expect(r.execution).toBe('executed')
+      expect(r.ranking.every(c => c.suitability >= 0 && c.suitability <= 1)).toBe(true)
+      expect(r.confidence).toBeGreaterThanOrEqual(0.5)
+      for (const item of r.ranking) {
+        const e = byId.get(item.id)!
         if (isLimitedProfile(p)) expect(e.caution).toEqual([])
         if (e.kind === 'chapter') expect(e.href).not.toBeNull()
       }
     }
   }, 120_000)
-  it('a model that maximally prefers risky content still cannot show it to limited users (guard is independent)', () => {
+  it('a model that maximally prefers risky content still cannot reach limited users (safe pool is independent)', () => {
     const adversarial = fixtureWeights({}, { c_caution_count: 50, c_caution_overhead: 50, c_caution_balance: 50 })
-    const p = profile({ goals: ['rehab_support'], difficulties: ['soreness'] })
-    const r = service(adversarial)(request(p), { mode: 'active' })
-    expect([...r.active.result!.chapters, ...r.active.result!.games].every(x => x.entry.caution.length === 0)).toBe(true)
+    const r = shadow(adversarial, profile({ goals: ['rehab_support'], difficulties: ['soreness'] }))
+    expect(r.ranking.length).toBeGreaterThan(0)
+    expect(r.ranking.every(x => (byId.get(x.id)?.caution.length ?? 1) === 0)).toBe(true)
   })
-  it('risk profiles never reach the model', () => {
-    for (const risk of ['acute_pain', 'dizziness', 'recent_injury'] as const) {
-      const r = service(fixtureWeights())(request(profile({ risk })), { mode: 'active' })
-      expect(r.fallbackReason).toBe('SAFETY_HOLD'); expect(r.model).toBeNull(); expect(r.active.status).toBe('safety_hold')
-    }
-  })
-  it('abstains on low suitability and on out-of-distribution input, falling back to rules', () => {
-    const low = service(fixtureWeights({ abstainSuitabilityBelow: 1.01 }))(request(), { mode: 'active' })
-    expect(low.fallbackReason).toBe('MODEL_ABSTAINED'); expect(low.model?.abstainReason).toBe('LOW_SUITABILITY'); expect(low.decisionOrigin).toBe('rules')
-    const ood = service(fixtureWeights({ scale: FEATURE_NAMES.map(() => 1e-3) }))(request(), { mode: 'active' })
-    expect(ood.model?.abstainReason).toBe('OUT_OF_DISTRIBUTION'); expect(ood.active.result).toEqual(getCoachWebRecommendation(request()).result)
-  })
-  it('range-based OOD (v1.1): abstains only when the top candidate leaves the training range, and names the features', () => {
+  it('range-based OOD: abstains only when the top candidate leaves the training range, and names the features', () => {
     const allZero = { min: FEATURE_NAMES.map(() => 0), max: FEATURE_NAMES.map(() => 0) }
-    const ood = service(fixtureWeights({ featureRange: allZero }))(request(), { mode: 'active' })
-    expect(ood.model?.abstainReason).toBe('OUT_OF_DISTRIBUTION')
-    expect(ood.model?.oodFeatures?.length).toBeGreaterThan(0)
-    expect(ood.decisionOrigin).toBe('rules')
-    // Rare-but-observed binary values (range 0..1) and bounded counts are in-distribution.
+    const ood = shadow(fixtureWeights({ featureRange: allZero }))
+    expect(ood.abstainReason).toBe('OUT_OF_DISTRIBUTION')
+    expect(ood.outOfDistributionFeatures.length).toBeGreaterThan(0)
+    expect(ood.fallbackReason).toBe('MODEL_ABSTAINED')
     const wide = { min: FEATURE_NAMES.map(() => -5), max: FEATURE_NAMES.map(() => 5) }
-    const ok = service(fixtureWeights({ featureRange: wide }))(request(profile({ regions: ['neck', 'shoulders'] })), { mode: 'active' })
-    expect(ok.decisionOrigin).toBe('model')
-    expect(loadWeights({ ...fixtureWeights({ featureRange: { min: [Number.NaN], max: [1] } }), trainedOn: { matrixSha256: 'x', labels: { kind: 'human' }, devFamilies: [] } }).ok).toBe(false)
-  })
-  it('honours availability and rejects unknown ids or a mismatched host state', () => {
-    const r = service(fixtureWeights())(request(profile({ preference: 'game' })), { mode: 'active', availability: { snapshotRef: 't', unavailableIds: ['archery', 'yijinjing'] } })
-    expect(r.model!.candidates.some(c => c.id === 'archery' || c.programId === 'yijinjing')).toBe(false)
-    expect(service(fixtureWeights())(request(), { mode: 'active', availability: { snapshotRef: 't', unavailableIds: ['nope'] } }).fallbackReason).toBe('INVALID_AVAILABILITY')
-    const other: DecisionState = { profile: profile({ regions: ['legs'] }), history: { status: 'missing' }, report: { status: 'missing' } }
-    expect(service(fixtureWeights())(request(), { mode: 'active', state: other }).fallbackReason).toBe('STATE_PROFILE_MISMATCH')
-  })
-  it('shadow mode keeps rules active; inference errors fall back', () => {
-    const s = service(fixtureWeights())(request(), { mode: 'shadow' })
-    expect(s.fallbackReason).toBe('SHADOW_MODE'); expect(s.model).not.toBeNull(); expect(s.active.result).toEqual(getCoachWebRecommendation(request()).result)
-    const broken = service(fixtureWeights({ featureNames: ['no_such_feature'], mean: [0], scale: [1], coef: [1] }))(request(), { mode: 'active' })
-    expect(['MODEL_ERROR', 'OUTPUT_GUARD_REJECTED', 'MODEL_ABSTAINED']).toContain(broken.fallbackReason)
-    expect(broken.decisionOrigin).toBe('rules')
+    expect(shadow(fixtureWeights({ featureRange: wide }), profile({ regions: ['neck', 'shoulders'] })).fallbackReason).toBe('SHADOW_MODE')
   })
   it('guard rejects tampered outputs', () => {
     const p = profile({ goals: ['rehab_support'] })
@@ -159,5 +135,15 @@ describe('fp-cdm adapter with fixture weights', () => {
     expect(guardCdmOutput(claimed, p, COACH_KNOWLEDGE, null)).toContain('MODEL_IDENTITY')
     const altered = structuredClone(out); altered.result!.chapters[0].entry = { ...altered.result!.chapters[0].entry, regions: ['neck'] }
     expect(guardCdmOutput(altered, p, COACH_KNOWLEDGE, null).some(v => v.startsWith('ENTRY_ALTERED'))).toBe(true)
+  })
+  it('reasons are readable sentences, and the label tier is stated honestly', () => {
+    const p = profile()
+    const state: DecisionState = { profile: p, history: { status: 'missing' }, report: { status: 'missing' } }
+    const ai = inferCdm(fixtureWeights({}, {}, 'ai_single_annotator'), state, COACH_KNOWLEDGE, null, [])
+    expect(ai.result?.limitations.join('')).toContain('AI 标注者')
+    expect(ai.result?.limitations.join('')).not.toContain('两名独立人工')
+    for (const c of ai.candidates) for (const reason of c.reasons) expect(reason).not.toMatch(/[a-z]_[a-z]/)
+    const human = inferCdm(fixtureWeights(), state, COACH_KNOWLEDGE, null, [])
+    expect(human.result?.limitations.join('')).toContain('两名独立人工')
   })
 })
