@@ -1,6 +1,6 @@
 # FormPilot Competition Decision Model V1（fp-cdm）
 
-> 最新完整结果、版本与结论状态以 [MODEL_REPORT.md](MODEL_REPORT.md) 为准。运行时 1.1.0 改为“两阶段检索 + 重排”，并采用新的 OOD 规则；Web 接口见 [WEB_INTEGRATION_CDM.md](WEB_INTEGRATION_CDM.md)。本文件保留第一轮的设计记录。
+> 最新完整结果、版本与结论状态以 [MODEL_REPORT.md](MODEL_REPORT.md) 为准。Web 唯一接口为 `engine/` 的 `recommendCoachDecision`，见 [WEB_INTEGRATION_READY.md](WEB_INTEGRATION_READY.md)；下文的 `getCoachCdmRecommendation` 已移除。本文件保留第一轮的设计记录（历史文档，不再更新）。
 
 日期：2026-11-07。分支 `feat/coach-decision-model-trained`，叠加在 PR #49（`feat/coach-decision-model-v1`）之上；PR #49 的手工权重排序器 fp-coach-ranker 原样保留，作为对照基线（只新增了一个只读评测导出）。
 
@@ -59,7 +59,7 @@ CoachWebRequest ──► P0 规则服务（不变；始终可回退）
 - E4 安全：13,392 个风险画像全部暂停，模型执行 0 次；22,320 个画像中受限 caution 泄漏 0、不可启动章节 0；对抗权重泄漏 0；不可用内容 0；低适配与分布外输入正确弃权；未训练时回退。
 - E5 性能（CPU、单线程 Node）：单次 p50 0.59 ms / p95 2.83 ms；批量 1.16 ms/次；打包后冷启动导入 3.6 ms，首次调用 7.3 ms（中位数，7 个新进程），堆内存 4.8 MB；包体 137,298 B min；参数 337 个；不用 GPU。
 
-## Web 集成接口（与 PR #49 相同的请求契约）
+## Web 集成接口（第一轮记录，已被 `recommendCoachDecision` 取代）
 
 ```ts
 import { getCoachCdmRecommendation } from './features/coachAgent/decisionModel/cdm'

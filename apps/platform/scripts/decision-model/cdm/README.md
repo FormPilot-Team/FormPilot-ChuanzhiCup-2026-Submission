@@ -5,7 +5,7 @@
 | 模型 | 输入 | 标签 | 状态 |
 | --- | --- | --- | --- |
 | **M1 内容理解** `fp-cdm-m1` | 参考姿态轨迹的 3 s 窗口特征（真实观测，1,677 窗口 × 76 特征） | 团队人工目录标签（部位 / 注意项） | **已训练**：leave-one-programme-out |
-| **M2 偏好排序** `fp-cdm-m2` | 用户 × 内容（P）、历史 × 内容（H）、报告 × 内容（R）共 111 个特征，含 M1 的 out-of-fold 输出 | **两名独立人工标注者**对合成场景的 0–3 分级 | **流水线就绪，等待标签**；植入信号与随机标签两类对照均已验证 |
+| **M2 偏好排序** `fp-cdm-m2` | 用户 × 内容（P）、历史 × 内容（H）、报告 × 内容（R）共 111 个特征，含 M1 的 out-of-fold 输出 | 发布 v1.0：**单一 AI 标注者**（实验性）；正式版需两名独立人工标注者 | **已训练（实验性）并随发布 `fp-cdm-release/1.0.0` 绑定**；人工标签流水线就绪 |
 
 以下命令在 `apps/platform` 下执行。`VN` 为 `node_modules/.pnpm/vite-node@3.2.4_@types+node_de474a0b50d035fb47eb67fa144202a3/node_modules/vite-node/vite-node.mjs`，`PY` 为本机 Python 3.12（numpy、scikit-learn 1.8、scipy），用 `-I -B` 运行。
 
@@ -91,8 +91,27 @@ $PY -I -B scripts/decision-model/cdm/evaluate_human_test.py --labels-dir <dir> -
 
 完整结果、版本与结论状态见 `docs/ai-coach-agent/decision-model/MODEL_REPORT.md`。
 
+## 7. 第三阶段：集成就绪（2026-11-08）
+
+发布 `fp-cdm-release/1.0.0` 已冻结；本阶段不重训发布模型、不再使用冻结测试集。Web 只调用 `src/features/coachAgent/decisionModel/engine` 的 `recommendCoachDecision`（说明见 `docs/ai-coach-agent/decision-model/WEB_INTEGRATION_READY.md`）。
+
+```bash
+node $VN scripts/decision-model/cdm/freeze-release.ts                       # 校验 release.ts 与权重 / M1 表 / 目录一致（--write 写入，--manifest <json> 输出文件清单）
+$PY -I -B scripts/decision-model/cdm/integration_experiments.py --matrix scripts/decision-model/cdm/data/m2-matrix.v1.json     --ai-labels scripts/decision-model/cdm/labels-ai/fp-cdm-ai-labels-v1.json --out scripts/decision-model/cdm/artifacts/integration   # I1/I2 消融、I3 训练阶段、研究变体（只用开发族）
+node $VN scripts/decision-model/cdm/probes.ts --variants scripts/decision-model/cdm/artifacts/integration/variants --out scripts/decision-model/cdm/artifacts/integration/probes.json   # I4 行为探针
+node $VN scripts/decision-model/cdm/evaluate-cdm.ts --out <dir>             # E2/E4/E5，经公开接口（发布模型）
+node scripts/decision-model/cdm/cold-start.mjs <tmpDir> 7                    # 冷启动
+node $VN scripts/decision-model/cdm/export-examples.ts                       # docs/.../examples/*.json（真实调用生成）
+node node_modules/vitest/vitest.mjs run tests/coach-cdm.test.ts tests/coach-decision-engine.test.ts
+A=scripts/decision-model/cdm/artifacts
+node scripts/decision-model/cdm/lab/build-lab.mjs --out <coach-decision-lab-v3.html>   --m2-report $A/m2-ai-experiment/fp-cdm-m2.ai-experiment.report.json --research $A/m2-research/m2-research-ai-v1-features.json   --m1-metrics $A/m1/fp-cdm-m1.metrics.json --m1v11 $A/m1-v11/fp-cdm-m1-v11.report.json --m1-robustness $A/m1-v11/fp-cdm-m1-robustness.json   --ai-quality scripts/decision-model/cdm/labels-ai/ai-label-quality.json --e245 $A/integration/cdm-e2-e4-e5-release.json --cold $A/integration/cold-start.json   --integration $A/integration/integration-experiments.json --probes $A/integration/probes.json --variants $A/integration/variants --manifest $A/integration/release-manifest.json
+```
+
+- 研究变体（`artifacts/integration/variants/`）只能通过 `createCoachDecisionEngine({ binding: 'unbound' })` 影子运行，引擎拒绝把它们用于 ACTIVE。
+- `evaluate-cdm.ts --weights <w>` 评估非绑定的研究权重；不带 `--weights` 时评估发布模型。
+
 ## 禁止事项
 
 - 不用规则、PR #49 输出、persona、画像枚举或标为 do-not-train 的数据作 M2 标签。
 - `planted` / `null` 结果只能写作“流水线验证”，不得写作模型效果。
-- 运行时只加载 `trainedOn.labels.kind === 'human'` 的权重；占位文件 `status: AWAITING_LABELS` 时一律回退规则。
+- 运行时只接受 `trainedOn.labels.kind` 为 `human`（层级 human）或 `ai_single_annotator`（层级 ai_experimental）的权重；植入信号、随机标签、fixture 一律拒绝。实验性权重在 ACTIVE 下需要负责人设置 `allowExperimentalModel`。
