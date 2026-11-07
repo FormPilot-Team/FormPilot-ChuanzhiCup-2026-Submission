@@ -63,7 +63,7 @@ const ch = (chapterId: string, sessions: number, meanScore: number, trend: 'up' 
 const stages: Array<[string, Partial<CoachDecisionInput>]> = [
   ['S0 新用户（无历史）', {}],
   ['S1 第 1 周：八段锦第一式 2 次', { trainingHistory: { origin: 'synthetic_demo', chapters: [ch('bdj-1', 2, 62, 'flat', 2)] } }],
-  ['S2 第 2 周：第一、二式 + 摘苹果', { trainingHistory: { origin: 'synthetic_demo', chapters: [ch('bdj-1', 5, 70, 'up', 5), ch('bdj-2', 3, 64, 'flat', 2)] }, gameHistory: { origin: 'synthetic_demo', games: [{ gameId: 'apple', plays: 3, completedPlays: 3, lastPlayedAt: NOW - 1 * DAY }] } }],
+  ['S2 第 2 周：第一、二式 + 摘苹果', { trainingHistory: { origin: 'synthetic_demo', chapters: [ch('bdj-1', 5, 70, 'up', 5), ch('bdj-2', 3, 64, 'flat', 4)] }, gameHistory: { origin: 'synthetic_demo', games: [{ gameId: 'apple', plays: 3, completedPlays: 3, lastPlayedAt: NOW - 1 * DAY }] } }],
   ['S3 第 4 周：八段锦前四式 + 太极起势 + 划船', { trainingHistory: { origin: 'synthetic_demo', chapters: [ch('bdj-1', 8, 78, 'up', 6), ch('bdj-2', 7, 74, 'up', 4), ch('bdj-3', 6, 72, 'up', 2), ch('bdj-4', 4, 70, 'flat', 1), ch('tjq-1', 2, 60, 'flat', 3)] },
     gameHistory: { origin: 'synthetic_demo', games: [{ gameId: 'apple', plays: 6, completedPlays: 6, lastPlayedAt: NOW - 3 * DAY }, { gameId: 'boating', plays: 5, completedPlays: 4, lastPlayedAt: NOW - 1 * DAY }] } }],
 ]
@@ -90,6 +90,14 @@ out.riskProbe = (['none', 'acute_pain', 'dizziness', 'recent_injury'] as const).
 const oodP = P({ goals: ['mobility'], difficulties: ['none'], regions: ['shoulders', 'neck', 'arms', 'legs'], preference: 'routine' })
 const nearP = P({ goals: ['mobility'], difficulties: ['none'], regions: ['shoulders', 'neck', 'arms'], preference: 'routine' })
 out.oodProbe = [oodP, nearP].map(p => { const i = inp(p); const r = run(i); return { input: i, ...summary(r), displayIsRules: r.decisionOrigin === 'rules' } })
+// P6b recency coverage: S2 user + report on bdj-2 (which makes bdj-2 the top candidate); bdj-2 practised d days ago.
+// The training data only had practised candidates 4-20 days ago, so h_recency_this above its range + 25% (d <= 2) is OOD.
+out.recencyProbe = [0, 1, 2, 3, 4, 5, 7, 10, 14].map(d => {
+  const i = inp(base, { ...s2, trainingHistory: { origin: 'synthetic_demo', chapters: [ch('bdj-1', 5, 70, 'up', 5), ch('bdj-2', 3, 64, 'flat', d)] },
+    latestReport: { origin: 'synthetic_demo', createdAt: NOW - DAY, findings: [{ focus: 'stability', subjectId: 'bdj-2', score: 52, trend: 'worse' }] } })
+  const r = run(i)
+  return { daysSinceBdj2: d, h_recency_this: r4(Math.exp(-d / 7)), decisionOrigin: r.decisionOrigin, fallbackReason: r.fallbackReason, abstainReason: r.abstainReason, outOfDistributionFeatures: r.outOfDistributionFeatures, top1: r.ranking[0]?.id ?? null }
+})
 // P7 robustness to small input perturbations (history numbers jittered, seed-fixed)
 let seed = 20261107; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
 const s2in = inp(base, s2); const s2r = run(s2in); const taus: number[] = []; let top1Same = 0, slateSame = 0
@@ -119,14 +127,4 @@ if (vdir) {
 }
 const file = arg('--out') ?? 'probes.json'
 writeFileSync(file, `${JSON.stringify(out, null, 1)}\n`)
-const brief = {
-  goal: (out.goalSweep as Array<Record<string, unknown>>).map(g => [JSON.stringify((g.input as CoachDecisionInput).profile.goals), g.slate, g.kendallVsUpperLimbOverCommon, g.slateJaccardVsUpperLimb, g.rulesSlateJaccardVsUpperLimb]),
-  region: (out.regionSweep as Array<Record<string, any>>).map(g => [g.input.profile.regions.join('+'), g.model.regionPrecision, g.rulesP0.regionPrecision, g.pr49.regionPrecision, g.fallbackReason]),
-  stages: (out.trainingStages as Array<Record<string, any>>).map(s => [s.label, s.slate, s.kendallVsS0, s.slateNovelShare, JSON.stringify(s.ranks)]),
-  report: (out.reportProbe as Array<Record<string, any>>).map(s => [s.focus, s.meanRankWithoutReport, s.meanRankWithReport, s.kendallVsNoReport]),
-  risk: (out.riskProbe as Array<Record<string, any>>).map(s => [s.input.profile.risk, s.fallbackReason, s.execution]),
-  ood: (out.oodProbe as Array<Record<string, any>>).map(s => [s.input.profile.regions.length, s.fallbackReason, s.abstainReason, s.outOfDistributionFeatures]),
-  perturbation: out.perturbation && { ...(out.perturbation as Record<string, unknown>), base: undefined },
-  variants: ((out.variants ?? []) as Array<Record<string, any>>).map(v => [v.variant, v.users.map((u: any) => u.kendallVsRelease)]),
-}
-console.log(JSON.stringify(brief, null, 0).replace(/\],\[/g, '],\n['))
+console.log(JSON.stringify({ file, sections: Object.keys(out), perturbation: { ...(out.perturbation as Record<string, unknown>), base: undefined } }))

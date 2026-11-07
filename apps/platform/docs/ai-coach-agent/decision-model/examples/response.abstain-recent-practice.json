@@ -1,0 +1,1373 @@
+{
+  "contract": "fp-coach-decision/v1",
+  "mode": "active",
+  "status": "ready",
+  "decisionOrigin": "rules",
+  "display": {
+    "result": {
+      "status": "ready",
+      "message": "已根据画像生成三类候选。你的偏好为功法与游戏混合；请在舒适范围内选择，出现不适即停止。",
+      "routines": [
+        {
+          "entry": {
+            "id": "baduanjin",
+            "kind": "routine",
+            "programId": "baduanjin",
+            "title": "八段锦",
+            "regions": [
+              "shoulders",
+              "arms",
+              "neck",
+              "trunk",
+              "legs"
+            ],
+            "focuses": [
+              "reach",
+              "coordination",
+              "general"
+            ],
+            "movement": "八式的上举、侧推、转头、俯身、冲拳与提踵；整套包含不同负荷",
+            "caution": [
+              "overhead",
+              "twist",
+              "balance",
+              "bending"
+            ],
+            "verification": "project_verified",
+            "sources": [
+              "apps/platform/src/features/routines/programs.ts#ROUTINE_PROGRAMS"
+            ],
+            "href": null
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：八式的上举、侧推、转头、俯身、冲拳与提踵；整套包含不同负荷。画像适配是工程建议，医学改善效果待核验。",
+            "仅建议从可选章节「八段锦 · 两手托天理三焦、八段锦 · 左右开弓似射雕、八段锦 · 调理脾胃须单举」开始了解；这不是整套训练处方，请使用下方章节入口。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        }
+      ],
+      "chapters": [
+        {
+          "entry": {
+            "id": "bdj-1",
+            "kind": "chapter",
+            "programId": "baduanjin",
+            "chapterId": "bdj-1",
+            "title": "八段锦 · 两手托天理三焦",
+            "regions": [
+              "shoulders",
+              "arms"
+            ],
+            "focuses": [
+              "reach",
+              "coordination"
+            ],
+            "movement": "双臂同时上托、下落",
+            "caution": [
+              "overhead"
+            ],
+            "verification": "project_verified",
+            "sources": [
+              "apps/platform/src/features/routines/programs.ts#ROUTINE_PROGRAMS",
+              "apps/platform/src/features/routines/analyzers/baduanjin/steps.ts#BADUANJIN_STEPS"
+            ],
+            "href": "/routines/baduanjin/train?form=bdj-1"
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：双臂同时上托、下落。画像适配是工程建议，医学改善效果待核验。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        },
+        {
+          "entry": {
+            "id": "bdj-2",
+            "kind": "chapter",
+            "programId": "baduanjin",
+            "chapterId": "bdj-2",
+            "title": "八段锦 · 左右开弓似射雕",
+            "regions": [
+              "shoulders",
+              "arms",
+              "legs"
+            ],
+            "focuses": [
+              "reach",
+              "coordination",
+              "stability"
+            ],
+            "movement": "马步中左右交替拉弓与侧向推掌",
+            "caution": [
+              "balance"
+            ],
+            "verification": "project_verified",
+            "sources": [
+              "apps/platform/src/features/routines/programs.ts#ROUTINE_PROGRAMS",
+              "apps/platform/src/features/routines/analyzers/baduanjin/steps.ts#BADUANJIN_STEPS"
+            ],
+            "href": "/routines/baduanjin/train?form=bdj-2"
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：马步中左右交替拉弓与侧向推掌。画像适配是工程建议，医学改善效果待核验。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        },
+        {
+          "entry": {
+            "id": "bdj-3",
+            "kind": "chapter",
+            "programId": "baduanjin",
+            "chapterId": "bdj-3",
+            "title": "八段锦 · 调理脾胃须单举",
+            "regions": [
+              "shoulders",
+              "arms"
+            ],
+            "focuses": [
+              "reach",
+              "coordination"
+            ],
+            "movement": "一掌上托、一掌下按，左右交替",
+            "caution": [
+              "overhead"
+            ],
+            "verification": "project_verified",
+            "sources": [
+              "apps/platform/src/features/routines/programs.ts#ROUTINE_PROGRAMS",
+              "apps/platform/src/features/routines/analyzers/baduanjin/steps.ts#BADUANJIN_STEPS"
+            ],
+            "href": "/routines/baduanjin/train?form=bdj-3"
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：一掌上托、一掌下按，左右交替。画像适配是工程建议，医学改善效果待核验。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        }
+      ],
+      "games": [
+        {
+          "entry": {
+            "id": "apple",
+            "kind": "game",
+            "title": "摘苹果",
+            "regions": [
+              "shoulders",
+              "arms"
+            ],
+            "focuses": [
+              "reach",
+              "stability",
+              "coordination"
+            ],
+            "movement": "向上、向侧面伸手触达目标并短暂停留",
+            "caution": [
+              "overhead"
+            ],
+            "verification": "project_verified",
+            "sources": [
+              "apps/motion-games-lab/app/src/data/games.ts#GAMES",
+              "apps/motion-games-lab/app/src/motion/targetTracker.ts"
+            ],
+            "href": null
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：向上、向侧面伸手触达目标并短暂停留。画像适配是工程建议，医学改善效果待核验。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        },
+        {
+          "entry": {
+            "id": "archery",
+            "kind": "game",
+            "title": "林间射箭",
+            "regions": [
+              "shoulders",
+              "arms"
+            ],
+            "focuses": [
+              "stability",
+              "coordination",
+              "reach"
+            ],
+            "movement": "双臂拉开、持弓手瞄准、拉弦手收回胸前；拉弓量为手腕间距代理",
+            "caution": [],
+            "verification": "project_verified",
+            "sources": [
+              "apps/motion-games-lab/app/src/data/games.ts#GAMES",
+              "apps/motion-games-lab/app/src/games/archery/README.md"
+            ],
+            "href": null
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：双臂拉开、持弓手瞄准、拉弦手收回胸前；拉弓量为手腕间距代理。画像适配是工程建议，医学改善效果待核验。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        }
+      ],
+      "focus": [
+        "reach",
+        "coordination"
+      ],
+      "evidence": [],
+      "limitations": [
+        "当前仅使用自述画像；未读取或接入真实用户训练、报告和游戏历史。",
+        "不做诊断、不承诺医学疗效，不提供康复剂量；不把相似度、游戏得分或工程评分混成健康总分。",
+        "未进行真人效果验证；下一阶段侧重点属于建议，不表示已确认的身体问题或进步。",
+        "StartLux 决策模型尚未接入；当前使用本地画像规则兜底。"
+      ]
+    },
+    "answers": {
+      "suitable": "可先了解八段锦。建议先查看章节「八段锦 · 两手托天理三焦」，按舒适范围练习。这是画像规则建议，不是医学处方。",
+      "first_game": "可先了解「摘苹果」：向上、向侧面伸手触达目标并短暂停留。画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。该游戏是独立应用，当前展示页未配置启动地址。",
+      "recent_issues": "证据不足：尚无可用于说明主要问题的有效报告分项。画像中的不适是你的自述，练过某动作也不能证明存在动作缺陷。",
+      "why": "以「八段锦 · 两手托天理三焦」为例：画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。\n动作依据：双臂同时上托、下落。画像适配是工程建议，医学改善效果待核验。知识来源：apps/platform/src/features/routines/programs.ts#ROUTINE_PROGRAMS；apps/platform/src/features/routines/analyzers/baduanjin/steps.ts#BADUANJIN_STEPS。",
+      "next_focus": "下一阶段可关注：舒适范围内的动作幅度、左右与手脚配合。这是画像与已授权证据支持的训练建议，不代表已测得疾病或疗效。StartLux 尚无可用输出，继续采用本地规则兜底。"
+    }
+  },
+  "ranking": [
+    {
+      "rank": 1,
+      "id": "bdj-2",
+      "kind": "chapter",
+      "programId": "baduanjin",
+      "title": "八段锦 · 左右开弓似射雕",
+      "href": "/routines/baduanjin/train?form=bdj-2",
+      "launch": "in_app_route",
+      "score": 2.5136,
+      "suitability": 0.9408,
+      "inSlate": false,
+      "reasons": [
+        "回应最近报告中的待关注项",
+        "与你最近的练习记录相衔接",
+        "覆盖你关注的部位：肩部、上肢"
+      ],
+      "explanation": [
+        {
+          "feature": "r_same_subject",
+          "label": "报告所指的同一内容",
+          "group": "R",
+          "groupLabel": "最近报告",
+          "value": 1,
+          "points": 1.2246
+        },
+        {
+          "feature": "h_practised_this_log",
+          "label": "练过该内容的次数",
+          "group": "H",
+          "groupLabel": "训练历史",
+          "value": 1.3863,
+          "points": -0.6792
+        },
+        {
+          "feature": "h_recency_this",
+          "label": "最近练过该章节",
+          "group": "H",
+          "groupLabel": "训练历史",
+          "value": 0.7515,
+          "points": 0.6729
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "c_prog_baduanjin",
+          "label": "属于八段锦",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.4923
+        },
+        {
+          "feature": "c_m1_caution_balance",
+          "label": "M1 姿态感知：平衡要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.9847,
+          "points": 0.4874
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "yjj-1",
+      "kind": "chapter",
+      "programId": "yijinjing",
+      "title": "易筋经 · 韦驮献杵第一势",
+      "href": "/routines/yijinjing/train?form=yjj-1",
+      "launch": "in_app_route",
+      "score": 2.1064,
+      "suitability": 0.9238,
+      "inSlate": false,
+      "reasons": [
+        "考虑到「僵硬感」，选择侧重日常活动的内容",
+        "覆盖你关注的部位：肩部、上肢",
+        "符合目标「上肢功能练习」：内容侧重日常活动"
+      ],
+      "explanation": [
+        {
+          "feature": "x_diff_stiffness_focus_general",
+          "label": "「僵硬感」× 内容侧重「日常活动」",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.8238
+        },
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.6924
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "c_m1_caution_balance",
+          "label": "M1 姿态感知：平衡要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.0775,
+          "points": -0.4258
+        },
+        {
+          "feature": "x_region_match_trunk",
+          "label": "命中所选部位：躯干",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": -0.3896
+        },
+        {
+          "feature": "c_region_shoulders",
+          "label": "内容涉及肩部",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.3693
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "apple",
+      "kind": "game",
+      "programId": null,
+      "title": "摘苹果",
+      "href": null,
+      "launch": "external_app",
+      "score": 1.6805,
+      "suitability": 0.9012,
+      "inSlate": false,
+      "reasons": [
+        "你玩过这个游戏，可以继续",
+        "覆盖你关注的部位：肩部、上肢",
+        "符合目标「上肢功能练习」：内容侧重动作幅度"
+      ],
+      "explanation": [
+        {
+          "feature": "h_game_completion_this",
+          "label": "该游戏完成率",
+          "group": "H",
+          "groupLabel": "训练历史",
+          "value": 1,
+          "points": 0.977
+        },
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.6924
+        },
+        {
+          "feature": "c_m1_caution_overhead",
+          "label": "M1 姿态感知：过顶要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": 0.5857
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "c_m1_caution_balance",
+          "label": "M1 姿态感知：平衡要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": -0.5038
+        },
+        {
+          "feature": "c_form_position",
+          "label": "章节在套路中的位置",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": 0.4294
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "archery",
+      "kind": "game",
+      "programId": null,
+      "title": "林间射箭",
+      "href": null,
+      "launch": "external_app",
+      "score": 1.2883,
+      "suitability": 0.8754,
+      "inSlate": false,
+      "reasons": [
+        "覆盖你关注的部位：肩部、上肢",
+        "符合目标「上肢功能练习」：内容侧重动作幅度",
+        "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+      ],
+      "explanation": [
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.6924
+        },
+        {
+          "feature": "c_m1_caution_overhead",
+          "label": "M1 姿态感知：过顶要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": 0.5857
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "c_m1_caution_balance",
+          "label": "M1 姿态感知：平衡要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": -0.5038
+        },
+        {
+          "feature": "c_form_position",
+          "label": "章节在套路中的位置",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": 0.4294
+        },
+        {
+          "feature": "x_goal_upper_limb_focus_reach",
+          "label": "目标「上肢功能练习」× 内容侧重「动作幅度」",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.4016
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "yjj-6",
+      "kind": "chapter",
+      "programId": "yijinjing",
+      "title": "易筋经 · 出爪亮翅势",
+      "href": "/routines/yijinjing/train?form=yjj-6",
+      "launch": "in_app_route",
+      "score": 0.9525,
+      "suitability": 0.8488,
+      "inSlate": false,
+      "reasons": [
+        "覆盖你关注的部位：肩部、上肢",
+        "符合目标「上肢功能练习」：内容侧重动作幅度",
+        "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+      ],
+      "explanation": [
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.6924
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "x_goal_upper_limb_focus_reach",
+          "label": "目标「上肢功能练习」× 内容侧重「动作幅度」",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.4016
+        },
+        {
+          "feature": "x_region_match_trunk",
+          "label": "命中所选部位：躯干",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": -0.3896
+        },
+        {
+          "feature": "c_region_shoulders",
+          "label": "内容涉及肩部",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.3693
+        },
+        {
+          "feature": "x_diff_stiffness_focus_stability",
+          "label": "「僵硬感」× 内容侧重「姿势稳定」",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.3254
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "yjj-2",
+      "kind": "chapter",
+      "programId": "yijinjing",
+      "title": "易筋经 · 韦驮献杵第二势",
+      "href": "/routines/yijinjing/train?form=yjj-2",
+      "launch": "in_app_route",
+      "score": 0.4772,
+      "suitability": 0.8035,
+      "inSlate": false,
+      "reasons": [
+        "覆盖你关注的部位：肩部、上肢",
+        "符合目标「上肢功能练习」：内容侧重动作幅度",
+        "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+      ],
+      "explanation": [
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.6924
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "c_m1_caution_balance",
+          "label": "M1 姿态感知：平衡要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.0461,
+          "points": -0.4574
+        },
+        {
+          "feature": "x_goal_upper_limb_focus_reach",
+          "label": "目标「上肢功能练习」× 内容侧重「动作幅度」",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.4016
+        },
+        {
+          "feature": "x_region_match_trunk",
+          "label": "命中所选部位：躯干",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": -0.3896
+        },
+        {
+          "feature": "c_region_shoulders",
+          "label": "内容涉及肩部",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.3693
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "boating",
+      "kind": "game",
+      "programId": null,
+      "title": "林间划船",
+      "href": null,
+      "launch": "external_app",
+      "score": 0.4214,
+      "suitability": 0.7975,
+      "inSlate": false,
+      "reasons": [
+        "覆盖你关注的部位：肩部、上肢",
+        "内容本身侧重动作节奏",
+        "考虑到「僵硬感」，选择侧重动作节奏的内容"
+      ],
+      "explanation": [
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.6924
+        },
+        {
+          "feature": "c_m1_caution_overhead",
+          "label": "M1 姿态感知：过顶要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": 0.5857
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "c_m1_caution_balance",
+          "label": "M1 姿态感知：平衡要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": -0.5038
+        },
+        {
+          "feature": "c_form_position",
+          "label": "章节在套路中的位置",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": 0.4294
+        },
+        {
+          "feature": "x_region_match_trunk",
+          "label": "命中所选部位：躯干",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": -0.3896
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "bdj-1",
+      "kind": "chapter",
+      "programId": "baduanjin",
+      "title": "八段锦 · 两手托天理三焦",
+      "href": "/routines/baduanjin/train?form=bdj-1",
+      "launch": "in_app_route",
+      "score": -0.3279,
+      "suitability": 0.705,
+      "inSlate": false,
+      "reasons": [
+        "与你最近的练习记录相衔接",
+        "覆盖你关注的部位：肩部、上肢",
+        "符合目标「上肢功能练习」：内容侧重动作幅度"
+      ],
+      "explanation": [
+        {
+          "feature": "c_m1_caution_overhead",
+          "label": "M1 姿态感知：过顶要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.9654,
+          "points": -1.7318
+        },
+        {
+          "feature": "h_trend_this",
+          "label": "该章节分数趋势",
+          "group": "H",
+          "groupLabel": "训练历史",
+          "value": 1,
+          "points": 1.254
+        },
+        {
+          "feature": "h_practised_this_log",
+          "label": "练过该内容的次数",
+          "group": "H",
+          "groupLabel": "训练历史",
+          "value": 1.7918,
+          "points": -0.8968
+        },
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.6924
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "c_prog_baduanjin",
+          "label": "属于八段锦",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.4923
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "bdj-3",
+      "kind": "chapter",
+      "programId": "baduanjin",
+      "title": "八段锦 · 调理脾胃须单举",
+      "href": "/routines/baduanjin/train?form=bdj-3",
+      "launch": "in_app_route",
+      "score": -0.9467,
+      "suitability": 0.6127,
+      "inSlate": false,
+      "reasons": [
+        "覆盖你关注的部位：肩部、上肢",
+        "与你最近的练习记录相衔接",
+        "符合目标「上肢功能练习」：内容侧重动作幅度"
+      ],
+      "explanation": [
+        {
+          "feature": "c_m1_caution_overhead",
+          "label": "M1 姿态感知：过顶要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.8446,
+          "points": -1.4419
+        },
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.6924
+        },
+        {
+          "feature": "h_practised_programme_log",
+          "label": "同功法其他章节练习量",
+          "group": "H",
+          "groupLabel": "训练历史",
+          "value": 2.1972,
+          "points": 0.6052
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "c_prog_baduanjin",
+          "label": "属于八段锦",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.4923
+        },
+        {
+          "feature": "x_goal_upper_limb_focus_reach",
+          "label": "目标「上肢功能练习」× 内容侧重「动作幅度」",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.4016
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "id": "yjj-7",
+      "kind": "chapter",
+      "programId": "yijinjing",
+      "title": "易筋经 · 九鬼拔马刀势",
+      "href": "/routines/yijinjing/train?form=yjj-7",
+      "launch": "in_app_route",
+      "score": -0.9607,
+      "suitability": 0.6104,
+      "inSlate": false,
+      "reasons": [
+        "覆盖你关注的部位：肩部、上肢",
+        "符合目标「上肢功能练习」：内容侧重动作幅度",
+        "考虑到「暂无明显困难」，选择侧重姿势稳定的内容"
+      ],
+      "explanation": [
+        {
+          "feature": "c_caution_twist",
+          "label": "内容注意项：转体",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 1.1934
+        },
+        {
+          "feature": "c_m1_caution_overhead",
+          "label": "M1 姿态感知：过顶要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.6712,
+          "points": -1.0256
+        },
+        {
+          "feature": "x_diff_stiffness_caution_count",
+          "label": "「僵硬感」× 注意项数量",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 2,
+          "points": -0.7743
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.8,
+          "points": 0.4497
+        },
+        {
+          "feature": "x_goal_upper_limb_focus_reach",
+          "label": "目标「上肢功能练习」× 内容侧重「动作幅度」",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.4016
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "id": "wqx-1",
+      "kind": "chapter",
+      "programId": "wuqinxi",
+      "title": "五禽戏 · 虎举",
+      "href": "/routines/wuqinxi/train?form=wqx-1",
+      "launch": "in_app_route",
+      "score": -1.3433,
+      "suitability": 0.5484,
+      "inSlate": false,
+      "reasons": [
+        "覆盖你关注的部位：肩部、上肢",
+        "符合目标「上肢功能练习」：内容侧重动作幅度",
+        "动作感知模型 M1 从示范姿态中识别到肩部参与"
+      ],
+      "explanation": [
+        {
+          "feature": "c_m1_caution_overhead",
+          "label": "M1 姿态感知：过顶要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.9315,
+          "points": -1.6503
+        },
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.6924
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "x_goal_upper_limb_focus_reach",
+          "label": "目标「上肢功能练习」× 内容侧重「动作幅度」",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.4016
+        },
+        {
+          "feature": "x_region_match_trunk",
+          "label": "命中所选部位：躯干",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": -0.3896
+        },
+        {
+          "feature": "c_m1_caution_balance",
+          "label": "M1 姿态感知：平衡要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.1239,
+          "points": -0.379
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "id": "yjj-3",
+      "kind": "chapter",
+      "programId": "yijinjing",
+      "title": "易筋经 · 韦驮献杵第三势",
+      "href": "/routines/yijinjing/train?form=yjj-3",
+      "launch": "in_app_route",
+      "score": -2.485,
+      "suitability": 0.3618,
+      "inSlate": false,
+      "reasons": [
+        "覆盖你关注的部位：肩部、上肢",
+        "符合目标「上肢功能练习」：内容侧重动作幅度",
+        "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+      ],
+      "explanation": [
+        {
+          "feature": "c_m1_caution_overhead",
+          "label": "M1 姿态感知：过顶要求",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.928,
+          "points": -1.642
+        },
+        {
+          "feature": "x_diff_stiffness_caution_count",
+          "label": "「僵硬感」× 注意项数量",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 2,
+          "points": -0.7743
+        },
+        {
+          "feature": "x_region_recall",
+          "label": "所选部位被覆盖的比例",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.5586
+        },
+        {
+          "feature": "x_region_f1",
+          "label": "与所选部位的整体匹配度",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0.8,
+          "points": 0.4497
+        },
+        {
+          "feature": "x_goal_upper_limb_focus_reach",
+          "label": "目标「上肢功能练习」× 内容侧重「动作幅度」",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 1,
+          "points": 0.4016
+        },
+        {
+          "feature": "x_region_match_trunk",
+          "label": "命中所选部位：躯干",
+          "group": "P",
+          "groupLabel": "画像与内容",
+          "value": 0,
+          "points": -0.3896
+        }
+      ]
+    }
+  ],
+  "programmes": [
+    {
+      "programId": "yijinjing",
+      "title": "易筋经",
+      "score": 1.5295,
+      "suitability": 0.9238
+    },
+    {
+      "programId": "baduanjin",
+      "title": "八段锦",
+      "score": 1.0928,
+      "suitability": 0.9408
+    },
+    {
+      "programId": "wuqinxi",
+      "title": "五禽戏",
+      "score": -1.3433,
+      "suitability": 0.5484
+    }
+  ],
+  "model": {
+    "release": "fp-cdm-release/1.0.0",
+    "id": "fp-cdm-m2",
+    "version": "1.0.0",
+    "runtimeVersion": "1.2.0",
+    "family": "pairwise_lr",
+    "featureSet": "fp-cdm-features/v1",
+    "tier": "ai_experimental",
+    "tierLabel": "实验性：AI 标注弱监督训练（单一 AI 标注者，未经人工验证）",
+    "binding": "release_bound",
+    "weightsFingerprint": "fnv1a32x2:501683ad09c7bd0a",
+    "weightsSha256": "d8bfd9ed8ad64d7b7832a4fefd063a6216af65ee3fc156b01b6dada484ac8b5c",
+    "contentModel": {
+      "id": "fp-cdm-m1",
+      "tableVersion": "1.0.0",
+      "fingerprint": "fnv1a32x2:ba463a0d4bd82785",
+      "modelOfRecord": "fp-cdm-m1 v1.1（嵌套留一功法验证 macro AUC 0.777；M2 v1.0 绑定 v1.0 的 out-of-fold 内容表）"
+    },
+    "catalogueFingerprint": "fnv1a32x2:e01fd2104d0ef965",
+    "trainedOn": {
+      "labelsSha256": "6ba82c3eebbad378e8d13e6a4c979044471b1e65c5800d3b64387d691e02a327",
+      "matrixSha256": "300c2f6c437d5d7474d3690a903752499ee01912c10fdebe2666939ecc93dd56",
+      "devFamilies": 18
+    },
+    "validation": {
+      "offlineTechnical": "passed",
+      "humanValidation": "pending",
+      "productAcceptance": "not_accepted"
+    }
+  },
+  "execution": "executed",
+  "confidence": 0.6112,
+  "abstained": true,
+  "abstainReason": "OUT_OF_DISTRIBUTION",
+  "outOfDistributionFeatures": [
+    "h_recency_this"
+  ],
+  "fallbackReason": "MODEL_ABSTAINED",
+  "comparison": null,
+  "guard": {
+    "checked": true,
+    "violations": []
+  },
+  "inputIssues": [],
+  "dataSources": {
+    "profile": "self_reported",
+    "trainingHistory": "synthetic_demo",
+    "gameHistory": "synthetic_demo",
+    "latestReport": "synthetic_demo",
+    "catalogue": "trusted_project_catalogue"
+  },
+  "rules": {
+    "schemaVersion": 1,
+    "status": "ready",
+    "source": {
+      "mode": "rules",
+      "synthetic": false,
+      "label": "自述画像的本地规则建议；未读取真实历史。",
+      "historyStatus": "not_connected",
+      "decisionStatus": "not_connected",
+      "recommendationMode": "profile_rules"
+    },
+    "result": {
+      "status": "ready",
+      "message": "已根据画像生成三类候选。你的偏好为功法与游戏混合；请在舒适范围内选择，出现不适即停止。",
+      "routines": [
+        {
+          "entry": {
+            "id": "baduanjin",
+            "kind": "routine",
+            "programId": "baduanjin",
+            "title": "八段锦",
+            "regions": [
+              "shoulders",
+              "arms",
+              "neck",
+              "trunk",
+              "legs"
+            ],
+            "focuses": [
+              "reach",
+              "coordination",
+              "general"
+            ],
+            "movement": "八式的上举、侧推、转头、俯身、冲拳与提踵；整套包含不同负荷",
+            "caution": [
+              "overhead",
+              "twist",
+              "balance",
+              "bending"
+            ],
+            "verification": "project_verified",
+            "sources": [
+              "apps/platform/src/features/routines/programs.ts#ROUTINE_PROGRAMS"
+            ],
+            "href": null
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：八式的上举、侧推、转头、俯身、冲拳与提踵；整套包含不同负荷。画像适配是工程建议，医学改善效果待核验。",
+            "仅建议从可选章节「八段锦 · 两手托天理三焦、八段锦 · 左右开弓似射雕、八段锦 · 调理脾胃须单举」开始了解；这不是整套训练处方，请使用下方章节入口。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        }
+      ],
+      "chapters": [
+        {
+          "entry": {
+            "id": "bdj-1",
+            "kind": "chapter",
+            "programId": "baduanjin",
+            "chapterId": "bdj-1",
+            "title": "八段锦 · 两手托天理三焦",
+            "regions": [
+              "shoulders",
+              "arms"
+            ],
+            "focuses": [
+              "reach",
+              "coordination"
+            ],
+            "movement": "双臂同时上托、下落",
+            "caution": [
+              "overhead"
+            ],
+            "verification": "project_verified",
+            "sources": [
+              "apps/platform/src/features/routines/programs.ts#ROUTINE_PROGRAMS",
+              "apps/platform/src/features/routines/analyzers/baduanjin/steps.ts#BADUANJIN_STEPS"
+            ],
+            "href": "/routines/baduanjin/train?form=bdj-1"
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：双臂同时上托、下落。画像适配是工程建议，医学改善效果待核验。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        },
+        {
+          "entry": {
+            "id": "bdj-2",
+            "kind": "chapter",
+            "programId": "baduanjin",
+            "chapterId": "bdj-2",
+            "title": "八段锦 · 左右开弓似射雕",
+            "regions": [
+              "shoulders",
+              "arms",
+              "legs"
+            ],
+            "focuses": [
+              "reach",
+              "coordination",
+              "stability"
+            ],
+            "movement": "马步中左右交替拉弓与侧向推掌",
+            "caution": [
+              "balance"
+            ],
+            "verification": "project_verified",
+            "sources": [
+              "apps/platform/src/features/routines/programs.ts#ROUTINE_PROGRAMS",
+              "apps/platform/src/features/routines/analyzers/baduanjin/steps.ts#BADUANJIN_STEPS"
+            ],
+            "href": "/routines/baduanjin/train?form=bdj-2"
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：马步中左右交替拉弓与侧向推掌。画像适配是工程建议，医学改善效果待核验。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        },
+        {
+          "entry": {
+            "id": "bdj-3",
+            "kind": "chapter",
+            "programId": "baduanjin",
+            "chapterId": "bdj-3",
+            "title": "八段锦 · 调理脾胃须单举",
+            "regions": [
+              "shoulders",
+              "arms"
+            ],
+            "focuses": [
+              "reach",
+              "coordination"
+            ],
+            "movement": "一掌上托、一掌下按，左右交替",
+            "caution": [
+              "overhead"
+            ],
+            "verification": "project_verified",
+            "sources": [
+              "apps/platform/src/features/routines/programs.ts#ROUTINE_PROGRAMS",
+              "apps/platform/src/features/routines/analyzers/baduanjin/steps.ts#BADUANJIN_STEPS"
+            ],
+            "href": "/routines/baduanjin/train?form=bdj-3"
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：一掌上托、一掌下按，左右交替。画像适配是工程建议，医学改善效果待核验。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        }
+      ],
+      "games": [
+        {
+          "entry": {
+            "id": "apple",
+            "kind": "game",
+            "title": "摘苹果",
+            "regions": [
+              "shoulders",
+              "arms"
+            ],
+            "focuses": [
+              "reach",
+              "stability",
+              "coordination"
+            ],
+            "movement": "向上、向侧面伸手触达目标并短暂停留",
+            "caution": [
+              "overhead"
+            ],
+            "verification": "project_verified",
+            "sources": [
+              "apps/motion-games-lab/app/src/data/games.ts#GAMES",
+              "apps/motion-games-lab/app/src/motion/targetTracker.ts"
+            ],
+            "href": null
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：向上、向侧面伸手触达目标并短暂停留。画像适配是工程建议，医学改善效果待核验。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        },
+        {
+          "entry": {
+            "id": "archery",
+            "kind": "game",
+            "title": "林间射箭",
+            "regions": [
+              "shoulders",
+              "arms"
+            ],
+            "focuses": [
+              "stability",
+              "coordination",
+              "reach"
+            ],
+            "movement": "双臂拉开、持弓手瞄准、拉弦手收回胸前；拉弓量为手腕间距代理",
+            "caution": [],
+            "verification": "project_verified",
+            "sources": [
+              "apps/motion-games-lab/app/src/data/games.ts#GAMES",
+              "apps/motion-games-lab/app/src/games/archery/README.md"
+            ],
+            "href": null
+          },
+          "reasons": [
+            "画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。",
+            "动作依据：双臂拉开、持弓手瞄准、拉弦手收回胸前；拉弓量为手腕间距代理。画像适配是工程建议，医学改善效果待核验。"
+          ],
+          "evidenceIds": [],
+          "basis": "profile_rules"
+        }
+      ],
+      "focus": [
+        "reach",
+        "coordination"
+      ],
+      "evidence": [],
+      "limitations": [
+        "当前仅使用自述画像；未读取或接入真实用户训练、报告和游戏历史。",
+        "不做诊断、不承诺医学疗效，不提供康复剂量；不把相似度、游戏得分或工程评分混成健康总分。",
+        "未进行真人效果验证；下一阶段侧重点属于建议，不表示已确认的身体问题或进步。",
+        "StartLux 决策模型尚未接入；当前使用本地画像规则兜底。"
+      ]
+    },
+    "answers": {
+      "suitable": "可先了解八段锦。建议先查看章节「八段锦 · 两手托天理三焦」，按舒适范围练习。这是画像规则建议，不是医学处方。",
+      "first_game": "可先了解「摘苹果」：向上、向侧面伸手触达目标并短暂停留。画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。该游戏是独立应用，当前展示页未配置启动地址。",
+      "recent_issues": "证据不足：尚无可用于说明主要问题的有效报告分项。画像中的不适是你的自述，练过某动作也不能证明存在动作缺陷。",
+      "why": "以「八段锦 · 两手托天理三焦」为例：画像规则：你选择了上肢功能练习，僵硬感；本条目包含肩部、上肢动作。\n动作依据：双臂同时上托、下落。画像适配是工程建议，医学改善效果待核验。知识来源：apps/platform/src/features/routines/programs.ts#ROUTINE_PROGRAMS；apps/platform/src/features/routines/analyzers/baduanjin/steps.ts#BADUANJIN_STEPS。",
+      "next_focus": "下一阶段可关注：舒适范围内的动作幅度、左右与手脚配合。这是画像与已授权证据支持的训练建议，不代表已测得疾病或疗效。StartLux 尚无可用输出，继续采用本地规则兜底。"
+    },
+    "availability": {
+      "routines": "available",
+      "chapters": "available",
+      "games": "available"
+    },
+    "evidenceStatus": "missing",
+    "reportStatus": "missing",
+    "error": null
+  },
+  "error": null,
+  "limitations": [
+    "rules 为 Agent Web P0 规则服务的原输出，未修改；模型只在安全筛选之后的候选内排序，不能解除任何限制。",
+    "当前模型为实验性版本：训练标签来自单一 AI 标注者（弱监督），未经人工、专家或真实用户验证。",
+    "输入中含合成演示数据，不代表本人真实训练表现。",
+    "不做诊断、不承诺疗效、不提供剂量；出现不适即停止。"
+  ],
+  "executedActions": false
+}

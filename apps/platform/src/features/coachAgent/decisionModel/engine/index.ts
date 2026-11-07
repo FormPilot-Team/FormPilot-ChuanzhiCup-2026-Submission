@@ -1,7 +1,7 @@
 /**
  * FormPilot Coach Decision engine — the ONLY entry point the Web needs.
  *
- *   import { recommendCoachDecision, COACH_DECISION_CONTRACT } from '@/features/coachAgent/decisionModel/engine'
+ *   import { recommendCoachDecision, COACH_DECISION_CONTRACT } from '<relative path>/features/coachAgent/decisionModel/engine'
  *   const res = recommendCoachDecision({ contract: COACH_DECISION_CONTRACT, profile }, { mode: 'shadow' })
  *   render(res.display)            // always the thing to show; res.ranking / res.model for explanation panels
  *
@@ -11,6 +11,6 @@
 export { recommendCoachDecision, describeCoachDecisionModel, createCoachDecisionEngine, type CoachDecisionEngine, type CoachDecisionEngineConfig } from './engine'
 export * from './contract'
 // Local-record helpers (routine session store + consent-gated report reader) live in './platform' so this core import stays small:
-//   import { collectLocalDecisionInput, historyFromRoutineSessions } from '@/features/coachAgent/decisionModel/engine/platform'
+//   import { collectLocalDecisionInput, historyFromRoutineSessions } from '<relative path>/features/coachAgent/decisionModel/engine/platform'
 export { FP_CDM_RELEASE, weightsFingerprint, contentTableFingerprint, fingerprintText } from './release'
 export { featureLabel } from '../cdm/explain'

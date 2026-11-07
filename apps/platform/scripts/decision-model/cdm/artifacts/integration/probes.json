@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-11-07T17:13:57.169Z",
+ "generatedAt": "2026-11-07T17:26:57.650Z",
  "engine": "fp-cdm-release/1.0.0 via recommendCoachDecision (ACTIVE + owner flag for the probe)",
  "now": 1794139200000,
  "note": "Synthetic probe users (not real users). Descriptive behaviour of the released model; AI-label experimental tier. Not accuracy, not clinical evidence.",
@@ -1974,7 +1974,7 @@
        "completedSessions": 3,
        "meanScore": 64,
        "trend": "flat",
-       "lastPracticedAt": 1793966400000
+       "lastPracticedAt": 1793793600000
       }
      ]
     },
@@ -2041,18 +2041,6 @@
      ]
     },
     {
-     "id": "bdj-2",
-     "title": "八段锦 · 左右开弓似射雕",
-     "score": 0.7065,
-     "suitability": 0.8265,
-     "inSlate": false,
-     "reasons": [
-      "与你最近的练习记录相衔接",
-      "覆盖你关注的部位：肩部、上肢",
-      "符合目标「上肢功能练习」：内容侧重动作幅度"
-     ]
-    },
-    {
      "id": "archery",
      "title": "林间射箭",
      "score": 0.6874,
@@ -2063,19 +2051,31 @@
       "符合目标「上肢功能练习」：内容侧重动作幅度",
       "考虑到「僵硬感」，选择侧重姿势稳定的内容"
      ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 0.5338,
+     "suitability": 0.8094,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "与你最近的练习记录相衔接",
+      "符合目标「上肢功能练习」：内容侧重动作幅度"
+     ]
     }
    ],
-   "kendallVsS0": 0.7818,
+   "kendallVsS0": 0.7455,
    "slateNovelShare": 0.8,
    "ranks": {
     "bdj-1": 9,
-    "bdj-2": 4,
+    "bdj-2": 5,
     "bdj-3": 10,
     "bdj-4": null,
     "bdj-5": null,
     "apple": 3,
     "boating": 6,
-    "archery": 5
+    "archery": 4
    }
   },
   {
@@ -2289,7 +2289,7 @@
        "completedSessions": 3,
        "meanScore": 64,
        "trend": "flat",
-       "lastPracticedAt": 1793966400000
+       "lastPracticedAt": 1793793600000
       }
      ]
     },
@@ -2317,26 +2317,30 @@
      ]
     }
    },
-   "decisionOrigin": "rules",
+   "decisionOrigin": "model",
    "status": "ready",
-   "fallbackReason": "MODEL_ABSTAINED",
-   "abstainReason": "OUT_OF_DISTRIBUTION",
-   "outOfDistributionFeatures": [
-    "h_recency_this"
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.5204,
+   "slate": [
+    "bdj-2",
+    "yjj-1",
+    "yjj-6",
+    "apple",
+    "archery"
    ],
-   "confidence": 0.5679,
-   "slate": [],
    "top5": [
     {
      "id": "bdj-2",
      "title": "八段锦 · 左右开弓似射雕",
-     "score": 2.3525,
-     "suitability": 0.9346,
-     "inSlate": false,
+     "score": 2.1798,
+     "suitability": 0.9272,
+     "inSlate": true,
      "reasons": [
       "回应最近报告中的待关注项",
-      "与你最近的练习记录相衔接",
-      "覆盖你关注的部位：肩部、上肢"
+      "覆盖你关注的部位：肩部、上肢",
+      "与你最近的练习记录相衔接"
      ]
     },
     {
@@ -2344,7 +2348,7 @@
      "title": "易筋经 · 韦驮献杵第一势",
      "score": 2.1064,
      "suitability": 0.9238,
-     "inSlate": false,
+     "inSlate": true,
      "reasons": [
       "考虑到「僵硬感」，选择侧重日常活动的内容",
       "覆盖你关注的部位：肩部、上肢",
@@ -2356,7 +2360,7 @@
      "title": "摘苹果",
      "score": 1.6805,
      "suitability": 0.9012,
-     "inSlate": false,
+     "inSlate": true,
      "reasons": [
       "你玩过这个游戏，可以继续",
       "覆盖你关注的部位：肩部、上肢",
@@ -2368,7 +2372,7 @@
      "title": "林间射箭",
      "score": 1.2883,
      "suitability": 0.8754,
-     "inSlate": false,
+     "inSlate": true,
      "reasons": [
       "覆盖你关注的部位：肩部、上肢",
       "符合目标「上肢功能练习」：内容侧重动作幅度",
@@ -2380,7 +2384,7 @@
      "title": "易筋经 · 出爪亮翅势",
      "score": 0.9525,
      "suitability": 0.8488,
-     "inSlate": false,
+     "inSlate": true,
      "reasons": [
       "覆盖你关注的部位：肩部、上肢",
       "符合目标「上肢功能练习」：内容侧重动作幅度",
@@ -2392,148 +2396,6 @@
    "candidatesWithFocus": 7,
    "meanRankWithReport": 4.7143,
    "meanRankWithoutReport": 4.1429,
-   "kendallVsNoReport": 0.8545
-  },
-  {
-   "input": {
-    "contract": "fp-coach-decision/v1",
-    "profile": {
-     "version": 1,
-     "goals": [
-      "upper_limb"
-     ],
-     "difficulties": [
-      "stiffness"
-     ],
-     "regions": [
-      "shoulders",
-      "arms"
-     ],
-     "preference": "mixed",
-     "risk": "none",
-     "acknowledged": true
-    },
-    "now": 1794139200000,
-    "trainingHistory": {
-     "origin": "synthetic_demo",
-     "chapters": [
-      {
-       "chapterId": "bdj-1",
-       "sessions": 5,
-       "completedSessions": 5,
-       "meanScore": 70,
-       "trend": "up",
-       "lastPracticedAt": 1793707200000
-      },
-      {
-       "chapterId": "bdj-2",
-       "sessions": 3,
-       "completedSessions": 3,
-       "meanScore": 64,
-       "trend": "flat",
-       "lastPracticedAt": 1793966400000
-      }
-     ]
-    },
-    "gameHistory": {
-     "origin": "synthetic_demo",
-     "games": [
-      {
-       "gameId": "apple",
-       "plays": 3,
-       "completedPlays": 3,
-       "lastPlayedAt": 1794052800000
-      }
-     ]
-    },
-    "latestReport": {
-     "origin": "synthetic_demo",
-     "createdAt": 1794052800000,
-     "findings": [
-      {
-       "focus": "reach",
-       "subjectId": "bdj-2",
-       "score": 52,
-       "trend": "worse"
-      }
-     ]
-    }
-   },
-   "decisionOrigin": "rules",
-   "status": "ready",
-   "fallbackReason": "MODEL_ABSTAINED",
-   "abstainReason": "OUT_OF_DISTRIBUTION",
-   "outOfDistributionFeatures": [
-    "h_recency_this"
-   ],
-   "confidence": 0.6785,
-   "slate": [],
-   "top5": [
-    {
-     "id": "bdj-2",
-     "title": "八段锦 · 左右开弓似射雕",
-     "score": 2.3525,
-     "suitability": 0.9346,
-     "inSlate": false,
-     "reasons": [
-      "回应最近报告中的待关注项",
-      "与你最近的练习记录相衔接",
-      "覆盖你关注的部位：肩部、上肢"
-     ]
-    },
-    {
-     "id": "apple",
-     "title": "摘苹果",
-     "score": 1.6805,
-     "suitability": 0.9012,
-     "inSlate": false,
-     "reasons": [
-      "你玩过这个游戏，可以继续",
-      "覆盖你关注的部位：肩部、上肢",
-      "符合目标「上肢功能练习」：内容侧重动作幅度"
-     ]
-    },
-    {
-     "id": "yjj-1",
-     "title": "易筋经 · 韦驮献杵第一势",
-     "score": 1.5055,
-     "suitability": 0.8903,
-     "inSlate": false,
-     "reasons": [
-      "考虑到「僵硬感」，选择侧重日常活动的内容",
-      "覆盖你关注的部位：肩部、上肢",
-      "符合目标「上肢功能练习」：内容侧重日常活动"
-     ]
-    },
-    {
-     "id": "archery",
-     "title": "林间射箭",
-     "score": 1.2883,
-     "suitability": 0.8754,
-     "inSlate": false,
-     "reasons": [
-      "覆盖你关注的部位：肩部、上肢",
-      "符合目标「上肢功能练习」：内容侧重动作幅度",
-      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
-     ]
-    },
-    {
-     "id": "yjj-6",
-     "title": "易筋经 · 出爪亮翅势",
-     "score": 0.9525,
-     "suitability": 0.8488,
-     "inSlate": false,
-     "reasons": [
-      "覆盖你关注的部位：肩部、上肢",
-      "符合目标「上肢功能练习」：内容侧重动作幅度",
-      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
-     ]
-    }
-   ],
-   "focus": "reach",
-   "candidatesWithFocus": 10,
-   "meanRankWithReport": 6.8,
-   "meanRankWithoutReport": 6.9,
    "kendallVsNoReport": 0.8182
   },
   {
@@ -2573,7 +2435,153 @@
        "completedSessions": 3,
        "meanScore": 64,
        "trend": "flat",
-       "lastPracticedAt": 1793966400000
+       "lastPracticedAt": 1793793600000
+      }
+     ]
+    },
+    "gameHistory": {
+     "origin": "synthetic_demo",
+     "games": [
+      {
+       "gameId": "apple",
+       "plays": 3,
+       "completedPlays": 3,
+       "lastPlayedAt": 1794052800000
+      }
+     ]
+    },
+    "latestReport": {
+     "origin": "synthetic_demo",
+     "createdAt": 1794052800000,
+     "findings": [
+      {
+       "focus": "reach",
+       "subjectId": "bdj-2",
+       "score": 52,
+       "trend": "worse"
+      }
+     ]
+    }
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.6352,
+   "slate": [
+    "bdj-2",
+    "yjj-1",
+    "yjj-6",
+    "apple",
+    "archery"
+   ],
+   "top5": [
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 2.1798,
+     "suitability": 0.9272,
+     "inSlate": true,
+     "reasons": [
+      "回应最近报告中的待关注项",
+      "覆盖你关注的部位：肩部、上肢",
+      "与你最近的练习记录相衔接"
+     ]
+    },
+    {
+     "id": "apple",
+     "title": "摘苹果",
+     "score": 1.6805,
+     "suitability": 0.9012,
+     "inSlate": true,
+     "reasons": [
+      "你玩过这个游戏，可以继续",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.5055,
+     "suitability": 0.8903,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 1.2883,
+     "suitability": 0.8754,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "yjj-6",
+     "title": "易筋经 · 出爪亮翅势",
+     "score": 0.9525,
+     "suitability": 0.8488,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "focus": "reach",
+   "candidatesWithFocus": 10,
+   "meanRankWithReport": 6.8,
+   "meanRankWithoutReport": 6.9,
+   "kendallVsNoReport": 0.7818
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000,
+    "trainingHistory": {
+     "origin": "synthetic_demo",
+     "chapters": [
+      {
+       "chapterId": "bdj-1",
+       "sessions": 5,
+       "completedSessions": 5,
+       "meanScore": 70,
+       "trend": "up",
+       "lastPracticedAt": 1793707200000
+      },
+      {
+       "chapterId": "bdj-2",
+       "sessions": 3,
+       "completedSessions": 3,
+       "meanScore": 64,
+       "trend": "flat",
+       "lastPracticedAt": 1793793600000
       }
      ]
     },
@@ -2606,7 +2614,7 @@
    "fallbackReason": null,
    "abstainReason": null,
    "outOfDistributionFeatures": [],
-   "confidence": 0.6628,
+   "confidence": 0.7043,
    "slate": [
     "tjq-1",
     "bdj-2",
@@ -2630,13 +2638,13 @@
     {
      "id": "bdj-2",
      "title": "八段锦 · 左右开弓似射雕",
-     "score": 1.7516,
-     "suitability": 0.9054,
+     "score": 1.5789,
+     "suitability": 0.895,
      "inSlate": true,
      "reasons": [
       "回应最近报告中的待关注项",
-      "与你最近的练习记录相衔接",
-      "覆盖你关注的部位：肩部、上肢"
+      "覆盖你关注的部位：肩部、上肢",
+      "与你最近的练习记录相衔接"
      ]
     },
     {
@@ -2680,7 +2688,7 @@
    "candidatesWithFocus": 1,
    "meanRankWithReport": 5,
    "meanRankWithoutReport": 6,
-   "kendallVsNoReport": 0.9091
+   "kendallVsNoReport": 0.8788
   }
  ],
  "riskProbe": [
@@ -3081,6 +3089,95 @@
    "displayIsRules": false
   }
  ],
+ "recencyProbe": [
+  {
+   "daysSinceBdj2": 0,
+   "h_recency_this": 1,
+   "decisionOrigin": "rules",
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "OUT_OF_DISTRIBUTION",
+   "outOfDistributionFeatures": [
+    "h_recency_this"
+   ],
+   "top1": "bdj-2"
+  },
+  {
+   "daysSinceBdj2": 1,
+   "h_recency_this": 0.8669,
+   "decisionOrigin": "rules",
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "OUT_OF_DISTRIBUTION",
+   "outOfDistributionFeatures": [
+    "h_recency_this"
+   ],
+   "top1": "bdj-2"
+  },
+  {
+   "daysSinceBdj2": 2,
+   "h_recency_this": 0.7515,
+   "decisionOrigin": "rules",
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "OUT_OF_DISTRIBUTION",
+   "outOfDistributionFeatures": [
+    "h_recency_this"
+   ],
+   "top1": "bdj-2"
+  },
+  {
+   "daysSinceBdj2": 3,
+   "h_recency_this": 0.6514,
+   "decisionOrigin": "model",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "top1": "bdj-2"
+  },
+  {
+   "daysSinceBdj2": 4,
+   "h_recency_this": 0.5647,
+   "decisionOrigin": "model",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "top1": "bdj-2"
+  },
+  {
+   "daysSinceBdj2": 5,
+   "h_recency_this": 0.4895,
+   "decisionOrigin": "model",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "top1": "bdj-2"
+  },
+  {
+   "daysSinceBdj2": 7,
+   "h_recency_this": 0.3679,
+   "decisionOrigin": "model",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "top1": "yjj-1"
+  },
+  {
+   "daysSinceBdj2": 10,
+   "h_recency_this": 0.2397,
+   "decisionOrigin": "model",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "top1": "yjj-1"
+  },
+  {
+   "daysSinceBdj2": 14,
+   "h_recency_this": 0.1353,
+   "decisionOrigin": "model",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "top1": "yjj-1"
+  }
+ ],
  "perturbation": {
   "base": {
    "contract": "fp-coach-decision/v1",
@@ -3118,7 +3215,7 @@
       "completedSessions": 3,
       "meanScore": 64,
       "trend": "flat",
-      "lastPracticedAt": 1793966400000
+      "lastPracticedAt": 1793793600000
      }
     ]
    },
@@ -3136,8 +3233,8 @@
   },
   "trials": 200,
   "perturbation": "meanScore ±5, lastPracticedAt ±1 day, sessions ±1 with p=0.3",
-  "kendallMedian": 0.9697,
-  "kendallP05": 0.9394,
+  "kendallMedian": 1,
+  "kendallP05": 0.9697,
   "top1Unchanged": 1,
   "slateUnchanged": 1
  },
@@ -3194,8 +3291,8 @@
      ],
      "kendallVsRelease": 1,
      "top3OverlapWithRelease": 3,
-     "fallbackReason": "MODEL_ABSTAINED",
-     "abstainReason": "OUT_OF_DISTRIBUTION"
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
     },
     {
      "label": "颈肩",
@@ -3249,7 +3346,7 @@
       "yjj-1",
       "bdj-2"
      ],
-     "kendallVsRelease": 0.8485,
+     "kendallVsRelease": 0.8182,
      "top3OverlapWithRelease": 2,
      "fallbackReason": "SHADOW_MODE",
      "abstainReason": null
@@ -3330,7 +3427,7 @@
       "yjj-1",
       "apple"
      ],
-     "kendallVsRelease": 0.7576,
+     "kendallVsRelease": 0.7879,
      "top3OverlapWithRelease": 3,
      "fallbackReason": "SHADOW_MODE",
      "abstainReason": null
@@ -3356,8 +3453,8 @@
      ],
      "kendallVsRelease": 0.9394,
      "top3OverlapWithRelease": 3,
-     "fallbackReason": "MODEL_ABSTAINED",
-     "abstainReason": "OUT_OF_DISTRIBUTION"
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
     },
     {
      "label": "颈肩",
@@ -3408,10 +3505,10 @@
      "label": "S2 有历史",
      "top3": [
       "tjq-1",
-      "bdj-2",
-      "bdj-1"
+      "bdj-1",
+      "bdj-2"
      ],
-     "kendallVsRelease": 0.2727,
+     "kendallVsRelease": 0.2121,
      "top3OverlapWithRelease": 1,
      "fallbackReason": "SHADOW_MODE",
      "abstainReason": null
@@ -3437,8 +3534,8 @@
      ],
      "kendallVsRelease": 0.2727,
      "top3OverlapWithRelease": 1,
-     "fallbackReason": "MODEL_ABSTAINED",
-     "abstainReason": "OUT_OF_DISTRIBUTION"
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
     },
     {
      "label": "颈肩",
@@ -3492,7 +3589,7 @@
       "yjj-1",
       "apple"
      ],
-     "kendallVsRelease": 0.9697,
+     "kendallVsRelease": 0.9394,
      "top3OverlapWithRelease": 3,
      "fallbackReason": "SHADOW_MODE",
      "abstainReason": null
@@ -3573,7 +3670,7 @@
       "yjj-1",
       "bdj-2"
      ],
-     "kendallVsRelease": 0.8485,
+     "kendallVsRelease": 0.8182,
      "top3OverlapWithRelease": 2,
      "fallbackReason": "SHADOW_MODE",
      "abstainReason": null
@@ -3680,8 +3777,8 @@
      ],
      "kendallVsRelease": 1,
      "top3OverlapWithRelease": 3,
-     "fallbackReason": "MODEL_ABSTAINED",
-     "abstainReason": "OUT_OF_DISTRIBUTION"
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
     },
     {
      "label": "颈肩",
@@ -3735,7 +3832,7 @@
       "yjj-6",
       "boating"
      ],
-     "kendallVsRelease": 0.3333,
+     "kendallVsRelease": 0.3636,
      "top3OverlapWithRelease": 0,
      "fallbackReason": "MODEL_ABSTAINED",
      "abstainReason": "LOW_SUITABILITY"
@@ -3756,10 +3853,10 @@
      "label": "S2 + 报告",
      "top3": [
       "archery",
-      "yjj-6",
-      "bdj-2"
+      "bdj-2",
+      "yjj-6"
      ],
-     "kendallVsRelease": 0.6061,
+     "kendallVsRelease": 0.6364,
      "top3OverlapWithRelease": 1,
      "fallbackReason": "MODEL_ABSTAINED",
      "abstainReason": "LOW_SUITABILITY"
@@ -3816,7 +3913,7 @@
       "apple",
       "tjq-1"
      ],
-     "kendallVsRelease": 0.6364,
+     "kendallVsRelease": 0.6667,
      "top3OverlapWithRelease": 3,
      "fallbackReason": "SHADOW_MODE",
      "abstainReason": null
@@ -3897,7 +3994,7 @@
       "yjj-1",
       "apple"
      ],
-     "kendallVsRelease": 0.8182,
+     "kendallVsRelease": 0.8485,
      "top3OverlapWithRelease": 3,
      "fallbackReason": "SHADOW_MODE",
      "abstainReason": null
@@ -3919,10 +4016,10 @@
      "top3": [
       "yjj-1",
       "apple",
-      "bdj-2"
+      "archery"
      ],
-     "kendallVsRelease": 0.8485,
-     "top3OverlapWithRelease": 3,
+     "kendallVsRelease": 0.8182,
+     "top3OverlapWithRelease": 2,
      "fallbackReason": "SHADOW_MODE",
      "abstainReason": null
     },
@@ -4020,7 +4117,7 @@
        "completedSessions": 3,
        "meanScore": 64,
        "trend": "flat",
-       "lastPracticedAt": 1793966400000
+       "lastPracticedAt": 1793793600000
       }
      ]
     },
@@ -4170,7 +4267,7 @@
        "completedSessions": 3,
        "meanScore": 64,
        "trend": "flat",
-       "lastPracticedAt": 1793966400000
+       "lastPracticedAt": 1793793600000
       }
      ]
     },

@@ -1,0 +1,20 @@
+{
+  "contract": "fp-coach-decision/v1",
+  "profile": {
+    "version": 1,
+    "goals": [
+      "upper_limb"
+    ],
+    "difficulties": [
+      "stiffness"
+    ],
+    "regions": [
+      "shoulders",
+      "arms"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+  },
+  "now": 1794110400000
+}
