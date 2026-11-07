@@ -1,0 +1,4264 @@
+{
+ "schemaVersion": 1,
+ "generatedAt": "2026-11-07T17:13:57.169Z",
+ "engine": "fp-cdm-release/1.0.0 via recommendCoachDecision (ACTIVE + owner flag for the probe)",
+ "now": 1794139200000,
+ "note": "Synthetic probe users (not real users). Descriptive behaviour of the released model; AI-label experimental tier. Not accuracy, not clinical evidence.",
+ "goalSweep": [
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.6888,
+   "slate": [
+    "yjj-1",
+    "bdj-2",
+    "yjj-6",
+    "archery",
+    "boating"
+   ],
+   "top5": [
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.2097,
+     "suitability": 0.8695,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 0.4948,
+     "suitability": 0.8053,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 0.3085,
+     "suitability": 0.7851,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": 0.1256,
+     "suitability": 0.7638,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重动作节奏的内容"
+     ]
+    },
+    {
+     "id": "yjj-6",
+     "title": "易筋经 · 出爪亮翅势",
+     "score": -0.0273,
+     "suitability": 0.7449,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "limitedProfileSafetyPoolChanged": false,
+   "slateFocus": {
+    "stability": 4,
+    "general": 1,
+    "reach": 3,
+    "coordination": 3,
+    "rhythm": 1
+   },
+   "kendallVsUpperLimbOverCommon": 1,
+   "slateJaccardVsUpperLimb": 1,
+   "rulesP0Slate": [
+    "bdj-1",
+    "bdj-2",
+    "bdj-3",
+    "apple",
+    "archery"
+   ],
+   "pr49Slate": [
+    "wqx-1",
+    "yjj-2",
+    "yjj-1",
+    "archery",
+    "apple"
+   ],
+   "rulesSlateJaccardVsUpperLimb": 1
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "mobility"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.6859,
+   "slate": [
+    "yjj-1",
+    "bdj-2",
+    "yjj-6",
+    "archery",
+    "apple"
+   ],
+   "top5": [
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.272,
+     "suitability": 0.8742,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「肩颈活动」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 0.569,
+     "suitability": 0.813,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「肩颈活动」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 0.3827,
+     "suitability": 0.7933,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「肩颈活动」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "yjj-6",
+     "title": "易筋经 · 出爪亮翅势",
+     "score": 0.1671,
+     "suitability": 0.7688,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「肩颈活动」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "apple",
+     "title": "摘苹果",
+     "score": -0.1224,
+     "suitability": 0.7327,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「肩颈活动」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "limitedProfileSafetyPoolChanged": false,
+   "slateFocus": {
+    "stability": 5,
+    "general": 1,
+    "reach": 4,
+    "coordination": 3
+   },
+   "kendallVsUpperLimbOverCommon": 1,
+   "slateJaccardVsUpperLimb": 0.6667,
+   "rulesP0Slate": [
+    "bdj-1",
+    "bdj-2",
+    "bdj-3",
+    "apple",
+    "archery"
+   ],
+   "pr49Slate": [
+    "yjj-2",
+    "wqx-1",
+    "yjj-6",
+    "archery",
+    "apple"
+   ],
+   "rulesSlateJaccardVsUpperLimb": 1
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "daily"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.687,
+   "slate": [
+    "tjq-1",
+    "yjj-1",
+    "tjq-10",
+    "boating",
+    "archery"
+   ],
+   "top5": [
+    {
+     "id": "tjq-1",
+     "title": "太极拳 · 起势",
+     "score": 2.3002,
+     "suitability": 0.9324,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「日常锻炼」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.5929,
+     "suitability": 0.8959,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「日常锻炼」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": 0.9226,
+     "suitability": 0.8462,
+     "inSlate": true,
+     "reasons": [
+      "符合目标「日常锻炼」：内容侧重动作节奏",
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重动作节奏"
+     ]
+    },
+    {
+     "id": "bdj-7",
+     "title": "八段锦 · 攒拳怒目增气力",
+     "score": 0.6645,
+     "suitability": 0.8225,
+     "inSlate": false,
+     "reasons": [
+      "符合目标「日常锻炼」：内容侧重动作节奏",
+      "覆盖你关注的部位：上肢、肩部",
+      "内容本身侧重动作节奏"
+     ]
+    },
+    {
+     "id": "tjq-10",
+     "title": "太极拳 · 云手",
+     "score": 0.5056,
+     "suitability": 0.8065,
+     "inSlate": true,
+     "reasons": [
+      "符合目标「日常锻炼」：内容侧重动作节奏",
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重动作节奏"
+     ]
+    }
+   ],
+   "limitedProfileSafetyPoolChanged": false,
+   "slateFocus": {
+    "coordination": 4,
+    "general": 2,
+    "stability": 2,
+    "rhythm": 2,
+    "reach": 1
+   },
+   "kendallVsUpperLimbOverCommon": 0.9444,
+   "slateJaccardVsUpperLimb": 0.4286,
+   "rulesP0Slate": [
+    "bdj-7",
+    "tjq-1",
+    "tjq-10",
+    "boating",
+    "apple"
+   ],
+   "pr49Slate": [
+    "yjj-1",
+    "wqx-1",
+    "yjj-2",
+    "boating",
+    "archery"
+   ],
+   "rulesSlateJaccardVsUpperLimb": 0.1111
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "mobility",
+      "daily"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.6466,
+   "slate": [
+    "tjq-1",
+    "yjj-1",
+    "yjj-6",
+    "boating",
+    "archery"
+   ],
+   "top5": [
+    {
+     "id": "tjq-1",
+     "title": "太极拳 · 起势",
+     "score": 2.6279,
+     "suitability": 0.9449,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「日常锻炼」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 2.0842,
+     "suitability": 0.9227,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「日常锻炼」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 1.0391,
+     "suitability": 0.8561,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「肩颈活动」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": 0.9926,
+     "suitability": 0.8522,
+     "inSlate": true,
+     "reasons": [
+      "符合目标「日常锻炼」：内容侧重动作节奏",
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重动作节奏"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 0.8528,
+     "suitability": 0.8401,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「肩颈活动」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "limitedProfileSafetyPoolChanged": false,
+   "slateFocus": {
+    "coordination": 3,
+    "general": 2,
+    "stability": 3,
+    "reach": 2,
+    "rhythm": 1
+   },
+   "kendallVsUpperLimbOverCommon": 0.9636,
+   "slateJaccardVsUpperLimb": 0.6667,
+   "rulesP0Slate": [
+    "bdj-1",
+    "bdj-2",
+    "bdj-3",
+    "apple",
+    "archery"
+   ],
+   "pr49Slate": [
+    "yjj-2",
+    "wqx-1",
+    "yjj-1",
+    "archery",
+    "boating"
+   ],
+   "rulesSlateJaccardVsUpperLimb": 1
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "rehab_support"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.7301,
+   "slate": [
+    "tjq-1",
+    "yjj-1",
+    "yjj-6",
+    "boating",
+    "archery"
+   ],
+   "top5": [
+    {
+     "id": "tjq-1",
+     "title": "太极拳 · 起势",
+     "score": 1.7216,
+     "suitability": 0.9036,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "动作感知模型 M1 从示范姿态中识别到肩部参与"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 0.826,
+     "suitability": 0.8376,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重日常活动"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": 0.4968,
+     "suitability": 0.8055,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「康复辅助意向」：内容侧重动作节奏",
+      "内容本身侧重动作节奏"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 0.0953,
+     "suitability": 0.7601,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "符合目标「康复辅助意向」：内容侧重协调配合"
+     ]
+    },
+    {
+     "id": "yjj-6",
+     "title": "易筋经 · 出爪亮翅势",
+     "score": -0.3882,
+     "suitability": 0.6966,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "符合目标「康复辅助意向」：内容侧重姿势稳定"
+     ]
+    }
+   ],
+   "limitedProfileSafetyPoolChanged": true,
+   "slateFocus": {
+    "coordination": 3,
+    "general": 2,
+    "stability": 3,
+    "reach": 2,
+    "rhythm": 1
+   },
+   "kendallVsUpperLimbOverCommon": 0.8,
+   "slateJaccardVsUpperLimb": 0.6667,
+   "rulesP0Slate": [
+    "yjj-1",
+    "tjq-1",
+    "yjj-2",
+    "archery",
+    "boating"
+   ],
+   "pr49Slate": [
+    "yjj-1",
+    "yjj-2",
+    "yjj-6",
+    "archery",
+    "boating"
+   ],
+   "rulesSlateJaccardVsUpperLimb": 0.1111
+  }
+ ],
+ "regionSweep": [
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.8677,
+   "slate": [
+    "bdj-4",
+    "yjj-1",
+    "bdj-2",
+    "archery",
+    "boating"
+   ],
+   "top5": [
+    {
+     "id": "bdj-4",
+     "title": "八段锦 · 五劳七伤往后瞧",
+     "score": 1.9558,
+     "suitability": 0.9164,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 0.2632,
+     "suitability": 0.78,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": -0.3256,
+     "suitability": 0.7053,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": -0.5704,
+     "suitability": 0.6703,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": -0.7533,
+     "suitability": 0.6428,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重动作节奏的内容"
+     ]
+    }
+   ],
+   "model": {
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   },
+   "rulesP0": {
+    "slate": [
+     "bdj-1",
+     "bdj-2",
+     "bdj-3",
+     "apple",
+     "archery"
+    ],
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   },
+   "pr49": {
+    "slate": [
+     "bdj-1",
+     "yjj-2",
+     "bdj-4",
+     "archery",
+     "apple"
+    ],
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   }
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "neck"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.8207,
+   "slate": [
+    "bdj-4",
+    "wqx-7",
+    "bdj-5",
+    "archery",
+    "apple"
+   ],
+   "top5": [
+    {
+     "id": "bdj-4",
+     "title": "八段锦 · 五劳七伤往后瞧",
+     "score": 3.0679,
+     "suitability": 0.9584,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：颈部",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    },
+    {
+     "id": "wqx-7",
+     "title": "五禽戏 · 猿提",
+     "score": 1.6989,
+     "suitability": 0.9023,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：颈部",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    },
+    {
+     "id": "bdj-5",
+     "title": "八段锦 · 摇头摆尾去心火",
+     "score": 0.878,
+     "suitability": 0.8423,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：颈部",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    },
+    {
+     "id": "yjj-4",
+     "title": "易筋经 · 摘星换斗势",
+     "score": -0.0673,
+     "suitability": 0.7398,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：颈部",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": -2.2304,
+     "suitability": 0.4019,
+     "inSlate": false,
+     "reasons": [
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    }
+   ],
+   "model": {
+    "regionPrecision": 0.6,
+    "regionCoverage": 1
+   },
+   "rulesP0": {
+    "slate": [
+     "bdj-4",
+     "bdj-5",
+     "wqx-7",
+     "apple",
+     "archery"
+    ],
+    "regionPrecision": 0.6,
+    "regionCoverage": 1
+   },
+   "pr49": {
+    "slate": [
+     "bdj-4",
+     "yjj-4",
+     "bdj-5",
+     "archery",
+     "apple"
+    ],
+    "regionPrecision": 0.6,
+    "regionCoverage": 1
+   }
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "rules",
+   "status": "ready",
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "LOW_SUITABILITY",
+   "outOfDistributionFeatures": [],
+   "confidence": 0.5959,
+   "slate": [],
+   "top5": [
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 0.1442,
+     "suitability": 0.766,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": -0.2055,
+     "suitability": 0.7217,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "yjj-6",
+     "title": "易筋经 · 出爪亮翅势",
+     "score": -0.4742,
+     "suitability": 0.6843,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "apple",
+     "title": "摘苹果",
+     "score": -0.7106,
+     "suitability": 0.6493,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "yjj-2",
+     "title": "易筋经 · 韦驮献杵第二势",
+     "score": -0.9432,
+     "suitability": 0.6132,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "model": {
+    "regionPrecision": null,
+    "regionCoverage": 0
+   },
+   "rulesP0": {
+    "slate": [
+     "bdj-1",
+     "bdj-2",
+     "bdj-3",
+     "apple",
+     "archery"
+    ],
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   },
+   "pr49": {
+    "slate": [
+     "wqx-1",
+     "yjj-2",
+     "yjj-11",
+     "archery",
+     "apple"
+    ],
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   }
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "trunk"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.8997,
+   "slate": [
+    "bdj-5",
+    "yjj-7",
+    "yjj-9",
+    "racing",
+    "archery"
+   ],
+   "top5": [
+    {
+     "id": "bdj-5",
+     "title": "八段锦 · 摇头摆尾去心火",
+     "score": 1.9198,
+     "suitability": 0.9145,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：躯干",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    },
+    {
+     "id": "yjj-7",
+     "title": "易筋经 · 九鬼拔马刀势",
+     "score": -0.0547,
+     "suitability": 0.7414,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：躯干",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「暂无明显困难」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "yjj-9",
+     "title": "易筋经 · 青龙探爪势",
+     "score": -0.1344,
+     "suitability": 0.7311,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：躯干",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「暂无明显困难」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "racing",
+     "title": "体感赛车",
+     "score": -0.57,
+     "suitability": 0.6704,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：躯干",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "tjq-16",
+     "title": "太极拳 · 左下势独立",
+     "score": -1.1371,
+     "suitability": 0.5821,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：躯干",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "动作感知模型 M1 从示范姿态中识别到肩部参与"
+     ]
+    }
+   ],
+   "model": {
+    "regionPrecision": 0.8,
+    "regionCoverage": 1
+   },
+   "rulesP0": {
+    "slate": [
+     "bdj-6",
+     "tjq-19",
+     "bdj-5",
+     "racing",
+     "apple"
+    ],
+    "regionPrecision": 0.8,
+    "regionCoverage": 1
+   },
+   "pr49": {
+    "slate": [
+     "yjj-9",
+     "yjj-11",
+     "bdj-6",
+     "racing",
+     "archery"
+    ],
+    "regionPrecision": 0.8,
+    "regionCoverage": 1
+   }
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "legs"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "rules",
+   "status": "ready",
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "LOW_SUITABILITY",
+   "outOfDistributionFeatures": [],
+   "confidence": 0.7851,
+   "slate": [],
+   "top5": [
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": -0.1219,
+     "suitability": 0.7328,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：下肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "bdj-8",
+     "title": "八段锦 · 背后七颠百病消",
+     "score": -1.288,
+     "suitability": 0.5575,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：下肢",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "tjq-5",
+     "title": "太极拳 · 手挥琵琶",
+     "score": -1.3117,
+     "suitability": 0.5536,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：下肢",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "动作感知模型 M1 从示范姿态中识别到肩部参与"
+     ]
+    },
+    {
+     "id": "yjj-8",
+     "title": "易筋经 · 三盘落地势",
+     "score": -2.3099,
+     "suitability": 0.3892,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：下肢",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "动作感知模型 M1 从示范姿态中识别到颈部参与"
+     ]
+    },
+    {
+     "id": "tjq-13",
+     "title": "太极拳 · 右蹬脚",
+     "score": -2.3679,
+     "suitability": 0.3801,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：下肢",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "动作感知模型 M1 从示范姿态中识别到肩部参与"
+     ]
+    }
+   ],
+   "model": {
+    "regionPrecision": null,
+    "regionCoverage": 0
+   },
+   "rulesP0": {
+    "slate": [
+     "bdj-2",
+     "bdj-6",
+     "tjq-19",
+     "racing",
+     "apple"
+    ],
+    "regionPrecision": 0.8,
+    "regionCoverage": 1
+   },
+   "pr49": {
+    "slate": [
+     "tjq-13",
+     "bdj-8",
+     "bdj-2",
+     "racing",
+     "archery"
+    ],
+    "regionPrecision": 0.8,
+    "regionCoverage": 1
+   }
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "neck"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.849,
+   "slate": [
+    "bdj-4",
+    "wqx-7",
+    "bdj-2",
+    "archery",
+    "boating"
+   ],
+   "top5": [
+    {
+     "id": "bdj-4",
+     "title": "八段锦 · 五劳七伤往后瞧",
+     "score": 3.6081,
+     "suitability": 0.9706,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：颈部、肩部",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    },
+    {
+     "id": "wqx-7",
+     "title": "五禽戏 · 猿提",
+     "score": 2.054,
+     "suitability": 0.9213,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：颈部、肩部",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    },
+    {
+     "id": "yjj-4",
+     "title": "易筋经 · 摘星换斗势",
+     "score": 0.3586,
+     "suitability": 0.7907,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：肩部、颈部",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": -1.0764,
+     "suitability": 0.592,
+     "inSlate": true,
+     "reasons": [
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": -1.3632,
+     "suitability": 0.5451,
+     "inSlate": true,
+     "reasons": [
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    }
+   ],
+   "model": {
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   },
+   "rulesP0": {
+    "slate": [
+     "bdj-4",
+     "wqx-7",
+     "bdj-1",
+     "apple",
+     "archery"
+    ],
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   },
+   "pr49": {
+    "slate": [
+     "bdj-4",
+     "yjj-4",
+     "bdj-1",
+     "archery",
+     "apple"
+    ],
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   }
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "trunk",
+      "legs"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.715,
+   "slate": [
+    "bdj-5",
+    "wqx-6",
+    "bdj-6",
+    "racing",
+    "archery"
+   ],
+   "top5": [
+    {
+     "id": "bdj-5",
+     "title": "八段锦 · 摇头摆尾去心火",
+     "score": 2.4705,
+     "suitability": 0.9392,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：躯干、下肢",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    },
+    {
+     "id": "wqx-6",
+     "title": "五禽戏 · 熊晃",
+     "score": 1.6426,
+     "suitability": 0.8989,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：躯干、下肢",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "racing",
+     "title": "体感赛车",
+     "score": -0.0213,
+     "suitability": 0.7457,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：躯干、下肢",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "tjq-16",
+     "title": "太极拳 · 左下势独立",
+     "score": -0.452,
+     "suitability": 0.6875,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：下肢、躯干",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "动作感知模型 M1 从示范姿态中识别到肩部参与"
+     ]
+    },
+    {
+     "id": "tjq-7",
+     "title": "太极拳 · 左揽雀尾",
+     "score": -0.5844,
+     "suitability": 0.6682,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：躯干、下肢",
+      "动作感知模型 M1 从示范姿态中识别到肩部参与",
+      "内容本身侧重动作节奏"
+     ]
+    }
+   ],
+   "model": {
+    "regionPrecision": 0.8,
+    "regionCoverage": 1
+   },
+   "rulesP0": {
+    "slate": [
+     "bdj-6",
+     "tjq-19",
+     "bdj-5",
+     "racing",
+     "apple"
+    ],
+    "regionPrecision": 0.8,
+    "regionCoverage": 1
+   },
+   "pr49": {
+    "slate": [
+     "tjq-16",
+     "bdj-6",
+     "tjq-17",
+     "racing",
+     "archery"
+    ],
+    "regionPrecision": 0.8,
+    "regionCoverage": 1
+   }
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "arms",
+      "legs"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "rules",
+   "status": "ready",
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "LOW_SUITABILITY",
+   "outOfDistributionFeatures": [],
+   "confidence": 0.7688,
+   "slate": [],
+   "top5": [
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 0.6695,
+     "suitability": 0.8229,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：上肢、下肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "tjq-5",
+     "title": "太极拳 · 手挥琵琶",
+     "score": -0.4121,
+     "suitability": 0.6932,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：上肢、下肢",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "动作感知模型 M1 从示范姿态中识别到肩部参与"
+     ]
+    },
+    {
+     "id": "tjq-12",
+     "title": "太极拳 · 高探马",
+     "score": -0.714,
+     "suitability": 0.6488,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：上肢、下肢",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "动作感知模型 M1 从示范姿态中识别到肩部参与"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": -0.9983,
+     "suitability": 0.6045,
+     "inSlate": false,
+     "reasons": [
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容",
+      "内容本身侧重姿势稳定"
+     ]
+    },
+    {
+     "id": "tjq-6",
+     "title": "太极拳 · 倒卷肱",
+     "score": -1.1595,
+     "suitability": 0.5785,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：上肢、下肢",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重动作节奏的内容"
+     ]
+    }
+   ],
+   "model": {
+    "regionPrecision": null,
+    "regionCoverage": 0
+   },
+   "rulesP0": {
+    "slate": [
+     "bdj-2",
+     "bdj-6",
+     "tjq-19",
+     "racing",
+     "apple"
+    ],
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   },
+   "pr49": {
+    "slate": [
+     "bdj-2",
+     "tjq-13",
+     "tjq-6",
+     "racing",
+     "archery"
+    ],
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   }
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.6888,
+   "slate": [
+    "yjj-1",
+    "bdj-2",
+    "yjj-6",
+    "archery",
+    "boating"
+   ],
+   "top5": [
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.2097,
+     "suitability": 0.8695,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 0.4948,
+     "suitability": 0.8053,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 0.3085,
+     "suitability": 0.7851,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": 0.1256,
+     "suitability": 0.7638,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重动作节奏的内容"
+     ]
+    },
+    {
+     "id": "yjj-6",
+     "title": "易筋经 · 出爪亮翅势",
+     "score": -0.0273,
+     "suitability": 0.7449,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "model": {
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   },
+   "rulesP0": {
+    "slate": [
+     "bdj-1",
+     "bdj-2",
+     "bdj-3",
+     "apple",
+     "archery"
+    ],
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   },
+   "pr49": {
+    "slate": [
+     "wqx-1",
+     "yjj-2",
+     "yjj-1",
+     "archery",
+     "apple"
+    ],
+    "regionPrecision": 1,
+    "regionCoverage": 1
+   }
+  }
+ ],
+ "trainingStages": [
+  {
+   "label": "S0 新用户（无历史）",
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.6888,
+   "slate": [
+    "yjj-1",
+    "bdj-2",
+    "yjj-6",
+    "archery",
+    "boating"
+   ],
+   "top5": [
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.2097,
+     "suitability": 0.8695,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 0.4948,
+     "suitability": 0.8053,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 0.3085,
+     "suitability": 0.7851,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": 0.1256,
+     "suitability": 0.7638,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重动作节奏的内容"
+     ]
+    },
+    {
+     "id": "yjj-6",
+     "title": "易筋经 · 出爪亮翅势",
+     "score": -0.0273,
+     "suitability": 0.7449,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "kendallVsS0": 1,
+   "slateNovelShare": 1,
+   "ranks": {
+    "bdj-1": 8,
+    "bdj-2": 2,
+    "bdj-3": 11,
+    "bdj-4": null,
+    "bdj-5": null,
+    "apple": 6,
+    "boating": 4,
+    "archery": 3
+   }
+  },
+  {
+   "label": "S1 第 1 周：八段锦第一式 2 次",
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000,
+    "trainingHistory": {
+     "origin": "synthetic_demo",
+     "chapters": [
+      {
+       "chapterId": "bdj-1",
+       "sessions": 2,
+       "completedSessions": 2,
+       "meanScore": 62,
+       "trend": "flat",
+       "lastPracticedAt": 1793966400000
+      }
+     ]
+    }
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.7392,
+   "slate": [
+    "tjq-1",
+    "yjj-1",
+    "yjj-6",
+    "archery",
+    "boating"
+   ],
+   "top5": [
+    {
+     "id": "tjq-1",
+     "title": "太极拳 · 起势",
+     "score": 2.3599,
+     "suitability": 0.9349,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.4224,
+     "suitability": 0.8848,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 1.0733,
+     "suitability": 0.8588,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 0.632,
+     "suitability": 0.8193,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": 0.4214,
+     "suitability": 0.7975,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重动作节奏的内容"
+     ]
+    }
+   ],
+   "kendallVsS0": 0.8909,
+   "slateNovelShare": 1,
+   "ranks": {
+    "bdj-1": 11,
+    "bdj-2": 3,
+    "bdj-3": 10,
+    "bdj-4": null,
+    "bdj-5": null,
+    "apple": 7,
+    "boating": 5,
+    "archery": 4
+   }
+  },
+  {
+   "label": "S2 第 2 周：第一、二式 + 摘苹果",
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000,
+    "trainingHistory": {
+     "origin": "synthetic_demo",
+     "chapters": [
+      {
+       "chapterId": "bdj-1",
+       "sessions": 5,
+       "completedSessions": 5,
+       "meanScore": 70,
+       "trend": "up",
+       "lastPracticedAt": 1793707200000
+      },
+      {
+       "chapterId": "bdj-2",
+       "sessions": 3,
+       "completedSessions": 3,
+       "meanScore": 64,
+       "trend": "flat",
+       "lastPracticedAt": 1793966400000
+      }
+     ]
+    },
+    "gameHistory": {
+     "origin": "synthetic_demo",
+     "games": [
+      {
+       "gameId": "apple",
+       "plays": 3,
+       "completedPlays": 3,
+       "lastPlayedAt": 1794052800000
+      }
+     ]
+    }
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.721,
+   "slate": [
+    "tjq-1",
+    "yjj-1",
+    "yjj-6",
+    "apple",
+    "archery"
+   ],
+   "top5": [
+    {
+     "id": "tjq-1",
+     "title": "太极拳 · 起势",
+     "score": 2.3599,
+     "suitability": 0.9349,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.5055,
+     "suitability": 0.8903,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "apple",
+     "title": "摘苹果",
+     "score": 1.0796,
+     "suitability": 0.8594,
+     "inSlate": true,
+     "reasons": [
+      "你玩过这个游戏，可以继续",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 0.7065,
+     "suitability": 0.8265,
+     "inSlate": false,
+     "reasons": [
+      "与你最近的练习记录相衔接",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 0.6874,
+     "suitability": 0.8247,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "kendallVsS0": 0.7818,
+   "slateNovelShare": 0.8,
+   "ranks": {
+    "bdj-1": 9,
+    "bdj-2": 4,
+    "bdj-3": 10,
+    "bdj-4": null,
+    "bdj-5": null,
+    "apple": 3,
+    "boating": 6,
+    "archery": 5
+   }
+  },
+  {
+   "label": "S3 第 4 周：八段锦前四式 + 太极起势 + 划船",
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000,
+    "trainingHistory": {
+     "origin": "synthetic_demo",
+     "chapters": [
+      {
+       "chapterId": "bdj-1",
+       "sessions": 8,
+       "completedSessions": 8,
+       "meanScore": 78,
+       "trend": "up",
+       "lastPracticedAt": 1793620800000
+      },
+      {
+       "chapterId": "bdj-2",
+       "sessions": 7,
+       "completedSessions": 7,
+       "meanScore": 74,
+       "trend": "up",
+       "lastPracticedAt": 1793793600000
+      },
+      {
+       "chapterId": "bdj-3",
+       "sessions": 6,
+       "completedSessions": 6,
+       "meanScore": 72,
+       "trend": "up",
+       "lastPracticedAt": 1793966400000
+      },
+      {
+       "chapterId": "bdj-4",
+       "sessions": 4,
+       "completedSessions": 4,
+       "meanScore": 70,
+       "trend": "flat",
+       "lastPracticedAt": 1794052800000
+      },
+      {
+       "chapterId": "tjq-1",
+       "sessions": 2,
+       "completedSessions": 2,
+       "meanScore": 60,
+       "trend": "flat",
+       "lastPracticedAt": 1793880000000
+      }
+     ]
+    },
+    "gameHistory": {
+     "origin": "synthetic_demo",
+     "games": [
+      {
+       "gameId": "apple",
+       "plays": 6,
+       "completedPlays": 6,
+       "lastPlayedAt": 1793880000000
+      },
+      {
+       "gameId": "boating",
+       "plays": 5,
+       "completedPlays": 4,
+       "lastPlayedAt": 1794052800000
+      }
+     ]
+    }
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.5186,
+   "slate": [
+    "bdj-2",
+    "tjq-1",
+    "bdj-1",
+    "boating",
+    "apple"
+   ],
+   "top5": [
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 1.7918,
+     "suitability": 0.9076,
+     "inSlate": true,
+     "reasons": [
+      "与你最近的练习记录相衔接",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "tjq-1",
+     "title": "太极拳 · 起势",
+     "score": 1.7249,
+     "suitability": 0.9038,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "与你最近的练习记录相衔接",
+      "覆盖你关注的部位：肩部、上肢"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.5886,
+     "suitability": 0.8956,
+     "inSlate": false,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": 1.1454,
+     "suitability": 0.8646,
+     "inSlate": true,
+     "reasons": [
+      "你玩过这个游戏，可以继续",
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重动作节奏"
+     ]
+    },
+    {
+     "id": "apple",
+     "title": "摘苹果",
+     "score": 1.1195,
+     "suitability": 0.8625,
+     "inSlate": true,
+     "reasons": [
+      "你玩过这个游戏，可以继续",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度"
+     ]
+    }
+   ],
+   "kendallVsS0": 0.7455,
+   "slateNovelShare": 0,
+   "ranks": {
+    "bdj-1": 8,
+    "bdj-2": 1,
+    "bdj-3": 10,
+    "bdj-4": null,
+    "bdj-5": null,
+    "apple": 5,
+    "boating": 4,
+    "archery": 6
+   }
+  }
+ ],
+ "reportProbe": [
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000,
+    "trainingHistory": {
+     "origin": "synthetic_demo",
+     "chapters": [
+      {
+       "chapterId": "bdj-1",
+       "sessions": 5,
+       "completedSessions": 5,
+       "meanScore": 70,
+       "trend": "up",
+       "lastPracticedAt": 1793707200000
+      },
+      {
+       "chapterId": "bdj-2",
+       "sessions": 3,
+       "completedSessions": 3,
+       "meanScore": 64,
+       "trend": "flat",
+       "lastPracticedAt": 1793966400000
+      }
+     ]
+    },
+    "gameHistory": {
+     "origin": "synthetic_demo",
+     "games": [
+      {
+       "gameId": "apple",
+       "plays": 3,
+       "completedPlays": 3,
+       "lastPlayedAt": 1794052800000
+      }
+     ]
+    },
+    "latestReport": {
+     "origin": "synthetic_demo",
+     "createdAt": 1794052800000,
+     "findings": [
+      {
+       "focus": "stability",
+       "subjectId": "bdj-2",
+       "score": 52,
+       "trend": "worse"
+      }
+     ]
+    }
+   },
+   "decisionOrigin": "rules",
+   "status": "ready",
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "OUT_OF_DISTRIBUTION",
+   "outOfDistributionFeatures": [
+    "h_recency_this"
+   ],
+   "confidence": 0.5679,
+   "slate": [],
+   "top5": [
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 2.3525,
+     "suitability": 0.9346,
+     "inSlate": false,
+     "reasons": [
+      "回应最近报告中的待关注项",
+      "与你最近的练习记录相衔接",
+      "覆盖你关注的部位：肩部、上肢"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 2.1064,
+     "suitability": 0.9238,
+     "inSlate": false,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "apple",
+     "title": "摘苹果",
+     "score": 1.6805,
+     "suitability": 0.9012,
+     "inSlate": false,
+     "reasons": [
+      "你玩过这个游戏，可以继续",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 1.2883,
+     "suitability": 0.8754,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "yjj-6",
+     "title": "易筋经 · 出爪亮翅势",
+     "score": 0.9525,
+     "suitability": 0.8488,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "focus": "stability",
+   "candidatesWithFocus": 7,
+   "meanRankWithReport": 4.7143,
+   "meanRankWithoutReport": 4.1429,
+   "kendallVsNoReport": 0.8545
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000,
+    "trainingHistory": {
+     "origin": "synthetic_demo",
+     "chapters": [
+      {
+       "chapterId": "bdj-1",
+       "sessions": 5,
+       "completedSessions": 5,
+       "meanScore": 70,
+       "trend": "up",
+       "lastPracticedAt": 1793707200000
+      },
+      {
+       "chapterId": "bdj-2",
+       "sessions": 3,
+       "completedSessions": 3,
+       "meanScore": 64,
+       "trend": "flat",
+       "lastPracticedAt": 1793966400000
+      }
+     ]
+    },
+    "gameHistory": {
+     "origin": "synthetic_demo",
+     "games": [
+      {
+       "gameId": "apple",
+       "plays": 3,
+       "completedPlays": 3,
+       "lastPlayedAt": 1794052800000
+      }
+     ]
+    },
+    "latestReport": {
+     "origin": "synthetic_demo",
+     "createdAt": 1794052800000,
+     "findings": [
+      {
+       "focus": "reach",
+       "subjectId": "bdj-2",
+       "score": 52,
+       "trend": "worse"
+      }
+     ]
+    }
+   },
+   "decisionOrigin": "rules",
+   "status": "ready",
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "OUT_OF_DISTRIBUTION",
+   "outOfDistributionFeatures": [
+    "h_recency_this"
+   ],
+   "confidence": 0.6785,
+   "slate": [],
+   "top5": [
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 2.3525,
+     "suitability": 0.9346,
+     "inSlate": false,
+     "reasons": [
+      "回应最近报告中的待关注项",
+      "与你最近的练习记录相衔接",
+      "覆盖你关注的部位：肩部、上肢"
+     ]
+    },
+    {
+     "id": "apple",
+     "title": "摘苹果",
+     "score": 1.6805,
+     "suitability": 0.9012,
+     "inSlate": false,
+     "reasons": [
+      "你玩过这个游戏，可以继续",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.5055,
+     "suitability": 0.8903,
+     "inSlate": false,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 1.2883,
+     "suitability": 0.8754,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "yjj-6",
+     "title": "易筋经 · 出爪亮翅势",
+     "score": 0.9525,
+     "suitability": 0.8488,
+     "inSlate": false,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "focus": "reach",
+   "candidatesWithFocus": 10,
+   "meanRankWithReport": 6.8,
+   "meanRankWithoutReport": 6.9,
+   "kendallVsNoReport": 0.8182
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000,
+    "trainingHistory": {
+     "origin": "synthetic_demo",
+     "chapters": [
+      {
+       "chapterId": "bdj-1",
+       "sessions": 5,
+       "completedSessions": 5,
+       "meanScore": 70,
+       "trend": "up",
+       "lastPracticedAt": 1793707200000
+      },
+      {
+       "chapterId": "bdj-2",
+       "sessions": 3,
+       "completedSessions": 3,
+       "meanScore": 64,
+       "trend": "flat",
+       "lastPracticedAt": 1793966400000
+      }
+     ]
+    },
+    "gameHistory": {
+     "origin": "synthetic_demo",
+     "games": [
+      {
+       "gameId": "apple",
+       "plays": 3,
+       "completedPlays": 3,
+       "lastPlayedAt": 1794052800000
+      }
+     ]
+    },
+    "latestReport": {
+     "origin": "synthetic_demo",
+     "createdAt": 1794052800000,
+     "findings": [
+      {
+       "focus": "rhythm",
+       "subjectId": "bdj-2",
+       "score": 52,
+       "trend": "worse"
+      }
+     ]
+    }
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.6628,
+   "slate": [
+    "tjq-1",
+    "bdj-2",
+    "bdj-1",
+    "apple",
+    "boating"
+   ],
+   "top5": [
+    {
+     "id": "tjq-1",
+     "title": "太极拳 · 起势",
+     "score": 2.3599,
+     "suitability": 0.9349,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 1.7516,
+     "suitability": 0.9054,
+     "inSlate": true,
+     "reasons": [
+      "回应最近报告中的待关注项",
+      "与你最近的练习记录相衔接",
+      "覆盖你关注的部位：肩部、上肢"
+     ]
+    },
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.5055,
+     "suitability": 0.8903,
+     "inSlate": false,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "apple",
+     "title": "摘苹果",
+     "score": 1.0796,
+     "suitability": 0.8594,
+     "inSlate": true,
+     "reasons": [
+      "你玩过这个游戏，可以继续",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": 1.0223,
+     "suitability": 0.8547,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重动作节奏的内容"
+     ]
+    }
+   ],
+   "focus": "rhythm",
+   "candidatesWithFocus": 1,
+   "meanRankWithReport": 5,
+   "meanRankWithoutReport": 6,
+   "kendallVsNoReport": 0.9091
+  }
+ ],
+ "riskProbe": [
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.6888,
+   "slate": [
+    "yjj-1",
+    "bdj-2",
+    "yjj-6",
+    "archery",
+    "boating"
+   ],
+   "top5": [
+    {
+     "id": "yjj-1",
+     "title": "易筋经 · 韦驮献杵第一势",
+     "score": 1.2097,
+     "suitability": 0.8695,
+     "inSlate": true,
+     "reasons": [
+      "考虑到「僵硬感」，选择侧重日常活动的内容",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重日常活动"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 0.4948,
+     "suitability": 0.8053,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "archery",
+     "title": "林间射箭",
+     "score": 0.3085,
+     "suitability": 0.7851,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    },
+    {
+     "id": "boating",
+     "title": "林间划船",
+     "score": 0.1256,
+     "suitability": 0.7638,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "内容本身侧重动作节奏",
+      "考虑到「僵硬感」，选择侧重动作节奏的内容"
+     ]
+    },
+    {
+     "id": "yjj-6",
+     "title": "易筋经 · 出爪亮翅势",
+     "score": -0.0273,
+     "suitability": 0.7449,
+     "inSlate": true,
+     "reasons": [
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「上肢功能练习」：内容侧重动作幅度",
+      "考虑到「僵硬感」，选择侧重姿势稳定的内容"
+     ]
+    }
+   ],
+   "execution": "executed",
+   "displayStatus": "ready",
+   "message": "已由训练的偏好排序模型生成候选（顶部置信度 69%）。请在舒适范围内选择，出现不适即停止。"
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "acute_pain",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "rules",
+   "status": "safety_hold",
+   "fallbackReason": "SAFETY_HOLD",
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": null,
+   "slate": [],
+   "top5": [],
+   "execution": "not_run",
+   "displayStatus": "safety_hold",
+   "message": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。"
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "dizziness",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "rules",
+   "status": "safety_hold",
+   "fallbackReason": "SAFETY_HOLD",
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": null,
+   "slate": [],
+   "top5": [],
+   "execution": "not_run",
+   "displayStatus": "safety_hold",
+   "message": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。"
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "recent_injury",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "rules",
+   "status": "safety_hold",
+   "fallbackReason": "SAFETY_HOLD",
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": null,
+   "slate": [],
+   "top5": [],
+   "execution": "not_run",
+   "displayStatus": "safety_hold",
+   "message": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。"
+  }
+ ],
+ "oodProbe": [
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "mobility"
+     ],
+     "difficulties": [
+      "none"
+     ],
+     "regions": [
+      "shoulders",
+      "neck",
+      "arms",
+      "legs"
+     ],
+     "preference": "routine",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "rules",
+   "status": "ready",
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "OUT_OF_DISTRIBUTION",
+   "outOfDistributionFeatures": [
+    "x_region_overlap"
+   ],
+   "confidence": 0.9039,
+   "slate": [],
+   "top5": [
+    {
+     "id": "wqx-7",
+     "title": "五禽戏 · 猿提",
+     "score": 4.3763,
+     "suitability": 0.9822,
+     "inSlate": false,
+     "reasons": [
+      "符合你偏好的功法形式",
+      "覆盖你关注的部位：颈部、肩部、上肢、下肢",
+      "考虑到「暂无明显困难」，选择侧重协调配合的内容"
+     ]
+    },
+    {
+     "id": "yjj-4",
+     "title": "易筋经 · 摘星换斗势",
+     "score": 2.3588,
+     "suitability": 0.9348,
+     "inSlate": false,
+     "reasons": [
+      "符合你偏好的功法形式",
+      "覆盖你关注的部位：肩部、上肢、颈部",
+      "符合目标「肩颈活动」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 2.3137,
+     "suitability": 0.933,
+     "inSlate": false,
+     "reasons": [
+      "符合你偏好的功法形式",
+      "覆盖你关注的部位：肩部、上肢、下肢",
+      "符合目标「肩颈活动」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "tjq-20",
+     "title": "太极拳 · 闪通臂",
+     "score": 1.7016,
+     "suitability": 0.9025,
+     "inSlate": false,
+     "reasons": [
+      "符合你偏好的功法形式",
+      "覆盖你关注的部位：肩部、上肢、下肢",
+      "符合目标「肩颈活动」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "wqx-8",
+     "title": "五禽戏 · 猿摘",
+     "score": 0.9949,
+     "suitability": 0.8524,
+     "inSlate": false,
+     "reasons": [
+      "符合你偏好的功法形式",
+      "覆盖你关注的部位：肩部、上肢、下肢",
+      "符合目标「肩颈活动」：内容侧重动作幅度"
+     ]
+    }
+   ],
+   "displayIsRules": true
+  },
+  {
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "mobility"
+     ],
+     "difficulties": [
+      "none"
+     ],
+     "regions": [
+      "shoulders",
+      "neck",
+      "arms"
+     ],
+     "preference": "routine",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "decisionOrigin": "model",
+   "status": "ready",
+   "fallbackReason": null,
+   "abstainReason": null,
+   "outOfDistributionFeatures": [],
+   "confidence": 0.7914,
+   "slate": [
+    "wqx-7",
+    "yjj-4",
+    "yjj-7",
+    "apple",
+    "archery"
+   ],
+   "top5": [
+    {
+     "id": "wqx-7",
+     "title": "五禽戏 · 猿提",
+     "score": 4.0361,
+     "suitability": 0.9777,
+     "inSlate": true,
+     "reasons": [
+      "符合你偏好的功法形式",
+      "覆盖你关注的部位：颈部、肩部、上肢",
+      "考虑到「暂无明显困难」，选择侧重协调配合的内容"
+     ]
+    },
+    {
+     "id": "yjj-4",
+     "title": "易筋经 · 摘星换斗势",
+     "score": 2.8359,
+     "suitability": 0.9517,
+     "inSlate": true,
+     "reasons": [
+      "符合你偏好的功法形式",
+      "覆盖你关注的部位：肩部、上肢、颈部",
+      "符合目标「肩颈活动」：内容侧重动作幅度"
+     ]
+    },
+    {
+     "id": "bdj-2",
+     "title": "八段锦 · 左右开弓似射雕",
+     "score": 1.7871,
+     "suitability": 0.9074,
+     "inSlate": false,
+     "reasons": [
+      "符合你偏好的功法形式",
+      "符合目标「肩颈活动」：内容侧重动作幅度",
+      "覆盖你关注的部位：肩部、上肢"
+     ]
+    },
+    {
+     "id": "yjj-7",
+     "title": "易筋经 · 九鬼拔马刀势",
+     "score": 1.5968,
+     "suitability": 0.8961,
+     "inSlate": true,
+     "reasons": [
+      "符合你偏好的功法形式",
+      "符合目标「肩颈活动」：内容侧重动作幅度",
+      "覆盖你关注的部位：肩部、上肢"
+     ]
+    },
+    {
+     "id": "bdj-1",
+     "title": "八段锦 · 两手托天理三焦",
+     "score": 1.1114,
+     "suitability": 0.8619,
+     "inSlate": false,
+     "reasons": [
+      "符合你偏好的功法形式",
+      "覆盖你关注的部位：肩部、上肢",
+      "符合目标「肩颈活动」：内容侧重动作幅度"
+     ]
+    }
+   ],
+   "displayIsRules": false
+  }
+ ],
+ "perturbation": {
+  "base": {
+   "contract": "fp-coach-decision/v1",
+   "profile": {
+    "version": 1,
+    "goals": [
+     "upper_limb"
+    ],
+    "difficulties": [
+     "stiffness"
+    ],
+    "regions": [
+     "shoulders",
+     "arms"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+   },
+   "now": 1794139200000,
+   "trainingHistory": {
+    "origin": "synthetic_demo",
+    "chapters": [
+     {
+      "chapterId": "bdj-1",
+      "sessions": 5,
+      "completedSessions": 5,
+      "meanScore": 70,
+      "trend": "up",
+      "lastPracticedAt": 1793707200000
+     },
+     {
+      "chapterId": "bdj-2",
+      "sessions": 3,
+      "completedSessions": 3,
+      "meanScore": 64,
+      "trend": "flat",
+      "lastPracticedAt": 1793966400000
+     }
+    ]
+   },
+   "gameHistory": {
+    "origin": "synthetic_demo",
+    "games": [
+     {
+      "gameId": "apple",
+      "plays": 3,
+      "completedPlays": 3,
+      "lastPlayedAt": 1794052800000
+     }
+    ]
+   }
+  },
+  "trials": 200,
+  "perturbation": "meanScore ±5, lastPracticedAt ±1 day, sessions ±1 with p=0.3",
+  "kendallMedian": 0.9697,
+  "kendallP05": 0.9394,
+  "top1Unchanged": 1,
+  "slateUnchanged": 1
+ },
+ "variants": [
+  {
+   "file": "fp-cdm-m2.variant-full-refit.weights.json",
+   "variant": "full-refit",
+   "note": "release procedure refitted here (sanity: should match the release coefficients)",
+   "trainFamilies": 18,
+   "features": 111,
+   "users": [
+    {
+     "label": "基础画像",
+     "top3": [
+      "yjj-1",
+      "bdj-2",
+      "archery"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 有历史",
+     "top3": [
+      "tjq-1",
+      "yjj-1",
+      "apple"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S3 有历史",
+     "top3": [
+      "bdj-2",
+      "tjq-1",
+      "yjj-1"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 + 报告",
+     "top3": [
+      "bdj-2",
+      "yjj-1",
+      "apple"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "OUT_OF_DISTRIBUTION"
+    },
+    {
+     "label": "颈肩",
+     "top3": [
+      "bdj-4",
+      "wqx-7",
+      "yjj-4"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "下肢躯干 / 游戏",
+     "top3": [
+      "racing",
+      "tjq-10",
+      "wqx-6"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    }
+   ]
+  },
+  {
+   "file": "fp-cdm-m2.variant-no-history.weights.json",
+   "variant": "no-history",
+   "note": "all H features removed",
+   "trainFamilies": 18,
+   "features": 100,
+   "users": [
+    {
+     "label": "基础画像",
+     "top3": [
+      "yjj-1",
+      "bdj-2",
+      "archery"
+     ],
+     "kendallVsRelease": 0.9697,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 有历史",
+     "top3": [
+      "tjq-1",
+      "yjj-1",
+      "bdj-2"
+     ],
+     "kendallVsRelease": 0.8485,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S3 有历史",
+     "top3": [
+      "tjq-1",
+      "yjj-1",
+      "bdj-2"
+     ],
+     "kendallVsRelease": 0.7879,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 + 报告",
+     "top3": [
+      "yjj-1",
+      "bdj-2",
+      "archery"
+     ],
+     "kendallVsRelease": 0.8788,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "颈肩",
+     "top3": [
+      "bdj-4",
+      "wqx-7",
+      "yjj-4"
+     ],
+     "kendallVsRelease": 0.9697,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "下肢躯干 / 游戏",
+     "top3": [
+      "racing",
+      "tjq-10",
+      "wqx-6"
+     ],
+     "kendallVsRelease": 0.8788,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    }
+   ]
+  },
+  {
+   "file": "fp-cdm-m2.variant-no-m1.weights.json",
+   "variant": "no-m1",
+   "note": "M1 content features removed",
+   "trainFamilies": 18,
+   "features": 100,
+   "users": [
+    {
+     "label": "基础画像",
+     "top3": [
+      "yjj-1",
+      "archery",
+      "bdj-2"
+     ],
+     "kendallVsRelease": 0.8182,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 有历史",
+     "top3": [
+      "tjq-1",
+      "yjj-1",
+      "apple"
+     ],
+     "kendallVsRelease": 0.7576,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S3 有历史",
+     "top3": [
+      "bdj-2",
+      "yjj-1",
+      "bdj-3"
+     ],
+     "kendallVsRelease": 0.5455,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 + 报告",
+     "top3": [
+      "bdj-2",
+      "yjj-1",
+      "apple"
+     ],
+     "kendallVsRelease": 0.9394,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "OUT_OF_DISTRIBUTION"
+    },
+    {
+     "label": "颈肩",
+     "top3": [
+      "bdj-4",
+      "yjj-4",
+      "wqx-7"
+     ],
+     "kendallVsRelease": 0.7576,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "下肢躯干 / 游戏",
+     "top3": [
+      "tjq-10",
+      "racing",
+      "tjq-21"
+     ],
+     "kendallVsRelease": 0.7576,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    }
+   ]
+  },
+  {
+   "file": "fp-cdm-m2.variant-no-profile-crosses.weights.json",
+   "variant": "no-profile-crosses",
+   "note": "all x_* profile x content crosses removed",
+   "trainFamilies": 18,
+   "features": 49,
+   "users": [
+    {
+     "label": "基础画像",
+     "top3": [
+      "bdj-2",
+      "yjj-7",
+      "boating"
+     ],
+     "kendallVsRelease": 0.303,
+     "top3OverlapWithRelease": 1,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 有历史",
+     "top3": [
+      "tjq-1",
+      "bdj-2",
+      "bdj-1"
+     ],
+     "kendallVsRelease": 0.2727,
+     "top3OverlapWithRelease": 1,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S3 有历史",
+     "top3": [
+      "bdj-2",
+      "tjq-1",
+      "bdj-1"
+     ],
+     "kendallVsRelease": 0.3636,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 + 报告",
+     "top3": [
+      "bdj-2",
+      "yjj-7",
+      "bdj-1"
+     ],
+     "kendallVsRelease": 0.2727,
+     "top3OverlapWithRelease": 1,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "OUT_OF_DISTRIBUTION"
+    },
+    {
+     "label": "颈肩",
+     "top3": [
+      "bdj-4",
+      "wqx-7",
+      "bdj-2"
+     ],
+     "kendallVsRelease": 0.5758,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "下肢躯干 / 游戏",
+     "top3": [
+      "tjq-10",
+      "tjq-8",
+      "tjq-21"
+     ],
+     "kendallVsRelease": 0.5455,
+     "top3OverlapWithRelease": 1,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    }
+   ]
+  },
+  {
+   "file": "fp-cdm-m2.variant-no-report.weights.json",
+   "variant": "no-report",
+   "note": "all R features removed",
+   "trainFamilies": 18,
+   "features": 106,
+   "users": [
+    {
+     "label": "基础画像",
+     "top3": [
+      "yjj-1",
+      "bdj-2",
+      "archery"
+     ],
+     "kendallVsRelease": 0.9697,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 有历史",
+     "top3": [
+      "tjq-1",
+      "yjj-1",
+      "apple"
+     ],
+     "kendallVsRelease": 0.9697,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S3 有历史",
+     "top3": [
+      "bdj-2",
+      "tjq-1",
+      "yjj-1"
+     ],
+     "kendallVsRelease": 0.9394,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 + 报告",
+     "top3": [
+      "yjj-1",
+      "apple",
+      "bdj-2"
+     ],
+     "kendallVsRelease": 0.8485,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "颈肩",
+     "top3": [
+      "bdj-4",
+      "wqx-7",
+      "yjj-4"
+     ],
+     "kendallVsRelease": 0.9697,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "下肢躯干 / 游戏",
+     "top3": [
+      "racing",
+      "tjq-10",
+      "wqx-6"
+     ],
+     "kendallVsRelease": 0.9697,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    }
+   ]
+  },
+  {
+   "file": "fp-cdm-m2.variant-profile-content-only.weights.json",
+   "variant": "profile-content-only",
+   "note": "P group only (no history, no report)",
+   "trainFamilies": 18,
+   "features": 95,
+   "users": [
+    {
+     "label": "基础画像",
+     "top3": [
+      "yjj-1",
+      "bdj-2",
+      "archery"
+     ],
+     "kendallVsRelease": 0.9697,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 有历史",
+     "top3": [
+      "tjq-1",
+      "yjj-1",
+      "bdj-2"
+     ],
+     "kendallVsRelease": 0.8485,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S3 有历史",
+     "top3": [
+      "tjq-1",
+      "yjj-1",
+      "bdj-2"
+     ],
+     "kendallVsRelease": 0.7879,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 + 报告",
+     "top3": [
+      "yjj-1",
+      "bdj-2",
+      "archery"
+     ],
+     "kendallVsRelease": 0.7879,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "颈肩",
+     "top3": [
+      "bdj-4",
+      "wqx-7",
+      "yjj-4"
+     ],
+     "kendallVsRelease": 0.9697,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "下肢躯干 / 游戏",
+     "top3": [
+      "racing",
+      "tjq-10",
+      "wqx-6"
+     ],
+     "kendallVsRelease": 0.8788,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    }
+   ]
+  },
+  {
+   "file": "fp-cdm-m2.variant-stage-100.weights.json",
+   "variant": "stage-100",
+   "note": "checkpoint trained on 18/18 dev families",
+   "trainFamilies": 18,
+   "features": 111,
+   "users": [
+    {
+     "label": "基础画像",
+     "top3": [
+      "yjj-1",
+      "bdj-2",
+      "archery"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 有历史",
+     "top3": [
+      "tjq-1",
+      "yjj-1",
+      "apple"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S3 有历史",
+     "top3": [
+      "bdj-2",
+      "tjq-1",
+      "yjj-1"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 + 报告",
+     "top3": [
+      "bdj-2",
+      "yjj-1",
+      "apple"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "OUT_OF_DISTRIBUTION"
+    },
+    {
+     "label": "颈肩",
+     "top3": [
+      "bdj-4",
+      "wqx-7",
+      "yjj-4"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "下肢躯干 / 游戏",
+     "top3": [
+      "racing",
+      "tjq-10",
+      "wqx-6"
+     ],
+     "kendallVsRelease": 1,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    }
+   ]
+  },
+  {
+   "file": "fp-cdm-m2.variant-stage-25.weights.json",
+   "variant": "stage-25",
+   "note": "checkpoint trained on 4/18 dev families",
+   "trainFamilies": 4,
+   "features": 111,
+   "users": [
+    {
+     "label": "基础画像",
+     "top3": [
+      "bdj-2",
+      "archery",
+      "apple"
+     ],
+     "kendallVsRelease": 0.6667,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "LOW_SUITABILITY"
+    },
+    {
+     "label": "S2 有历史",
+     "top3": [
+      "archery",
+      "yjj-6",
+      "boating"
+     ],
+     "kendallVsRelease": 0.3333,
+     "top3OverlapWithRelease": 0,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "LOW_SUITABILITY"
+    },
+    {
+     "label": "S3 有历史",
+     "top3": [
+      "archery",
+      "yjj-6",
+      "apple"
+     ],
+     "kendallVsRelease": 0.2121,
+     "top3OverlapWithRelease": 0,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "LOW_SUITABILITY"
+    },
+    {
+     "label": "S2 + 报告",
+     "top3": [
+      "archery",
+      "yjj-6",
+      "bdj-2"
+     ],
+     "kendallVsRelease": 0.6061,
+     "top3OverlapWithRelease": 1,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "LOW_SUITABILITY"
+    },
+    {
+     "label": "颈肩",
+     "top3": [
+      "bdj-4",
+      "bdj-2",
+      "yjj-4"
+     ],
+     "kendallVsRelease": 0.8485,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "OUT_OF_DISTRIBUTION"
+    },
+    {
+     "label": "下肢躯干 / 游戏",
+     "top3": [
+      "yjj-12",
+      "tjq-8",
+      "tjq-10"
+     ],
+     "kendallVsRelease": 0.2121,
+     "top3OverlapWithRelease": 1,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "OUT_OF_DISTRIBUTION"
+    }
+   ]
+  },
+  {
+   "file": "fp-cdm-m2.variant-stage-50.weights.json",
+   "variant": "stage-50",
+   "note": "checkpoint trained on 9/18 dev families",
+   "trainFamilies": 9,
+   "features": 111,
+   "users": [
+    {
+     "label": "基础画像",
+     "top3": [
+      "yjj-1",
+      "archery",
+      "yjj-6"
+     ],
+     "kendallVsRelease": 0.8485,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 有历史",
+     "top3": [
+      "yjj-1",
+      "apple",
+      "tjq-1"
+     ],
+     "kendallVsRelease": 0.6364,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S3 有历史",
+     "top3": [
+      "apple",
+      "yjj-1",
+      "archery"
+     ],
+     "kendallVsRelease": 0.3636,
+     "top3OverlapWithRelease": 1,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 + 报告",
+     "top3": [
+      "yjj-1",
+      "apple",
+      "archery"
+     ],
+     "kendallVsRelease": 0.7273,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "颈肩",
+     "top3": [
+      "bdj-4",
+      "wqx-7",
+      "yjj-4"
+     ],
+     "kendallVsRelease": 0.9697,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "OUT_OF_DISTRIBUTION"
+    },
+    {
+     "label": "下肢躯干 / 游戏",
+     "top3": [
+      "tjq-8",
+      "racing",
+      "tjq-10"
+     ],
+     "kendallVsRelease": 0.6061,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    }
+   ]
+  },
+  {
+   "file": "fp-cdm-m2.variant-stage-75.weights.json",
+   "variant": "stage-75",
+   "note": "checkpoint trained on 14/18 dev families",
+   "trainFamilies": 14,
+   "features": 111,
+   "users": [
+    {
+     "label": "基础画像",
+     "top3": [
+      "yjj-1",
+      "archery",
+      "bdj-2"
+     ],
+     "kendallVsRelease": 0.8788,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 有历史",
+     "top3": [
+      "tjq-1",
+      "yjj-1",
+      "apple"
+     ],
+     "kendallVsRelease": 0.8182,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S3 有历史",
+     "top3": [
+      "yjj-1",
+      "apple",
+      "tjq-1"
+     ],
+     "kendallVsRelease": 0.7273,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "S2 + 报告",
+     "top3": [
+      "yjj-1",
+      "apple",
+      "bdj-2"
+     ],
+     "kendallVsRelease": 0.8485,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    },
+    {
+     "label": "颈肩",
+     "top3": [
+      "bdj-4",
+      "wqx-7",
+      "yjj-4"
+     ],
+     "kendallVsRelease": 0.9697,
+     "top3OverlapWithRelease": 3,
+     "fallbackReason": "MODEL_ABSTAINED",
+     "abstainReason": "OUT_OF_DISTRIBUTION"
+    },
+    {
+     "label": "下肢躯干 / 游戏",
+     "top3": [
+      "racing",
+      "tjq-10",
+      "tjq-8"
+     ],
+     "kendallVsRelease": 0.7576,
+     "top3OverlapWithRelease": 2,
+     "fallbackReason": "SHADOW_MODE",
+     "abstainReason": null
+    }
+   ]
+  }
+ ],
+ "variantUsers": [
+  {
+   "label": "基础画像",
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "releaseTop3": [
+    "yjj-1",
+    "bdj-2",
+    "archery"
+   ]
+  },
+  {
+   "label": "S2 有历史",
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000,
+    "trainingHistory": {
+     "origin": "synthetic_demo",
+     "chapters": [
+      {
+       "chapterId": "bdj-1",
+       "sessions": 5,
+       "completedSessions": 5,
+       "meanScore": 70,
+       "trend": "up",
+       "lastPracticedAt": 1793707200000
+      },
+      {
+       "chapterId": "bdj-2",
+       "sessions": 3,
+       "completedSessions": 3,
+       "meanScore": 64,
+       "trend": "flat",
+       "lastPracticedAt": 1793966400000
+      }
+     ]
+    },
+    "gameHistory": {
+     "origin": "synthetic_demo",
+     "games": [
+      {
+       "gameId": "apple",
+       "plays": 3,
+       "completedPlays": 3,
+       "lastPlayedAt": 1794052800000
+      }
+     ]
+    }
+   },
+   "releaseTop3": [
+    "tjq-1",
+    "yjj-1",
+    "apple"
+   ]
+  },
+  {
+   "label": "S3 有历史",
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000,
+    "trainingHistory": {
+     "origin": "synthetic_demo",
+     "chapters": [
+      {
+       "chapterId": "bdj-1",
+       "sessions": 8,
+       "completedSessions": 8,
+       "meanScore": 78,
+       "trend": "up",
+       "lastPracticedAt": 1793620800000
+      },
+      {
+       "chapterId": "bdj-2",
+       "sessions": 7,
+       "completedSessions": 7,
+       "meanScore": 74,
+       "trend": "up",
+       "lastPracticedAt": 1793793600000
+      },
+      {
+       "chapterId": "bdj-3",
+       "sessions": 6,
+       "completedSessions": 6,
+       "meanScore": 72,
+       "trend": "up",
+       "lastPracticedAt": 1793966400000
+      },
+      {
+       "chapterId": "bdj-4",
+       "sessions": 4,
+       "completedSessions": 4,
+       "meanScore": 70,
+       "trend": "flat",
+       "lastPracticedAt": 1794052800000
+      },
+      {
+       "chapterId": "tjq-1",
+       "sessions": 2,
+       "completedSessions": 2,
+       "meanScore": 60,
+       "trend": "flat",
+       "lastPracticedAt": 1793880000000
+      }
+     ]
+    },
+    "gameHistory": {
+     "origin": "synthetic_demo",
+     "games": [
+      {
+       "gameId": "apple",
+       "plays": 6,
+       "completedPlays": 6,
+       "lastPlayedAt": 1793880000000
+      },
+      {
+       "gameId": "boating",
+       "plays": 5,
+       "completedPlays": 4,
+       "lastPlayedAt": 1794052800000
+      }
+     ]
+    }
+   },
+   "releaseTop3": [
+    "bdj-2",
+    "tjq-1",
+    "yjj-1"
+   ]
+  },
+  {
+   "label": "S2 + 报告",
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "upper_limb"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "shoulders",
+      "arms"
+     ],
+     "preference": "mixed",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000,
+    "trainingHistory": {
+     "origin": "synthetic_demo",
+     "chapters": [
+      {
+       "chapterId": "bdj-1",
+       "sessions": 5,
+       "completedSessions": 5,
+       "meanScore": 70,
+       "trend": "up",
+       "lastPracticedAt": 1793707200000
+      },
+      {
+       "chapterId": "bdj-2",
+       "sessions": 3,
+       "completedSessions": 3,
+       "meanScore": 64,
+       "trend": "flat",
+       "lastPracticedAt": 1793966400000
+      }
+     ]
+    },
+    "gameHistory": {
+     "origin": "synthetic_demo",
+     "games": [
+      {
+       "gameId": "apple",
+       "plays": 3,
+       "completedPlays": 3,
+       "lastPlayedAt": 1794052800000
+      }
+     ]
+    },
+    "latestReport": {
+     "origin": "synthetic_demo",
+     "createdAt": 1794052800000,
+     "findings": [
+      {
+       "focus": "stability",
+       "subjectId": "bdj-2",
+       "score": 52,
+       "trend": "worse"
+      }
+     ]
+    }
+   },
+   "releaseTop3": [
+    "bdj-2",
+    "yjj-1",
+    "apple"
+   ]
+  },
+  {
+   "label": "颈肩",
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "mobility"
+     ],
+     "difficulties": [
+      "stiffness"
+     ],
+     "regions": [
+      "neck",
+      "shoulders"
+     ],
+     "preference": "routine",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "releaseTop3": [
+    "bdj-4",
+    "wqx-7",
+    "yjj-4"
+   ]
+  },
+  {
+   "label": "下肢躯干 / 游戏",
+   "input": {
+    "contract": "fp-coach-decision/v1",
+    "profile": {
+     "version": 1,
+     "goals": [
+      "daily"
+     ],
+     "difficulties": [
+      "sedentary"
+     ],
+     "regions": [
+      "legs",
+      "trunk"
+     ],
+     "preference": "game",
+     "risk": "none",
+     "acknowledged": true
+    },
+    "now": 1794139200000
+   },
+   "releaseTop3": [
+    "racing",
+    "tjq-10",
+    "wqx-6"
+   ]
+  }
+ ]
+}

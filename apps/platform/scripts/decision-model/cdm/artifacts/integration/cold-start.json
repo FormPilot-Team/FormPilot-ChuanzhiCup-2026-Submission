@@ -1,0 +1,1 @@
+{"runs":7,"bundleBytes":167708,"median":{"importMs":5.835,"firstCallMs":16.111,"secondCallMs":3.5,"rssMB":48.751,"heapMB":6.497},"note":"fresh node process per run; release-bound engine (fp-cdm-release/1.0.0, AI-label experimental tier) in ACTIVE with the owner flag, so the first call runs the trained model end to end"}
