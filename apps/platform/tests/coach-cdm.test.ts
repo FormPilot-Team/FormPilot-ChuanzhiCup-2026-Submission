@@ -123,6 +123,18 @@ describe('fp-cdm adapter with fixture weights', () => {
     const ood = service(fixtureWeights({ scale: FEATURE_NAMES.map(() => 1e-3) }))(request(), { mode: 'active' })
     expect(ood.model?.abstainReason).toBe('OUT_OF_DISTRIBUTION'); expect(ood.active.result).toEqual(getCoachWebRecommendation(request()).result)
   })
+  it('range-based OOD (v1.1): abstains only when the top candidate leaves the training range, and names the features', () => {
+    const allZero = { min: FEATURE_NAMES.map(() => 0), max: FEATURE_NAMES.map(() => 0) }
+    const ood = service(fixtureWeights({ featureRange: allZero }))(request(), { mode: 'active' })
+    expect(ood.model?.abstainReason).toBe('OUT_OF_DISTRIBUTION')
+    expect(ood.model?.oodFeatures?.length).toBeGreaterThan(0)
+    expect(ood.decisionOrigin).toBe('rules')
+    // Rare-but-observed binary values (range 0..1) and bounded counts are in-distribution.
+    const wide = { min: FEATURE_NAMES.map(() => -5), max: FEATURE_NAMES.map(() => 5) }
+    const ok = service(fixtureWeights({ featureRange: wide }))(request(profile({ regions: ['neck', 'shoulders'] })), { mode: 'active' })
+    expect(ok.decisionOrigin).toBe('model')
+    expect(loadWeights({ ...fixtureWeights({ featureRange: { min: [Number.NaN], max: [1] } }), trainedOn: { matrixSha256: 'x', labels: { kind: 'human' }, devFamilies: [] } }).ok).toBe(false)
+  })
   it('honours availability and rejects unknown ids or a mismatched host state', () => {
     const r = service(fixtureWeights())(request(profile({ preference: 'game' })), { mode: 'active', availability: { snapshotRef: 't', unavailableIds: ['archery', 'yijinjing'] } })
     expect(r.model!.candidates.some(c => c.id === 'archery' || c.programId === 'yijinjing')).toBe(false)

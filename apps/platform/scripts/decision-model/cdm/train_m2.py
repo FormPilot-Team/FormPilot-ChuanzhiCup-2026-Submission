@@ -129,9 +129,10 @@ def main():
     ap.add_argument('--labels-dir')
     ap.add_argument('--seed', type=int, default=1)
     ap.add_argument('--out', required=True)
+    ap.add_argument('--matrix', default=os.path.join(HERE, 'data', 'm2-matrix.v1.json'))
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
-    mpath = os.path.join(HERE, 'data', 'm2-matrix.v1.json')
+    mpath = args.matrix
     M = json.load(open(mpath, encoding='utf-8'))
     names, groups_of = M['featureNames'], M['featureGroups']
     rows = M['rows']
@@ -308,6 +309,7 @@ def main():
         weights = {'schemaVersion': 1, 'id': 'fp-cdm-m2', 'version': '1.0.0', 'family': fam_c, 'hyperparameter': hp_c, 'featureSet': M['featureSet'],
                    'featureNames': [names[i] for i in cC], 'mean': mC.scaler.mean_.tolist(), 'scale': mC.scaler.scale_.tolist(), 'coef': mC.coef.tolist(),
                    'pairTemperature': T, 'platt': {'a': float(platt.coef_[0][0]), 'b': float(platt.intercept_[0])}, 'abstainSuitabilityBelow': tau,
+                   'featureRange': {'min': X[dev][:, cC].min(axis=0).tolist(), 'max': X[dev][:, cC].max(axis=0).tolist(), 'source': 'dev split rows of the training matrix'},
                    'trainedOn': {'matrixSha256': sha(mpath), 'labels': label_info, 'devFamilies': dev_fams}}
         with open(os.path.join(args.out, 'fp-cdm-m2.weights.json' if args.labels == 'human' else 'fp-cdm-m2.ai-experiment.weights.json'), 'w', encoding='utf-8') as f:
             json.dump(weights, f)

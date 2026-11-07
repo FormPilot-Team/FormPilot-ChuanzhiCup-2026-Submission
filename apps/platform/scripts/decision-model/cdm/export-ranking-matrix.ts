@@ -68,5 +68,5 @@ const rows = file.scenarios.flatMap(s => {
 const out = { schemaVersion: 1, id: 'fp-cdm-m2-matrix/v1', featureSet: FEATURE_SET_VERSION, scenarioSha256: createHash('sha256').update(text).digest('hex'),
   featureNames: FEATURE_NAMES, featureGroups: FEATURE_GROUPS, rows }
 const outText = JSON.stringify(out)
-writeFileSync(resolve(DIR, 'data/m2-matrix.v1.json'), outText)
+writeFileSync(resolve(DIR, `data/m2-matrix.${FEATURE_SET_VERSION.split('/')[1]}.json`), outText)
 console.log(JSON.stringify({ rows: rows.length, features: FEATURE_NAMES.length, groups: Object.values(FEATURE_GROUPS).reduce((m: Record<string, number>, g) => (m[g] = (m[g] ?? 0) + 1, m), {}), pr49SlateOutsidePool: slateMismatch, sha256: createHash('sha256').update(outText).digest('hex') }))

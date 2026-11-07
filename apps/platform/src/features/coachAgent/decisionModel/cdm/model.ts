@@ -1,6 +1,6 @@
 import type { CoachRecommendation, CoachRecommendationResult, KnowledgeEntry } from '../../recommendation/types'
-import { answerCoachQuestion } from '../../recommendation/engine'
-import { candidatePool } from '../ranker'
+import { answerCoachQuestion, recommendCoach } from '../../recommendation/engine'
+import { candidatePool, rankCoachDecision, scoreCandidatesForEvaluation } from '../ranker'
 import type { CatalogueAvailability } from '../types'
 import { buildFeatures, FEATURE_GROUPS, FEATURE_NAMES, FEATURE_SET_VERSION } from './features'
 import type { DecisionState } from './state'
@@ -27,6 +27,8 @@ export interface CdmWeights {
   /** Platt scaling: P(suitable = label >= 2) = sigmoid(a * score + b), fitted on dev out-of-fold scores. */
   platt: { a: number; b: number }
   abstainSuitabilityBelow: number
+  /** Per-feature range observed in the training rows (optional; enables the range-based OOD rule). */
+  featureRange?: { min: number[]; max: number[] }
   trainedOn: { matrixSha256: string; labels: { kind: string; file_sha256?: string; annotators?: unknown }; devFamilies: string[] }
 }
 
@@ -41,7 +43,8 @@ export function loadWeights(raw: unknown): CdmWeightsStatus {
   const finite = (a: unknown) => Array.isArray(a) && a.length === n && a.every(x => typeof x === 'number' && Number.isFinite(x))
   if (w.featureSet !== FEATURE_SET_VERSION || !w.featureNames!.every(name => FEATURE_NAMES.includes(name)) || !finite(w.mean) || !finite(w.scale) || !finite(w.coef)
     || !(typeof w.pairTemperature === 'number' && w.pairTemperature > 0) || !w.platt || !Number.isFinite(w.platt.a) || !Number.isFinite(w.platt.b)
-    || typeof w.abstainSuitabilityBelow !== 'number' || w.trainedOn?.labels?.kind !== 'human') return { ok: false, reason: 'WEIGHTS_INVALID' }
+    || typeof w.abstainSuitabilityBelow !== 'number' || w.trainedOn?.labels?.kind !== 'human'
+    || (w.featureRange !== undefined && (!finite(w.featureRange.min) || !finite(w.featureRange.max)))) return { ok: false, reason: 'WEIGHTS_INVALID' }
   return { ok: true, weights: w as CdmWeights }
 }
 export const BUNDLED_WEIGHTS: CdmWeightsStatus = loadWeights(bundled)
@@ -77,19 +80,48 @@ export interface CdmOutput {
   answers: Record<'suitable' | 'first_game' | 'recent_issues' | 'why' | 'next_focus', string> | null
   stateOrigin: { history: string; report: string }
   excluded: { byAvailability: string[]; byMeasuredCaution: string[] }
+  /** Stage-1 candidate set the trained model re-ranks (v1.1). */
+  retrieval: { k: number; safePool: number; sources: { rulesP0: number; pr49: number; utilityFill: number } }
+  /** Features of the top candidate outside the training range (only when abstaining as OUT_OF_DISTRIBUTION). */
+  oodFeatures?: string[]
 }
 
 const GROUP_TEXT: Record<'P' | 'H' | 'R', string> = { P: '画像与内容', H: '训练历史', R: '最近报告' }
 
-/** Pure inference: features -> scores -> calibrated suitability -> slate. No side effects, no network. */
+/**
+ * Stage 1 retrieval (v1.1): the learned ranker only re-ranks a candidate set built the way the labelled pools were
+ * built (P0 slate + PR #49 slate, padded by PR #49 utility), all inside the safe pool. Ranking the full catalogue put
+ * the model off-distribution (content-only priors such as "neck content" dominated for users who did not select neck).
+ */
+export const RETRIEVAL_K = 12
+export function retrieveCandidates(state: DecisionState, catalogue: readonly KnowledgeEntry[], safe: KnowledgeEntry[], evidence: CoachRecommendationResult['evidence']) {
+  const allowed = new Map(safe.map(e => [e.id, e]))
+  const p0 = recommendCoach(state.profile, { evidence: [...evidence], limitations: [], decisionStatus: 'not_connected' })
+  const p0Ids = p0.status === 'ready' ? [...p0.chapters, ...p0.games].map(i => i.entry.id).filter(id => allowed.has(id)) : []
+  const prIds = rankCoachDecision({ profile: state.profile, evidence: [...evidence], availability: null, catalogue }).priority.map(i => i.id).filter(id => allowed.has(id))
+  const util = scoreCandidatesForEvaluation(state.profile, [...evidence], catalogue, [...allowed.keys()])
+  const fill = [...allowed.keys()].sort((a, b) => util[b] - util[a] || a.localeCompare(b))
+  const ids = [...new Set([...p0Ids, ...prIds, ...fill])].slice(0, RETRIEVAL_K)
+  const from = (list: string[]) => ids.filter(id => list.includes(id)).length
+  return { entries: ids.map(id => allowed.get(id) as KnowledgeEntry), sources: { rulesP0: from(p0Ids), pr49: ids.filter(id => prIds.includes(id) && !p0Ids.includes(id)).length, utilityFill: ids.length - new Set([...p0Ids, ...prIds].filter(id => ids.includes(id))).size } }
+}
+
+/** Pure inference: retrieval -> features -> scores -> calibrated suitability -> slate. No side effects, no network. */
 export function inferCdm(weights: CdmWeights, state: DecisionState, catalogue: readonly KnowledgeEntry[], availability: CatalogueAvailability | null, evidence: CoachRecommendationResult['evidence']): CdmOutput {
   const pool = candidatePool(state.profile, catalogue, new Set(availability?.unavailableIds ?? []))
+  const retrieval = retrieveCandidates(state, catalogue, [...pool.chapters, ...pool.games], evidence)
   const index = weights.featureNames.map(name => FEATURE_NAMES.indexOf(name))
-  let outside = 0
-  const scored: CdmCandidateScore[] = [...pool.chapters, ...pool.games].map((entry): CdmCandidateScore => {
+  // OOD v1.1 (2026-11-07): judged on the TOP candidate only. With trained feature ranges: any feature outside
+  // [min - 25% range, max + 25% range]. Legacy weights without ranges: more than 3 features beyond 8 sigma.
+  // (v1 counted 8-sigma features across the whole pool and misfired on rare-but-observed binary features.)
+  const oodOf = new Map<string, string[]>()
+  const scored: CdmCandidateScore[] = retrieval.entries.map((entry): CdmCandidateScore => {
     const x = buildFeatures(state, entry, catalogue)
     const z = index.map((i, k) => (x[i] - weights.mean[k]) / (weights.scale[k] || 1))
-    outside += z.filter(v => Math.abs(v) > 8).length
+    const range = weights.featureRange
+    oodOf.set(entry.id, range
+      ? weights.featureNames.filter((_, k) => { const pad = 0.25 * (range.max[k] - range.min[k]); return x[index[k]] < range.min[k] - pad - 1e-9 || x[index[k]] > range.max[k] + pad + 1e-9 })
+      : (z.filter(v => Math.abs(v) > 8).length > 3 ? weights.featureNames.filter((_, k) => Math.abs(z[k]) > 8) : []))
     const parts = z.map((v, k) => ({ feature: weights.featureNames[k], group: FEATURE_GROUPS[weights.featureNames[k]], value: round(x[index[k]]), points: round(v * weights.coef[k]) }))
     const score = parts.reduce((s, p) => s + p.points, 0)
     return {
@@ -104,6 +136,7 @@ export function inferCdm(weights: CdmWeights, state: DecisionState, catalogue: r
     candidates: scored,
     stateOrigin: { history: state.history.status === 'present' ? state.history.origin : 'missing', report: state.report.status === 'present' ? state.report.origin : 'missing' },
     excluded: { byAvailability: pool.excludedByAvailability, byMeasuredCaution: pool.excludedByMeasuredCaution },
+    retrieval: { k: RETRIEVAL_K, safePool: pool.chapters.length + pool.games.length, sources: retrieval.sources },
   }
   const programmes = [...new Set(scored.filter(c => c.programId).map(c => c.programId as string))].map(programId => {
     const top = scored.filter(c => c.programId === programId).slice(0, 2)
@@ -111,7 +144,8 @@ export function inferCdm(weights: CdmWeights, state: DecisionState, catalogue: r
   }).sort((a, b) => b.score - a.score)
   if (!scored.length) return { ...base, status: 'empty', abstainReason: 'NO_CANDIDATES', confidence: null, programmes, priority: [], result: null, answers: null }
   const confidence = scored.length > 1 ? round(sigmoid((scored[0].score - scored[1].score) / weights.pairTemperature)) : 1
-  if (outside > 3) return { ...base, status: 'abstain', abstainReason: 'OUT_OF_DISTRIBUTION', confidence, programmes, priority: [], result: null, answers: null }
+  const oodTop = oodOf.get(scored[0].id) ?? []
+  if (oodTop.length) return { ...base, status: 'abstain', abstainReason: 'OUT_OF_DISTRIBUTION', oodFeatures: oodTop, confidence, programmes, priority: [], result: null, answers: null }
   if (scored[0].suitability < weights.abstainSuitabilityBelow) return { ...base, status: 'abstain', abstainReason: 'LOW_SUITABILITY', confidence, programmes, priority: [], result: null, answers: null }
 
   // Product slate (same presentation limits as P0/PR #49): <=3 chapters from <=2 programmes, <=2 games.

@@ -1,0 +1,1 @@
+{"runs":7,"bundleBytes":138202,"median":{"importMs":3.773,"firstCallMs":7.277,"secondCallMs":0.621,"rssMB":44.827,"heapMB":4.801},"note":"fresh node process per run; bundled weights are the AWAITING_LABELS placeholder, so the first call measures the fallback path until trained weights are bundled"}

@@ -1,0 +1,107 @@
+{
+ "schemaVersion": 1,
+ "generatedAt": "2026-11-07T13:39:09.833Z",
+ "weightsKind": "trained",
+ "labelKind": "ai_single_annotator",
+ "weightsPath": "F:/ProjectEvidence/FormPilot/20261107-cdm-trained/ai-experiment/fp-cdm-m2.ai-experiment.weights+ranges.json",
+ "scope": "self-report profile space (synthetic enumeration), not real users",
+ "e2": {
+  "profiles": 22320,
+  "cdmAbstainedOrFellBack": 2133,
+  "distinctSlates": {
+   "rules_p0": 57,
+   "pr49": 433,
+   "cdm": 360
+  },
+  "normalisedEntropy": {
+   "rules_p0": 0.1983,
+   "pr49": 0.4024,
+   "cdm": 0.302
+  },
+  "meanRegionCoverage": {
+   "rules_p0": 0.8216,
+   "pr49": 0.8233,
+   "cdm": 0.845
+  },
+  "meanDistinctProgrammes": {
+   "rules_p0": 1.9823,
+   "pr49": 1.9358,
+   "cdm": 1.9965
+  }
+ },
+ "e4": {
+  "riskProfiles": {
+   "checked": 13392,
+   "held": 13392,
+   "modelExecutions": 0
+  },
+  "profileSpace": {
+   "profiles": 22320,
+   "executed": 22320,
+   "outcomes": {
+    "null": 20187,
+    "MODEL_ABSTAINED": 2133
+   },
+   "limitedCautionItems": 0,
+   "nonLaunchableChapters": 0
+  },
+  "adversarialCautionLovingWeights": {
+   "limitedProfiles": 6572,
+   "cautionItemsShown": 0
+  },
+  "unavailableContentShownByModel": 0,
+  "lowConfidenceAbstain": {
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "LOW_SUITABILITY",
+   "activeIsRules": true
+  },
+  "outOfDistributionAbstain": {
+   "fallbackReason": null,
+   "abstainReason": null
+  },
+  "untrainedBundledWeights": {
+   "fallbackReason": "MODEL_NOT_TRAINED"
+  },
+  "missingTrustedData": {
+   "note": "rules-mode requests carry no history/report: state history/report = missing; H/R features are 0 by construction (tested)",
+   "historyStatus": {
+    "history": "missing",
+    "report": "missing"
+   }
+  }
+ },
+ "e5": {
+  "weightsKind": "trained",
+  "weightsFileBytes": 12243,
+  "parameters": 337,
+  "singleRequestMs": {
+   "n": 22320,
+   "p50": 0.9862,
+   "p95": 2.1644,
+   "max": 8.113
+  },
+  "rulesOnlyMs": {
+   "p50": 0.0442,
+   "p95": 0.1175
+  },
+  "batch5000": {
+   "totalMs": 6431.4357,
+   "perRequestMs": 1.2863
+  },
+  "heapUsedMB": 52.5095,
+  "cpu": "single thread, Node, development laptop",
+  "gpu": "not used",
+  "network": "none",
+  "bundle": {
+   "p0WebService": {
+    "minifiedBytes": 42664,
+    "gzipBytes": 11914
+   },
+   "cdmIndexIncludingP0AndPr49": {
+    "minifiedBytes": 138860,
+    "gzipBytes": 36363
+   }
+  },
+  "coldStart": "measured separately by scripts/decision-model/cdm/cold-start.mjs (fresh process import + first call)"
+ }
+}

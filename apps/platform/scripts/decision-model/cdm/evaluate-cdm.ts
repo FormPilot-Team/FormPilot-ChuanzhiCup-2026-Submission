@@ -20,7 +20,13 @@ const arg = (n: string) => { const i = args.indexOf(n); return i >= 0 ? args[i +
 const OUT = resolve(arg('--out') ?? 'test-results/cdm-eval'); mkdirSync(OUT, { recursive: true })
 const weightsPath = arg('--weights')
 let weights: CdmWeights, weightsKind: 'trained' | 'fixture'
-if (weightsPath) {
+const aiExperiment = args.includes('--ai-label-experiment')
+if (weightsPath && aiExperiment) {
+  // Single-AI-annotator weights: the production loader refuses them; evaluated here only as a labelled experiment.
+  const raw = JSON.parse(readFileSync(weightsPath, 'utf8')) as CdmWeights
+  if (raw.trainedOn?.labels?.kind !== 'ai_single_annotator') throw new Error('--ai-label-experiment requires ai_single_annotator weights')
+  weights = raw; weightsKind = 'trained'
+} else if (weightsPath) {
   const status = loadWeights(JSON.parse(readFileSync(weightsPath, 'utf8')))
   if (!status.ok) throw new Error(`weights refused: ${status.reason}`)
   weights = status.weights; weightsKind = 'trained'
@@ -127,6 +133,6 @@ if (weightsKind === 'trained') {
     distinctSlates: Object.fromEntries(Object.entries(sys).map(([k, m]) => [k, m.size])), normalisedEntropy: Object.fromEntries(Object.entries(sys).map(([k, m]) => [k, ent(m, profiles.length)])),
     meanRegionCoverage: Object.fromEntries(Object.entries(covs).map(([k, v]) => [k, mean(v)])), meanDistinctProgrammes: Object.fromEntries(Object.entries(progs).map(([k, v]) => [k, mean(v)])) }
 }
-const report = { schemaVersion: 1, generatedAt: new Date().toISOString(), weightsKind, weightsPath: weightsPath ?? null, scope: 'self-report profile space (synthetic enumeration), not real users', e2, e4, e5 }
-writeFileSync(resolve(OUT, `cdm-e2-e4-e5-${weightsKind}.json`), `${JSON.stringify(report, null, 1)}\n`)
+const report = { schemaVersion: 1, generatedAt: new Date().toISOString(), weightsKind, labelKind: weights.trainedOn.labels.kind, weightsPath: weightsPath ?? null, scope: 'self-report profile space (synthetic enumeration), not real users', e2, e4, e5 }
+writeFileSync(resolve(OUT, `cdm-e2-e4-e5-${weightsKind === 'trained' ? weights.trainedOn.labels.kind : weightsKind}.json`), `${JSON.stringify(report, null, 1)}\n`)
 console.log(JSON.stringify({ weightsKind, e4, e5: { ...e5, bundle: e5.bundle }, e2 }, null, 1))

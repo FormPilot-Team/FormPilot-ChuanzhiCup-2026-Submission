@@ -238,8 +238,8 @@ function unifiedOrder<T>(preference: CoachProfile['preference'], chapters: T[], 
 }
 
 /**
- * Offline evaluation only (fp-cdm E1 baselines): the base utility this ranker assigns to each given
- * candidate before greedy slate selection. Read-only; rankCoachDecision behaviour is unchanged.
+ * Read-only base utility this ranker assigns to each given candidate before greedy slate selection.
+ * Used by fp-cdm E1 baselines and by fp-cdm stage-1 retrieval. rankCoachDecision behaviour is unchanged.
  */
 export function scoreCandidatesForEvaluation(profile: CoachProfile, evidence: CoachEvidence[], catalogue: readonly KnowledgeEntry[], ids: readonly string[]): Record<string, number> {
   const needs = profileNeeds(profile)

@@ -24,7 +24,11 @@ const elevation = (s: Point, e: Point) => { const dx = e.x - s.x, dy = e.y - s.y
 /** Continuous per-frame signals (scale-free: torso-normalised or degrees). Flags are derived inside windows. */
 const SIGNALS = ['elevMax', 'elevMin', 'elbowMin', 'wristHeightMax', 'wristAboveNose', 'trunkLeanAbs', 'torsoVertical', 'widthLogAbs',
   'kneeMin', 'kneeMax', 'ankleDiff', 'hipHeightRel', 'headDrop', 'earRatioRel', 'wristToFloorMin', 'vWrist', 'vAnkle', 'vNose', 'vHip'] as const
-type Signal = typeof SIGNALS[number]
+/** v2 (opt-in --v2): extra signals added for M1 v1.1 research; v1 output stays byte-identical. */
+const V2 = process.argv.includes('--v2')
+const SIGNALS_V2 = ['elevAsym', 'elbowAboveShoulder', 'wristSep', 'wristLateral', 'kneeLift', 'handsCross', 'headTilt'] as const
+type Signal = typeof SIGNALS[number] | typeof SIGNALS_V2[number]
+const ACTIVE: readonly Signal[] = V2 ? [...SIGNALS, ...SIGNALS_V2] : SIGNALS
 
 function main() {
   const rows: Array<Record<string, unknown>> = []
@@ -76,6 +80,13 @@ function main() {
         earRatioRel: le && re ? (Math.hypot(le.x - re.x, le.y - re.y) / b.shoulderWidth) / medEar : Number.NaN,
         wristToFloorMin: toFloor.length ? Math.min(...toFloor) : Number.NaN,
         vWrist: speed(['lw', 'rw']), vAnkle: speed(['la', 'ra']), vNose: speed(['nose']), vHip: speed(['hip']),
+        elevAsym: elev.length === 2 ? Math.abs(elev[0] - elev[1]) : Number.NaN,
+        elbowAboveShoulder: sides.some(x => x.s && x.e && x.e.y < x.s.y) ? 1 : 0,
+        wristSep: pts.lw && pts.rw ? Math.hypot(pts.lw.x - pts.rw.x, pts.lw.y - pts.rw.y) / S : Number.NaN,
+        wristLateral: Math.max(...sides.map(x => x.w ? Math.abs(x.w.x - b.shoulderMid.x) / S : 0)),
+        kneeLift: Math.max(...sides.map(x => x.k && x.h ? (x.k.y < b.hipMid.y + 0.5 * S ? (b.hipMid.y + 0.5 * S - x.k.y) / S : 0) : 0)),
+        handsCross: pts.lw && pts.rw && p(LM.leftShoulder) && p(LM.rightShoulder) ? Number(Math.sign(pts.lw.x - pts.rw.x) !== Math.sign(p(LM.leftShoulder)!.x - p(LM.rightShoulder)!.x)) : Number.NaN,
+        headTilt: le && re ? Math.abs(Math.atan2(re.y - le.y, Math.abs(re.x - le.x))) : Number.NaN,
       }
       prev = { t, pts }
       return { t, value }
@@ -86,7 +97,7 @@ function main() {
         const expected = track.frames.filter(f => f.t >= start && f.t < start + WINDOW).length
         if (!expected || inWin.length / expected < MIN_VALID) continue
         const feat: Record<string, number> = {}
-        for (const s of SIGNALS) {
+        for (const s of ACTIVE) {
           const v = inWin.map(f => f.value[s]).filter(Number.isFinite)
           feat[`${s}_mean`] = mean(v); feat[`${s}_p10`] = q(v, 0.1); feat[`${s}_p90`] = q(v, 0.9); feat[`${s}_std`] = std(v)
         }
@@ -96,13 +107,13 @@ function main() {
   }
   const chapters = COACH_KNOWLEDGE.filter(e => e.kind === 'chapter').map(e => ({ chapterId: e.id, programId: e.programId, regions: e.regions, caution: e.caution, focuses: e.focuses, launchable: e.href !== null }))
   const out = {
-    schemaVersion: 1, id: 'fp-cdm-m1-windows/v1', generatedBy: 'scripts/decision-model/cdm/export-window-features.ts',
+    schemaVersion: 1, id: V2 ? 'fp-cdm-m1-windows/v2' : 'fp-cdm-m1-windows/v1', generatedBy: 'scripts/decision-model/cdm/export-window-features.ts',
     dataOrigin: 'real observations: reference pose tracks of standard demonstration videos (single demonstrator, MediaPipe Pose Lite 2D)',
     labelOrigin: 'catalogue regions/caution tags authored by the FormPilot team (human annotation, not expert or clinical)',
     window: { seconds: WINDOW, hopSeconds: HOP, minValidFraction: MIN_VALID }, tracks, featureNames: Object.keys(rows[0].features as object), chapters, rows,
   }
   const text = JSON.stringify(out)
-  writeFileSync(resolve(import.meta.dirname, 'data/m1-windows.v1.json'), text)
+  writeFileSync(resolve(import.meta.dirname, V2 ? 'data/m1-windows.v2.json' : 'data/m1-windows.v1.json'), text)
   console.log(JSON.stringify({ windows: rows.length, features: out.featureNames.length, chapters: new Set(rows.map(r => r.chapterId)).size, sha256: sha256(text), bytes: text.length }))
 }
 main()
