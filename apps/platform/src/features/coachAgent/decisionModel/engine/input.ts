@@ -40,6 +40,12 @@ export function prepareDecisionInput(raw: unknown, catalogue: readonly Knowledge
     return { envelopeOk: false, profile: undefined, now: clock(), state: empty, evidence: [], availability: null, availabilityValid: true, issues: [{ path: '$.contract', message: `必须为 ${COACH_DECISION_CONTRACT}` }], dataSources: missingSources }
   }
   for (const key of Object.keys(raw)) if (!TOP_KEYS.includes(key)) issues.push({ path: `$.${key}`, message: '未知字段（契约 v1 不接受）' })
+  // Sparse arrays (holes) are skipped by Array#every in the shared profile validator but reach the ranker as undefined.
+  // JSON input can never contain holes; programmatic input is reported here instead of failing inside inference.
+  if (obj(raw.profile)) for (const key of ['goals', 'difficulties', 'regions']) {
+    const list = raw.profile[key]
+    if (Array.isArray(list)) for (let i = 0; i < list.length; i += 1) if (!(i in list)) issues.push({ path: `$.profile.${key}[${i}]`, message: '数组不能有空位' })
+  }
   let now = clock()
   if (raw.now !== undefined) {
     if (typeof raw.now === 'number' && Number.isFinite(raw.now) && raw.now > 0) now = raw.now

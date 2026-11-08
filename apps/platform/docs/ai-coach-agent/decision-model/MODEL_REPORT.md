@@ -1,24 +1,35 @@
 # FormPilot Coach Decision Model（fp-cdm）技术报告
 
-更新：2026-11-08（Asia/Shanghai），阶段：Competition Integration Readiness。分支 `feat/coach-decision-integration-ready`（叠加在 PR #50 → PR #49 → main 之上）。负责执行：Claude Code；负责人：KiyOm1Lykke。
-Web 接线说明：`WEB_INTEGRATION_READY.md`；Codex 最小指令：`CODEX_WIRING_BRIEF.md`；JSON 示例：`examples/`。
+更新：2026-11-08（Asia/Shanghai），阶段：最终交付收尾（模型侧冻结，等待 Web 正式接线）。分支 `feat/coach-decision-integration-ready`，PR #51（叠加在 PR #50 → PR #49 → main 之上）。负责执行：Claude Code；负责人：KiyOm1Lykke。
+Web 接线说明：`WEB_INTEGRATION_READY.md`；Codex 最小指令：`CODEX_WIRING_BRIEF.md`；JSON 示例：`examples/`；人工标注包：`scripts/decision-model/cdm/annotation-kit/packages/HANDOFF_PACKAGES.md`。
 
 ## 0. 结论状态
 
 | 结论 | 状态 | 范围 |
 | --- | --- | --- |
-| 浏览器推理模块与 Web 接口（OFF / SHADOW / ACTIVE、故障回退） | **已验证（离线）** | 30 个单元测试；OFF 与 Agent Web P0 逐字一致；13 类故障全部回退规则；Vite 生产构建后在 Edge 中实际运行 |
+| 浏览器推理模块与 Web 接口（OFF / SHADOW / ACTIVE、故障回退） | **已验证（离线）** | 32 个单元测试；OFF 与 Agent Web P0 逐字一致；全部回退原因都有测试；3,007 个畸形输入的模糊测试 0 次抛出；Vite 生产构建后在 Edge 中实际运行 |
 | 训练 / 推理一致性 | **已验证** | 72 个标注场景经接口输入后，模型分数与训练时的状态逐项相同 |
 | 安全门禁、弃权与回退 | **已验证（离线）** | 22,320 个画像全量；13,392 个风险画像；对抗权重；故障注入 |
 | 推理性能与资源 | **已验证（开发机）** | Node 与 Edge 实测；未在比赛目标设备上复测 |
 | M1 内容理解（跨功法） | **已验证（离线，限定）** | 真实参考姿态 + 团队人工标签；嵌套按功法留一；比手工描述符略好，差异不显著 |
 | M2 排序质量、相对规则 / PR #49 的优势 | **实验性** | 单一 AI 标注者（Claude Opus 5.5），合成场景；指标衡量与该 AI 标注者的一致性 |
 | 画像特征的作用 | **实验性** | 部位、偏好交叉特征显著有用；目标、困难交叉特征无增益（开发集，AI 标签） |
-| 历史 / 报告特征的作用 | **实验性，效应很小** | 只有游戏历史显著（−0.013）；报告主要把所指章节重新排前 |
-| 人工或专家一致性 | **待验证** | 未进行 |
+| 历史 / 报告特征的作用 | **实验性，效应很小** | 只有游戏历史显著（全部开发场景 −0.013，有历史的场景 −0.015）；报告主要把所指章节重新排前 |
+| 人工或专家一致性 | **待验证** | 未进行；两份独立标注包已备好，等待两名团队成员 |
+| Web 接线后的 SHADOW 验收 | **待进行** | 需要 Web 正式页面；流程与检查器已备好（`WEB_INTEGRATION_READY.md` §10） |
 | 真实用户推荐质量、康复效果 | **待验证** | 不作任何宣称 |
 
 “已验证”只指离线技术验证；**产品验收未进行**，任何一项都不等于产品验收通过。
+
+### 0.1 模型实际能做什么、不能说什么
+
+- **能做**：对一个自述画像（加可选的本机训练历史与最近报告），在安全筛选后的约 12 个候选内，按“与单一 AI 标注者在 72 个合成场景上的判断相一致”的方式排序，并给出可读理由；超出训练范围或把握不足时弃权，交回规则结果。
+- **证据层级**：
+  1. 工程与安全行为：离线验证，可复现（§5、§7）。
+  2. 排序质量：只有与 AI 标签的一致性。冻结测试上 NDCG@5 的优势不显著，CI 跨 0。
+  3. 人工一致性：0 条人工标签。
+  4. 真实用户、专家或临床：没有任何证据。
+- **不能说**：“比规则推荐更好”“经人工 / 专家验证”“个性化效果已证实”“有康复或医疗效果”。可以说：“训练的偏好排序模型（实验性，AI 标注弱监督）”“离线技术验证通过”“默认关闭，回退到规则”。
 
 ## 1. 架构与版本
 
@@ -107,7 +118,7 @@ Web ──► recommendCoachDecision(input, { mode })            契约 fp-coach
 | PR #49 手工权重 | 0.770 | 0.797（0.723–0.849） | 0.759 | 0.625 | 0.732 |
 | **fp-cdm（P+H+R）** | 0.811 | **0.868**（0.738–0.959） | 0.889 | 0.763 | **0.873** |
 
-模型 − P0 的 NDCG@5 差值 CI 为 [−0.024, 0.122]，模型 − PR #49 为 [−0.090, 0.174]，NDCG 优势**不显著**。成对准确率的差距较大。测试集只评测过这一次。
+模型 − P0 的 NDCG@5 差值 CI 为 [−0.024, 0.122]，模型 − PR #49 为 [−0.090, 0.174]，NDCG 优势**不显著**。成对准确率的差距较大（0.873 对 0.707 / 0.732），但没有做区间估计；测试只有 18 个场景，标签来自训练标签的同一 AI 标注者，不能据此说模型优于规则。测试集只评测过这一次，收尾阶段也没有为补算区间而再次使用它。
 
 ### 4.3 开发集研究（只用开发族；冻结测试不参与）
 
@@ -183,14 +194,27 @@ fp-cdm 在 2,133 个画像（9.6%）上弃权并回退规则：低适配 1,936 �
 
 | 检查 | 结果 |
 | --- | --- |
-| `tests/coach-decision-engine.test.ts`（20 项） | 通过：发布绑定、OFF 一致性、SHADOW、ACTIVE 门禁、全部故障、72 场景一致性、平台记录映射 |
+| `tests/coach-decision-engine.test.ts`（22 项） | 通过：发布绑定、OFF 一致性、SHADOW、ACTIVE 门禁、全部故障、稀疏数组输入、72 场景一致性、平台记录映射、SHADOW 验收日志与检查器 |
 | `tests/coach-cdm.test.ts`（10 项） | 通过：标签层级加载、特征、Guard、安全池独立性、OOD、解释文本 |
-| 全量 vitest | 121 个文件中 119 个通过；1,952 项中 1,947 项通过。5 项失败均为 `ENOENT`：工作树中没有被忽略的标准功法 MP4（`public/assets/routines/*-standard.mp4`），与本改动无关，第二轮已记录 |
+| 全量 vitest | 见 §5.2.1（收尾阶段重跑） |
+| `tsc -b`、`eslint .`、平台生产构建 `vite build` | 见 §5.2.1 |
+| 模糊测试 `fuzz-engine.ts`（3,007 个畸形输入 × 9 种选项，确定性） | 0 次抛出；0 次未经批准展示模型；风险画像 0 次得到模型结果；`safety_hold` 0 次展示内容；全部 JSON 安全。收尾审查中发现 4 例**稀疏数组**画像（如 `goals: ['upper_limb', <空位>]`）通过 P0 的画像校验后在推理中抛错（已安全回退为 `MODEL_ERROR`）；已在引擎输入层改为 `INPUT_INVALID`，没有改动 P0 校验 |
+| 最小 Web 页面经 Vite 生产构建后在 Edge 156 运行 | 通过：完整性 ok；OFF → 规则；SHADOW → 规则 + 12 项排序；ACTIVE（批准）→ 模型推荐，与 Node 生成的示例逐字节相同；只有页面与自身 JS 两个请求 |
+| Lab v3 一致性（`lab/check-lab.mjs`，无头 Edge） | 11 个内嵌数据源与提交的产物文件相同；8 个现场案例的浏览器渲染与 Node 引擎输出相同，且每个案例的文字结论在实际输出上成立；无控制台错误、无网络请求；1366 px / 375 px 无横向滚动 |
+| SHADOW 检查器自检（`shadow-acceptance.ts --self-test`） | 72 个合成场景的干净日志：7 项硬性检查全部通过，因覆盖不足判为 INSUFFICIENT（符合预期）；篡改日志（在 SHADOW 下展示模型排序）：H3 失败 |
+| 标注包（无头 Edge 打开 A1、A2 两份工具） | 均可离线使用，0/18 起始，无网络请求，不显示任何系统输出 |
+
+#### 5.2.1 收尾阶段全量检查（2026-11-08，工作树 `feat/coach-decision-integration-ready`）
+
+| 检查 | 结果 |
+| --- | --- |
 | `tsc -b` | 通过 |
 | `eslint .` | 通过 |
+| 全量 vitest | 121 个文件中 119 个通过；1,954 项中 1,949 项通过。5 项失败与上一轮相同，均为工作树中缺少被 git 忽略的标准功法 MP4（`public/assets/routines/*-standard.mp4`，`ENOENT`），与本改动无关 |
 | 平台生产构建 `vite build` | 通过 |
-| 最小 Web 页面经 Vite 生产构建后在 Edge 运行 | 通过：完整性 ok；OFF → 规则；SHADOW → 规则 + 12 项排序；ACTIVE（批准）→ 模型推荐；只有页面与自身 JS 两个请求 |
-| Lab v3 无头 Edge（1366 px / 375 px） | 无控制台错误，无横向滚动 |
+| GitHub CI（#49、#50、#51） | `check` 与 `hygiene` 均通过（收尾推送后重新运行，结果见 PR） |
+
+日志：`F:\ProjectEvidence\FormPilot\20261108-cdm-final\checks\`。
 
 ### 5.3 性能（E5）
 
@@ -206,15 +230,34 @@ fp-cdm 在 2,133 个画像（9.6%）上弃权并回退规则：低适配 1,936 �
 | 接入包体（含 P0、PR #49、权重、M1 表） | esbuild 164 KB min / 45 KB gzip；Vite 生产 chunk 141 KB；Node 内置依赖 0 |
 | 本机记录辅助函数（可选） | 另加平台既有读取器后 512 KB min / 133 KB gzip（这些代码平台已有） |
 
-CPU 单线程，开发笔记本；不用 GPU，不联网。
+CPU 单线程，开发笔记本；不用 GPU，不联网。收尾阶段重测（同一台机器）：整次调用 p50 0.97 ms / p95 1.79 ms，有历史 + 报告 p50 1.71 ms / p95 2.24 ms；核心包体 168 KB min / 46 KB gzip（输入层修复后略增）。
+
+浏览器兼容：只用标准 JavaScript，唯一较新的 API 是 `structuredClone`（Chrome / Edge ≥ 98、Firefox ≥ 94、Safari ≥ 15.4）。只在 Edge 156 上实测，Firefox 与 Safari 未实测。
 
 ## 6. Coach Decision Lab v3（比赛展示版）
 
-`scripts/decision-model/cdm/lab/build-lab.mjs` 生成离线单文件 HTML（约 530 KB）。页面上的每次推荐都调用**公开接口** `recommendCoachDecision`，与 Web 接线完全相同。内容：结论状态｜模型架构图｜数据与来源｜实时决策（自定义画像、历史 / 报告预设、可用性、OFF / SHADOW / ACTIVE 切换、“实验条件”切换到 10 个研究变体、可编辑的契约 JSON、“用户将看到”面板、特征贡献、与规则 / PR #49 对照、完整响应）｜8 个现场案例（目标、历史、部位、报告、不可用、风险、近期练习、分布外）｜典型画像｜M1 / M2 训练过程与训练阶段｜冻结测试与个性化｜消融｜行为探针｜泛化｜安全与性能（含本浏览器实测）｜版本、SHA 与复现命令｜局限与启用条件。全页标注“实验性模型 · AI 标注弱监督”。
+`scripts/decision-model/cdm/lab/build-lab.mjs` 生成离线单文件 HTML（约 530 KB）。页面上的每次推荐都调用**公开接口** `recommendCoachDecision`，与 Web 接线完全相同。内容：结论状态｜模型架构图｜数据与来源｜实时决策（自定义画像、历史 / 报告预设、可用性、OFF / SHADOW / ACTIVE 切换、“实验条件”切换到 10 个研究变体、可编辑的契约 JSON、“用户将看到”面板、特征贡献、与规则 / PR #49 对照、完整响应）｜8 个现场案例（目标、历史、部位、报告、不可用、风险、近期练习、分布外）｜典型画像｜M1 / M2 训练过程与训练阶段｜冻结测试与个性化｜消融｜行为探针｜泛化｜安全与性能（含本浏览器实测）｜版本、SHA 与复现命令｜局限与启用条件。全页标注“实验性模型 · AI 标注弱监督”。收尾阶段用当前引擎重建，并用 `lab/check-lab.mjs` 核对：内嵌图表数据与产物文件相同，8 个现场案例的浏览器结果与 Node 引擎相同、文字结论成立（§5.2）。
 
-## 7. 复现
+## 7. 复现与证据索引
 
-见 `scripts/decision-model/cdm/README.md` §7。Python 3.12 + scikit-learn 1.8（`-I -B`），TS 用 vite-node；全部只读仓库数据。
+命令见 `scripts/decision-model/cdm/README.md` §7–§8。Python 3.12 + scikit-learn 1.8（`-I -B`），TS 用 vite-node；全部只读仓库数据。收尾阶段（2026-11-08）**没有重新训练任何模型，没有再次使用冻结测试集**；只重跑了推理类脚本并核对结果。
+
+| 内容 | 产物（`scripts/decision-model/cdm/`） | 生成脚本 | 收尾复核 |
+| --- | --- | --- | --- |
+| 训练场景 | `data/scenarios.v1.json`（SHA `11ad3c42…`） | `build-scenarios.ts` | 发布清单 SHA 一致 |
+| AI 标签（原始冻结） | `labels-ai/fp-cdm-ai-labels-v1.json` | AI 标注轮 | SHA 一致 |
+| M1 训练与评测 | `artifacts/m1/`、`artifacts/m1-v11/` | `train_m1.py`、`train_m1_v11.py`、`robustness_m1.py` | SHA 一致；未重训 |
+| M2 训练与冻结测试（含规则、PR #49 对照） | `artifacts/m2-ai-experiment/` | `train_m2.py --labels ai` | SHA 一致；第三阶段同流程重拟合与发布权重一致；未重训 |
+| 消融、训练阶段、研究变体 | `artifacts/integration/integration-experiments.json`、`variants/` | `integration_experiments.py` | Lab 内嵌数据与文件相同；未重训 |
+| 行为探针 | `artifacts/integration/probes.json` | `probes.ts` | 重跑，除时间戳外逐项相同 |
+| 个性化 E2、安全 E4、性能 E5 | `artifacts/integration/cdm-e2-e4-e5-release.json` | `evaluate-cdm.ts` | 重跑：E2、E4 逐项相同；E5 重测（§5.3），文件已更新 |
+| 冷启动 | `artifacts/integration/cold-start.json` | `cold-start.mjs` | 未重跑 |
+| 健壮性 | `artifacts/integration/fuzz-engine.json` | `fuzz-engine.ts` | 新增，0 失败 |
+| SHADOW 检查器自检 | `artifacts/integration/shadow-acceptance-selftest.json` | `shadow-acceptance.ts --self-test` | 新增 |
+| Web 示例 | `docs/ai-coach-agent/decision-model/examples/` | `export-examples.ts` | 重新生成，逐字节相同 |
+| Lab v3 | 证据目录 `lab/coach-decision-lab-v3.html` | `lab/build-lab.mjs`、`lab/check-lab.mjs` | 用当前引擎重建并通过一致性检查 |
+| 发布 | `artifacts/integration/release-manifest.json` | `freeze-release.ts` | 18/18 文件 SHA 一致，`release.ts` 与权重一致 |
+| 人工标注包 | 证据目录 `annotation-packages/` | `annotation-kit/packages/build-packages.mjs` | 新增；无人工标签 |
 
 ## 8. 尚未解决的问题
 
@@ -226,11 +269,13 @@ CPU 单线程，开发笔记本；不用 GPU，不联网。
 6. 测试集只有 6 个族；M1 只有单一示范者、4 套功法，太极拳泛化最弱。
 7. 游戏没有姿态描述符，也没有历史记录持久化（游戏历史接口已就绪但无数据源）。
 8. 报告分项的分数与趋势目前不是结构化字段，接入时传 null。
+9. Web 正式页面尚未完成，接线、E2E 与 SHADOW 验收都还没有进行。现有独立预览页 `sprint/CoachSprint.tsx` 直接调用 `recommendCoach(profile, context)`，与引擎 OFF（只用画像的 P0）不完全相同（见 `WEB_INTEGRATION_READY.md` §1.1）。
+10. 浏览器只在 Edge 上实测；性能只在开发笔记本上测过。
 
 ## 9. 正式启用条件（需负责人决定）
 
-1. **人工验证（关键剩余项）**：两名团队成员各用 `annotation-kit/fp-cdm-annotation-v1-testfamilies.html` 标注 6 个冻结测试族（18 个场景，约 180 条 / 人，约 15–20 分钟），然后运行 `ingest_labels.py --subset test` 与 `evaluate_human_test.py`：得到人工之间的一致性、AI 与人工的一致性，以及在人工标签上重新计算的规则 / PR #49 / 模型对照（不重新训练）。
+1. **人工验证（关键剩余项）**：负责人把两份独立标注包（A1、A2，见 `annotation-kit/packages/HANDOFF_PACKAGES.md`）分别私下发给两名团队成员，每人标注 6 个冻结测试族（18 个场景，约 180 条，约 15–20 分钟）。然后运行 `ingest_labels.py --subset test` 与 `evaluate_human_test.py`，得到人工之间的一致性、AI 与人工的一致性，以及在人工标签上重新计算的规则 / PR #49 / 模型对照（不重新训练）。
 2. 根据第 1 步结果决定：继续以“实验性模型”展示，或补充近期练习等场景并用人工标签重训正式权重（加载器层级随之变为 `human`）。
-3. 合并顺序 #49 → #50 → 本阶段 PR；Web 先以 SHADOW 接线并完成 `WEB_INTEGRATION_READY.md` §9 的 E2E。
+3. 合并顺序 #49 → #50 → #51。Web 先以 OFF 接线完成 `WEB_INTEGRATION_READY.md` §9 的 E2E，再在验收构建中按 §10 做 SHADOW 验收（≥ 3 台设备、≥ 30 次调用）。
 4. ACTIVE（并设置 `allowExperimentalModel`）、合并 main、修改安全门禁，均由负责人决定。
 5. 在比赛目标设备上复测性能；不对外宣称临床效果、专家验证或真实用户效果。

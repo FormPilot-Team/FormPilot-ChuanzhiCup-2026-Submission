@@ -13,6 +13,8 @@ import {
   COACH_DECISION_CONTRACT, createCoachDecisionEngine, describeCoachDecisionModel, FP_CDM_RELEASE, recommendCoachDecision, type CoachDecisionInput,
 } from '../src/features/coachAgent/decisionModel/engine'
 import { collectLocalDecisionInput, historyFromRoutineSessions } from '../src/features/coachAgent/decisionModel/engine/platform'
+import { toShadowLogEntry } from '../src/features/coachAgent/decisionModel/engine/shadow'
+import { checkShadowLogs } from '../scripts/decision-model/cdm/shadowCheck'
 import { scenarioEvidence } from '../scripts/decision-model/cdm/evidence'
 import type { SyntheticHistory, SyntheticReport } from '../scripts/decision-model/cdm/scenarioTypes'
 import scenarioFile from '../scripts/decision-model/cdm/data/scenarios.v1.json'
@@ -144,6 +146,15 @@ describe('fault handling (every case falls back to rules without touching the gu
       expectRules(r, 'INPUT_INVALID'); expect(r.inputIssues.map(i => i.path)).toContain(path); expect(r.display?.result).toEqual(rulesOf(profile()).result)
     }
   })
+  it('sparse profile arrays (holes) -> INPUT_INVALID instead of an inference failure (found by the review fuzz)', () => {
+    // eslint-disable-next-line no-sparse-arrays
+    const sparse = profile({ goals: ['upper_limb', , ] as unknown as CoachProfile['goals'] })
+    for (const options of [approved, { mode: 'shadow' as const }]) {
+      const r = recommendCoachDecision(input({ profile: sparse }), options)
+      expectRules(r, 'INPUT_INVALID'); expect(r.inputIssues.map(i => i.path)).toContain('$.profile.goals[1]')
+      expect(r.execution).toBe('not_run')
+    }
+  })
   it('risk users never reach the model in any mode', () => {
     for (const risk of ['acute_pain', 'dizziness', 'recent_injury'] as const) for (const mode of ['shadow', 'active'] as const) {
       const r = recommendCoachDecision(input({ profile: profile({ risk }) }), { mode, allowExperimentalModel: true })
@@ -246,5 +257,25 @@ describe('platform record mapping', () => {
     expect(granted.gameHistory).toBeUndefined()
     expect(writes).toEqual([])
     expect(recommendCoachDecision(granted, { mode: 'shadow' }).inputIssues).toEqual([])
+  })
+})
+
+describe('SHADOW acceptance log', () => {
+  it('a log entry carries ids and outcomes only, and the checker passes clean SHADOW logs and fails a shown model ranking', () => {
+    const full = input({ trainingHistory: { origin: 'live_local_records', chapters: [{ chapterId: 'bdj-1', sessions: 3, completedSessions: 3, meanScore: 70, trend: 'up', lastPracticedAt: NOW - 6 * DAY }] } })
+    const entries = [input(), full, input({ profile: profile({ risk: 'dizziness' }) })].map(i => toShadowLogEntry(recommendCoachDecision(i, { mode: 'shadow' }), { at: NOW, elapsedMs: 1.5 }))
+    const text = JSON.stringify(entries)
+    for (const leaked of ['upper_limb', 'stiffness', 'shoulders', 'dizziness', 'meanScore', 'acknowledged']) expect(text).not.toContain(leaked)
+    expect(entries[0].displayed).toEqual(entries[0].rules)
+    expect(entries[0].modelSlate.chapters.length).toBeGreaterThan(0)
+    expect(entries[2]).toMatchObject({ status: 'safety_hold', execution: 'not_run', displayed: { routines: [], chapters: [], games: [] } })
+    const clean = checkShadowLogs([{ name: 'a', entries }])
+    expect(Object.values(clean.hard).every(h => h.status === 'PASS')).toBe(true)
+    expect(clean.verdict).toBe('INSUFFICIENT') // one device, three calls: coverage short, never PASS
+    const shown = { ...entries[0], displayed: { ...entries[0].displayed, chapters: [...entries[0].modelSlate.chapters].reverse() } }
+    expect(checkShadowLogs([{ name: 'b', entries: [shown] }]).hard.H3_display_is_rules.status).toBe('FAIL')
+    const active = toShadowLogEntry(recommendCoachDecision(input(), approved), { at: NOW })
+    const r = checkShadowLogs([{ name: 'c', entries: [active] }])
+    expect([r.verdict, r.hard.H2_mode.status, r.hard.H3_display_is_rules.status, r.latency.status]).toEqual(['FAIL', 'FAIL', 'FAIL', 'NOT_MEASURED'])
   })
 })

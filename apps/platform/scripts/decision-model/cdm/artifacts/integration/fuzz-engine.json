@@ -1,0 +1,17 @@
+{
+  "checked": 3007,
+  "failures": 0,
+  "firstFailures": [],
+  "modelShown": 28,
+  "outcomes": {
+    "INPUT_INVALID": 801,
+    "MODEL_DISABLED": 1669,
+    "PROFILE_REQUIRED": 380,
+    "INVALID_AVAILABILITY": 37,
+    "EXPERIMENTAL_MODEL_NOT_APPROVED": 49,
+    "SHADOW_MODE": 41,
+    "MODEL_SHOWN": 28,
+    "SAFETY_HOLD": 1,
+    "MODEL_ABSTAINED": 1
+  }
+}

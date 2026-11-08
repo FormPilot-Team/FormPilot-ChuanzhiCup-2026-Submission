@@ -1,6 +1,6 @@
 {
  "schemaVersion": 2,
- "generatedAt": "2026-11-07T17:09:10.747Z",
+ "generatedAt": "2026-11-08T02:08:01.963Z",
  "via": "public engine recommendCoachDecision",
  "labelKind": "ai_single_annotator",
  "weightsPath": "apps/platform/src/features/coachAgent/decisionModel/cdm/fp-cdm-m2.weights.json",
@@ -72,24 +72,24 @@
   "parameters": 337,
   "singleRequestMs": {
    "n": 22320,
-   "p50": 0.9618,
-   "p95": 1.744,
-   "max": 3.5528
+   "p50": 0.9705,
+   "p95": 1.7861,
+   "max": 3.9488
   },
   "withHistoryAndReportMs": {
    "n": 3000,
-   "p50": 1.6314,
-   "p95": 2.073
+   "p50": 1.7105,
+   "p95": 2.2373
   },
   "rulesOnlyMs": {
-   "p50": 0.0412,
-   "p95": 0.0796
+   "p50": 0.0461,
+   "p95": 0.1034
   },
   "batch5000": {
-   "totalMs": 5700.5654,
-   "perRequestMs": 1.1401
+   "totalMs": 5833.6189,
+   "perRequestMs": 1.1667
   },
-  "heapUsedMB": 55.2303,
+  "heapUsedMB": 55.5261,
   "cpu": "single thread, Node, development laptop",
   "gpu": "not used",
   "network": "none",
@@ -101,14 +101,14 @@
     "processReferences": 0
    },
    "engineCoreIncludingP0Pr49AndWeights": {
-    "minifiedBytes": 167932,
-    "gzipBytes": 45994,
+    "minifiedBytes": 168163,
+    "gzipBytes": 46079,
     "nodeBuiltinImports": 0,
     "processReferences": 0
    },
    "engineWithLocalRecordHelpers": {
-    "minifiedBytes": 511893,
-    "gzipBytes": 132939,
+    "minifiedBytes": 512124,
+    "gzipBytes": 133028,
     "nodeBuiltinImports": 0,
     "processReferences": 0
    }

@@ -13,14 +13,22 @@
 | --- | --- | --- | --- |
 | 1 | [#49](https://github.com/FormPilot-Team/FormPilot/pull/49) | PR #49 规则排序器（手工权重，作为基线与候选检索的一部分） | `main` |
 | 2 | [#50](https://github.com/FormPilot-Team/FormPilot/pull/50) | fp-cdm 训练流水线、M1、M2（AI 标签实验）、评测 | #49 |
-| 3 | 本阶段 PR | **决策引擎 `engine/`、发布权重、契约、测试、Lab v3、本文档** | #50 |
+| 3 | [#51](https://github.com/FormPilot-Team/FormPilot/pull/51) | **决策引擎 `engine/`、发布权重、契约、测试、Lab v3、SHADOW 验收工具、本文档** | #50 |
 
-三个 PR 都只改 `apps/platform/src/features/coachAgent/decisionModel/**`、`apps/platform/scripts/decision-model/**`、`apps/platform/tests/coach-*`、`apps/platform/docs/ai-coach-agent/decision-model/**`，**不改任何页面、路由、样式、构建配置或 Agent Web P0 文件**。Web 分支只需在三个 PR 合并后（或先基于本阶段分支）开始接线。负责人决定合并；在此之前可以基于分支 `feat/coach-decision-integration-ready` 联调。
+只能按 #49 → #50 → #51 的顺序合并（每个 PR 的基线是前一个分支）。三个 PR 与其他打开的 PR（#36、#40、#45、#48）没有共同修改的文件。三个 PR 都只改 `apps/platform/src/features/coachAgent/decisionModel/**`、`apps/platform/scripts/decision-model/**`、`apps/platform/tests/coach-*`、`apps/platform/docs/ai-coach-agent/decision-model/**`，**不改任何页面、路由、样式、构建配置或 Agent Web P0 文件**。Web 分支只需在三个 PR 合并后（或先基于本阶段分支）开始接线。负责人决定合并；在此之前可以基于分支 `feat/coach-decision-integration-ready` 联调。
+
+### 1.1 当前代码中的调用点（2026-11-08 复核 main 与 #51）
+
+- Agent Web P0 服务 `getCoachWebRecommendation` 目前**没有页面调用**；引擎 OFF 的输出与它完全相同（只用画像）。
+- 唯一的现有页面是独立的比赛预览页 `src/features/coachAgent/sprint/CoachSprint.tsx`（入口 `sprint/main.tsx`），它直接调用 `recommendCoach(profile, context)`，`context` 可能含合成样例或授权读取的本机证据。**它不等于引擎 OFF**：有证据时规则的理由与 `evidenceIds` 会不同。若正式页面沿用这个页面，用引擎替换 `recommendCoach(profile, context)` 后，历史改由 `collectLocalDecisionInput`（本机）或 `origin: 'synthetic_demo'` 的输入块（演示）传入。
+- 本模型侧 PR 不改这个页面；改哪个页面由 Web 负责人决定。
 
 ## 2. 需要引入的文件与依赖
 
 - **只引入一个模块**：`apps/platform/src/features/coachAgent/decisionModel/engine`（`index.ts`）。
 - 可选：`engine/platform`，用于从本机训练记录生成输入（需在用户授权后调用，见 §4.2）。
+- 可选：`engine/shadow`，只在 SHADOW 验收构建中记录验收日志（见 §10）。
+- 浏览器：引擎只用标准 JavaScript，唯一较新的 API 是 `structuredClone`（Chrome / Edge ≥ 98、Firefox ≥ 94、Safari ≥ 15.4），低于平台 Vite 7 的默认构建目标；不使用 `fetch`、存储、`eval` 或 Node 内置模块。实测：Vite 生产构建在 Edge 156（无头）中运行，结果与 Node 生成的示例逐字节相同。Firefox / Safari 未实测。
 - **不需要安装任何依赖**：纯 TypeScript + JSON 导入，与平台现有 Vite / TypeScript 配置兼容（已实际构建验证）。不需要 Node polyfill、后端服务、环境变量、网络、GPU、Qwen、StartLux 或付费 API。
 - 引擎内部会用到（已随 PR 提供，**Web 不要修改**）：`decisionModel/cdm/*`（特征、模型、Guard、解释、权重 `fp-cdm-m2.weights.json`、M1 内容表 `m1ContentFeatures.json`）、`decisionModel/ranker.ts`、`decisionModel/adapter.ts`、`decisionModel/descriptors.ts`、`motionDescriptors.json`，以及 Agent Web P0 的 `recommendation/*`。
 - 包体（含 P0 规则、PR #49、权重、M1 内容表）：Vite 生产构建的单独 chunk 约 141 KB（未压缩），esbuild min 164 KB / gzip 45 KB。
@@ -187,7 +195,7 @@ const res = recommendCoachDecision(input, { mode: COACH_DECISION_MODE })
 
 ## 7. 风险、弃权与异常
 
-引擎内部不会抛出异常（模型异常已在内部回退）。宿主仍应 `try/catch` 包住调用，出错时结束 loading、清空旧结果并提供重试。
+引擎内部不会抛出异常（模型异常已在内部回退；3,007 个畸形输入的确定性模糊测试中 0 次抛出、0 次未经批准展示模型，见 `scripts/decision-model/cdm/fuzz-engine.ts`）。宿主仍应 `try/catch` 包住调用，出错时结束 loading、清空旧结果并提供重试。
 
 | `status` | 处理 |
 | --- | --- |
@@ -225,26 +233,70 @@ const res = recommendCoachDecision(input, { mode: COACH_DECISION_MODE })
 
 ## 9. E2E 验收清单
 
-在 Web 的正式入口完成接线后，逐项执行并保留截图 / 录屏：
+在 Web 的正式入口完成接线后，逐项执行并保留截图 / 录屏。除第 7 项外都只用画像（不授权读取记录），基准画像 **P** = 目标“上肢功能练习”、困难“僵硬感”、部位“肩部 + 上肢”、偏好“功法与游戏混合”、风险“无”、已勾选了解。期望值来自发布版引擎的实际输出（2026-11-08 复核）：
 
 | # | 操作 | 期望 |
 | --- | --- | --- |
-| 1 | 默认配置（OFF）提交画像 | 推荐与当前 Agent Web P0 完全一致；`decisionOrigin: rules` |
-| 2 | SHADOW 提交同一画像 | 用户看到的仍是规则推荐；开发面板能看到 `ranking`（约 12 项） |
-| 3 | ACTIVE + `allowExperimentalModel: true`，画像 = 上肢功能练习 / 僵硬感 / 肩部 + 上肢 / 混合 | 显示“训练模型推荐 + 实验性模型”；章节首位为「易筋经 · 韦驮献杵第一势」，每项有中文理由 |
-| 4 | ACTIVE 不批准实验性模型 | `fallbackReason: EXPERIMENTAL_MODEL_NOT_APPROVED`，显示规则推荐 |
-| 5 | 风险选“眩晕” | 暂停推荐、无任何训练 / 游戏；模型未运行 |
-| 6 | 关注部位选 肩、颈、上肢、下肢，目标肩颈活动，偏好功法 | `MODEL_ABSTAINED / OUT_OF_DISTRIBUTION`，显示规则推荐 |
-| 7 | 授权读取本机记录后再推荐 | `dataSources.trainingHistory: live_local_records`（若有记录）；拒绝授权时为 `missing` |
-| 8 | 把“林间射箭”标为不可用 | 模型推荐中不出现林间射箭 |
-| 9 | 故意传一个未知字段 | `INPUT_INVALID`，`inputIssues` 指出字段路径，仍显示规则推荐 |
+| 1 | 默认配置（OFF）提交 P | 与当前 Agent Web P0 完全一致：章节 八段锦 · 两手托天理三焦 / 左右开弓似射雕 / 调理脾胃须单举，游戏 摘苹果、林间射箭；`decisionOrigin: rules`，`fallbackReason: MODEL_DISABLED` |
+| 2 | SHADOW 提交 P | 用户看到的与第 1 项完全相同；开发面板 `fallbackReason: SHADOW_MODE`，`ranking` 12 项，`confidence` 0.69 |
+| 3 | ACTIVE + `allowExperimentalModel: true` 提交 P | 显示“训练模型推荐 + 实验性模型”；章节 易筋经 · 韦驮献杵第一势 / 八段锦 · 左右开弓似射雕 / 易筋经 · 出爪亮翅势，游戏 林间射箭、林间划船；每项有中文理由 |
+| 4 | ACTIVE 不批准实验性模型，提交 P | `fallbackReason: EXPERIMENTAL_MODEL_NOT_APPROVED`，显示与第 1 项相同的规则推荐 |
+| 5 | P 但风险选“眩晕” | `status: safety_hold`，暂停文案，无任何功法 / 章节 / 游戏；`execution: not_run` |
+| 6 | 目标“肩颈活动”、困难“暂无明显困难”、部位 肩部 + 颈部 + 上肢 + 下肢、偏好“功法优先” | `MODEL_ABSTAINED`，`abstainReason: OUT_OF_DISTRIBUTION`（`x_region_overlap`），显示规则推荐 |
+| 7 | 授权读取本机记录后再推荐 | 有功法跟练记录时 `dataSources.trainingHistory: live_local_records`；拒绝授权时为 `missing` |
+| 8 | 第 3 项配置下把“林间射箭”（`archery`）放进 `availability.unavailableIds` | 模型游戏变为 林间划船、摘苹果；任何位置都不出现林间射箭 |
+| 9 | 故意传一个未知字段（如 `userId`） | `INPUT_INVALID`，`inputIssues[0].path: "$.userId"`，仍显示规则推荐 |
 | 10 | 浏览器开发者工具 Network | 推荐过程不产生任何网络请求 |
 | 11 | 性能 | 单次调用 < 10 ms（开发机实测 p50 约 1–2 ms）；首次调用 < 50 ms |
 | 12 | 1366 px 与 375 px 宽度 | 推荐与解释正常显示，无横向滚动 |
 
 Lab（`coach-decision-lab-v3.html`）中“现场案例”和“实时决策”区域可以对照验证上述结果，两者调用的是同一个函数。
 
-## 10. 不要做的事
+## 10. SHADOW 验收流程（接线完成后、讨论 ACTIVE 之前）
+
+目的：在真实页面、真实本机记录上确认接线、安全与稳定性，同时观察模型在真实使用中会怎样回退或弃权。**SHADOW 验收不衡量推荐质量**，质量结论只来自人工标注验证（`scripts/decision-model/cdm/annotation-kit/`）。
+
+**S0 前提**：Web 分支基于 #51（或三个 PR 已合并）；§9 第 1–12 项已通过；只在开发 / 验收构建中设 `COACH_DECISION_MODE = 'shadow'`，`COACH_ALLOW_EXPERIMENTAL = false`；正式构建仍为 `off`。
+
+**S1 记录**（只在验收构建中）：每次调用后记录一条日志，不含画像答案、历史数值或自由文本：
+
+```ts
+import { toShadowLogEntry, COACH_DECISION_SHADOW_LOG_KEY, COACH_DECISION_SHADOW_LOG_MAX } from '../features/coachAgent/decisionModel/engine/shadow'
+
+const t0 = performance.now()
+const res = recommendCoachDecision(input, { mode: 'shadow' })
+const entry = toShadowLogEntry(res, { at: Date.now(), elapsedMs: performance.now() - t0 })
+// 追加到本机 localStorage[COACH_DECISION_SHADOW_LOG_KEY]（JSON 数组，最多 COACH_DECISION_SHADOW_LOG_MAX 条）；
+// 开发面板提供“导出 SHADOW 日志”（下载 JSON）和“清空”。不上传、不发送。
+```
+
+**S2 试用**：至少 3 台设备（队员各自的电脑），每台在授权读取本机记录后，先做 1–2 次功法跟练，再在 AI Coach 中改几次画像提交，覆盖第 5 项（风险）和第 6 项（分布外）。共计至少 30 次 `ready` 调用，其中至少 10 次带本机训练记录。
+
+**S3 检查**：每台设备导出一个 JSON 文件，然后在 `apps/platform` 下运行：
+
+```bash
+node <VN> scripts/decision-model/cdm/shadow-acceptance.ts --log deviceA.json --log deviceB.json --log deviceC.json --out shadow-acceptance-report.json
+```
+
+`<VN>` 是 vite-node 脚本路径，见 `scripts/decision-model/cdm/README.md` 开头（`node_modules/.pnpm/vite-node@3.2.4_…/node_modules/vite-node/vite-node.mjs`）。
+
+| 检查 | 规则 | 不通过时 |
+| --- | --- | --- |
+| H1 schema | 每条记录为 `fp-coach-decision-shadow-log/v1` | 修正日志写入 |
+| H2 mode | 全部为 `shadow` | 验收构建的模式开关有误 |
+| H3 display = rules | 用户看到的与规则结果完全相同，`decisionOrigin: rules` | **Web 在 SHADOW 下展示了模型排序**，必须修复 |
+| H4 release | 发布号与权重指纹与本发布一致，无模型文件完整性失败 | 模型文件未完整合并或被改动 |
+| H5 wiring | 无 `INPUT_INVALID` / `INVALID_AVAILABILITY` | 字段映射有误，看 `inputIssues` |
+| H6 model faults | 无 `MODEL_ERROR` / `OUTPUT_GUARD_REJECTED` | 记录输入并报告模型侧 |
+| H7 safety | `safety_hold` 时模型未运行、无任何内容 | 必须修复 |
+| 延迟 | `elapsedMs` p95 ≤ 10 ms | 在比赛设备上复测 |
+| 覆盖 | ≥ 30 次 ready、≥ 3 台设备、≥ 10 次带本机记录 | 结论为 INSUFFICIENT，继续试用 |
+
+结论：任一硬性检查失败为 **FAIL**；全部通过但覆盖不足为 **INSUFFICIENT**；否则 **PASS**。报告的 `observed` 部分只作描述：模型实际运行比例、弃权比例与原因、分布外特征、与规则的差异（`rankingEffect`）、首选章节一致率、数据来源。预期弃权来源见 §8 第 2–3 项（例如刚练过的章节）。检查器自检（合成场景 + 负对照）：`shadow-acceptance.ts --self-test`，结果在 `artifacts/integration/shadow-acceptance-selftest.json`：干净日志硬性检查全部通过、因覆盖不足为 INSUFFICIENT，篡改日志在 H3 失败。
+
+**S4 交给负责人**：SHADOW PASS 只说明可以讨论 ACTIVE。ACTIVE（含 `allowExperimentalModel: true`）仍由负责人单独批准；建议同时参考人工标注验证结果与 `observed` 中的弃权比例。
+
+## 11. 不要做的事
 
 - 不要修改 `decisionModel/**`、权重或 M1 内容表（修改会让完整性校验失败并回退规则）。
 - 不要把 `ranking`（模型排序）当作 OFF / SHADOW 模式下给用户看的推荐。

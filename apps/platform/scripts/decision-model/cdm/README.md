@@ -110,6 +110,20 @@ node scripts/decision-model/cdm/lab/build-lab.mjs --out <coach-decision-lab-v3.h
 - 研究变体（`artifacts/integration/variants/`）只能通过 `createCoachDecisionEngine({ binding: 'unbound' })` 影子运行，引擎拒绝把它们用于 ACTIVE。
 - `evaluate-cdm.ts --weights <w>` 评估非绑定的研究权重；不带 `--weights` 时评估发布模型。
 
+## 8. 最终交付收尾（2026-11-08）
+
+模型侧冻结：不重训、不再使用冻结测试集、不新增实验。新增的只有审查与验收工具：
+
+```bash
+node $VN scripts/decision-model/cdm/fuzz-engine.ts                           # 公开接口健壮性：3,007 个畸形输入，失败时退出码 1
+node $VN scripts/decision-model/cdm/shadow-acceptance.ts --self-test         # SHADOW 检查器自检（合成场景 + 负对照，不是验收证据）
+node $VN scripts/decision-model/cdm/shadow-acceptance.ts --log a.json --log b.json --log c.json --out report.json   # Web 接线后的 SHADOW 验收
+node scripts/decision-model/cdm/lab/check-lab.mjs <lab.html> <out.json>      # Lab 内嵌数据 = 产物文件；8 个案例浏览器 = Node 引擎；文字结论成立
+node scripts/decision-model/cdm/annotation-kit/packages/build-packages.mjs --out <dir>   # 两份独立人工标注包 A1 / A2
+```
+
+Lab 构建在第 7 节命令后追加 `--tests <tests-summary.json>`（测试摘要，只用于展示）。SHADOW 日志格式见 `src/features/coachAgent/decisionModel/engine/shadow.ts`；流程见 `WEB_INTEGRATION_READY.md` §10。人工标注包的分发、回收与评测见 `annotation-kit/packages/HANDOFF_PACKAGES.md`。
+
 ## 禁止事项
 
 - 不用规则、PR #49 输出、persona、画像枚举或标为 do-not-train 的数据作 M2 标签。
