@@ -17,6 +17,8 @@ pnpm --dir apps/motion-games-lab/app preview
 ```
 
 - 游戏服务地址默认 `http://127.0.0.1:5181/`，构建时可用 `VITE_MOTION_GAMES_URL` 改为部署地址。
+- `competition:build` 是竞赛专用构建（`vite build --mode competition`）：AI Coach 决策模型 ACTIVE（负责人已批准实验性模型）。普通 `build` 为 OFF。
+- 离线竞赛包（Windows，无需 Node）：`python -I -B scripts/competition-package/build_package.py --out <目录>`，生成 `FormPilot-Web-V1.0.0/`（`platform/` + `games/` + `start-formpilot.cmd`）、`SHA256SUMS.txt` 和 ZIP；说明文档在 `scripts/competition-package/docs/`。
 - 功法标准视频 `public/assets/routines/*-standard.mp4` 不进 Git（`.gitignore`），需按 `assets-manifest` 放到本机；缺失时详情页显示“示范视频暂时无法播放”。
 - 开发服务器：`pnpm --dir apps/platform dev`。
 
@@ -50,12 +52,14 @@ pnpm --dir apps/motion-games-lab/app preview
 ## 5. AI Coach 与决策模型
 
 - 调用：`runCoachDecision`（`pages/Web/CoachPage.tsx`）= `collectLocalDecisionInput(profile, {consent})` → `recommendCoachDecision(input, { mode })`。不传 `allowExperimentalModel`。
-- 模式开关 `src/app/coachDecisionConfig.ts`：默认 `off`；`shadow` 仅在 `VITE_COACH_DECISION_MODE=shadow` 构建或 DEV 下 `?coachMode=shadow` 时启用；任何输入都不会得到 `active`（有单测）。
+- 模式开关 `src/app/coachDecisionConfig.ts`：普通开发 / 构建 `off`；`shadow` 仅在 `VITE_COACH_DECISION_MODE=shadow` 构建或 DEV 下 `?coachMode=shadow` 时启用；**竞赛构建（`--mode competition`）为 `active` 并显式传入 `allowExperimentalModel: true`**。模式只由构建模式决定，URL / localStorage / 用户操作都不能开启 ACTIVE（有单测与生产构建 E2E）。
+- ACTIVE 展示：模型身份与版本、完整性校验、每项适配度（注明不是医学概率）、特征贡献、首选把握、弃权与回退原因、数据来源；弃权或任何异常回退规则推荐。
 - 流程：画像（目标 / 困难 / 部位 / 偏好）→ 风险确认 → “我已了解”→ 数据授权（默认仅画像；勾选后才读取本机功法记录）→ 推荐。
 - 展示：`display.result` 的章节 / 功法 / 游戏、每项理由与依据、固定五问（`display.answers`）、推荐计划、下一步建议；章节直接跳转 `/routines/:id/train?form=…`，游戏跳转 `/games?game=…`（体感赛车未接入游戏中心，显示“尚未接入”）。
 - `safety_hold` 只显示暂停与专业咨询提示；`profile_required` 引导补全画像；模型弃权回退规则并提示。
 - SHADOW 开发面板：模型排序、适配度、前 6 个特征贡献条形图、置信度、回退 / 弃权原因、模型发布号；日志写入 `localStorage['formpilot.coach-decision-shadow-log:v1']`（`toShadowLogEntry`，只含内容 ID、结果和耗时），可导出 / 清空，不上传。
-- 模型身份始终标注「实验性模型，AI 标注训练，未经人工验证」。决策模型目录（`features/coachAgent/decisionModel/**`）、权重、契约、Guard 未改动。
+- 模型身份始终标注「实验性模型：AI 标注训练，项目负责人已审阅标签，尚未进行独立人工或专家标注」（2026-11-09 起，见 `docs/ai-coach-agent/decision-model/OWNER_LABEL_REVIEW.md`）。
+- 视觉：AI Coach 首屏与头像使用 PR #54 的透明 WebM 光球（`src/components/web/CoachOrb.tsx`）：先显示 poster，视频解码后接管；减少动态效果时不加载视频；离开屏幕或标签页隐藏时暂停；视频失败保留 poster。素材来源见 `public/web-v1/ASSET_SOURCES.md`。决策模型目录（`features/coachAgent/decisionModel/**`）、权重、契约、Guard 未改动。
 
 ## 6. 游戏中心
 

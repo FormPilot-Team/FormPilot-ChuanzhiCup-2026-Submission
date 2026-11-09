@@ -67,9 +67,11 @@ export interface CoachRun { response: CoachDecisionResponse | null; elapsedMs: n
  */
 export function runCoachDecision(profile: CoachProfile, scope: DataScope, runtime: WebCoachDecisionMode | CoachDecisionRuntime, storage: Pick<Storage, 'getItem'> | null, now = Date.now()): CoachRun {
   const { mode, allowExperimentalModel } = typeof runtime === 'string' ? { mode: runtime, allowExperimentalModel: false } : runtime
-  const started = performance.now()
+  let started = performance.now()
   try {
     const input = collectLocalDecisionInput(profile, { storage: storage ?? { getItem: () => null }, now, consent: scope === 'local_records' && storage ? 'granted' : 'denied' })
+    // elapsedMs times the engine call only, as the SHADOW log contract defines it (WEB_INTEGRATION_READY §10 S1).
+    started = performance.now()
     const response = recommendCoachDecision(input, allowExperimentalModel ? { mode, allowExperimentalModel: true } : { mode })
     return { response, elapsedMs: performance.now() - started, failed: false }
   } catch {
