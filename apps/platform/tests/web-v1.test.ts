@@ -36,7 +36,10 @@ function emptyRepositories() {
 const PROFILE_P: CoachProfile = { version: 1, goals: ['upper_limb'], difficulties: ['stiffness'], regions: ['shoulders', 'arms'], preference: 'mixed', risk: 'none', acknowledged: true }
 
 /** Demo numbers of the prototype that must never appear as if they were the user's data. */
-const PROTOTYPE_DEMO_VALUES = ['7.5', '6,240', '200+', '林同学', '1,280', '72</b>', '326']
+const PROTOTYPE_DEMO_VALUES = ['7.5', '6,240', '200+', '林同学', '1,280', 'BPM', '326', 'kcal']
+
+/** Visible text only (attributes and SVG paths contain arbitrary numbers). */
+const visibleText = (html: string) => html.replace(/<[^>]*>/g, ' ')
 
 describe('Web V1 routes', () => {
   it('maps every path to one of the six boards', () => {
@@ -98,7 +101,7 @@ describe('Web V1 pages render real data and honest empty states', () => {
     expect(html).toContain('fh-landing')
     expect(html).toContain('完成第一次训练后，这里会出现你的变化')
     expect(html).toContain('data-testid="home-recent-empty"')
-    for (const value of PROTOTYPE_DEMO_VALUES) expect(html, value).not.toContain(value)
+    for (const value of PROTOTYPE_DEMO_VALUES) expect(visibleText(html), value).not.toContain(value)
     for (const label of ['首页', '训练中心', '功法训练', '游戏中心', 'AI Coach', '我的']) expect(html).toContain(`>${label}</a>`)
   })
 
@@ -137,7 +140,7 @@ describe('Web V1 pages render real data and honest empty states', () => {
     const html = renderToStaticMarkup(createElement(MePage, { repositories: emptyRepositories(), now: at(60) }))
     expect(html).toContain('data-testid="me-trend-empty"')
     expect(html).toContain('href="/workshop"')
-    for (const value of PROTOTYPE_DEMO_VALUES) expect(html, value).not.toContain(value)
+    for (const value of PROTOTYPE_DEMO_VALUES) expect(visibleText(html), value).not.toContain(value)
     const sessions = [makeSession({ id: 's1', startedAt: at(1) }), makeSession({ id: 's2', startedAt: at(2) })]
     expect(formalTrend(mergeHistoryEntries(buildTrainingHistoryItems(sessions), []))).toHaveLength(2)
   })

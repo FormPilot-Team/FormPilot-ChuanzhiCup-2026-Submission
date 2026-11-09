@@ -3,8 +3,10 @@ import { SCORING_CALIBRATION_STATEMENT } from '../../src/features/scoring/scorin
 import { markOnboardingSeen } from './support/onboarding'
 
 /**
- * Round-2 usability fixes from the real-person test: five equal mode cards, 评分依据, the coach's speech bubble, no
- * safe-zone frame on the camera, one media height on the follow-along stage and the 3-2-1 countdown on the camera.
+ * Round-2 usability fixes from the real-person test: 评分依据, no safe-zone frame on the camera, one media height on the
+ * follow-along stage and the 3-2-1 countdown on the camera.
+ * Web V1 (#52): Round2 A (five equal Home mode cards) and C (Home coach speech bubble) tested the pre-#52 Home, which the
+ * approved six-board Home replaced; they were retired with it. 评分依据 moved next to 使用说明 in 训练中心.
  */
 
 type Box = { x: number; y: number; width: number; height: number }
@@ -16,69 +18,20 @@ const VIEWPORTS = [
   { width: 390, height: 844 },
 ] as const
 
-const overlaps = (a: Box, b: Box) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height
-
 async function box(locator: Locator): Promise<Box> {
   const value = await locator.boundingBox()
   expect(value).not.toBeNull()
   return value as Box
 }
 
-/** Share of sample points under the bubble where the coach picture is opaque (her body, arms or hands). */
-async function coachUnderBubble(page: Page): Promise<number> {
-  return page.evaluate(async () => {
-    const image = document.querySelector<HTMLImageElement>('[data-testid="home-coach-image"]')!
-    const bubble = document.querySelector('[data-testid="home-coach-welcome"]')!.getBoundingClientRect()
-    await image.decode()
-    const canvas = document.createElement('canvas')
-    canvas.width = image.naturalWidth
-    canvas.height = image.naturalHeight
-    const context = canvas.getContext('2d')!
-    context.drawImage(image, 0, 0)
-    const rect = image.getBoundingClientRect()
-    let opaque = 0
-    let total = 0
-    for (let y = bubble.top + 2; y < bubble.bottom - 2; y += 3) {
-      for (let x = bubble.left + 2; x < bubble.right - 2; x += 3) {
-        if (x < rect.left || x >= rect.right || y < rect.top || y >= rect.bottom) continue
-        const px = Math.floor(((x - rect.left) / rect.width) * image.naturalWidth)
-        const py = Math.floor(((y - rect.top) / rect.height) * image.naturalHeight)
-        total += 1
-        if (context.getImageData(px, py, 1, 1).data[3] > 60) opaque += 1
-      }
-    }
-    return total ? opaque / total : 0
-  })
-}
-
 test.beforeEach(async ({ page }) => { await markOnboardingSeen(page) })
-
-test('Round2 A: five mode cards share one 开始训练 button, no odd corner text', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 })
-  await page.goto('/')
-  const ids = ['smart-training', 'baduanjin', 'taijiquan', 'wuqinxi', 'yijinjing']
-  const buttons: string[] = []
-  for (const id of ids) {
-    const card = page.getByTestId(`mode-card-${id}`)
-    await expect(card, id).toHaveAccessibleName(/^开始训练 · /)
-    await expect(card.getByText('开始训练', { exact: true }), id).toBeVisible()
-    await expect(card, id).not.toContainText(/开始跟练|可使用/)
-    buttons.push(await card.getByText('开始训练', { exact: true }).evaluate((element) => {
-      const style = getComputedStyle(element.parentElement!)
-      return `${style.backgroundColor} ${style.color} ${style.borderRadius}`
-    }))
-  }
-  expect(new Set(buttons).size, buttons.join(' | ')).toBe(1)
-  await expect(page.getByTestId('home-training-modes').getByText('推荐').first()).toBeVisible()
-  await expect(page.locator('.fp-mode-mark')).toHaveCount(0)
-})
 
 test('Round2 B: 评分依据 opens a light dialog with the three layers and the calibration statement', async ({ page }) => {
   for (const viewport of [VIEWPORTS[1], VIEWPORTS[3]]) {
     await page.setViewportSize(viewport)
-    await page.goto('/')
-    const entry = page.getByTestId('home-scoring-basis')
-    const guide = page.getByTestId('home-guide')
+    await page.goto('/training')
+    const entry = page.getByTestId('training-scoring-basis')
+    const guide = page.getByTestId('training-guide')
     await expect(entry).toBeVisible()
     // Next to 使用说明, on the same line and at the same size.
     const [entryBox, guideBox] = [await box(entry), await box(guide)]
@@ -99,24 +52,6 @@ test('Round2 B: 评分依据 opens a light dialog with the three layers and the 
     await dialog.getByRole('button', { name: '关闭评分依据' }).click()
     await expect(dialog).toBeHidden()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-  }
-})
-
-test('Round2 C: the welcome is a speech bubble beside the coach, clear of her face, arms and hands', async ({ page }) => {
-  for (const viewport of VIEWPORTS) {
-    await page.setViewportSize(viewport)
-    await page.goto('/')
-    const bubble = page.getByTestId('home-coach-welcome')
-    await expect(bubble).toBeVisible()
-    await expect(bubble.locator('[data-part="bubble-tail"]')).toBeAttached()
-    // The tail leaves the bubble towards the coach.
-    const [bubbleBox, tailBox, image] = [await box(bubble), await box(bubble.locator('[data-part="bubble-tail"]')), await box(page.getByTestId('home-coach-image'))]
-    expect(tailBox.x + tailBox.width).toBeGreaterThan(bubbleBox.x + bubbleBox.width)
-    expect(tailBox.x + tailBox.width / 2).toBeLessThan(image.x + image.width / 2)
-    // Not a card on top of her: (almost) nothing of the picture under the bubble.
-    expect(await coachUnderBubble(page), `${viewport.width}: coach under bubble`).toBeLessThanOrEqual(0.03)
-    for (const id of ['home-guide', 'home-scoring-basis']) expect(overlaps(bubbleBox, await box(page.getByTestId(id))), `${viewport.width}: ${id}`).toBe(false)
-    await page.screenshot({ path: `test-results/round2-home-${viewport.width}x${viewport.height}.png` })
   }
 })
 

@@ -224,8 +224,9 @@ test('Workshop H: the closed loop — create, test, save and start training, the
   await page.getByRole('button', { name: '查看训练报告' }).click()
   await expect(page.getByRole('heading', { level: 1, name: '闭环动作训练报告' })).toBeVisible()
   await expect(page.getByTestId('report-summary')).toContainText('本次完成了 3 / 3 次，其中 3 次识别重点都达标')
-  await page.goto('/')
-  await expect(page.getByTestId('home-my-actions').getByRole('link', { name: '开始训练 · 闭环动作' })).toHaveAttribute('href', `/workshop/${saved.id}/train`)
+  // Web V1: the user's own actions are listed in 训练中心.
+  await page.goto('/training')
+  await expect(page.getByTestId('training-my-actions').getByRole('link', { name: '开始训练 · 闭环动作' })).toHaveAttribute('href', `/workshop/${saved.id}/train`)
 })
 
 test('Workshop I: the whole editor works from the keyboard alone', async ({ page }) => {

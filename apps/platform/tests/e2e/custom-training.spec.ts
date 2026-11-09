@@ -80,11 +80,13 @@ test('Custom A: a saved action trains to completion, and its record reaches Repo
   await page.getByRole('group', { name: '按训练模式筛选' }).getByRole('button', { name: '热身训练' }).click()
   await expect(page.getByTestId('history-incomplete-hidden')).toBeVisible()
 
+  // Web V1: Home shows the latest record; the user's own actions are listed in 训练中心.
   await page.goto('/')
-  await expect(page.getByTestId('home-training-history')).toContainText('我的动作 · 侧平举练习')
-  const myActions = page.getByTestId('home-my-actions')
+  await expect(page.getByTestId('home-recent')).toContainText('我的动作 · 侧平举练习')
+  await page.goto('/training')
+  const myActions = page.getByTestId('training-my-actions')
   await expect(myActions.getByRole('link', { name: '开始训练 · 侧平举练习' })).toHaveAttribute('href', '/workshop/custom-e2e-raise/train')
-  await expect(myActions.getByTestId('home-my-actions-manage')).toHaveAttribute('href', '/workshop')
+  await expect(page.getByTestId('training-manage-actions')).toHaveAttribute('href', '/workshop')
 })
 
 test('Custom B: ending early saves an incomplete record; pausing works by button, Space and losing the pose', async ({ page }) => {

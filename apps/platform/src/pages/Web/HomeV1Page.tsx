@@ -1,6 +1,8 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { COACH_PATH, GAMES_PATH, HISTORY_PATH, ROUTINES_PATH, SMART_TRAINING_PATH, TRAINING_CENTER_PATH } from '../../app/routes'
+import { OnboardingDialog } from '../../components/onboarding/OnboardingDialog'
 import { StatusPill, WebEmpty, WebShell } from '../../components/web/WebShell'
+import { recordOnboarding, shouldAutoOpenOnboarding } from '../../features/onboarding/onboarding'
 import { ROUTINE_PROGRAMS } from '../../features/routines/programs'
 import { WEB_GAMES } from '../../features/web/games'
 import {
@@ -26,6 +28,8 @@ function percent(value: number, total: number): string {
  */
 export function HomeV1Page({ repositories, now }: HomeV1PageProps) {
   const clock = now ?? Date.now()
+  // First visit: the existing 使用说明 guide (gestures, framing) opens once; afterwards it is under the topbar 帮助 button.
+  const [guideOpen, setGuideOpen] = useState(() => shouldAutoOpenOnboarding())
   const history = useMemo(() => loadWebHistory(repositories, clock), [repositories, clock])
   const { summary, finished } = history
   const latest = finished[0]
@@ -112,6 +116,7 @@ export function HomeV1Page({ repositories, now }: HomeV1PageProps) {
           )}
         </section>
       </div>
+      <OnboardingDialog open={guideOpen} onClose={(outcome) => { recordOnboarding(outcome); setGuideOpen(false) }} />
     </WebShell>
   )
 }

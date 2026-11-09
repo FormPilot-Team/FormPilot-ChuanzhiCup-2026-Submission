@@ -18,9 +18,10 @@ async function seed(page: Page, key: string, value: unknown) {
 
 test.beforeEach(async ({ page }) => { await markOnboardingSeen(page) })
 
-test('AI Coach A: opens and closes by mouse and keyboard, keeps focus in order and answers Home questions from history', async ({ page }) => {
+// Web V1: AI Coach is its own board (/coach); the floating AI 教练 dock stays on History, Report, 动作工坊 and training.
+test('AI Coach A: opens and closes by mouse and keyboard, keeps focus in order and answers History questions from history', async ({ page }) => {
   await seed(page, ROUTINE_SESSION_STORAGE_KEY, [routineRecord({ id: 'routine-coach', startedAt: Date.now() - 3_600_000, programId: 'taijiquan' })])
-  await page.goto('/')
+  await page.goto('/history')
   await expect(trigger(page)).toHaveAttribute('aria-expanded', 'false')
   await trigger(page).click()
   await expect(panel(page)).toBeVisible()
@@ -48,7 +49,7 @@ test('AI Coach A: opens and closes by mouse and keyboard, keeps focus in order a
 })
 
 test('AI Coach B: free input is matched simply, and anything else is declined without made-up answers', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/history')
   await trigger(page).click()
   const input = panel(page).getByLabel('向教练提问')
   await input.fill('你好')
@@ -110,7 +111,7 @@ test('AI Coach E: on a custom action it explains the user\'s own poses, and typi
 })
 
 test('AI Coach F: the coach fits every target viewport and stays out of the way on phones', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/history')
   for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
     await page.setViewportSize(viewport)
     await page.reload()
