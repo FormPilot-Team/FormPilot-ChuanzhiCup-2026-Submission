@@ -17,6 +17,8 @@
   .fpw .tip-card strong { display: block; font-size: 17px; }
   .fpw .history-score { max-width: 40%; text-align: right; font-size: 12px; }
   .fpw .menu-item { width: 100%; text-align: left; }
+  /* AI Coach orb (#54) at panel-head size; the same poster asset, scaled by the browser. */
+  .fpw .coach-orb.fpw-orb-sm { width: 32px; height: 32px; flex: 0 0 32px; }
   .fpw .fpw-dev-panel { border: 1px dashed rgba(79, 143, 223, .45); }
   .fpw .fpw-explain-bar { height: 8px; border-radius: 99px; background: rgba(115, 139, 168, .14); position: relative; overflow: hidden; }
   .fpw .fpw-explain-bar span { position: absolute; top: 0; bottom: 0; border-radius: inherit; }

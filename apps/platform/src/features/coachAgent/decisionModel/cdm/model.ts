@@ -184,7 +184,7 @@ export function inferCdm(weights: CdmWeights, state: DecisionState, catalogue: r
   const byId = new Map(catalogue.map(e => [e.id, e]))
   const historyIds = state.history.status === 'present' ? new Set([...state.history.routines.map(r => r.chapterId), ...state.history.games.map(g => g.gameId)]) : new Set<string>()
   const tier = tierOf(weights)
-  const labelText = tier === 'human' ? '由两名独立人工标注者的分级学习' : '由单一 AI 标注者的分级学习，实验性，未经人工验证'
+  const labelText = tier === 'human' ? '由两名独立人工标注者的分级学习' : '由单一 AI 标注者的分级学习，实验性；项目负责人已审阅标签，尚未进行独立人工或专家标注'
   const recommend = (c: CdmCandidateScore): CoachRecommendation => {
     const linked = evidence.filter(e => e.contentId === c.id || (c.programId !== undefined && e.contentId === c.programId)).map(e => e.id)
     return {

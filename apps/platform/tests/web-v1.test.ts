@@ -1,7 +1,8 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { COACH_DECISION_DEFAULT_MODE, resolveCoachDecisionMode } from '../src/app/coachDecisionConfig'
+import { COACH_DECISION_DEFAULT_MODE, COMPETITION_BUILD_MODE, resolveCoachDecisionMode, resolveCoachDecisionRuntime } from '../src/app/coachDecisionConfig'
+import { COACH_DECISION_CONTRACT, recommendCoachDecision } from '../src/features/coachAgent/decisionModel/engine'
 import { COACH_PATH, GAMES_PATH, ME_PATH, ROUTINES_PATH, TRAINING_CENTER_PATH, webBoardOf } from '../src/app/routes'
 import type { CoachProfile } from '../src/features/coachAgent/recommendation/types'
 import { ROUTINE_SESSION_STORAGE_KEY } from '../src/features/routines/session/RoutineSessionRepository'
@@ -12,7 +13,7 @@ import { WEB_GAMES, motionGameUrl, motionGamesBaseUrl, probeMotionGames } from '
 import { entryRetrainPath, loadWebHistory, relativeDayText, trainingStreakDays } from '../src/features/web/webHistory'
 import { MemoryCustomSessionRepository } from '../src/features/workshop/session'
 import { MemoryCustomActionRepository } from '../src/features/workshop/store'
-import { COACH_FIXED_QUESTIONS, CoachPage, runCoachDecision } from '../src/pages/Web/CoachPage'
+import { COACH_FIXED_QUESTIONS, CoachPage, EXPERIMENTAL_LABEL, runCoachDecision } from '../src/pages/Web/CoachPage'
 import { GamesCenterPage } from '../src/pages/Web/GamesCenterPage'
 import { HomeV1Page } from '../src/pages/Web/HomeV1Page'
 import { MePage, formalTrend } from '../src/pages/Web/MePage'
@@ -175,13 +176,17 @@ describe('Web V1 games', () => {
 })
 
 describe('Web V1 AI Coach decision wiring', () => {
-  it('defaults to OFF and can never resolve to ACTIVE', () => {
+  it('is OFF by default; only the competition build mode turns on ACTIVE with approved experimental weights', () => {
     expect(COACH_DECISION_DEFAULT_MODE).toBe('off')
     expect(resolveCoachDecisionMode({ DEV: false }, '?coachMode=shadow')).toBe('off')
     expect(resolveCoachDecisionMode({ DEV: true }, '?coachMode=shadow')).toBe('shadow')
-    expect(resolveCoachDecisionMode({ DEV: true }, '?coachMode=active')).toBe('off')
-    expect(resolveCoachDecisionMode({ VITE_COACH_DECISION_MODE: 'active' }, '')).toBe('off')
     expect(resolveCoachDecisionMode({ VITE_COACH_DECISION_MODE: 'shadow' }, '')).toBe('shadow')
+    // Ordinary builds: no URL parameter or env value reaches ACTIVE.
+    expect(resolveCoachDecisionRuntime({ DEV: true, MODE: 'development' }, '?coachMode=active&allowExperimentalModel=true')).toEqual({ mode: 'off', allowExperimentalModel: false, source: 'default' })
+    expect(resolveCoachDecisionRuntime({ DEV: false, MODE: 'production', VITE_COACH_DECISION_MODE: 'active' }, '')).toEqual({ mode: 'off', allowExperimentalModel: false, source: 'default' })
+    expect(resolveCoachDecisionRuntime({ DEV: false, MODE: 'production' }, '?coachMode=shadow').allowExperimentalModel).toBe(false)
+    // The competition build (vite build --mode competition) runs ACTIVE with the owner-approved experimental weights.
+    expect(resolveCoachDecisionRuntime({ DEV: false, MODE: COMPETITION_BUILD_MODE }, '?coachMode=shadow')).toEqual({ mode: 'active', allowExperimentalModel: true, source: 'competition_build' })
   })
 
   it('OFF shows the Agent Web P0 rule recommendation for profile P (§9 item 1)', () => {
@@ -235,5 +240,65 @@ describe('Web V1 AI Coach decision wiring', () => {
   it('asks for the profile when it is incomplete', () => {
     const response = runCoachDecision({ ...PROFILE_P, acknowledged: false }, 'profile_only', 'off', null).response!
     expect(response.status).toBe('profile_required')
+  })
+})
+
+describe('Web V1 AI Coach — competition build (ACTIVE)', () => {
+  const COMPETITION = resolveCoachDecisionRuntime({ DEV: false, MODE: COMPETITION_BUILD_MODE }, '')
+
+  it('shows the trained model recommendation for profile P (§9 item 3) with the reviewed-label identity', () => {
+    const response = runCoachDecision(PROFILE_P, 'profile_only', COMPETITION, null).response!
+    expect(response.mode).toBe('active')
+    expect(response.decisionOrigin).toBe('model')
+    expect(response.fallbackReason).toBeNull()
+    expect(response.execution).toBe('executed')
+    expect(response.display?.result.chapters.map((item) => item.entry.title)).toEqual(['易筋经 · 韦驮献杵第一势', '八段锦 · 左右开弓似射雕', '易筋经 · 出爪亮翅势'])
+    expect(response.display?.result.games.map((item) => item.entry.title)).toEqual(['林间射箭', '林间划船'])
+    expect(response.display?.result.chapters.every((item) => item.reasons.length > 0)).toBe(true)
+    // Identity stays honest: still the AI-label tier, human validation still pending.
+    expect(response.model).toMatchObject({ id: 'fp-cdm-m2', version: '1.0.0', release: 'fp-cdm-release/1.0.0', tier: 'ai_experimental', tierLabel: EXPERIMENTAL_LABEL })
+    expect(response.model?.validation).toEqual({ offlineTechnical: 'passed', humanValidation: 'pending', productAcceptance: 'not_accepted' })
+    const top = response.ranking.find((item) => item.id === response.display?.result.chapters[0].entry.id)
+    expect(top?.explanation.length).toBeGreaterThan(0)
+  })
+
+  it('a bare "active" mode without the build approval falls back to rules (§9 item 4)', () => {
+    const response = runCoachDecision(PROFILE_P, 'profile_only', 'active', null).response!
+    expect(response.decisionOrigin).toBe('rules')
+    expect(response.fallbackReason).toBe('EXPERIMENTAL_MODEL_NOT_APPROVED')
+    expect(response.display).toEqual(runCoachDecision(PROFILE_P, 'profile_only', 'off', null).response!.display)
+  })
+
+  it('still pauses every risk profile without running the model', () => {
+    for (const risk of ['acute_pain', 'dizziness', 'recent_injury'] as const) {
+      const response = runCoachDecision({ ...PROFILE_P, risk }, 'profile_only', COMPETITION, null).response!
+      expect(response.status, risk).toBe('safety_hold')
+      expect(response.execution, risk).toBe('not_run')
+      expect(response.decisionOrigin, risk).toBe('rules')
+    }
+  })
+
+  it('abstains on an out-of-distribution profile and shows the rule recommendation (§9 item 6)', () => {
+    const profile: CoachProfile = { version: 1, goals: ['mobility'], difficulties: ['none'], regions: ['shoulders', 'neck', 'arms', 'legs'], preference: 'routine', risk: 'none', acknowledged: true }
+    const response = runCoachDecision(profile, 'profile_only', COMPETITION, null).response!
+    expect(response.abstained).toBe(true)
+    expect(response.fallbackReason).toBe('MODEL_ABSTAINED')
+    expect(response.decisionOrigin).toBe('rules')
+    expect(response.display).toEqual(runCoachDecision(profile, 'profile_only', 'off', null).response!.display)
+  })
+
+  it('rejects an invalid request through the public interface instead of crashing (§9 item 9)', () => {
+    const response = recommendCoachDecision({ contract: COACH_DECISION_CONTRACT, profile: PROFILE_P, userId: 'x' } as never, { mode: 'active', allowExperimentalModel: true })
+    expect(response.fallbackReason).toBe('INPUT_INVALID')
+    expect(response.inputIssues[0]?.path).toBe('$.userId')
+    expect(response.decisionOrigin).toBe('rules')
+  })
+
+  it('renders the competition page with the orb intro and, inside, the profile form', () => {
+    expect(renderToStaticMarkup(createElement(CoachPage, { runtime: COMPETITION, storage: null }))).toContain('data-testid="coach-orb-stage"')
+    const html = renderToStaticMarkup(createElement(CoachPage, { runtime: COMPETITION, storage: null, startInside: true }))
+    expect(html).toContain('data-testid="coach-profile"')
+    expect(html).toContain('data-testid="coach-orb-avatar"')
+    expect(html).not.toContain('未经人工验证')
   })
 })

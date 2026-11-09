@@ -1117,7 +1117,7 @@
     "family": "pairwise_lr",
     "featureSet": "fp-cdm-features/v1",
     "tier": "ai_experimental",
-    "tierLabel": "实验性：AI 标注弱监督训练（单一 AI 标注者，未经人工验证）",
+    "tierLabel": "实验性模型：AI 标注训练，项目负责人已审阅标签，尚未进行独立人工或专家标注",
     "binding": "release_bound",
     "weightsFingerprint": "fnv1a32x2:501683ad09c7bd0a",
     "weightsSha256": "d8bfd9ed8ad64d7b7832a4fefd063a6216af65ee3fc156b01b6dada484ac8b5c",

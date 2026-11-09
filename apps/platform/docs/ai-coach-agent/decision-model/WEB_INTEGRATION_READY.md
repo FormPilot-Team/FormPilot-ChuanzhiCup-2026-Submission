@@ -7,6 +7,8 @@
 
 > **模型身份必须如实展示**：当前发布的排序模型是用单一 AI 标注者的标签训练的**实验性模型**，不是人工或专家验证。产品默认 `OFF`；`ACTIVE` 需要负责人批准，并且界面必须带“实验性模型”标识（见 §6）。
 
+> **2026-11-09 更新（PR #53，Web V1 正式接线）**：项目负责人已审阅 AI 标签（`OWNER_LABEL_REVIEW.md`），身份文案改为「实验性模型：AI 标注训练，项目负责人已审阅标签，尚未进行独立人工或专家标注」（层级仍为 `ai_experimental`，`humanValidation` 仍为 `pending`）。Web V1 的模式由构建决定：普通开发 / 普通构建 OFF；DEV `?coachMode=shadow` 或 `VITE_COACH_DECISION_MODE=shadow` 为 SHADOW；**竞赛专用构建 `competition:build`（`vite build --mode competition`）为 ACTIVE + `allowExperimentalModel: true`**（负责人批准）。实现：`apps/platform/src/app/coachDecisionConfig.ts`、`apps/platform/src/pages/Web/CoachPage.tsx`。下文 §5、§9、§10 中“需负责人批准”的 ACTIVE 已按此执行；其余契约与要求不变。
+
 ## 1. 前提：分支与合并顺序
 
 | 顺序 | PR | 内容 | 基线 |
@@ -181,7 +183,7 @@ const res = recommendCoachDecision(input, { mode: COACH_DECISION_MODE })
 
 - 渲染 `res.display.result`，结构与 Agent Web P0 的 `result` 相同：`routines`（功法方向）、`chapters`、`games`，每项含 `entry`、`reasons`、`evidenceIds`、`basis`。现有 P0 展示组件可直接复用。
 - 跳转：只用非 null 的 `entry.href`。章节为站内路由 `/routines/:programId/train?form=:chapterId`；功法方向 `href` 为 null，从章节进入；游戏 `href` 为 null，`launch: 'external_app'`，按游戏中心既有方式启动。
-- 来源标识：`res.decisionOrigin === 'model'` 时显示“训练模型推荐”；若 `res.model.tier === 'ai_experimental'`，**同时显示“实验性模型（AI 标注训练，未经人工验证）”**（文案可用 `res.model.tierLabel`）。规则结果显示“规则推荐”。
+- 来源标识：`res.decisionOrigin === 'model'` 时显示“训练模型推荐”；若 `res.model.tier === 'ai_experimental'`，**同时显示“实验性模型：AI 标注训练，项目负责人已审阅标签，尚未进行独立人工或专家标注”**（文案可用 `res.model.tierLabel`；2026-11-09 起的文案）。规则结果显示“规则推荐”。
 - 每项的模型分数：用 `res.ranking.find(x => x.id === item.entry.id)`，可展示 `suitability`（如“适配度 86%”，注明不是医学概率）。
 - 合成数据：`dataSources.*` 为 `synthetic_demo` 时显示合成标签。
 - `res.limitations` 放在结果底部的“说明”里。

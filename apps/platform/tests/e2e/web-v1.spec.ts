@@ -218,7 +218,7 @@ test('Web V1 I: SHADOW (DEV switch) keeps the rule display, adds the labelled pa
   await page.goto('/coach?view=profile&coachMode=shadow')
   await fillProfileP(page)
   await expect(page.getByTestId('coach-origin')).toHaveText('规则推荐')
-  await expect(page.getByTestId('coach-shadow-panel')).toContainText('实验性模型，AI 标注训练，未经人工验证')
+  await expect(page.getByTestId('coach-shadow-panel')).toContainText('实验性模型：AI 标注训练，项目负责人已审阅标签，尚未进行独立人工或专家标注')
   await expect(page.getByTestId('coach-shadow-meta')).toContainText('fallback SHADOW_MODE')
   const log = await page.evaluate(() => JSON.parse(localStorage.getItem('formpilot.coach-decision-shadow-log:v1') ?? '[]'))
   expect(log).toHaveLength(1)

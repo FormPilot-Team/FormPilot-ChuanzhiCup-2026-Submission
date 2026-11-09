@@ -30,7 +30,7 @@ export interface CoachDecisionEngineConfig {
 }
 
 const MODES: readonly CoachDecisionMode[] = ['off', 'shadow', 'active']
-const TIER_LABEL = { human: '人工标注训练（两名独立标注者）', ai_experimental: '实验性：AI 标注弱监督训练（单一 AI 标注者，未经人工验证）' } as const
+const TIER_LABEL = { human: '人工标注训练（两名独立标注者）', ai_experimental: '实验性模型：AI 标注训练，项目负责人已审阅标签，尚未进行独立人工或专家标注' } as const
 
 export function createCoachDecisionEngine(config: CoachDecisionEngineConfig = {}) {
   const catalogue = config.catalogue ?? COACH_KNOWLEDGE

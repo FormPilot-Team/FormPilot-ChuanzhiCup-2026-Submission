@@ -49,7 +49,7 @@ export function SettingsPage() {
           <div className="fpw-setting-row">训练记录<span>浏览器本地存储（localStorage），不上传、不同步</span></div>
           <div className="fpw-setting-row">摄像头画面<span>只用于本次实时识别，不录制、不上传</span></div>
           <div className="fpw-setting-row">AI Coach 画像<span>只保存在页面内存，离开页面即清除</span></div>
-          <div className="fpw-setting-row" data-testid="settings-model">AI Coach 决策模型<span>{mode === 'shadow' ? 'SHADOW（开发验收：后台运行，界面仍为规则推荐）' : '默认关闭（规则推荐）'} · 实验性模型，AI 标注训练，未经人工验证</span></div>
+          <div className="fpw-setting-row" data-testid="settings-model">AI Coach 决策模型<span>{mode === 'active' ? 'ACTIVE（竞赛构建：训练模型推荐，异常或弃权时回退规则）' : mode === 'shadow' ? 'SHADOW（开发验收：后台运行，界面仍为规则推荐）' : '关闭（规则推荐）'} · 实验性模型：AI 标注训练，项目负责人已审阅标签，尚未进行独立人工或专家标注</span></div>
           <div className="fpw-setting-row">体感游戏<span>独立应用 {motionGamesBaseUrl()} · 成绩不写入训练记录</span></div>
         </div>
       </section>

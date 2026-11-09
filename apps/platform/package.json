@@ -18,7 +18,7 @@
     "jev:evaluate": "node scripts/jev-evaluate.ts",
     "competition:dev": "vite --host 127.0.0.1",
     "adaptive:evaluate": "node --experimental-transform-types scripts/adaptive-evaluate.ts",
-    "competition:build": "tsc -b && vite build --outDir dist-competition",
+    "competition:build": "tsc -b && vite build --mode competition --outDir dist-competition",
     "competition:preview": "vite preview --outDir dist-competition --host 127.0.0.1 --port 4175"
   },
   "dependencies": {
