@@ -40,7 +40,7 @@ test.beforeEach(async ({ page }) => { await markOnboardingSeen(page) })
 test('Workshop A: create → record poses → test → save, then reload and edit', async ({ page }) => {
   test.setTimeout(90_000)
   await page.goto('/workshop')
-  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '动作工坊' })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '我的', exact: true })).toHaveAttribute('aria-current', 'page') // Web V1: 动作工坊 sits under 我的
   await expect(page.getByTestId('workshop-empty')).toContainText('还没有自定义动作')
   await expect(page.getByTestId('workshop-create')).toHaveAttribute('href', '/workshop/new')
 
