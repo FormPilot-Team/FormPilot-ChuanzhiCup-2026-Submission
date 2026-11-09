@@ -8,6 +8,8 @@ import { defineConfig, devices } from '@playwright/test'
  */
 export default defineConfig({
   testDir: './tests/visual-web-v1',
+  // Own artifacts folder: Playwright empties outputDir at start, which must never race the main e2e run.
+  outputDir: './test-results-web-v1-visual',
   fullyParallel: false,
   workers: 1,
   reporter: 'line',

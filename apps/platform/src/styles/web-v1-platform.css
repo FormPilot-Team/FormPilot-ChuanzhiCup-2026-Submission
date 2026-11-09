@@ -119,3 +119,13 @@
     .fpw .gc-labels { text-align: left; white-space: normal; }
   }
 }
+
+/*
+ * Unlayered on purpose (must beat the dock's Tailwind `bottom-*` utilities): on phones the Web V1 bottom tabs sit at
+ * the bottom edge, so the existing floating AI 教练 dock (History, Report, 动作工坊) moves above them. Pages without
+ * the tabs (immersive training) keep the dock where it was.
+ */
+@media (max-width: 820px) {
+  body:has(.fpw .bottom-tabs) .fixed[data-testid="ai-coach-trigger"] { bottom: 92px; }
+  body:has(.fpw .bottom-tabs) .fixed[data-testid="ai-coach-panel"][class*="bottom-20"] { bottom: 148px; max-height: min(60dvh, 540px); }
+}
