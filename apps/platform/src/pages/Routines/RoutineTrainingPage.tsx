@@ -95,7 +95,7 @@ export function RoutineTrainingPage({ program, scope }: { program: RoutineProgra
   })
   return (
     <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900" data-routine={program.id}>
-      <AppHeader />
+      <AppHeader immersive />
       <main className="mx-auto min-w-0 max-w-[1600px] px-4 py-5 lg:px-7">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">

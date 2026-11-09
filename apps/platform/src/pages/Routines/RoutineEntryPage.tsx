@@ -1,7 +1,8 @@
-import { useMemo } from 'react'
-import { ArrowLeft, ArrowRight, Camera, CircleCheck, Clock3, History, ListOrdered, Play, ScanLine } from 'lucide-react'
-import { HOME_PATH, reportPath, routineTrainingPath } from '../../app/routes'
+import { useMemo, useState } from 'react'
+import { ArrowLeft, ArrowRight, Camera, CircleCheck, Clock3, Eye, History, ListOrdered, Play, ScanLine } from 'lucide-react'
+import { ROUTINES_PATH, reportPath, routineTrainingPath } from '../../app/routes'
 import { AppHeader } from '../../components/layout/AppHeader'
+import { RoutineDemoVideo, type DemoRequest } from '../../components/routines/RoutineDemoVideo'
 import { ROUTINE_ACCENT } from '../../components/routines/routineTheme'
 import { loadRoutineHistory } from '../../features/history/routineHistory'
 import { chapterDisplayName, formatClock, formCount, scopeTitle } from '../../features/routines/scope'
@@ -53,11 +54,12 @@ export function RoutineEntryPage({ program, repository = localRepository }: { pr
   const accent = ROUTINE_ACCENT[program.accent]
   const forms = formCount(program)
   const extras = program.chapters.length - forms
+  const [demo, setDemo] = useState<DemoRequest | null>(null)
   return (
     <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900" data-routine={program.id}>
       <AppHeader />
       <main className="mx-auto min-w-0 max-w-[1200px] px-4 pb-12 pt-5 sm:px-6 lg:px-8 lg:pb-16">
-        <a href={HOME_PATH} className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><ArrowLeft size={17} aria-hidden="true" />返回首页</a>
+        <a href={ROUTINES_PATH} className="mb-4 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" data-testid="routine-back"><ArrowLeft size={17} aria-hidden="true" />返回功法训练</a>
 
         <section className="panel grid min-w-0 gap-6 overflow-hidden p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,.95fr)] lg:items-center lg:gap-10 lg:p-8" aria-labelledby="routine-title" data-testid="routine-entry">
           <div className="min-w-0">
@@ -70,12 +72,7 @@ export function RoutineEntryPage({ program, repository = localRepository }: { pr
             </dl>
             <a href={routineTrainingPath(program.id)} className="primary-button mt-6 inline-flex items-center justify-center gap-2 px-6 py-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" data-testid="routine-start-full">开始整套跟练<ArrowRight size={18} aria-hidden="true" /></a>
           </div>
-          <figure className="min-w-0">
-            <div className="overflow-hidden rounded-2xl bg-slate-950" style={{ aspectRatio: String(program.video.contentAspect) }}>
-              <img src={program.video.posterSrc} alt={`${program.title}标准示范视频画面`} className="size-full object-cover" />
-            </div>
-            <figcaption className="mt-2 text-xs text-slate-500">标准示范视频 · 横屏播放，训练中与你的动作实时比对</figcaption>
-          </figure>
+          <RoutineDemoVideo program={program} request={demo} />
         </section>
 
         <div className="mt-6 grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
@@ -90,6 +87,7 @@ export function RoutineEntryPage({ program, repository = localRepository }: { pr
                     <p className="truncate text-sm font-semibold text-slate-900" title={chapterDisplayName(chapter)}>{chapter.kind === 'form' && chapter.label !== chapter.name ? chapter.name : chapterDisplayName(chapter)}</p>
                     <p className="text-xs tabular-nums text-slate-500">{chapter.kind === 'form' ? `${chapter.label} · ` : ''}{formatClock(chapter.endSeconds - chapter.startSeconds)}</p>
                   </div>
+                  <button type="button" onClick={() => setDemo({ token: Date.now(), startSeconds: chapter.startSeconds, label: chapterDisplayName(chapter) })} aria-label={`观看示范 ${chapterDisplayName(chapter)}`} className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" data-testid={`routine-demo-${chapter.id}`}><Eye size={12} aria-hidden="true" />示范</button>
                   {chapter.kind === 'form' ? (
                     <a href={routineTrainingPath(program.id, chapter.id)} aria-label={`单独练习 ${chapterDisplayName(chapter)}`} className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-blue-700 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" data-testid={`routine-form-${chapter.id}`}><Play size={12} fill="currentColor" aria-hidden="true" />单练</a>
                   ) : null}

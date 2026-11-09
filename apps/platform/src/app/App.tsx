@@ -1,8 +1,12 @@
 import { lazy, Suspense } from 'react'
-import { HomePage } from '../pages/Home/HomePage'
+import { HomeV1Page } from '../pages/Web/HomeV1Page'
+import { TrainingCenterPage } from '../pages/Web/TrainingCenterPage'
+import { MePage } from '../pages/Web/MePage'
+import { SettingsPage } from '../pages/Web/SettingsPage'
+import { GamesCenterPage } from '../pages/Web/GamesCenterPage'
 import { SmartTrainingPage } from '../pages/SmartTraining/SmartTrainingPage'
 import { TrainingPage } from '../pages/Training/TrainingPage'
-import { HISTORY_PATH, SMART_TRAINING_PATH, isTrainingRoute, parseRoutineRoute, parseWorkshopRoute } from './routes'
+import { COACH_PATH, GAMES_PATH, HISTORY_PATH, ME_PATH, ME_SETTINGS_PATH, SMART_TRAINING_PATH, TRAINING_CENTER_PATH, isTrainingRoute, parseRoutineRoute, parseWorkshopRoute } from './routes'
 
 const TrainingReportPage = lazy(async () => {
   const module = await import('../pages/Report/TrainingReportPage')
@@ -20,13 +24,45 @@ const WorkshopRoutePage = lazy(async () => {
   return { default: module.WorkshopRoutePage }
 })
 
+/** AI Coach loads the decision engine (rules + fp-cdm weights) in its own chunk. */
+const CoachPage = lazy(async () => {
+  const module = await import('../pages/Web/CoachPage')
+  return { default: module.CoachPage }
+})
+
 const RoutineRoutePage = lazy(async () => {
   const module = await import('../pages/Routines/RoutineRoutePage')
   return { default: module.RoutineRoutePage }
 })
 
+function WebLoading({ text }: { text: string }) {
+  return <div className="grid min-h-dvh place-items-center bg-[#f7fafc] px-4 text-sm font-semibold text-slate-600" role="status">{text}</div>
+}
+
 export default function App() {
-  const { pathname, search } = window.location
+  const { search } = window.location
+  // Trailing slashes (e.g. /games/) open the same board.
+  const pathname = window.location.pathname.length > 1 ? window.location.pathname.replace(/\/+$/, '') : window.location.pathname
+  if (pathname === TRAINING_CENTER_PATH) {
+    document.title = 'FormPilot · 训练中心'
+    return <TrainingCenterPage />
+  }
+  if (pathname === GAMES_PATH) {
+    document.title = 'FormPilot · 游戏中心'
+    return <GamesCenterPage />
+  }
+  if (pathname === COACH_PATH) {
+    document.title = 'FormPilot · AI Coach'
+    return <Suspense fallback={<WebLoading text="正在打开 AI Coach…" />}><CoachPage /></Suspense>
+  }
+  if (pathname === ME_PATH) {
+    document.title = 'FormPilot · 我的'
+    return <MePage />
+  }
+  if (pathname === ME_SETTINGS_PATH) {
+    document.title = 'FormPilot · 设备与设置'
+    return <SettingsPage />
+  }
   const reportMatch = pathname.match(/^\/report\/([^/]+)$/)
   if (reportMatch) {
     document.title = 'FormPilot · 训练报告'
@@ -76,6 +112,19 @@ export default function App() {
     return <SmartTrainingPage />
   }
 
-  document.title = 'FormPilot'
-  return <HomePage />
+  if (pathname === '/' || pathname === '' || pathname === '/index.html') {
+    document.title = 'FormPilot · AI 动作训练'
+    return <HomeV1Page />
+  }
+
+  document.title = 'FormPilot · 页面不存在'
+  return <NotFound />
+}
+
+function NotFound() {
+  return (
+    <div className="grid min-h-dvh place-items-center bg-[#f7fafc] px-4 text-center" data-testid="not-found">
+      <div><p className="text-lg font-bold text-slate-900">没有找到这个页面</p><p className="mt-2 text-sm text-slate-600">链接可能已失效。</p><a className="mt-4 inline-block rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white" href="/">返回首页</a></div>
+    </div>
+  )
 }

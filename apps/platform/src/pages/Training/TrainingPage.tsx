@@ -104,7 +104,7 @@ export function TrainingPage() {
 
   return (
     <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900">
-      <AppHeader />
+      <AppHeader immersive />
       <main className="mx-auto min-w-0 max-w-[1600px] px-4 py-5 lg:px-7">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">

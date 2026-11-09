@@ -138,7 +138,7 @@ function CustomTrainingView({ action }: { action: CustomActionDefinition }) {
   const outOfFrame = capturing && courseSnapshot.state === 'ACTIVE' && !runtime.framing.valid && !runtime.poseUnavailable
   return (
     <div className="fp-page min-h-dvh min-w-0 overflow-x-clip text-slate-900" data-custom-action={action.id}>
-      <AppHeader />
+      <AppHeader immersive />
       <main className="mx-auto min-w-0 max-w-[1500px] px-4 py-5 lg:px-7">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">
@@ -231,7 +231,7 @@ export function CustomActionTrainingPage({ actionId, repository = localRepositor
   if (!action) {
     return (
       <div className="fp-page min-h-dvh text-slate-900">
-        <AppHeader />
+        <AppHeader immersive />
         <main className="mx-auto grid min-h-[60dvh] max-w-3xl place-items-center px-4 py-12">
           <section className="fp-card w-full p-8 text-center" data-testid="custom-training-not-found">
             <AlertTriangle className="mx-auto text-amber-600" size={28} aria-hidden="true" />

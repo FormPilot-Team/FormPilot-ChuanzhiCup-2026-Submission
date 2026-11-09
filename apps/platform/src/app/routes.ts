@@ -13,6 +13,31 @@ export const HISTORY_PATH = '/history'
 /** Follow-along routines (八段锦, 太极拳, 五禽戏, 易筋经): index, one entry page per routine, and its training page. */
 export const ROUTINES_PATH = '/routines'
 
+/**
+ * Web V1 six-board information architecture (design: docs/design/chuanzhi-web/formpilot-web, PR #52).
+ * 首页 `/` · 训练中心 `/training` · 功法训练 `/routines` · 游戏中心 `/games` · AI Coach `/coach` · 我的 `/me`.
+ */
+export const TRAINING_CENTER_PATH = '/training'
+export const GAMES_PATH = '/games'
+export const COACH_PATH = '/coach'
+export const ME_PATH = '/me'
+export const ME_SETTINGS_PATH = '/me/settings'
+
+export type WebBoard = 'home' | 'training' | 'routines' | 'games' | 'coach' | 'me'
+
+/** Which first-level board a path belongs to; undefined for paths outside the product (e.g. lab pages). */
+export function webBoardOf(pathname: string, search = ''): WebBoard | undefined {
+  const path = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname
+  if (path === TRAINING_CENTER_PATH || path === SMART_TRAINING_PATH || isTrainingRoute(path, search)) return 'training'
+  if (path === ROUTINES_PATH || path.startsWith(`${ROUTINES_PATH}/`)) return 'routines'
+  if (path === GAMES_PATH) return 'games'
+  if (path === COACH_PATH) return 'coach'
+  const workshop = parseWorkshopRoute(path)
+  if (workshop) return workshop.kind === 'train' ? 'training' : 'me'
+  if (path === ME_PATH || path.startsWith(`${ME_PATH}/`) || path === HISTORY_PATH || path.startsWith('/report/')) return 'me'
+  return path === HOME_PATH ? 'home' : undefined
+}
+
 export function reportPath(sessionId: string): string {
   return `/report/${encodeURIComponent(sessionId)}`
 }
