@@ -143,7 +143,7 @@ describe('Web V1 pages render real data and honest empty states', () => {
   })
 
   it('Game center shows the three design cards and never claims a running game before checking', () => {
-    const html = renderToStaticMarkup(createElement(GamesCenterPage, { probe: () => new Promise(() => undefined) }))
+    const html = renderToStaticMarkup(createElement(GamesCenterPage, { probe: () => new Promise<'available' | 'unavailable'>(() => undefined) }))
     for (const game of WEB_GAMES) expect(html).toContain(`data-testid="game-card-${game.id}"`)
     expect(html).toContain('正在检查体感游戏服务')
     expect(html).not.toContain('data-testid="game-running"')

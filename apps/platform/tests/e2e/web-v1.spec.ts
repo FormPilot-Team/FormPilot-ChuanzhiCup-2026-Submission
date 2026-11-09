@@ -3,7 +3,7 @@ import { ROUTINE_SESSION_STORAGE_KEY } from '../../src/features/routines/session
 import { SESSION_STORAGE_KEY } from '../../src/features/training/LocalStorageTrainingSessionRepository'
 import type { RoutineSessionRecord } from '../../src/features/routines/session/types'
 import type { TrainingSessionState } from '../../src/features/training/types'
-import { at, makeSession } from '../analysis-fixtures'
+import { makeSession } from '../analysis-fixtures'
 import { routineRecord } from '../helpers/routineFixtures'
 import { markOnboardingSeen } from './support/onboarding'
 
