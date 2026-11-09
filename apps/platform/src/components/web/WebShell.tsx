@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { COACH_PATH, GAMES_PATH, HOME_PATH, ME_PATH, ME_SETTINGS_PATH, ROUTINES_PATH, TRAINING_CENTER_PATH, webBoardOf, type WebBoard } from '../../app/routes'
 import { OnboardingDialog } from '../onboarding/OnboardingDialog'
-import { recordOnboarding } from '../../features/onboarding/onboarding'
+import { recordOnboarding, shouldAutoOpenOnboarding } from '../../features/onboarding/onboarding'
+
+/** Opens the page's one 使用说明 guide (owned by the topbar) from anywhere on the page. */
+export const OPEN_GUIDE_EVENT = 'fpw:open-guide'
+export function openWebGuide(): void { window.dispatchEvent(new Event(OPEN_GUIDE_EVENT)) }
 
 /** The six first-level boards, in the approved #52 order. Icons are the design's own glyphs. */
 export const WEB_NAV: ReadonlyArray<{ id: WebBoard; label: string; icon: string; href: string }> = [
@@ -61,8 +65,14 @@ const ICONS = {
 }
 
 /** Desktop top navigation of the #52 design. The global actions report real state only. */
-export function WebTopbar({ active = currentBoard(), onToast }: { active?: WebBoard; onToast: (text: string) => void }) {
-  const [guideOpen, setGuideOpen] = useState(false)
+export function WebTopbar({ active = currentBoard(), onToast, autoOpenGuide = false }: { active?: WebBoard; onToast: (text: string) => void; autoOpenGuide?: boolean }) {
+  // First visit to Home opens the guide once; afterwards the 帮助 button (or OPEN_GUIDE_EVENT) reopens it.
+  const [guideOpen, setGuideOpen] = useState(() => autoOpenGuide && shouldAutoOpenOnboarding())
+  useEffect(() => {
+    const open = () => setGuideOpen(true)
+    window.addEventListener(OPEN_GUIDE_EVENT, open)
+    return () => window.removeEventListener(OPEN_GUIDE_EVENT, open)
+  }, [])
   return (
     <header className="topbar" data-testid="web-topbar">
       <a className="brand" href={HOME_PATH} aria-label="FormPilot 首页">
@@ -103,16 +113,18 @@ interface WebShellProps {
   pageClassName?: string
   /** Render children directly in `<main>` (the home hero is full width, without the `.page` container). */
   bare?: boolean
+  /** Home only: open the 使用说明 guide on the first visit. */
+  autoOpenGuide?: boolean
   testId?: string
 }
 
 /** AppShell of the six Web V1 boards: design topbar, the page, mobile bottom tabs and the shared toast. */
-export function WebShell({ children, active, pageClassName, bare = false, testId }: WebShellProps) {
+export function WebShell({ children, active, pageClassName, bare = false, autoOpenGuide = false, testId }: WebShellProps) {
   const toast = useToast()
   return (
     <div className="fpw">
       <div className="app-shell">
-        <WebTopbar active={active} onToast={toast.show} />
+        <WebTopbar active={active} onToast={toast.show} autoOpenGuide={autoOpenGuide} />
         <main data-testid={bare ? testId : undefined}>{bare ? children : <div className={`page${pageClassName ? ` ${pageClassName}` : ''}`} data-testid={testId}>{children}</div>}</main>
         <WebBottomTabs active={active} />
       </div>

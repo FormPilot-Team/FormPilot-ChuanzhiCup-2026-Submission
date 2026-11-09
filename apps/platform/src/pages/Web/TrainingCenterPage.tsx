@@ -1,9 +1,7 @@
 import { useMemo, useState, type CSSProperties } from 'react'
 import { SMART_TRAINING_PATH, WORKSHOP_NEW_PATH, WORKSHOP_PATH, customTrainingPath } from '../../app/routes'
 import { ScoringBasisDialog } from '../../components/home/ScoringBasisDialog'
-import { OnboardingDialog } from '../../components/onboarding/OnboardingDialog'
-import { StatusPill, WebEmpty, WebShell } from '../../components/web/WebShell'
-import { recordOnboarding } from '../../features/onboarding/onboarding'
+import { StatusPill, WebEmpty, WebShell, openWebGuide } from '../../components/web/WebShell'
 import { BODY_AREAS } from '../../features/workshop/catalog'
 import { goalText } from '../../features/workshop/definition'
 import type { CustomActionBodyArea } from '../../features/workshop/types'
@@ -26,7 +24,6 @@ const FREE_ICONS = ['◌', '↥', '↔', '✦', '◠', '⇡'] as const
 export function TrainingCenterPage({ repositories, now }: { repositories?: WebHistoryRepositories; now?: number }) {
   const history = useMemo(() => loadWebHistory(repositories, now ?? Date.now()), [repositories, now])
   const shown = history.actions.slice(0, 3)
-  const [guideOpen, setGuideOpen] = useState(false)
   const [scoringOpen, setScoringOpen] = useState(false)
   return (
     <WebShell active="training" testId="web-training-center">
@@ -66,9 +63,8 @@ export function TrainingCenterPage({ repositories, now }: { repositories?: WebHi
         <section className="panel glass card"><WebEmpty mark="＋" title="还没有自定义动作" testId="training-actions-empty" action={<a className="btn btn-primary" href={WORKSHOP_NEW_PATH}>在动作工坊新建动作</a>}>记录开始姿势和完成姿势，测试通过后就能在这里直接训练。</WebEmpty></section>
       )}
 
-      <div className="section-head"><div><h2>训练前的小提示</h2></div><div className="filter-row"><button type="button" className="btn btn-ghost" onClick={() => setGuideOpen(true)} data-testid="training-guide">使用说明</button><button type="button" className="btn btn-ghost" onClick={() => setScoringOpen(true)} data-testid="training-scoring-basis">评分依据</button></div></div>
+      <div className="section-head"><div><h2>训练前的小提示</h2></div><div className="filter-row"><button type="button" className="btn btn-ghost" onClick={openWebGuide} data-testid="training-guide">使用说明</button><button type="button" className="btn btn-ghost" onClick={() => setScoringOpen(true)} data-testid="training-scoring-basis">评分依据</button></div></div>
       <div className="notice">摄像头训练会在浏览器本地完成识别，画面不会上传。摄像头只在训练准备页开启；也可以先在功法详情页观看标准示范视频，不授权摄像头。</div>
-      <OnboardingDialog open={guideOpen} onClose={(outcome) => { recordOnboarding(outcome); setGuideOpen(false) }} />
       <ScoringBasisDialog open={scoringOpen} onClose={() => setScoringOpen(false)} />
     </WebShell>
   )
