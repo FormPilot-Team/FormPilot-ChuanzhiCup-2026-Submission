@@ -33,7 +33,10 @@ test('Round2 B: 评分依据 opens a light dialog with the three layers and the 
     const entry = page.getByTestId('training-scoring-basis')
     const guide = page.getByTestId('training-guide')
     await expect(entry).toBeVisible()
-    // Next to 使用说明, on the same line and at the same size.
+    // Next to 使用说明, on the same line and at the same size. The design's buttons lift 2 px on hover and the page
+    // fades in, so measure with the pointer away from them once the motion has settled.
+    await page.mouse.move(0, 0)
+    await page.waitForTimeout(400)
     const [entryBox, guideBox] = [await box(entry), await box(guide)]
     expect(Math.abs(entryBox.y - guideBox.y)).toBeLessThanOrEqual(1)
     expect(Math.abs(entryBox.height - guideBox.height)).toBeLessThanOrEqual(1)
