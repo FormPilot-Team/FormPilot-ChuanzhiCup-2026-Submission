@@ -24,7 +24,7 @@ interface CoachOrbProps {
 
 /**
  * The AI Coach liquid orb (#54): a transparent VP9 WebM over its own poster. The poster is always rendered first and
- * stays when the video cannot load, when the browser cannot decode VP9, or when the user prefers reduced motion. The
+ * stays when the video cannot load or the browser cannot decode VP9. With reduced motion no video is loaded at all. The
  * video plays only while it is on screen and the tab is visible.
  */
 export function CoachOrb({ variant, animate = true, size = 'md', testId }: CoachOrbProps) {
@@ -45,6 +45,14 @@ export function CoachOrb({ variant, animate = true, size = 'md', testId }: Coach
     const video = videoRef.current
     if (!video) return
     video.muted = true
+    // The first frame may already be decoded before React's handler is attached (cache, fast disk): check readyState
+    // and listen natively, as the #54 prototype does.
+    const markReady = () => setReady(true)
+    const markFailed = () => setReady(false)
+    if (video.readyState >= 2) markReady()
+    video.addEventListener('loadeddata', markReady)
+    video.addEventListener('playing', markReady)
+    video.addEventListener('error', markFailed)
     let onScreen = true
     const sync = () => {
       if (reduced || !onScreen || document.hidden) video.pause()
@@ -60,6 +68,9 @@ export function CoachOrb({ variant, animate = true, size = 'md', testId }: Coach
     return () => {
       observer?.disconnect()
       document.removeEventListener('visibilitychange', sync)
+      video.removeEventListener('loadeddata', markReady)
+      video.removeEventListener('playing', markReady)
+      video.removeEventListener('error', markFailed)
       video.pause()
     }
   }, [reduced, useVideo])
@@ -71,7 +82,7 @@ export function CoachOrb({ variant, animate = true, size = 'md', testId }: Coach
   return (
     <div className={stage ? 'signals-orb-stage' : `coach-orb${size === 'sm' ? ' fpw-orb-sm' : ''}`} aria-hidden="true" data-testid={testId} data-orb-state={!useVideo ? 'poster' : reduced ? 'reduced-motion' : ready ? 'video' : 'loading'}>
       <img className={imageClass} src={COACH_ORB_POSTER} width={dimension} height={dimension} alt="" decoding="async" />
-      {useVideo ? (
+      {useVideo && !reduced ? (
         <video
           ref={videoRef}
           className={videoClass}

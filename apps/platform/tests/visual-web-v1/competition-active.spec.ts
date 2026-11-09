@@ -81,8 +81,8 @@ test('Competition E: the orb plays as a transparent video, stops under reduced m
   const still = await reduced.newPage()
   await still.goto('/coach')
   await expect(still.getByTestId('coach-orb-stage')).toHaveAttribute('data-orb-state', 'reduced-motion')
-  await still.waitForTimeout(800)
-  expect(await still.getByTestId('coach-orb-stage').locator('video').evaluate((video: HTMLVideoElement) => video.paused)).toBe(true)
+  // Reduced motion: no video is loaded at all, only the poster.
+  await expect(still.getByTestId('coach-orb-stage').locator('video')).toHaveCount(0)
   await expect(still.getByTestId('coach-orb-stage').locator('img')).toBeVisible()
   await reduced.close()
 
