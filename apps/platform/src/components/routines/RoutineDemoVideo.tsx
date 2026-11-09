@@ -31,7 +31,11 @@ export function RoutineDemoVideo({ program, request }: { program: RoutineProgram
       void video.play().catch(() => { /* autoplay with sound can be refused; controls stay available */ })
     }
     if (video.readyState >= 1) seek()
-    else video.addEventListener('loadedmetadata', seek, { once: true })
+    else {
+      // preload="none": nothing loads until asked, so start loading and seek once the metadata is known.
+      video.addEventListener('loadedmetadata', seek, { once: true })
+      video.load()
+    }
     return () => video.removeEventListener('loadedmetadata', seek)
   }, [request])
 

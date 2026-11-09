@@ -2,7 +2,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { MODE_CARD_CTA, MODE_STATUS_LABEL, ROUTINE_MODES, TRAINING_MODES, WARM_UP_MODE, WORKSHOP_ENTRY, modeEntryRoute } from '../src/app/modeCatalog'
-import { HISTORY_PATH, SMART_TRAINING_PATH, START_TRAINING_PATH, WORKSHOP_PATH } from '../src/app/routes'
+import { COACH_PATH, GAMES_PATH, HISTORY_PATH, ME_PATH, ROUTINES_PATH, SMART_TRAINING_PATH, START_TRAINING_PATH, TRAINING_CENTER_PATH, WORKSHOP_PATH } from '../src/app/routes'
 import { buildHomeTrainingSummary, startOfLocalWeek, weekChangeText } from '../src/features/history/homeSummary'
 import { mergeHistoryEntries } from '../src/features/history/historyEntries'
 import { buildTrainingHistoryItems } from '../src/features/history/TrainingHistory'
@@ -300,18 +300,20 @@ describe('Home', () => {
     expect(html).toContain('欢迎使用 FormPilot')
   })
 
-  it('links the header 开始训练 to Home\'s training section and 我的训练 to History', () => {
+  it('shares the Web V1 six-board navigation in the header (首页 … 我的, #52 order)', () => {
     const html = home()
     const nav = html.slice(html.indexOf('aria-label="主导航"'), html.indexOf('</nav>'))
-    expect(nav).toContain(`href="${START_TRAINING_PATH}"`)
-    expect(nav).toContain('开始训练')
-    expect(nav).toContain(`href="${HISTORY_PATH}"`)
-    expect(nav).toContain('我的训练')
-    expect(nav).toContain(`href="${WORKSHOP_PATH}"`)
-    expect(nav).toContain('动作工坊')
-    expect(nav.indexOf('开始训练')).toBeLessThan(nav.indexOf('动作工坊'))
-    expect(nav.indexOf('动作工坊')).toBeLessThan(nav.indexOf('我的训练'))
-    expect(nav).not.toMatch(/智能训练|功法跟练|训练记录/)
+    const boards: Array<[string, string]> = [['首页', '/'], ['训练中心', TRAINING_CENTER_PATH], ['功法训练', ROUTINES_PATH], ['游戏中心', GAMES_PATH], ['AI Coach', COACH_PATH], ['我的', ME_PATH]]
+    let previous = -1
+    for (const [label, href] of boards) {
+      expect(nav).toContain(`href="${href}"`)
+      const index = nav.indexOf(`>${label}</a>`)
+      expect(index).toBeGreaterThan(previous)
+      previous = index
+    }
+    // History and 动作工坊 stay reachable from 我的 and 训练中心; the old 开始训练 anchor is no longer a nav item.
+    expect(nav).not.toContain(`href="${START_TRAINING_PATH}"`)
+    expect(nav).not.toMatch(/动作工作坊/)
   })
 })
 
