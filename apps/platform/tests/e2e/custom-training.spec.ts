@@ -38,7 +38,7 @@ test('Custom A: a saved action trains to completion, and its record reaches Repo
   await seedActions(page, [lateralRaise('custom-e2e-raise')])
   await page.goto('/workshop/custom-e2e-raise/train?fixture=synthetic&fast=1')
   await expect(page.getByRole('heading', { level: 1, name: '侧平举练习' })).toBeVisible()
-  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '开始训练' })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '训练中心', exact: true })).toHaveAttribute('aria-current', 'page')
   await expect(courseState(page)).toHaveAttribute('data-course-state', 'ACTIVE', { timeout: 20_000 })
   const dialog = page.getByTestId('custom-complete-dialog')
   await expect(dialog).toHaveAttribute('data-outcome', 'completed', { timeout: 60_000 })
