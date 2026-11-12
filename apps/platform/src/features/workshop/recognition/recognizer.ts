@@ -66,6 +66,11 @@ export interface RecognitionSetup {
   framingLabel: string
 }
 
+/** A workshop test passes only when complete repetitions also satisfy every visible requirement. */
+export function workshopTestPasses(snapshot: Pick<RecognizerSnapshot, 'reps' | 'passedReps' | 'holdMs'>, goal: CustomActionDefinition['goal']): boolean {
+  return goal.type === 'duration' ? snapshot.holdMs >= 3000 && snapshot.passedReps >= 3 : snapshot.passedReps >= Math.min(3, goal.target)
+}
+
 const POSE_MATCH_ISSUE: Readonly<Record<PoseMatchIssue, string>> = {
   'not-captured': '请先记录开始姿势和完成姿势。',
   'missing-body': '记录的姿势没有看清肩膀和髋部，请重新记录。',
@@ -103,6 +108,9 @@ export function resolveRecognition(definition: CustomActionDefinition): Recognit
   }
   const templateId = recognition.source as FeatureTemplateId
   const template = FEATURE_TEMPLATES[templateId]
+  if (holdGoal && (template.counting === 'orbit' || template.counting === 'alternate')) {
+    return { mode: 'template', counting: template.counting, ready: false, issue: '这个动作模板按完整次数识别；请改为按次数，或选择可保持的识别方式。', template: templateId, thresholds: recognition.thresholds, requirements, bounds: [...template.bounds], framingLabel }
+  }
   const counting: TemplateCounting = holdGoal && template.counting === 'pulse' ? 'hold' : template.counting
   const bounds = [...(templateId === 'generic' ? PROFILE_BOUNDS[recognition.profile] : template.bounds)]
   let calibration: RecognitionSetup['calibration']
@@ -146,8 +154,10 @@ export function framingHintFor(landmarks: ReadonlyArray<PoseLandmark>, setup: Pi
   return undefined
 }
 
-const GAP_ABORT_MS = 450
 const ORBIT_TRAVEL = 4.5
+const MAX_PATH_DEVIATION = 0.45
+const SHORT_OCCLUSION_MS = 150
+const MAX_RESUME_PROGRESS_CHANGE = 0.3
 const FLASH_MS = { success: 1600, warning: 2800 }
 
 interface RepTracking {
@@ -164,22 +174,28 @@ export class CustomActionRecognizer {
   private passedReps = 0
   private holdMs = 0
   private movingFrames = 0
+  private startFrames = 0
   private returnFrames = 0
   private rep?: RepTracking
   private lastRep?: RepEvent
-  private gapStartedAt?: number
   private lastTimestamp?: number
+  private lastGoodProgress?: number
+  private occlusionAt?: number
   private flash?: { feedback: RecognizerFeedback; until: number }
   private neutralSignal?: number
   private neutralHipY?: number
   private orbit?: { left: number; right: number }
   private orbitTravel = 0
+  private orbitDirection = 0
+  private orbitSide?: 'left' | 'right'
   private side?: number
   private armed = true
   private holdStartedAt?: number
   private holdSecondsCounted = 0
+  private holdSegmentMs = 0
+  private lastHoldingAt?: number
 
-  constructor(private readonly definition: CustomActionDefinition) {
+  constructor(private readonly definition: CustomActionDefinition, private readonly recoverBriefOcclusion = true) {
     this.setup = resolveRecognition(definition)
   }
 
@@ -189,39 +205,59 @@ export class CustomActionRecognizer {
     this.passedReps = 0
     this.holdMs = 0
     this.movingFrames = 0
+    this.startFrames = 0
     this.returnFrames = 0
     this.rep = undefined
     this.lastRep = undefined
-    this.gapStartedAt = undefined
     this.lastTimestamp = undefined
+    this.lastGoodProgress = undefined
+    this.occlusionAt = undefined
     this.flash = undefined
     this.neutralSignal = undefined
     this.neutralHipY = undefined
     this.orbit = undefined
     this.orbitTravel = 0
+    this.orbitDirection = 0
+    this.orbitSide = undefined
     this.side = undefined
     this.armed = true
     this.holdStartedAt = undefined
     this.holdSecondsCounted = 0
+    this.holdSegmentMs = 0
+    this.lastHoldingAt = undefined
   }
 
   process(frame: NormalizedPoseFrame | null, timestamp: number, aspect: number): RecognizerSnapshot {
-    const previous = this.lastTimestamp
+    const previousTimestamp = this.lastTimestamp
     this.lastTimestamp = timestamp
     if (!this.setup.ready) return this.snapshot('lost', null, {}, timestamp, undefined, { code: 'NOT_READY', message: this.setup.issue ?? '请先完成识别设置。', tone: 'info' })
-    if (!frame || !this.hasTorso(frame.landmarks)) return this.gap(timestamp, 'lost', '请回到画面中，让身体完整入镜')
+    if (previousTimestamp !== undefined && timestamp - previousTimestamp > SHORT_OCCLUSION_MS && this.phase !== 'READY') {
+      this.gap(timestamp, 'lost', '识别中断，请重新从开始姿势做一次')
+    }
+    if (!frame || !this.hasTorso(frame.landmarks)) return this.missing(timestamp, 'lost', '请回到画面中，让身体完整入镜')
 
     const framing = this.framingHint(frame.landmarks)
     const reading = this.read(frame, aspect)
-    if (reading.progress === null || framing) return this.gap(timestamp, 'degraded', framing ?? `请让${this.setup.framingLabel}完整入镜`, reading.metrics)
-    this.gapStartedAt = undefined
+    if (reading.progress === null || framing) {
+      const offPath = this.setup.mode === 'pose-match' && (reading.metrics.deviation ?? -1) > MAX_PATH_DEVIATION
+      const hint = framing ?? (offPath ? '动作轨迹与示范差别较大，请按示范路线完成' : `请让${this.setup.framingLabel}完整入镜`)
+      return offPath ? this.gap(timestamp, 'degraded', hint, reading.metrics) : this.missing(timestamp, 'degraded', hint, reading.metrics)
+    }
+
+    if (this.occlusionAt !== undefined) {
+      const discontinuous = timestamp - this.occlusionAt > SHORT_OCCLUSION_MS
+        || this.lastGoodProgress === undefined || Math.abs(reading.progress - this.lastGoodProgress) > MAX_RESUME_PROGRESS_CHANGE
+      this.occlusionAt = undefined
+      if (discontinuous) return this.gap(timestamp, 'degraded', '遮挡期间动作位置变化过大，请重新从开始姿势做一次', reading.metrics)
+    }
+    this.lastGoodProgress = reading.progress
 
     const measures = measureRequirements(frame.landmarks, aspect)
     let repEvent: RepEvent | undefined
     switch (this.setup.counting) {
       case 'orbit': repEvent = this.countOrbit(reading.metrics, measures, timestamp); break
       case 'alternate': repEvent = this.countAlternate(reading.metrics, measures, timestamp); break
-      case 'hold': repEvent = this.countHold(reading.progress, measures, timestamp, previous); break
+      case 'hold': repEvent = this.countHold(reading.progress, measures, timestamp); break
       default: repEvent = this.countPulse(reading.progress, measures, timestamp)
     }
     const progress = this.setup.counting === 'orbit' ? Math.min(1, this.orbitTravel / ORBIT_TRAVEL) : reading.progress
@@ -243,7 +279,7 @@ export class CustomActionRecognizer {
     if (this.setup.mode === 'pose-match' && this.setup.model) {
       const reading = readPoseMatch(this.setup.model, bodyCoords(frame.landmarks, aspect))
       return {
-        progress: reading.progress,
+        progress: reading.deviation !== null && reading.deviation > MAX_PATH_DEVIATION ? null : reading.progress,
         metrics: { visibleShare: reading.visibleShare, deviation: reading.deviation ?? -1 },
       }
     }
@@ -301,7 +337,7 @@ export class CustomActionRecognizer {
 
   private complete(timestamp: number): RepEvent {
     const requirements = this.evaluate()
-    const failed = requirements.filter((item) => item.passed === false).map((item) => item.id)
+    const failed = requirements.filter((item) => item.passed !== true).map((item) => item.id)
     this.reps += 1
     if (!failed.length) this.passedReps += 1
     const event: RepEvent = {
@@ -323,6 +359,13 @@ export class CustomActionRecognizer {
   private countPulse(progress: number, measures: RequirementMeasures, timestamp: number): RepEvent | undefined {
     const { moving, peak, returnThreshold } = this.setup.thresholds
     if (this.phase === 'READY') {
+      if (progress <= returnThreshold) {
+        this.startFrames += 1
+        this.movingFrames = 0
+        this.rep = undefined
+        return undefined
+      }
+      if (this.startFrames < 2) return undefined
       if (progress >= moving) {
         this.movingFrames += 1
         this.track(progress, measures, timestamp)
@@ -365,7 +408,7 @@ export class CustomActionRecognizer {
     return undefined
   }
 
-  private countHold(progress: number, measures: RequirementMeasures, timestamp: number, previous: number | undefined): RepEvent | undefined {
+  private countHold(progress: number, measures: RequirementMeasures, timestamp: number): RepEvent | undefined {
     const { peak, returnThreshold } = this.setup.thresholds
     const holdRequired = this.definition.recognition.holdSeconds * 1000
     const durationGoal = this.definition.goal.type === 'duration'
@@ -374,6 +417,8 @@ export class CustomActionRecognizer {
       if (this.phase === 'HOLDING') {
         this.phase = progress <= returnThreshold ? 'READY' : 'RETURNING'
         this.holdStartedAt = undefined
+        this.lastHoldingAt = undefined
+        this.holdSegmentMs = 0
         this.rep = undefined
       } else if (this.phase === 'RETURNING' && progress <= returnThreshold) {
         this.phase = 'READY'
@@ -390,12 +435,17 @@ export class CustomActionRecognizer {
       this.phase = 'HOLDING'
       this.holdStartedAt = timestamp
       this.holdSecondsCounted = 0
+      this.holdSegmentMs = 0
+      this.lastHoldingAt = timestamp
       this.rep = undefined
     }
     this.track(progress, measures, timestamp)
     if (durationGoal) {
-      if (previous !== undefined) this.holdMs += Math.min(250, Math.max(0, timestamp - previous))
-      const heldSeconds = Math.floor((timestamp - (this.holdStartedAt ?? timestamp)) / 1000)
+      const elapsed = this.lastHoldingAt === undefined ? 0 : Math.min(250, Math.max(0, timestamp - this.lastHoldingAt))
+      this.lastHoldingAt = timestamp
+      this.holdMs += elapsed
+      this.holdSegmentMs += elapsed
+      const heldSeconds = Math.floor(this.holdSegmentMs / 1000)
       if (heldSeconds > this.holdSecondsCounted) {
         // 每满一秒按一次计，报告可以给出达标比例
         this.holdSecondsCounted = heldSeconds
@@ -428,15 +478,24 @@ export class CustomActionRecognizer {
       while (delta < -Math.PI) delta += Math.PI * 2
       return delta
     }
-    const delta = Math.max(left === undefined ? 0 : Math.abs(unwrap(left, this.orbit.left)), right === undefined ? 0 : Math.abs(unwrap(right, this.orbit.right)))
+    const side = this.orbitSide ?? (left !== undefined ? 'left' : 'right')
+    this.orbitSide = side
+    const current = side === 'left' ? left : right
+    const before = this.orbit[side]
     this.orbit = { left: left ?? this.orbit.left, right: right ?? this.orbit.right }
-    if (delta > 0.02) {
-      this.orbitTravel += Math.min(delta, 0.5)
+    if (current === undefined) return undefined
+    const delta = unwrap(current, before)
+    if (Math.abs(delta) > 0.02 && Math.abs(delta) <= 0.5) {
+      const direction = Math.sign(delta)
+      if (this.orbitDirection !== 0 && direction !== this.orbitDirection) this.orbitTravel = Math.max(0, this.orbitTravel - Math.abs(delta))
+      else this.orbitTravel += Math.abs(delta)
+      if (this.orbitTravel === 0 || this.orbitDirection === 0) this.orbitDirection = direction
       this.phase = 'MOVING'
       this.track(this.orbitTravel / ORBIT_TRAVEL, measures, timestamp)
     }
     if (this.orbitTravel >= ORBIT_TRAVEL) {
       this.orbitTravel = 0
+      this.orbitDirection = 0
       this.phase = 'READY'
       return this.complete(timestamp)
     }
@@ -468,19 +527,33 @@ export class CustomActionRecognizer {
     return undefined
   }
 
-  private gap(timestamp: number, quality: RecognizerQuality, hint: string, metrics: Record<string, number> = {}): RecognizerSnapshot {
-    if (this.phase !== 'READY') {
-      this.gapStartedAt ??= timestamp
-      if (timestamp - this.gapStartedAt >= GAP_ABORT_MS) {
-        // 跟踪中断的动作不会由后续帧补完
-        this.phase = 'READY'
-        this.rep = undefined
-        this.movingFrames = 0
-        this.returnFrames = 0
-        this.holdStartedAt = undefined
-        this.orbitTravel = 0
+  private missing(timestamp: number, quality: RecognizerQuality, hint: string, metrics: Record<string, number> = {}): RecognizerSnapshot {
+    if (this.recoverBriefOcclusion && this.setup.mode === 'pose-match' && this.setup.counting === 'pulse'
+      && this.phase !== 'READY' && this.lastGoodProgress !== undefined) {
+      this.occlusionAt ??= timestamp
+      if (timestamp - this.occlusionAt <= SHORT_OCCLUSION_MS) {
+        return this.snapshot(quality, null, metrics, timestamp, undefined, { code: 'SHORT_OCCLUSION', message: '暂时看不到动作，保持姿势并回到画面', tone: 'warning' }, hint)
       }
     }
+    return this.gap(timestamp, quality, hint, metrics)
+  }
+
+  private gap(timestamp: number, quality: RecognizerQuality, hint: string, metrics: Record<string, number> = {}): RecognizerSnapshot {
+    // Any unobserved part of a repetition cannot be stitched to later frames.
+    this.phase = 'READY'
+    this.rep = undefined
+    this.movingFrames = 0
+    this.startFrames = 0
+    this.returnFrames = 0
+    this.holdStartedAt = undefined
+    this.lastHoldingAt = undefined
+    this.holdSegmentMs = 0
+    this.orbit = undefined
+    this.orbitSide = undefined
+    this.orbitDirection = 0
+    this.orbitTravel = 0
+    this.lastGoodProgress = undefined
+    this.occlusionAt = undefined
     return this.snapshot(quality, null, metrics, timestamp, undefined, { code: quality === 'lost' ? 'POSE_LOST' : 'FRAMING', message: hint, tone: 'warning' }, hint)
   }
 

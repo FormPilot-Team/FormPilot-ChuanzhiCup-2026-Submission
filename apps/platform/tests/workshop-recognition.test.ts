@@ -3,7 +3,7 @@ import { createDraftAction, defaultRequirements, validateForSave, withSignalSour
 import { FIXTURE_ASPECT, cyclePosition, fixtureFrame, standingPose } from '../src/features/workshop/fixture'
 import { PoseCaptureSession } from '../src/features/workshop/recognition/capture'
 import { buildPoseMatch } from '../src/features/workshop/recognition/poseMatch'
-import { CustomActionRecognizer, resolveRecognition, type RecognizerSnapshot } from '../src/features/workshop/recognition/recognizer'
+import { CustomActionRecognizer, resolveRecognition, workshopTestPasses, type RecognizerSnapshot } from '../src/features/workshop/recognition/recognizer'
 import { effectiveRequirements, suggestRequirement } from '../src/features/workshop/recognition/requirements'
 import { templateProgressThresholds } from '../src/features/workshop/recognition/templates'
 import type { CapturedPose, CustomActionDefinition } from '../src/features/workshop/types'
@@ -92,16 +92,31 @@ describe('pose match: the user\'s own start and finish poses', () => {
     expect(snapshots.some((item) => item.feedback?.code === 'MOTION_TOO_SMALL')).toBe(true)
   })
 
-  it('counts a repetition with bent arms but reports the unmet requirement in user language', () => {
+  it('rejects a movement that strays far from the demonstrated path', () => {
     const recognizer = new CustomActionRecognizer(lateralRaiseAction())
     const start = standingPose(8)
     const bent = bentArmsPose()
     const lerp = (t: number) => start.map((a, index) => ({ ...a, x: a.x + (bent[index].x - a.x) * t, y: a.y + (bent[index].y - a.y) * t }))
     const snapshots = run(recognizer, (t) => lerp(cyclePosition(t)), 0, CYCLE)
-    const event = snapshots.find((item) => item.repEvent)?.repEvent
-    expect(event).toMatchObject({ index: 1, passed: false, failed: ['arms-straight'] })
-    const feedback = snapshots.find((item) => item.feedback?.code === 'REQUIREMENT_ARMS_STRAIGHT')?.feedback
-    expect(feedback).toEqual({ code: 'REQUIREMENT_ARMS_STRAIGHT', message: '手臂再伸直一些', tone: 'warning' })
+    expect(snapshots.at(-1)).toMatchObject({ reps: 0, passedReps: 0 })
+    expect(snapshots.some((item) => item.quality === 'degraded')).toBe(true)
+    expect(snapshots.some((item) => item.feedback?.message.includes('轨迹与示范差别较大'))).toBe(true)
+  })
+
+  it('does not join a peak to a return after a brief missing frame', () => {
+    const snapshots = run(new CustomActionRecognizer(lateralRaiseAction()), (t) => t < 1000 ? standingPose(8 + 82 * t / 1000) : t < 1100 ? null : standingPose(8), 0, 1800)
+    expect(snapshots.at(-1)?.reps).toBe(0)
+  })
+
+  it('requires an observed start before a finish-to-start movement can count', () => {
+    const snapshots = run(new CustomActionRecognizer(lateralRaiseAction()), (t) => standingPose(t < 500 ? 90 : 8), 0, 1100)
+    expect(snapshots.at(-1)?.reps).toBe(0)
+  })
+
+  it('does not pass when a required joint is invisible even if the movement counts', () => {
+    const action = lateralRaiseAction({ requirements: defaultRequirements('upper').map((item) => item.id === 'knees-bent' ? { ...item, enabled: true } : item) })
+    const snapshots = run(new CustomActionRecognizer(action), (t) => standingPose(8 + 82 * cyclePosition(t)).map((point, index) => index === 25 || index === 26 ? { ...point, visibility: 0.05 } : point), 0, CYCLE)
+    expect(snapshots.find((item) => item.repEvent)?.repEvent).toMatchObject({ passed: false, failed: ['knees-bent'] })
     expect(snapshots.at(-1)).toMatchObject({ reps: 1, passedReps: 0 })
   })
 
@@ -157,6 +172,12 @@ describe('hold goals', () => {
     expect(snapshots.some((item) => item.phase === 'HOLDING')).toBe(true)
     expect(effectiveRequirements(action).map((item) => item.id)).not.toContain('full-return')
   })
+  it('does not count missing-camera time as held time', () => {
+    const action = lateralRaiseAction({ goal: { type: 'duration', seconds: 10 } })
+    const snapshots = run(new CustomActionRecognizer(action), (t) => t < 500 ? standingPose(8) : t < 1600 ? standingPose(90) : t < 1800 ? null : standingPose(90), 0, 2600)
+    expect(snapshots.at(-1)?.holdMs).toBeLessThan(1900)
+    expect(snapshots.filter((item) => item.repEvent)).toHaveLength(1)
+  })
 })
 
 describe('workbench templates', () => {
@@ -185,6 +206,30 @@ describe('workbench templates', () => {
     const circle = (t: number) => standingPose(8 + (360 * t) / 2000)
     const snapshots = run(recognizer, circle, 0, 4000)
     expect(snapshots.at(-1)!.reps).toBeGreaterThanOrEqual(1)
+  })
+  it('does not count back-and-forth arm swings as an orbit', () => {
+    const action = withSignalSource(lateralRaiseAction({ startPose: { description: '' }, finishPose: { description: '' } }), 'arm-circle')
+    const snapshots = run(new CustomActionRecognizer(action), (t) => {
+      const pose = standingPose(8)
+      const shoulder = pose[11]
+      const angle = Math.sin(t / 220) * 1.3
+      pose[15] = { ...pose[15], x: shoulder.x + Math.cos(angle) * 0.18, y: shoulder.y + Math.sin(angle) * 0.18 }
+      return pose
+    }, 0, 4000)
+    expect(snapshots.at(-1)?.reps).toBe(0)
+  })
+  it('rejects duration goals with count-only templates', () => {
+    const action = withSignalSource(lateralRaiseAction({ goal: { type: 'duration', seconds: 10 } }), 'arm-circle')
+    expect(resolveRecognition(action)).toMatchObject({ ready: false, issue: expect.stringContaining('按次数') })
+    expect(validateForSave(action)).toContain('这个动作模板按完整次数识别；请改为按次数，或选择可保持的识别方式。')
+  })
+})
+
+describe('workshop test acceptance', () => {
+  it('requires passed repetitions, not just counted repetitions or time', () => {
+    expect(workshopTestPasses({ reps: 3, passedReps: 0, holdMs: 0 }, { type: 'reps', target: 10 })).toBe(false)
+    expect(workshopTestPasses({ reps: 3, passedReps: 3, holdMs: 0 }, { type: 'reps', target: 10 })).toBe(true)
+    expect(workshopTestPasses({ reps: 3, passedReps: 0, holdMs: 3200 }, { type: 'duration', seconds: 10 })).toBe(false)
   })
 })
 

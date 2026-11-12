@@ -143,12 +143,12 @@ export function WorkshopHomePage({ repository = localRepository }: { repository?
               <span className="fp-energy-gradient grid size-12 shrink-0 place-items-center rounded-2xl text-white shadow-[0_8px_18px_-10px_rgb(14_165_233/0.9)]"><WandSparkles size={23} aria-hidden="true" /></span>
               <div className="min-w-0">
                 <h1 className="text-balance text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">动作工坊</h1>
-                <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">教 FormPilot 学会你的动作：记录开始和完成姿势，选好识别重点，测试一下，保存后就能像其他训练一样开始练。</p>
+                <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-600 sm:text-base">把自己的动作变成可训练的项目：用摄像头或已有视频记录开始和完成姿势，选好识别重点，测试后保存。正式训练仍需摄像头。</p>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <a href={WORKSHOP_NEW_PATH} className="primary-button inline-flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" data-testid="workshop-create"><Plus size={17} aria-hidden="true" />创建动作</a>
-              <button type="button" onClick={() => fileRef.current?.click()} disabled={library.readOnly} className="secondary-button inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"><FileUp size={16} aria-hidden="true" />导入动作文件</button>
+              <button type="button" onClick={() => fileRef.current?.click()} disabled={library.readOnly} className="secondary-button inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50" title="用于导入已导出的动作数据，不用于导入示范视频"><FileUp size={16} aria-hidden="true" />导入动作文件</button>
               <button type="button" onClick={exportAll} disabled={!actions.length} className="secondary-button inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"><Download size={16} aria-hidden="true" />导出全部</button>
               <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" tabIndex={-1} aria-label="选择要导入的动作文件" onChange={onFile} data-testid="workshop-import-input" />
             </div>

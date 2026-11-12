@@ -1,6 +1,8 @@
 import { AlertTriangle, Camera, Check, CircleDashed, Download, Info, RotateCcw, ScanLine, X } from 'lucide-react'
 import type { ReactNode, Ref } from 'react'
 import { PoseSketch } from '../../components/workshop/PoseSketch'
+import { VideoDemonstrationInput } from '../../components/workshop/VideoDemonstrationInput'
+import type { ContinuousSuggestion } from '../../features/workshop/recognition/continuous'
 import { ProgressMeter, RequirementResults } from '../../components/workshop/RecognitionReadout'
 import {
   BODY_AREAS, BODY_AREA_ORDER, GOAL_LIMITS, JOINT_LABEL, PROFILE_OPTIONS, PROFILE_ORDER, REQUIREMENTS, REQUIREMENT_ORDER, SIGNAL_SOURCE_OPTIONS,
@@ -128,11 +130,13 @@ export function BasicsStep({ draft, errors, onChange }: {
 // ---- 2 · 设置识别要求 ----------------------------------------------------------------------------------------------------
 
 export type CaptureTarget = 'start' | 'finish'
+export type DemonstrationMethod = 'camera' | 'video'
 
-function PoseCard({ target, draft, capture, onDescription, onRecord, onCancel }: {
+function PoseCard({ target, draft, capture, method, onDescription, onRecord, onCancel }: {
   target: CaptureTarget
   draft: CustomActionDefinition
   capture: { target: CaptureTarget; progress: CaptureProgress | null } | null
+  method: DemonstrationMethod
   onDescription: (value: string) => void
   onRecord: () => void
   onCancel: () => void
@@ -169,11 +173,11 @@ function PoseCard({ target, draft, capture, onDescription, onRecord, onCancel }:
           <progress className="mt-2 h-2 w-full accent-blue-600" max={1} value={progress?.progress ?? 0} aria-label={`${title}记录进度`} />
           <button type="button" onClick={onCancel} className="mt-2 inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-semibold text-slate-600 hover:bg-white"><X size={14} aria-hidden="true" />取消记录</button>
         </div>
-      ) : (
+      ) : method === 'camera' ? (
         <button type="button" onClick={onRecord} disabled={Boolean(capture)} className={cn('mt-3 inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50', step.capture ? 'secondary-button' : 'primary-button')} data-testid={`record-${target}`}>
           {step.capture ? <RotateCcw size={16} aria-hidden="true" /> : <Camera size={16} aria-hidden="true" />}{step.capture ? '重新记录' : `记录${title}`}
         </button>
-      )}
+      ) : <p className="mt-3 text-xs leading-5 text-slate-500">在下方视频中找到这个画面，再点“记录为{title}”。</p>}
     </div>
   )
 }
@@ -182,13 +186,17 @@ function percentInput(value: number): number {
   return Math.round(value * 100)
 }
 
-export function RequirementsStep({ draft, setup, capture, onPoseDescription, onRecord, onCancelCapture, onToggleRequirement, onRequirementThreshold, onSource, onProfile, onThresholds, onTiming, onExport }: {
+export function RequirementsStep({ draft, setup, capture, method, onMethodChange, onPoseDescription, onRecord, onCancelCapture, onVideoCapture, onSuggestion, onToggleRequirement, onRequirementThreshold, onSource, onProfile, onThresholds, onTiming, onExport }: {
   draft: CustomActionDefinition
   setup: RecognitionSetup
   capture: { target: CaptureTarget; progress: CaptureProgress | null } | null
+  method: DemonstrationMethod
+  onMethodChange: (method: DemonstrationMethod) => void
   onPoseDescription: (target: CaptureTarget, value: string) => void
   onRecord: (target: CaptureTarget) => void
   onCancelCapture: () => void
+  onVideoCapture: (target: CaptureTarget, pose: NonNullable<CustomActionDefinition['startPose']['capture']>) => void
+  onSuggestion: (suggestion: ContinuousSuggestion) => void
   onToggleRequirement: (id: RequirementId, enabled: boolean) => void
   onRequirementThreshold: (id: RequirementId, value: number | undefined) => void
   onSource: (source: SignalSource) => void
@@ -207,19 +215,28 @@ export function RequirementsStep({ draft, setup, capture, onPoseDescription, onR
     <div className="grid gap-6">
       <section aria-labelledby="poses-title">
         <h3 id="poses-title" className="font-bold text-slate-950">1. 示范开始姿势和完成姿势</h3>
-        <p className="mt-1 text-pretty text-sm leading-6 text-slate-600">站到摄像头前，让{PROFILE_OPTIONS[draft.recognition.profile].framing}完整入镜。先做出开始姿势并保持约 1 秒，再做出完成姿势并保持约 1 秒。只记录身体关键点，不保存画面。</p>
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <PoseCard target="start" draft={draft} capture={capture} onDescription={(value) => onPoseDescription('start', value)} onRecord={() => onRecord('start')} onCancel={onCancelCapture} />
-          <PoseCard target="finish" draft={draft} capture={capture} onDescription={(value) => onPoseDescription('finish', value)} onRecord={() => onRecord('finish')} onCancel={onCancelCapture} />
+        <p className="mt-1 text-pretty text-sm leading-6 text-slate-600">选一种示范方式，分别记录动作开始和完成时的姿势。让{PROFILE_OPTIONS[draft.recognition.profile].framing}完整入镜；只保存身体关键点，不保存画面。</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2" role="group" aria-label="选择示范方式">
+          <button type="button" onClick={() => onMethodChange('camera')} aria-pressed={method === 'camera'} className={cn('rounded-xl border px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500', method === 'camera' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white')} data-testid="method-camera">
+            <span className="block font-bold text-slate-950">现在用摄像头示范</span><span className="mt-1 block text-xs text-slate-600">做出姿势并保持约 1 秒</span>
+          </button>
+          <button type="button" onClick={() => onMethodChange('video')} aria-pressed={method === 'video'} className={cn('rounded-xl border px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500', method === 'video' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white')} data-testid="method-video">
+            <span className="block font-bold text-slate-950">使用已有视频</span><span className="mt-1 block text-xs text-slate-600">选本机文件，暂停在两个姿势</span>
+          </button>
         </div>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <PoseCard target="start" draft={draft} capture={capture} method={method} onDescription={(value) => onPoseDescription('start', value)} onRecord={() => onRecord('start')} onCancel={onCancelCapture} />
+          <PoseCard target="finish" draft={draft} capture={capture} method={method} onDescription={(value) => onPoseDescription('finish', value)} onRecord={() => onRecord('finish')} onCancel={onCancelCapture} />
+        </div>
+        {method === 'video' ? <VideoDemonstrationInput profile={draft.recognition.profile} onCapture={onVideoCapture} onSuggestion={onSuggestion} onUseCamera={() => onMethodChange('camera')} /> : null}
         {bothRecorded ? (
           <div className="mt-3 flex flex-col gap-4 rounded-2xl bg-slate-50 p-4 sm:flex-row sm:items-center" data-testid="calibration-summary">
             <PoseSketch start={draft.startPose.capture} finish={draft.finishPose.capture} className="h-32 w-28 shrink-0" />
             {poseMatch.model ? (
               <div className="min-w-0 text-sm leading-6 text-slate-700">
-                <p className="font-bold text-slate-950">FormPilot 学会了这个动作</p>
+                <p className="font-bold text-slate-950">已记录开始和完成姿势</p>
                 <p className="mt-1 text-pretty">会重点看：<span className="font-semibold text-blue-800" data-testid="active-joints">{joints.map((name) => JOINT_LABEL[name]).join('、')}</span>。</p>
-                <p className="mt-1 text-pretty text-slate-500">灰色是开始姿势，蓝色是完成姿势；从开始到完成算 0% 到 100%。</p>
+                <p className="mt-1 text-pretty text-slate-500">灰色是开始姿势，蓝色是完成姿势。下一步请实际测试，确认能否识别完整动作。</p>
               </div>
             ) : (
               <p className="flex items-start gap-2 text-sm font-semibold text-coral-600" role="alert"><AlertTriangle size={16} className="mt-0.5 shrink-0" aria-hidden="true" />{setup.issue}</p>
@@ -383,7 +400,7 @@ export function TestStep({ draft, setup, snapshot, testing, passed, onStart, cam
       <div className="rounded-2xl bg-blue-50/70 p-4 text-pretty text-sm leading-6 text-blue-950">
         {durationGoal
           ? '做到完成姿势并保持住。FormPilot 累计识别到 3 秒保持，就算测试通过。'
-          : `按平时的节奏完整做几次。识别到 ${needed} 次完整动作，就算测试通过。`}
+          : `按平时的节奏完整做几次。识别到 ${needed} 次完整动作，且识别重点都达标，测试才算通过。`}
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <button type="button" onClick={onStart} disabled={!setup.ready} className="primary-button inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50" data-testid="test-start">
