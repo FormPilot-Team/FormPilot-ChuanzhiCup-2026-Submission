@@ -81,7 +81,6 @@ export function CustomActionReportView({ report, actionExists }: { report: Custo
         takeaways={takeaways(report)}
         nextActions={[
           { label: actionExists ? '再练一次' : '去动作工坊', href: againHref, primary: true, testId: 'custom-next-again' },
-          { label: '查看训练记录', href: HISTORY_PATH, testId: 'custom-next-history' },
         ]}
       />
 

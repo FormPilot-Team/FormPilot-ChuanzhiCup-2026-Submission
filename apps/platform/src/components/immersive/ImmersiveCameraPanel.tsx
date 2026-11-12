@@ -96,7 +96,7 @@ export function ImmersiveCameraPanel({
     <section className={cn('imm-panel', className)} aria-labelledby="camera-title" data-testid="camera-panel" data-variant="immersive">
       <div className="imm-panel-head">
         <h2 id="camera-title" className="imm-chip shrink-0"><ScanLine size={14} aria-hidden="true" />{title}<span className="imm-hide-sm text-slate-400">· 镜像</span></h2>
-        <span className="imm-chip imm-hide-md" data-camera-status={mode}><i className={cn('size-2 rounded-full', capturing ? 'bg-emerald-300' : mode === 'error' ? 'bg-coral-500' : loading ? 'bg-amber-300' : 'bg-slate-500')} aria-hidden="true" />{status}</span>
+        <span className="imm-chip imm-hide-md" data-camera-status={mode}><i className={cn('size-2 rounded-full', capturing ? 'bg-emerald-300' : mode === 'error' ? 'bg-coral-500' : loading ? 'bg-amber-300' : 'bg-slate-500')} aria-hidden="true" />{mode === 'live' ? <><span>摄像头已连接</span><span className="text-slate-500" aria-hidden="true">·</span><span>AI 识别中</span></> : status}</span>
         {framingAssist && capturing ? (
           <span className={cn('imm-chip max-w-[46%] truncate', framingAssist.status === 'READY' ? 'imm-chip-good' : 'imm-chip-warn')} role="status" data-testid="framing-status" data-framing-profile={framingAssist.profile}>{framingAssist.primaryHint}</span>
         ) : null}

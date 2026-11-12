@@ -139,7 +139,7 @@ test('V1.1 evidence C4: routine report three-question first screen', async ({ pa
 
 test('V1.1 evidence workshop: library, wizard and custom-action training', async ({ page }) => {
   test.setTimeout(180_000)
-  await seed(page, CUSTOM_ACTION_STORAGE_KEY, { schemaVersion: 1, actions: [sampleAction('custom-v11-evidence'), sampleAction('custom-v11-draft', { name: '弓步压腿', description: '', test: { status: 'untested', repsDetected: 0, repsPassed: 0 } })] })
+  await seed(page, CUSTOM_ACTION_STORAGE_KEY, { schemaVersion: 1, actions: [sampleAction('custom-v11-evidence'), sampleAction('custom-v11-draft', { name: '弓步压腿', description: '', test: { status: 'not-tested', repsDetected: 0, repsPassed: 0 } })] })
   for (const viewport of [VIEWPORTS[0], VIEWPORTS[3]]) {
     await page.setViewportSize(viewport)
     await page.goto('/workshop')

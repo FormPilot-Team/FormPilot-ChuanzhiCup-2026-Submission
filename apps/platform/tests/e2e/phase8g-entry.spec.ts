@@ -119,7 +119,8 @@ test.describe('8G Mode Hub and smart-training entry', () => {
     await page.getByRole('link', { name: /开始完整训练/ }).click()
     await expect(page).toHaveURL(/\/train$/)
     await expect(page.getByRole('heading', { name: '今日训练 · 肩部活动引导' })).toBeVisible()
-    await expect(page.getByText('第 1 / 6 项 · 实时姿态识别与动作纠正')).toBeVisible()
+    // Web V1.1 C3: the immersive top bar names the step and the exercise.
+    await expect(page.getByText('第 1 / 6 项 · 肩部环绕')).toBeVisible()
   })
 
   test('D: 训练中心 → 智能训练 → 徒手深蹲 opens free training on /train?exercise=squat without fast', async ({ page }) => {
@@ -129,8 +130,8 @@ test.describe('8G Mode Hub and smart-training entry', () => {
     await expect(page).toHaveURL(/\/train\?exercise=squat$/)
     expect(new URL(page.url()).searchParams.has('fast')).toBe(false)
     await expect(page.getByRole('heading', { name: '自由训练 · 徒手深蹲专项' })).toBeVisible()
-    await expect(page.getByText('单个动作 · 实时姿态识别与动作纠正')).toBeVisible()
-    await expect(page.getByText('自由训练 · 单个动作，达到目标后自动保存')).toBeVisible()
+    await expect(page.getByText('单个动作 · 徒手深蹲')).toBeVisible()
+    await expect(page.getByTestId('training-footer')).toContainText('达到目标后自动保存')
     await expect(page.getByRole('button', { name: '启用摄像头' })).toBeVisible()
 
     await page.goto('/smart-training')
@@ -167,13 +168,12 @@ test.describe('8G Mode Hub and smart-training entry', () => {
     await expect(page.getByRole('heading', { level: 1, name: '我的训练', exact: true })).toBeVisible()
     await page.getByRole('link', { name: '返回首页' }).click()
     await expect(page).toHaveURL(/\/$/)
+    // Web V1.1: training pages are immersive — no first-level navigation; the way back is the exit control.
     await page.goto('/train?exercise=knee_raise')
-    const nav = page.getByRole('navigation', { name: '主导航' })
-    await expect(nav.getByRole('link', { name: '首页' })).toHaveAttribute('href', '/')
-    await expect(nav.getByRole('link', { name: '我的', exact: true })).toHaveAttribute('href', '/me')
-    await expect(nav.getByRole('link', { name: '训练中心' })).toHaveAttribute('aria-current', 'page')
-    await expect(nav).not.toContainText(/智能训练|功法跟练|动作工作坊/)
-    await nav.getByRole('link', { name: '训练中心' }).click()
+    await expect(page.getByRole('navigation', { name: '主导航' })).toHaveCount(0)
+    await expect(page.getByTestId('training-exit')).toHaveAttribute('href', '/smart-training')
+    await expect(page.locator('header')).toContainText('FormPilot')
+    await page.goto('/training')
     await expect(page).toHaveURL(/\/training$/)
     await expect(page.getByTestId('training-free-options')).toBeVisible()
   })

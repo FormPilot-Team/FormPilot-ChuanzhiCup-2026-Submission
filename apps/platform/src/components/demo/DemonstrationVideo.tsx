@@ -71,7 +71,7 @@ export function DemonstrationVideo({ currentExerciseId, nextExerciseId, courseSn
       {compact ? (
         <div className="imm-panel-head">
           <h2 id="demonstration-video-title" className="imm-chip"><i className="size-2 rounded-full bg-violet-300" aria-hidden="true" />标准示范 · 真人</h2>
-          <span className="imm-chip ml-auto min-w-0 truncate">{directive.playback === 'playing' ? <Play size={12} fill="currentColor" aria-hidden="true" /> : <Pause size={12} fill="currentColor" aria-hidden="true" />}{source?.displayName ?? '未知动作'} · 循环</span>
+          <span className="imm-chip ml-auto min-w-0 truncate">{directive.playback === 'playing' ? <Play size={12} fill="currentColor" aria-hidden="true" /> : <Pause size={12} fill="currentColor" aria-hidden="true" />}<span className="truncate">{source?.displayName ?? '未知动作'}</span><span className="text-slate-400">· 循环</span></span>
         </div>
       ) : <div className="flex h-12 min-w-0 items-center gap-2 px-2">
         <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"><Clapperboard size={18} /></span>
