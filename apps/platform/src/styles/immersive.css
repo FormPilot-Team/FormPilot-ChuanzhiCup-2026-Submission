@@ -300,5 +300,7 @@
   .imm-warmup-dock [data-testid="detailed-metrics"] { overflow: visible; }
 
   .imm-warmup[data-arrangement="stacked"] .imm-warmup-camera .imm-stage { height: max(300px, 52dvh); }
+  /* Portrait: the large count comes right under the camera, before the demonstration window. */
+  .imm-warmup[data-arrangement="stacked"] .imm-count { order: -1; }
 
 }

@@ -194,7 +194,7 @@ function CustomTrainingView({ action }: { action: CustomActionDefinition }) {
             />
           </div>
           <div className="imm-warmup-side min-w-0" data-layout-region="side">
-            <section className="imm-panel px-4 py-3.5" aria-label={hold ? '保持时间' : '完成次数'} data-testid="custom-count-card" data-goal={hold ? 'hold' : 'reps'}>
+            <section className="imm-panel imm-count px-4 py-3.5" aria-label={hold ? '保持时间' : '完成次数'} data-testid="custom-count-card" data-goal={hold ? 'hold' : 'reps'}>
               <p className="text-xs text-slate-400">{hold ? '已保持 · 按保持时间' : '已完成 · 按次数'}</p>
               <p className="mt-1 flex items-baseline gap-1.5">
                 <strong className={cn('text-6xl font-extrabold leading-none tabular-nums', reached ? 'text-[#91e6d2]' : 'text-white')} data-testid="custom-count">{runtime.count}</strong>

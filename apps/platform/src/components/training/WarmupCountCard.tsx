@@ -27,7 +27,7 @@ export function WarmupCountCard({ exerciseName, progress, target, targetType, ph
   // The phases the exercise itself names, in its own order; 完成 is shown as the card's completed state instead.
   const phases = (Object.entries(presentation.phaseLabels) as Array<[ExercisePhase, string]>).filter(([key]) => key !== 'COMPLETE')
   return (
-    <section className="imm-panel px-4 py-3.5" aria-label="计数与动作阶段" data-testid="warmup-count" data-count={progress} data-target={target} data-phase={phase} data-complete={complete ? 'true' : 'false'}>
+    <section className="imm-panel imm-count px-4 py-3.5" aria-label="计数与动作阶段" data-testid="warmup-count" data-count={progress} data-target={target} data-phase={phase} data-complete={complete ? 'true' : 'false'}>
       <div className="flex items-end justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-xs text-slate-400">{exerciseName} · {TARGET_LABEL[targetType]}{guidanceOnly ? ' · 引导动作' : ''}</p>
