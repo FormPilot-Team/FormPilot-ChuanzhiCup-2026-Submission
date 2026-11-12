@@ -1,7 +1,7 @@
-"""Build the FormPilot Web V1.0 competition package (Windows, offline, no Node needed to run it).
+"""Build the FormPilot Web V1.1 competition package (Windows, offline, no Node needed to run it).
 
 Usage (from apps/platform, after `pnpm install` here and in apps/motion-games-lab/app):
-    python -I -B scripts/competition-package/build_package.py --out <folder> [--version 1.0.0]
+    python -I -B scripts/competition-package/build_package.py --out <folder> [--version 1.1.0]
 
 Steps
 1. `vite build --mode competition` (AI Coach ACTIVE, owner-approved experimental model) straight into
@@ -52,7 +52,7 @@ def sha256(path: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--out', required=True)
-    parser.add_argument('--version', default='1.0.0')
+    parser.add_argument('--version', default='1.1.0')
     args = parser.parse_args()
 
     for media in REQUIRED_MEDIA:
