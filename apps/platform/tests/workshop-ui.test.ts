@@ -49,7 +49,7 @@ describe('workshop library page', () => {
     expect(html).toContain('动作工坊')
     expect(html).toContain('把自己的动作变成可训练的项目')
     expect(html).toContain('正式训练仍需摄像头')
-    for (const step of ['创建动作', '设置识别要求', '测试', '保存', '开始训练']) expect(html).toContain(step)
+    for (const step of ['动作信息', '示范采集', '识别测试', '保存并训练']) expect(html).toContain(step)
     expect(html).toContain('data-testid="workshop-empty"')
     expect(html).toContain('还没有自定义动作')
     expect(html).toContain('href="/workshop/new"')
@@ -89,7 +89,7 @@ describe('action editor', () => {
     expect(html).toContain('id="action-name"')
     expect(html).toContain('训练部位')
     expect(html).toContain('计数方式')
-    for (const label of ['设置识别要求', '测试', '保存']) expect(html).toContain(label)
+    for (const label of ['动作信息', '示范采集', '识别测试', '保存并训练']) expect(html).toContain(label)
   })
 
   it('opens an existing action for editing and explains a missing one', () => {

@@ -200,7 +200,7 @@ describe('Home', () => {
     const workshop = card(home(), 'home-workshop')
     expect(workshop).toContain('动作工坊')
     expect(workshop).not.toContain('即将开放')
-    for (const step of ['创建动作', '设置识别要求', '测试', '保存', '开始训练']) expect(workshop).toContain(step)
+    for (const step of ['动作信息', '示范采集', '识别测试', '保存并训练']) expect(workshop).toContain(step)
     expect(workshop.match(/href="/g)).toHaveLength(1)
     expect(workshop).toContain(`href="${WORKSHOP_PATH}"`)
     expect(workshop).toContain('进入动作工坊')

@@ -26,7 +26,7 @@ async function createAction(page: Page, name: string, target = 5, saveButton: 'e
   await page.getByLabel('目标次数').fill(String(target))
   await page.getByTestId('editor-next').click()
   await expect(page.getByTestId('editor-step')).toHaveAttribute('data-step', 'requirements')
-  await expect(page.getByRole('heading', { name: '2 · 设置识别要求' })).toBeFocused()
+  await expect(page.getByRole('heading', { name: '2 · 示范采集' })).toBeFocused()
   await page.getByLabel('怎么做（给自己看的提示）').first().fill('站直，双臂自然下垂')
   await page.getByTestId('record-start').click()
   await expect(page.getByTestId('pose-card-start')).toHaveAttribute('data-recorded', 'true', { timeout: 8_000 })
@@ -323,7 +323,7 @@ test('Workshop I: the whole editor works from the keyboard alone', async ({ page
 
   await page.getByTestId('editor-next').focus()
   await page.keyboard.press('Enter')
-  await expect(page.getByRole('heading', { name: '2 · 设置识别要求' })).toBeFocused()
+  await expect(page.getByRole('heading', { name: '2 · 示范采集' })).toBeFocused()
   await page.getByTestId('record-start').focus()
   await page.keyboard.press('Enter')
   await expect(page.getByTestId('pose-card-start')).toHaveAttribute('data-recorded', 'true', { timeout: 8_000 })
