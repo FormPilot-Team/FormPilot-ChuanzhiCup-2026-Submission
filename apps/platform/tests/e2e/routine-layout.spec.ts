@@ -1,11 +1,19 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { markOnboardingSeen } from './support/onboarding'
 
+/**
+ * Web V1.1 C2 layout contract of the immersive follow-along: the standard demonstration and the user's own camera
+ * side by side on landscape screens (one height) and stacked on portrait screens; they never overlap each other, the
+ * coaching line sits under the camera picture (never on it), the secondary data is in 详细数据, and nothing scrolls
+ * sideways. The pictures are never stretched: the video keeps its content aspect, the camera feed is object-contain.
+ */
 const VIEWPORTS = [
-  { width: 1920, height: 1080 },
   { width: 1440, height: 900 },
-  { width: 1366, height: 768 },
+  { width: 1024, height: 768 },
+  { width: 768, height: 1024 },
   { width: 390, height: 844 },
+  { width: 1920, height: 1080 },
+  { width: 1366, height: 768 },
 ] as const
 
 async function box(locator: Locator) {
@@ -14,96 +22,110 @@ async function box(locator: Locator) {
   return value!
 }
 
+function overlap(a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }): number {
+  const w = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x)
+  const h = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y)
+  return w > 0 && h > 0 ? w * h : 0
+}
+
 async function openTraining(page: Page, path: string) {
   await page.goto(path)
   await expect(page.getByTestId('routine-stage')).toHaveAttribute('data-stage-status', 'ready', { timeout: 20_000 })
-  await expect(page.getByTestId('routine-training-layout')).toHaveAttribute('data-layout', 'camera-centered')
+  await expect(page.getByTestId('routine-training-layout')).toHaveAttribute('data-layout', 'immersive')
 }
 
 test.beforeEach(async ({ page }) => {
   await markOnboardingSeen(page)
 })
 
-test('follow-along layout keeps Camera between Demonstration and Feedback at target viewports', async ({ page }) => {
-  test.setTimeout(120_000)
+test('C2: demonstration and camera never cover each other at the target viewports', async ({ page }) => {
+  test.setTimeout(180_000)
   for (const viewport of VIEWPORTS) {
     await page.setViewportSize(viewport)
     await openTraining(page, '/routines/baduanjin/train?fixture=synthetic')
+    const landscape = viewport.width > viewport.height && viewport.width >= 896
+    await expect(page.getByTestId('routine-training-layout')).toHaveAttribute('data-arrangement', landscape ? 'side-by-side' : 'stacked')
+    await expect(page.getByTestId('routine-training-shell')).toHaveAttribute('data-theme', 'immersive')
 
-    const demonstration = page.locator('[data-layout-region="demonstration"]')
-    const camera = page.locator('[data-layout-region="camera"]')
-    const feedback = page.locator('[data-layout-region="feedback"]')
-    const [demoBox, cameraBox, feedbackBox, videoBox, cameraStageBox] = await Promise.all([
-      box(demonstration), box(camera), box(feedback), box(page.getByTestId('routine-stage-video')), box(page.getByTestId('camera-stage')),
+    const [media, camera, toast, rail] = await Promise.all([
+      box(page.getByTestId('routine-stage-media')), box(page.getByTestId('camera-stage')), box(page.getByTestId('camera-guidance')), box(page.getByTestId('routine-footer')),
     ])
-
-    await expect(page.getByRole('heading', { level: 2, name: '我的画面' })).toBeVisible()
-    await expect(page.getByRole('heading', { level: 2, name: '实时反馈' })).toBeVisible()
-    await expect(page.getByTestId('routine-feedback')).toContainText('跟练相似度')
+    expect(overlap(media, camera), `${viewport.width}: demo × camera`).toBe(0)
+    // The coaching line is under the picture, never over the body.
+    expect(overlap(toast, camera), `${viewport.width}: toast × camera`).toBe(0)
+    expect(toast.y).toBeGreaterThanOrEqual(camera.y + camera.height - 1)
+    expect(overlap(rail, camera), `${viewport.width}: rail × camera`).toBe(0)
+    expect(overlap(rail, media), `${viewport.width}: rail × demo`).toBe(0)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     expect(await page.getByTestId('routine-stage-video').evaluate((video) => getComputedStyle(video).objectFit)).toBe('contain')
-    expect(videoBox.width / videoBox.height).toBeCloseTo(16 / 9, 1)
-    expect(cameraStageBox.width / cameraStageBox.height).toBeCloseTo(16 / 9, 1)
+    expect(media.width / media.height).toBeCloseTo(16 / 9, 1)
+    expect(await page.getByTestId('camera-stage').locator('[data-demo-source]').evaluate((element) => getComputedStyle(element).objectFit)).toBe('contain')
 
-    if (viewport.width >= 1320) {
-      expect(demoBox.x + demoBox.width).toBeLessThanOrEqual(cameraBox.x)
-      expect(cameraBox.x + cameraBox.width).toBeLessThanOrEqual(feedbackBox.x)
-      // 标准示范 and 我的画面 are one media stage: the same top and the same height, side by side.
-      expect(Math.abs(cameraStageBox.y - videoBox.y), `${viewport.width}: top`).toBeLessThanOrEqual(1)
-      expect(Math.abs(cameraStageBox.height - videoBox.height), `${viewport.width}: height`).toBeLessThanOrEqual(1)
-      await expect(page.getByTestId('camera-stage')).toHaveAttribute('data-stage-height', 'matched')
-      expect(cameraBox.width).toBeGreaterThanOrEqual(demoBox.width - 1)
-      expect(demoBox.width).toBeGreaterThan(450)
-      expect(cameraBox.width).toBeGreaterThan(480)
-      expect(feedbackBox.width).toBeGreaterThan(280)
-      // Equal-width media columns (one shared height): at 1366 px both pictures are about 461 × 259.
-      expect(cameraStageBox.height).toBeGreaterThan(250)
+    if (landscape) {
+      expect(media.x + media.width).toBeLessThanOrEqual(camera.x)
+      expect(Math.abs(camera.y - media.y), `${viewport.width}: top`).toBeLessThanOrEqual(1)
+      expect(Math.abs(camera.height - media.height), `${viewport.width}: height`).toBeLessThanOrEqual(1)
+      expect(camera.height).toBeGreaterThan(250)
+      // Landscape screens fit the whole training view: rail included, no vertical scroll.
+      expect(rail.y + rail.height).toBeLessThanOrEqual(viewport.height + 1)
     } else {
-      expect(demoBox.y + demoBox.height).toBeLessThanOrEqual(cameraBox.y)
-      expect(cameraBox.y + cameraBox.height).toBeLessThanOrEqual(feedbackBox.y)
-      expect(demoBox.width).toBeLessThanOrEqual(viewport.width)
-      expect(cameraBox.width).toBeLessThanOrEqual(viewport.width)
+      expect(media.y + media.height).toBeLessThanOrEqual(camera.y)
+      expect(camera.height).toBeGreaterThanOrEqual(220)
     }
 
+    // Secondary data is folded into 详细数据 and opens on demand.
+    await expect(page.getByTestId('routine-feedback')).toBeHidden()
+    await page.getByTestId('details-toggle').click()
+    await expect(page.getByTestId('routine-feedback')).toBeVisible()
+    await expect(page.getByTestId('routine-feedback')).toContainText('跟练相似度')
+    await page.screenshot({ path: `test-results/routine-layout-baduanjin-${viewport.width}x${viewport.height}-details.png` })
+    await page.getByTestId('details-close').click()
+    await expect(page.getByTestId('routine-feedback')).toBeHidden()
     await page.screenshot({ path: `test-results/routine-layout-baduanjin-${viewport.width}x${viewport.height}.png`, fullPage: true })
   }
 })
 
-test('Taijiquan keeps the established 4:3 content viewport and black-bar crop treatment', async ({ page }) => {
+test('C2: Taijiquan keeps its 4:3 content viewport and black-bar crop treatment', async ({ page }) => {
   test.setTimeout(90_000)
-  for (const viewport of VIEWPORTS.slice(0, 3)) {
+  for (const viewport of [VIEWPORTS[0], VIEWPORTS[1], VIEWPORTS[3]]) {
     await page.setViewportSize(viewport)
     await openTraining(page, '/routines/taijiquan/train?fixture=synthetic')
-    const stageBox = await box(page.getByTestId('routine-stage-video'))
-    expect(stageBox.width / stageBox.height).toBeCloseTo(4 / 3, 1)
-    // The camera box takes the 4:3 video's height without stretching either picture: its column is wider, so it
-    // stays close to the camera's own 16:9 (a sliver of neutral surface at most), and the feed is never cropped.
-    const cameraStage = await box(page.getByTestId('camera-stage'))
-    expect(Math.abs(cameraStage.y - stageBox.y), `${viewport.width}: top`).toBeLessThanOrEqual(1)
-    expect(Math.abs(cameraStage.height - stageBox.height), `${viewport.width}: height`).toBeLessThanOrEqual(1)
-    expect(cameraStage.width / cameraStage.height).toBeGreaterThan(1.7)
-    expect(cameraStage.width / cameraStage.height).toBeLessThan(1.9)
+    const media = await box(page.getByTestId('routine-stage-media'))
+    expect(media.width / media.height).toBeCloseTo(4 / 3, 1)
     expect(await page.getByTestId('routine-stage-video').evaluate((video) => getComputedStyle(video).objectFit)).toBe('cover')
+    const camera = await box(page.getByTestId('camera-stage'))
+    expect(overlap(media, camera)).toBe(0)
+    if (viewport.width > viewport.height) {
+      expect(Math.abs(camera.y - media.y), `${viewport.width}: top`).toBeLessThanOrEqual(1)
+      expect(Math.abs(camera.height - media.height), `${viewport.width}: height`).toBeLessThanOrEqual(1)
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     await page.screenshot({ path: `test-results/routine-layout-taijiquan-${viewport.width}x${viewport.height}.png`, fullPage: true })
   }
 })
 
-test('all four routine videos and a single-form route use the same non-cropping layout contract', async ({ page }) => {
+test('C2: all four routines and a single-form route use the same immersive contract', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   for (const id of ['baduanjin', 'wuqinxi', 'yijinjing']) {
     await openTraining(page, `/routines/${id}/train?fixture=synthetic`)
     expect(await page.getByTestId('routine-stage-video').evaluate((video) => getComputedStyle(video).objectFit), id).toBe('contain')
+    await expect(page.getByTestId('routine-stage')).toHaveAttribute('data-presenter', 'real')
   }
   await openTraining(page, '/routines/baduanjin/train?fixture=synthetic&form=bdj-1')
   await expect(page.getByRole('heading', { level: 1, name: /八段锦 · 第一式/ })).toBeVisible()
-  await expect(page.getByRole('heading', { level: 2, name: '我的画面' })).toBeVisible()
-  const [demoBox, cameraBox, feedbackBox] = await Promise.all([
-    box(page.locator('[data-layout-region="demonstration"]')),
-    box(page.locator('[data-layout-region="camera"]')),
-    box(page.locator('[data-layout-region="feedback"]')),
-  ])
-  expect(demoBox.x + demoBox.width).toBeLessThanOrEqual(cameraBox.x)
-  expect(cameraBox.x + cameraBox.width).toBeLessThanOrEqual(feedbackBox.x)
+  await expect(page.getByRole('heading', { level: 2, name: /我的画面/ })).toBeVisible()
+  const [demo, camera] = await Promise.all([box(page.locator('[data-layout-region="demonstration"]')), box(page.locator('[data-layout-region="camera"]'))])
+  expect(demo.x + demo.width).toBeLessThanOrEqual(camera.x)
   await page.screenshot({ path: 'test-results/routine-layout-baduanjin-single-form-1440x900.png', fullPage: true })
+})
+
+test('C5: a requested presenter without a delivered, aligned asset falls back to the real-person video', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await openTraining(page, '/routines/baduanjin/train?fixture=synthetic&presenter=digital-human')
+  const stage = page.getByTestId('routine-stage')
+  await expect(stage).toHaveAttribute('data-presenter', 'real')
+  await expect(stage).toHaveAttribute('data-presenter-requested', 'digital-human')
+  await expect(stage).toHaveAttribute('data-presenter-fallback', 'asset_missing')
+  await expect(page.getByTestId('routine-stage-video')).toHaveAttribute('src', /baduanjin/)
+  await expect(page.getByRole('heading', { level: 2, name: /标准示范 · 真人/ })).toBeVisible()
 })

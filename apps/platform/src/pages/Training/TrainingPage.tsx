@@ -1,7 +1,9 @@
 import { AICoach } from '../../components/aiCoach/AICoach'
-import { AppHeader } from '../../components/layout/AppHeader'
 import { buildWarmUpCoachContext, warmUpGuide } from '../../features/coachContext/liveCoachContexts'
-import { CameraPanel } from '../../components/camera/CameraPanel'
+import { CoachToast, ImmersiveCameraPanel } from '../../components/immersive/ImmersiveCameraPanel'
+import { ImmersiveShell, ImmersiveTopBar } from '../../components/immersive/ImmersiveShell'
+import { useMediaArrangement } from '../../components/immersive/useMediaArrangement'
+import { WarmupCountCard } from '../../components/training/WarmupCountCard'
 import { DemonstrationVideo } from '../../components/demo/DemonstrationVideo'
 import { MetricsPanel } from '../../components/metrics/MetricsPanel'
 import { AICoachFeedbackDock } from '../../components/training/AICoachFeedbackDock'
@@ -102,39 +104,44 @@ export function TrainingPage() {
     : coachDockState
   const canPause = active && poseValid && ['START', 'CENTER', 'STANDING', 'READY', 'COMPLETE'].includes(runtime.result.phase)
 
+  const capturing = runtime.cameraMode === 'live' || runtime.cameraMode === 'demo'
+  const exerciseComplete = demonstrationSnapshot.state === 'TRANSITION' || demonstrationSnapshot.state === 'COURSE_COMPLETE' || runtime.session.status === 'completed'
+  const toastTone = adaptiveDockState.severity === 'warning' ? 'warning' : adaptiveDockState.severity === 'success' ? 'success' : adaptiveDockState.severity === 'info' ? 'info' : 'neutral'
+  const arrangement = useMediaArrangement()
+
   return (
-    <div className="min-h-dvh min-w-0 overflow-x-clip bg-[#f6f9fc] text-slate-900">
-      <AppHeader immersive />
-      <main className="mx-auto min-w-0 max-w-[1600px] px-4 py-5 lg:px-7">
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-          <div className="min-w-0">
+    <ImmersiveShell
+      testId="warmup-training-shell"
+      topBar={(
+        <ImmersiveTopBar
+          exit={(
             <TrainingExitControl
+              tone="dark"
               href={SMART_TRAINING_PATH}
               label="返回热身训练"
               phase={warmUpExitPhase({ sessionStatus: runtime.session.status, courseState: demonstrationSnapshot.state, exerciseIndex: runtime.exerciseIndex })}
             />
-            <h1 className="text-balance text-2xl font-bold text-slate-950 lg:text-3xl">{freeTraining ? '自由训练' : '今日训练'} · {definition.presentation.subtitle}</h1>
-            <p className="mt-1 text-pretty text-sm text-slate-500">{freeTraining ? '单个动作' : `第 ${runtime.exerciseIndex + 1} / ${runtime.exerciseNames.length} 项`} · 实时姿态识别与动作纠正</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <AICoach context={coachContext} variant="inline" />
-            <p className="rounded-2xl bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-600" data-testid="course-state">{courseStateText(runtime, freeTraining)}</p>
-          </div>
-        </div>
-        <div className="training-grid grid min-h-[635px] min-w-0 gap-3 xl:h-[clamp(520px,calc(100dvh-300px),680px)] xl:min-h-0 xl:grid-cols-[minmax(280px,0.72fr)_minmax(460px,1.45fr)_minmax(340px,0.9fr)]" data-testid="hybrid-training-layout">
-          <DemonstrationVideo
-            currentExerciseId={definition.id}
-            nextExerciseId={runtime.nextDefinition?.id}
-            courseSnapshot={demonstrationSnapshot}
-          />
-          <CameraPanel
+          )}
+          title={`${freeTraining ? '自由训练' : '今日训练'} · ${definition.presentation.subtitle}`}
+          subtitle={freeTraining ? `单个动作 · ${definition.displayName}` : `第 ${runtime.exerciseIndex + 1} / ${runtime.exerciseNames.length} 项 · ${definition.displayName}`}
+          status={<p className="imm-status max-sm:hidden" data-testid="course-state">{courseStateText(runtime, freeTraining)}</p>}
+          actions={<AICoach context={coachContext} variant="inline" />}
+        />
+      )}
+    >
+      {/* 热身 / 单动作 (Web V1.1 C3): the user's own camera is the main picture; the demonstration is a small window
+          beside it with the count, the movement phase and the AI coach. Counting, scoring, phases and the course
+          state machine are the runtime's and unchanged. */}
+      <div className="imm-warmup" data-testid="hybrid-training-layout" data-layout="camera-primary" data-arrangement={arrangement}>
+        <div className="imm-warmup-camera min-w-0" data-layout-region="camera">
+          <ImmersiveCameraPanel
+            className="h-full"
             videoRef={runtime.videoRef}
             demoImageRef={runtime.demoImageRef}
             overlayRef={runtime.overlayRef}
             mode={runtime.cameraMode}
             failure={runtime.cameraFailure}
             errors={runtime.result.errors}
-            feedback={runtime.feedback}
             demoAsset={definition.presentation.cameraDemo}
             demoFrameSrc={runtime.demoFrameSrc}
             preparationMessage={runtime.preparationMessage}
@@ -145,52 +152,75 @@ export function TrainingPage() {
             showPoseOverlay={shouldShowPoseOverlay(overlayCourseState)}
             framingAssist={runtime.poseUnavailable ? undefined : runtime.framingAssist}
             course={runtime.courseEnabled ? demonstrationSnapshot : undefined}
+            correctionActive={Boolean(runtime.confirmedPrimaryFeedback?.side)}
+            headerExtra={capturing && runtime.feedback?.kind === 'recovery' ? <span className="imm-chip imm-chip-good" data-testid="camera-recovery">{runtime.feedback.message}</span> : null}
+            guidance={<CoachToast message={adaptiveDockState.primaryMessage} tone={toastTone} label={toastTone === 'warning' ? '需要调整' : undefined} testId="warmup-coach-toast" />}
             onStart={runtime.startCamera}
           />
-          <AICoachFeedbackDock
-            state={adaptiveDockState}
-            adaptive={<AdaptiveDecisionPanel decision={adaptive.decision} input={adaptive.input} definition={definition} onPause={runtime.togglePause} canPause={canPause} />}
-            metrics={(
-              <MetricsPanel result={runtime.result} presentation={definition.presentation} advice={runtime.feedback?.message} guidanceOnly={runtime.courseEnabled && definition.id === 'shoulder_rotation'} trackingState={runtime.session.status === 'paused' ? 'paused' : runtime.poseUnavailable ? 'adjust' : (runtime.cameraMode === 'live' || runtime.cameraMode === 'demo') && runtime.features ? 'normal' : 'preparing'} />
-            )}
-          />
         </div>
-        <div className="mt-3">
-          <TrainingFooter
-            repCount={runtime.courseProgress}
-            targetReps={runtime.courseTarget}
-            targetType={runtime.courseTargetType}
-            exerciseIndex={runtime.exerciseIndex}
-            exerciseNames={runtime.exerciseNames}
-            currentName={definition.displayName}
-            nextName={runtime.nextDefinition?.displayName}
-            sessionStatus={runtime.session.status}
-            freeTraining={freeTraining}
-            voiceEnabled={runtime.voiceEnabled}
-            voiceAvailable={runtime.voiceAvailable}
-            onPause={runtime.togglePause}
-            onToggleVoice={runtime.toggleVoice}
-            onEnd={runtime.finish}
+        <div className="imm-warmup-side min-w-0" data-layout-region="side">
+          <DemonstrationVideo
+            variant="compact"
+            currentExerciseId={definition.id}
+            nextExerciseId={runtime.nextDefinition?.id}
+            courseSnapshot={demonstrationSnapshot}
           />
-        </div>
-        {runtime.debug ? (
-          <div className="mt-3">
-            <DebugPanel
-              definition={definition}
-              features={runtime.features}
-              state={runtime.exerciseState}
-              result={runtime.result}
-              performance={runtime.performanceData}
-              onExportJson={runtime.onExportJson}
-              onExportCsv={runtime.onExportCsv}
-              showCoachReference={runtime.showCoachReference}
-              onShowCoachReferenceChange={runtime.setShowCoachReference}
-              runtimeData={runtime.debugRuntimeData}
+          <WarmupCountCard
+            exerciseName={definition.displayName}
+            progress={runtime.courseProgress}
+            target={runtime.courseTarget}
+            targetType={runtime.courseTargetType ?? 'reps'}
+            phase={runtime.result.phase}
+            presentation={definition.presentation}
+            complete={exerciseComplete}
+            guidanceOnly={runtime.courseEnabled && definition.id === 'shoulder_rotation'}
+          />
+          <div className="imm-warmup-dock min-h-0 min-w-0">
+            <AICoachFeedbackDock
+              state={adaptiveDockState}
+              adaptive={<AdaptiveDecisionPanel decision={adaptive.decision} input={adaptive.input} definition={definition} onPause={runtime.togglePause} canPause={canPause} />}
+              metrics={(
+                <MetricsPanel result={runtime.result} presentation={definition.presentation} advice={runtime.feedback?.message} guidanceOnly={runtime.courseEnabled && definition.id === 'shoulder_rotation'} trackingState={runtime.session.status === 'paused' ? 'paused' : runtime.poseUnavailable ? 'adjust' : capturing && runtime.features ? 'normal' : 'preparing'} />
+              )}
             />
           </div>
-        ) : null}
-      </main>
+        </div>
+      </div>
+      <div className="imm-rail-slot">
+        <TrainingFooter
+          repCount={runtime.courseProgress}
+          targetReps={runtime.courseTarget}
+          targetType={runtime.courseTargetType}
+          exerciseIndex={runtime.exerciseIndex}
+          exerciseNames={runtime.exerciseNames}
+          currentName={definition.displayName}
+          nextName={runtime.nextDefinition?.displayName}
+          sessionStatus={runtime.session.status}
+          freeTraining={freeTraining}
+          voiceEnabled={runtime.voiceEnabled}
+          voiceAvailable={runtime.voiceAvailable}
+          onPause={runtime.togglePause}
+          onToggleVoice={runtime.toggleVoice}
+          onEnd={runtime.finish}
+        />
+      </div>
+      {runtime.debug ? (
+        <div className="rounded-3xl bg-white p-1 text-slate-900">
+          <DebugPanel
+            definition={definition}
+            features={runtime.features}
+            state={runtime.exerciseState}
+            result={runtime.result}
+            performance={runtime.performanceData}
+            onExportJson={runtime.onExportJson}
+            onExportCsv={runtime.onExportCsv}
+            showCoachReference={runtime.showCoachReference}
+            onShowCoachReferenceChange={runtime.setShowCoachReference}
+            runtimeData={runtime.debugRuntimeData}
+          />
+        </div>
+      ) : null}
       <SessionCompleteDialog session={runtime.session} persistFailed={runtime.persistFailed} />
-    </div>
+    </ImmersiveShell>
   )
 }

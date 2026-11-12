@@ -1,23 +1,24 @@
 import type { Ref, RefObject } from 'react'
-import { CircleAlert, Clapperboard, LoaderCircle, Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react'
+import { CircleAlert, LoaderCircle, Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react'
 import type { CourseSnapshot } from '../../features/course/CourseController'
+import { DEMO_PRESENTER_LABEL, type ResolvedDemo } from '../../features/demo/demoPresenter'
 import { VIDEO_FAILURE_TEXT, videoDiagnosticsRows, type VideoDiagnosticsReport } from '../../features/diagnostics/videoDiagnostics'
 import { chapterDisplayName, formatClock } from '../../features/routines/scope'
 import type { RoutineChapter, RoutineProgram } from '../../features/routines/types'
 import { cn } from '../../lib/cn'
 import { DiagnosticsDetails } from '../diagnostics/DiagnosticsDetails'
-import { ROUTINE_ACCENT } from './routineTheme'
+import { ROUTINE_ACCENT } from '../routines/routineTheme'
 
-interface RoutineVideoStageProps {
+interface DemoStageProps {
   program: RoutineProgram
+  /** The presenter the stage shows (DemoStage config, with its fallback to the real-person video). */
+  demo: ResolvedDemo
   chapter: RoutineChapter
   stageRef: RefObject<HTMLVideoElement | null>
-  /** The video box, so the camera beside it can take the same height. */
+  /** The picture box, so the camera beside it can take the same height. */
   mediaRef?: Ref<HTMLDivElement>
   stageStatus: 'loading' | 'ready' | 'error'
-  /** Still loading well past the normal time. */
   stageSlow?: boolean
-  /** Collected after an error (or a slow load); null until then. */
   diagnostics?: VideoDiagnosticsReport
   stageTime: number
   course: CourseSnapshot
@@ -39,45 +40,64 @@ function playbackLabel(course: CourseSnapshot, manuallyPaused: boolean): string 
 }
 
 /**
- * The standard video as the main stage. It keeps the source's own proportions: a pillarboxed source (4:3 inside
- * 16:9) is shown at its picture's aspect with only the black bars cropped; nothing is stretched.
+ * DemoStage (Web V1.1, C5): the standard demonstration on the dark training shell.
+ *
+ * - The presenter (真人 / 数字人 / 卡通) comes from configuration and falls back to the real-person video when an asset is
+ *   missing or not aligned to the original timeline; the scoring reference track, chapter times, pause and seek are
+ *   the runtime's and do not change with the presenter.
+ * - The picture keeps its own proportions and is never zoomed: a pillarboxed source (4:3 inside 16:9) is shown at its
+ *   content aspect with only the black bars cut; the source watermark stays in view (licensing note in the docs).
+ * - The chapter name and cue are rendered by the page under the picture (the video's own burned-in subtitles are not
+ *   relied on), so nothing is laid over the performer.
  */
-export function RoutineVideoStage({
-  program, chapter, stageRef, mediaRef, stageStatus, stageSlow = false, diagnostics, stageTime, course, manuallyPaused, videoMuted, onToggleSound, onMetadata, onError, onReload,
-}: RoutineVideoStageProps) {
+export function DemoStage({
+  program, demo, chapter, stageRef, mediaRef, stageStatus, stageSlow = false, diagnostics, stageTime, course, manuallyPaused, videoMuted, onToggleSound, onMetadata, onError, onReload,
+}: DemoStageProps) {
   const accent = ROUTINE_ACCENT[program.accent]
-  const frameAspect = program.video.width / program.video.height
-  const cropsBars = Math.abs(frameAspect - program.video.contentAspect) > 0.01
+  const frameAspect = demo.width / demo.height
+  const cropsBars = Math.abs(frameAspect - demo.contentAspect) > 0.01
   const chapterLength = chapter.endSeconds - chapter.startSeconds
   const chapterElapsed = Math.min(chapterLength, Math.max(0, stageTime - chapter.startSeconds))
   const playing = course.state === 'ACTIVE'
   const stageProblem = stageStatus === 'error' || (stageStatus === 'loading' && stageSlow)
   return (
     <section
-      className="panel flex min-w-0 flex-col overflow-hidden p-3"
+      className="imm-panel"
       aria-labelledby="routine-stage-title"
       data-testid="routine-stage"
       data-stage-status={stageStatus}
       data-stage-playing={playing ? 'true' : 'false'}
       data-stage-chapter={chapter.id}
+      data-presenter={demo.presenter}
+      data-presenter-requested={demo.requested}
+      data-presenter-fallback={demo.fallback ?? ''}
     >
-      <div className="flex min-h-12 min-w-0 items-center gap-2 px-2 pb-2">
-        <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"><Clapperboard size={18} aria-hidden="true" /></span>
-        <div className="min-w-0">
-          <h2 id="routine-stage-title" className="truncate font-bold text-slate-900">标准示范 · {program.title}</h2>
-          <p className="truncate text-xs text-slate-500">视频含原声口令，跟着示范一起练</p>
-        </div>
-        <span className="ml-auto inline-flex shrink-0 items-center gap-1.5 text-xs font-medium text-slate-600" data-testid="routine-stage-playback">
-          {playing ? <Play size={14} fill="currentColor" aria-hidden="true" /> : <Pause size={14} fill="currentColor" aria-hidden="true" />}
-          {playbackLabel(course, manuallyPaused)}
+      <div className="imm-panel-head">
+        <h2 id="routine-stage-title" className="imm-chip"><i className="size-2 rounded-full bg-violet-300" aria-hidden="true" />标准示范 · {DEMO_PRESENTER_LABEL[demo.presenter]}</h2>
+        {stageProblem ? null : <span className={cn('imm-chip max-w-[44%] truncate', accent.chip)} data-testid="routine-stage-chapter">{chapterDisplayName(chapter)}</span>}
+        <span className="imm-chip ml-auto shrink-0 tabular-nums" data-testid="routine-stage-playback">
+          {playing ? <Play size={13} fill="currentColor" aria-hidden="true" /> : <Pause size={13} fill="currentColor" aria-hidden="true" />}
+          <span className="imm-hide-sm">{playbackLabel(course, manuallyPaused)}</span>
         </span>
+        {stageProblem ? null : (
+          <button
+            type="button"
+            onClick={onToggleSound}
+            aria-pressed={!videoMuted}
+            aria-label={videoMuted ? '开启视频原声' : '关闭视频原声'}
+            className="imm-chip imm-chip-button"
+            data-testid="routine-video-sound"
+          >
+            {videoMuted ? <VolumeX size={14} aria-hidden="true" /> : <Volume2 size={14} aria-hidden="true" />}<span className="hidden sm:inline">原声</span>
+          </button>
+        )}
       </div>
 
-      <div ref={mediaRef} className="relative w-full overflow-hidden rounded-2xl bg-slate-950" style={{ aspectRatio: String(program.video.contentAspect) }} data-testid="routine-stage-media">
+      <div ref={mediaRef} className="imm-demo-media" style={{ aspectRatio: String(demo.contentAspect) }} data-testid="routine-stage-media">
         <video
           ref={stageRef}
-          src={program.video.src}
-          poster={program.video.posterSrc}
+          src={demo.src}
+          poster={demo.posterSrc}
           className={cn('size-full', cropsBars ? 'object-cover' : 'object-contain')}
           playsInline
           preload="auto"
@@ -117,7 +137,7 @@ export function RoutineVideoStage({
           </div>
         ) : null}
 
-        {/* The big 3-2-1 is on the camera (where the user looks to check their position); the video only dims. */}
+        {/* The big 3-2-1 is on the camera (where the user checks their position); the video only dims. */}
         {stageStatus === 'ready' && course.state === 'COUNTDOWN' ? (
           <div className="absolute inset-0 grid place-items-center bg-slate-950/35" data-testid="routine-countdown">
             <p className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm">即将开始</p>
@@ -131,31 +151,22 @@ export function RoutineVideoStage({
             </p>
           </div>
         ) : null}
-
-        {/* A failed or stuck video shows its own message; the chapter chip and sound button would only cover it. */}
-        {stageProblem ? null : (
-          <span className={cn('absolute left-3 top-3 max-w-[70%] truncate rounded-lg px-2.5 py-1 text-xs font-semibold shadow-sm', accent.chip)} data-testid="routine-stage-chapter">
-            {chapterDisplayName(chapter)}
-          </span>
-        )}
-        {stageProblem ? null : <button
-          type="button"
-          onClick={onToggleSound}
-          aria-pressed={!videoMuted}
-          aria-label={videoMuted ? '开启视频原声' : '关闭视频原声'}
-          className="absolute bottom-3 right-3 grid size-10 place-items-center rounded-full bg-slate-950/60 text-white hover:bg-slate-950/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          data-testid="routine-video-sound"
-        >
-          {videoMuted ? <VolumeX size={18} aria-hidden="true" /> : <Volume2 size={18} aria-hidden="true" />}
-        </button>}
       </div>
 
-      <div className="mt-3 flex min-w-0 items-center gap-3 px-2 text-xs text-slate-500">
-        <span className="shrink-0 font-semibold text-slate-700">本段</span>
-        <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
-          <div className={cn('h-full rounded-full', accent.fill)} style={{ width: `${chapterLength > 0 ? (chapterElapsed / chapterLength) * 100 : 0}%` }} />
+      <div className="imm-guidance imm-caption" data-testid="routine-stage-caption">
+        <div className="min-w-0 flex-1">
+          <p className="flex min-w-0 items-baseline gap-2">
+            <b className="shrink-0 text-sm text-white">{chapter.kind === 'form' ? chapter.name : chapter.label}</b>
+            <span className="min-w-0 truncate text-xs text-slate-300" title={chapter.cue}>{chapter.cue}</span>
+          </p>
+          <div className="imm-hide-sm mt-1.5 flex min-w-0 items-center gap-2 text-[11px] text-slate-400">
+            <span className="shrink-0">本段</span>
+            <div className="h-1 min-w-0 flex-1 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+              <div className={cn('h-full rounded-full', accent.fill)} style={{ width: `${chapterLength > 0 ? (chapterElapsed / chapterLength) * 100 : 0}%` }} />
+            </div>
+            <span className="shrink-0 tabular-nums">{formatClock(chapterElapsed)} / {formatClock(chapterLength)}</span>
+          </div>
         </div>
-        <span className="shrink-0 tabular-nums">{formatClock(chapterElapsed)} / {formatClock(chapterLength)}</span>
       </div>
     </section>
   )

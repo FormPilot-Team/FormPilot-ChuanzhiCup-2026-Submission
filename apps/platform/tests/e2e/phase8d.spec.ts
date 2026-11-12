@@ -58,7 +58,10 @@ for (const viewport of [
     await expect(page.getByTestId('primary-feedback')).toHaveAttribute('data-feedback-state', 'correcting', { timeout: 10_000 })
     await expectNoOverlap(page)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-    await expect(page.getByTestId('primary-feedback')).toBeInViewport()
+    // Web V1.1 C3: the live correction is the coaching line under the camera; the dock keeps the same state.
+    await expect(page.getByTestId('warmup-coach-toast')).toBeInViewport()
+    await expect(page.getByTestId('warmup-coach-toast')).toContainText(await page.getByTestId('coach-primary-message').innerText())
+    await expect(page.getByTestId('warmup-count')).toBeInViewport()
     await expect(page.getByRole('button', { name: '暂停训练' })).toBeInViewport()
     await expect(page.getByRole('button', { name: '结束训练' })).toBeInViewport()
   })

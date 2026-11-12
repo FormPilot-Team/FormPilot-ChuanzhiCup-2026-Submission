@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { CourseSnapshot } from '../../features/course/CourseController'
 import { COUNTDOWN_GO_MS, countdownCue } from '../../features/course/countdownCue'
 
@@ -8,7 +8,7 @@ import { COUNTDOWN_GO_MS, countdownCue } from '../../features/course/countdownCu
  * (三、二、一、开始, when a system voice exists) comes from the course's voice policy and is not needed here. Purely
  * visual: pointer-events none, so it never blocks a button. Each step scales in lightly; reduced motion shows it still.
  */
-export function CameraCountdown({ course }: { course?: Pick<CourseSnapshot, 'state' | 'countdown'> }) {
+export function CameraCountdown({ course, variant = 'overlay', fallback = null }: { course?: Pick<CourseSnapshot, 'state' | 'countdown'>; variant?: 'overlay' | 'band'; fallback?: ReactNode }) {
   const state = course?.state
   const previousState = useRef(state)
   const [justStarted, setJustStarted] = useState(false)
@@ -26,8 +26,18 @@ export function CameraCountdown({ course }: { course?: Pick<CourseSnapshot, 'sta
   }, [state])
 
   const cue = countdownCue(course, justStarted)
-  if (!cue) return null
+  if (!cue) return <>{fallback}</>
   const go = cue === '开始'
+  // Immersive training: the countdown sits in the band under the picture, so it never covers the body.
+  if (variant === 'band') {
+    return (
+      <div className="imm-toast" data-tone={go ? 'success' : 'info'} data-testid="camera-countdown" data-countdown={cue}>
+        <span className="imm-toast-bar" aria-hidden="true" />
+        <span key={cue} role="status" aria-live="assertive" aria-label={go ? '开始训练' : `倒计时 ${cue}`} className={go ? 'fp-countdown-step text-2xl font-extrabold text-emerald-200' : 'fp-countdown-step text-3xl font-extrabold tabular-nums text-white'}>{cue}</span>
+        <p className="min-w-0 flex-1 text-pretty text-sm font-semibold text-slate-200">{go ? '开始，跟着示范一起动起来' : '准备开始，保持站位'}</p>
+      </div>
+    )
+  }
   return (
     <div className="pointer-events-none absolute inset-0 z-20 grid place-items-center bg-slate-950/15" data-testid="camera-countdown" data-countdown={cue}>
       <span

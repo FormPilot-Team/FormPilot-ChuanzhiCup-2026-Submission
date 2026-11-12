@@ -46,6 +46,9 @@ button:focus-visible { outline: 3px solid rgb(147 197 253 / 0.7); outline-offset
   /* blue-600 保证白字对比度高于 4.5:1 */
   .primary-button { @apply rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_18px_-10px_rgb(37_99_235/0.8)] hover:bg-blue-700; }
   .secondary-button { @apply rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50; }
+  /* Web V1.1 visual spec: lime is reserved for the one primary action of a page (dark ink text). */
+  .fp-cta { @apply inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#d9f54a] px-5 py-2.5 text-sm font-bold text-[#162033] shadow-[0_9px_20px_-8px_rgb(150_180_20/0.55)] hover:bg-[#e3f86f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2; }
+  .fp-cta-dark { @apply inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#192233] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#243049] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2; }
   .danger-button { @apply rounded-xl bg-coral-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-coral-600; }
   .correction-badge { @apply absolute left-1/2 top-[16%] flex -translate-x-1/2 items-center gap-2 rounded-xl border border-coral-500 bg-white px-4 py-2.5 text-lg font-bold text-coral-600 shadow-lg sm:text-xl; }
   .correction-badge.success { @apply border-emerald-400 text-emerald-600; }

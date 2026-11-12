@@ -384,6 +384,8 @@ export function useRoutineRuntime(program: RoutineProgram, scope: RoutineScope) 
     const state = courseRef.current.getSnapshot().state
     if (shouldShowPoseOverlay(state)) overlayRef.current?.draw(filtered, [], options)
     else overlayRef.current?.clear()
+    // Web V1.1: every processed frame also reaches the immersive stage (body-aware framing, correction highlight).
+    overlayRef.current?.observe?.(filtered, options)
 
     const stage = stageRef.current
     const matcher = matcherRef.current

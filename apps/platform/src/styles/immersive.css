@@ -1,0 +1,304 @@
+/*
+ * Web V1.1 immersive training shell (C2 功法跟练, C3 热身/单动作, custom-action training).
+ * Visual spec: training pages are dark and immersive (no first-level navigation); browse, create and report pages stay
+ * light; lime (#d9f54a) is used only for the primary action. Tokens follow the approved concepts (concept.css): night
+ * #192233, ink #162033, blue #79b8ff, violet #a78bfa, coral #ff8f86, mint #91e6d2, lime #d9f54a.
+ */
+@layer theme, base, components, utilities;
+@layer components {
+  .imm-shell {
+    --imm-lime: #d9f54a;
+    --imm-mint: #91e6d2;
+    --imm-coral: #ff8f86;
+    --imm-blue: #79b8ff;
+    --imm-violet: #a78bfa;
+    --imm-glass: rgb(255 255 255 / 0.06);
+    --imm-line: rgb(255 255 255 / 0.11);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    color: #eef3fb;
+    background: radial-gradient(circle at 50% -10%, #2a3a55 0%, #18212f 45%, #0f1520 100%) fixed, #0f1520;
+    color-scheme: dark;
+    overflow-x: clip;
+  }
+  .imm-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 60px;
+    padding: 10px 16px;
+    min-width: 0;
+  }
+  @media (min-width: 1024px) { .imm-topbar { padding: 10px 28px; gap: 18px; } }
+  .imm-main {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 12px 12px;
+  }
+  @media (min-width: 1024px) { .imm-main { padding: 0 28px 20px; gap: 14px; } }
+
+  .imm-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.07);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    font-size: 13px;
+    font-weight: 600;
+    color: #d7e2f2;
+    white-space: nowrap;
+  }
+  .imm-ghost:hover { background: rgb(255 255 255 / 0.12); }
+  .imm-ghost:disabled { opacity: .45; cursor: not-allowed; }
+  .imm-ghost[aria-pressed="true"], .imm-ghost[aria-expanded="true"] { background: rgb(121 184 255 / 0.18); border-color: rgb(121 184 255 / 0.45); color: #fff; }
+
+  .imm-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgb(13 20 32 / 0.62);
+    color: #e8f0fb;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    white-space: nowrap;
+  }
+
+  /* Picture panels: a header strip, the picture, a guidance band. Chips and messages never sit on the picture. */
+  .imm-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    border-radius: 24px;
+    padding: 8px;
+    background: var(--imm-glass);
+    border: 1px solid var(--imm-line);
+  }
+  .imm-panel-head {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    /* One fixed height on every picture panel, so the demonstration and the camera pictures start on one line. */
+    height: 42px;
+    flex-shrink: 0;
+    padding: 0 2px 8px;
+  }
+  .imm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.25;
+    background: rgb(13 20 32 / 0.62);
+    color: #e8f0fb;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    white-space: nowrap;
+    height: 28px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .imm-chip-button { cursor: pointer; }
+  .imm-chip-button:hover { background: rgb(255 255 255 / 0.1); }
+  .imm-chip-button[aria-pressed="false"] { color: #b9c6d8; }
+  .imm-chip-good { background: rgb(145 230 210 / 0.16); border-color: rgb(145 230 210 / 0.45); color: #cdf7ec; }
+  .imm-chip-warn { background: rgb(255 202 115 / 0.16); border-color: rgb(255 202 115 / 0.5); color: #ffe2b0; }
+
+  .imm-stage {
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+    border-radius: 18px;
+    background: radial-gradient(ellipse at 50% 30%, #2f3b4f 0%, #1c2534 55%, #121925 100%);
+  }
+  .imm-layer {
+    position: absolute;
+    inset: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+  .imm-demo-media {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 18px;
+    background: #0b111b;
+  }
+  .imm-blocking {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    overflow-y: auto;
+    padding: 20px;
+    text-align: center;
+    background: rgb(18 25 37 / 0.92);
+  }
+  .imm-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border-radius: 14px;
+    background: var(--imm-lime, #d9f54a);
+    color: #162033;
+    font-weight: 800;
+    font-size: 14px;
+    box-shadow: 0 10px 26px rgb(217 245 74 / 0.22);
+  }
+  .imm-primary:hover { filter: brightness(1.04); }
+
+  .imm-guidance {
+    display: flex;
+    align-items: stretch;
+    min-height: 56px;
+    padding-top: 8px;
+    min-width: 0;
+  }
+  .imm-caption {
+    align-items: center;
+    padding: 8px 6px 0;
+  }
+  .imm-toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    padding: 10px 14px;
+    border-radius: 16px;
+    background: rgb(19 26 40 / 0.78);
+    border: 1px solid rgb(255 255 255 / 0.12);
+    color: #fff;
+    font-size: 15px;
+  }
+  .imm-toast-bar { width: 4px; align-self: stretch; border-radius: 4px; background: var(--imm-blue, #79b8ff); flex-shrink: 0; }
+  .imm-toast[data-tone="warning"] { border-color: rgb(255 143 134 / 0.55); }
+  .imm-toast[data-tone="warning"] .imm-toast-bar { background: var(--imm-coral, #ff8f86); }
+  .imm-toast[data-tone="success"] { border-color: rgb(145 230 210 / 0.5); }
+  .imm-toast[data-tone="success"] .imm-toast-bar { background: var(--imm-mint, #91e6d2); }
+  .imm-toast[data-tone="neutral"] .imm-toast-bar { background: rgb(255 255 255 / 0.35); }
+
+  .imm-rail {
+    display: grid;
+    gap: 14px;
+    align-items: center;
+    min-width: 0;
+    padding: 14px 16px;
+    border-radius: 22px;
+    background: var(--imm-glass);
+    border: 1px solid var(--imm-line);
+  }
+  @media (min-width: 1024px) {
+    .imm-rail { grid-template-columns: minmax(0, 240px) minmax(0, 1fr) auto; gap: 24px; padding: 14px 22px; }
+  }
+  .imm-round {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.08);
+    border: 1px solid rgb(255 255 255 / 0.13);
+    color: #e8f0fb;
+  }
+  .imm-round:hover { background: rgb(255 255 255 / 0.14); }
+  .imm-round:disabled { opacity: .45; cursor: not-allowed; }
+  .imm-round-main { width: 60px; height: 60px; border: 0; background: var(--imm-lime, #d9f54a); color: #162033; box-shadow: 0 10px 26px rgb(217 245 74 / 0.22); }
+  .imm-round-main:hover { background: #e3f86f; }
+
+  /* The details drawer is a light sheet over the dark shell (secondary data reads best on the light card styles). */
+  .imm-drawer {
+    position: fixed;
+    z-index: 35;
+    right: 12px;
+    top: 68px;
+    bottom: 12px;
+    width: min(400px, calc(100vw - 24px));
+    overflow-y: auto;
+    padding: 14px;
+    border-radius: 22px;
+    background: rgb(246 249 252 / 0.97);
+    color: #162033;
+    color-scheme: light;
+    box-shadow: 0 24px 70px rgb(0 0 0 / 0.45);
+  }
+  .imm-drawer[hidden] { display: none; }
+  @media (max-width: 640px) {
+    .imm-drawer { left: 8px; right: 8px; top: auto; width: auto; max-height: 72dvh; bottom: 8px; }
+  }
+
+  /* Landscape: the pictures and the rail form one centred group; portrait: the camera grows and the rail sits last. */
+  .imm-main:has(> .imm-media[data-arrangement="side-by-side"]) { justify-content: center; }
+  .imm-rail-slot { min-width: 0; }
+  .imm-main:has(> .imm-media[data-arrangement="stacked"]) > .imm-rail-slot { margin-top: auto; }
+
+  /* Follow-along media: side by side in landscape, stacked on portrait screens. */
+  .imm-media { display: grid; gap: 12px; min-width: 0; }
+  .imm-media[data-arrangement="side-by-side"] { grid-template-columns: var(--imm-cols, minmax(0, 1fr) minmax(0, 1fr)); align-items: start; }
+  .imm-media[data-arrangement="stacked"] { grid-template-columns: minmax(0, 1fr); flex: 1; grid-template-rows: auto minmax(0, 1fr); }
+  .imm-media[data-arrangement="stacked"] .imm-demo-media { width: min(100%, calc(30dvh * var(--imm-demo-aspect, 1.778))); margin-inline: auto; }
+  .imm-media[data-arrangement="stacked"] > [data-layout-region="camera"] { display: flex; flex-direction: column; min-height: 0; }
+  .imm-media[data-arrangement="stacked"] > [data-layout-region="camera"] > .imm-panel { flex: 1; }
+  .imm-media[data-arrangement="stacked"] > [data-layout-region="camera"] .imm-stage { flex: 1; min-height: 260px; }
+
+  /* Tablets and phones: the rail is the chapter bar on top, then the next chapter and the controls on one row. */
+  @media (max-width: 1023px) {
+    .imm-rail { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "ribbon ribbon" "info controls"; gap: 10px 12px; padding: 12px 14px; }
+    .imm-rail > :nth-child(1) { grid-area: info; }
+    .imm-rail > :nth-child(2) { grid-area: ribbon; }
+    .imm-rail > :nth-child(3) { grid-area: controls; }
+  }
+  @media (max-width: 1279px) { .imm-hide-md { display: none !important; } }
+  @media (max-width: 639px) {
+    .imm-hide-sm { display: none !important; }
+    .imm-topbar { gap: 8px; padding: 8px 10px; min-height: 52px; }
+    .imm-topbar [data-testid="ai-coach-trigger"] > span { display: none; }
+    .imm-main { gap: 8px; padding: 0 8px 8px; }
+    .imm-media { gap: 8px; }
+    .imm-panel { padding: 6px; border-radius: 18px; }
+    .imm-panel-head { height: 36px; padding-bottom: 6px; }
+    .imm-guidance { min-height: 48px; padding-top: 6px; }
+    .imm-toast { padding: 8px 12px; font-size: 14px; }
+    .imm-round { width: 42px; height: 42px; }
+    .imm-round-main { width: 50px; height: 50px; }
+    .imm-media[data-arrangement="stacked"] > [data-layout-region="camera"] .imm-stage { min-height: 220px; }
+  }
+
+  /* 热身 / 单动作 (C3): the camera is the main picture, a 400 px side column holds the demonstration window, the count
+     and the AI coach. Portrait screens stack them and the page scrolls. */
+  .imm-warmup { display: grid; gap: 12px; min-width: 0; }
+  .imm-warmup-side { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .imm-warmup-side > * { flex-shrink: 0; }
+  .imm-warmup-dock > [data-testid="ai-coach-feedback-dock"] { min-height: 0; height: 100%; }
+  .imm-warmup-camera .imm-stage { min-height: 300px; }
+  .imm-warmup[data-arrangement="side-by-side"] {
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 400px);
+    height: clamp(520px, calc(100dvh - 60px - 128px), 900px);
+  }
+  .imm-warmup[data-arrangement="side-by-side"] .imm-warmup-camera > .imm-panel { height: 100%; }
+  .imm-warmup[data-arrangement="side-by-side"] .imm-warmup-camera .imm-stage { flex: 1; }
+  /* The side column scrolls as one: the coach line and the decision stay at the top, detailed metrics below. */
+  .imm-warmup[data-arrangement="side-by-side"] .imm-warmup-side { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / 0.2) transparent; padding-right: 2px; }
+  .imm-warmup-dock { border-radius: 18px; flex-shrink: 0; }
+  .imm-warmup-dock [data-testid="ai-coach-dock"] { border-radius: 18px; }
+  .imm-warmup-dock [data-testid="detailed-metrics"] { overflow: visible; }
+
+  .imm-warmup[data-arrangement="stacked"] .imm-warmup-camera .imm-stage { height: max(300px, 52dvh); }
+
+}

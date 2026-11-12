@@ -1,6 +1,5 @@
 import { Camera, LoaderCircle, ScanLine } from 'lucide-react'
 import type { ReactNode, RefObject } from 'react'
-import type { CameraFailureKind } from '../../adapters/camera/BrowserCameraAdapter'
 import type { CameraFailureReport } from '../../features/camera/cameraDiagnostics'
 import type { CourseSnapshot } from '../../features/course/CourseController'
 import { isDesktopApp } from '../../features/diagnostics/desktopBridge'
@@ -12,6 +11,7 @@ import type { PoseOverlayHandle } from '../pose/PoseOverlay'
 import { PoseOverlay } from '../pose/PoseOverlay'
 import { CameraCountdown } from './CameraCountdown'
 import { CameraFailureNotice } from './CameraFailureNotice'
+import { FAILURE_STATUS } from './cameraStatus'
 
 interface CameraPanelProps {
   videoRef: RefObject<HTMLVideoElement | null>
@@ -47,17 +47,6 @@ interface CameraPanelProps {
   onStart: () => void
 }
 
-/** The short header status for each failure, instead of one "连接异常" for everything. */
-const FAILURE_STATUS: Readonly<Record<CameraFailureKind, string>> = {
-  permission_denied: '摄像头权限未开启',
-  not_found: '未检测到摄像头',
-  in_use: '摄像头无法读取',
-  constraint_failed: '摄像头参数不兼容',
-  security: '摄像头被阻止',
-  unsupported: '不支持摄像头',
-  unknown_error: '摄像头无法启动',
-  model_error: '识别模型加载失败',
-}
 
 export function CameraPanel({ videoRef, demoImageRef, overlayRef, mode, failure, errors, feedback, demoAsset, demoFrameSrc, preparationMessage, gesturePrompt, gestureProgress = 0, gestureHolding = false, outOfFrameMessage, showPoseOverlay = true, framingAssist, variant = 'default', stageHeight, course, title: panelTitle = '实时动作检测', footer, onStart }: CameraPanelProps) {
   const compact = variant === 'compact'

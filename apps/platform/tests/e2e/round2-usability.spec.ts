@@ -79,10 +79,11 @@ test('Round2 D: follow-along media share one height and the camera has no safe-z
   await page.setViewportSize(VIEWPORTS[3])
   await page.goto('/routines/baduanjin/train?fixture=synthetic&gesture=manual')
   await expect(page.getByTestId('routine-stage')).toHaveAttribute('data-stage-status', 'ready', { timeout: 20_000 })
-  // Stacked on a phone: the camera keeps its own 16:9 box.
-  await expect(page.getByTestId('camera-stage')).toHaveAttribute('data-stage-height', 'own')
-  const stage = await box(page.getByTestId('camera-stage'))
-  expect(stage.width / stage.height).toBeCloseTo(16 / 9, 1)
+  // Web V1.1 C2: stacked on a phone, the camera takes the remaining screen height (body-aware framing, never cropped).
+  await expect(page.getByTestId('routine-training-layout')).toHaveAttribute('data-arrangement', 'stacked')
+  const [demoBox, stage] = [await box(page.getByTestId('routine-stage-media')), await box(page.getByTestId('camera-stage'))]
+  expect(demoBox.y + demoBox.height).toBeLessThanOrEqual(stage.y)
+  expect(stage.height).toBeGreaterThanOrEqual(220)
 })
 
 test('Round2 E: warm-up camera shows no safe-zone frame and the feed is never cropped', async ({ page }) => {
@@ -105,12 +106,13 @@ async function countdownSteps(page: Page): Promise<string[]> {
     const value = await countdown.getAttribute('data-countdown', { timeout: 100 }).catch(() => null)
     if (value && seen.at(-1) !== value) {
       seen.push(value)
-      // Big, in the middle of the camera picture, and never in the way of a click.
-      const [cue, stage] = [await box(countdown.getByRole('status')), await box(page.getByTestId('camera-stage'))]
-      expect(cue.height).toBeGreaterThanOrEqual(100)
-      expect(Math.abs(cue.x + cue.width / 2 - (stage.x + stage.width / 2))).toBeLessThanOrEqual(4)
-      expect(Math.abs(cue.y + cue.height / 2 - (stage.y + stage.height / 2))).toBeLessThanOrEqual(4)
-      expect(await countdown.evaluate((element) => getComputedStyle(element).pointerEvents)).toBe('none')
+      // Web V1.1 C2/C3: large, right under the camera picture, never over the body.
+      const [cue, stage] = [await box(countdown), await box(page.getByTestId('camera-stage'))]
+      expect(cue.y).toBeGreaterThanOrEqual(stage.y + stage.height - 1)
+      expect(cue.x).toBeGreaterThanOrEqual(stage.x - 12)
+      expect(cue.x + cue.width).toBeLessThanOrEqual(stage.x + stage.width + 12)
+      const digit = await box(countdown.getByRole('status'))
+      expect(digit.height).toBeGreaterThanOrEqual(24)
     }
     await page.waitForTimeout(60)
   }
