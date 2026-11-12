@@ -108,6 +108,10 @@ export function ReportHero({ analysis, session }: { analysis: TrainingAnalysis; 
         { icon: Activity, label: '有效动作', value: `${validReps} 次` },
       ]}
       takeaways={smartTakeaways(analysis)}
+      nextActions={[
+        { label: '再次训练', href: trainingEntryPath(scope), primary: true, testId: 'report-next-again' },
+        { label: '查看训练记录', href: HISTORY_PATH, testId: 'report-next-history' },
+      ]}
     />
   )
 }

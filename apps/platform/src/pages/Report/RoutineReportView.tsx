@@ -1,5 +1,5 @@
 import { Activity, CalendarDays, ChevronDown, Clock3, History, Info, Layers, Play, Target } from 'lucide-react'
-import { HISTORY_PATH, reportPath, routineTrainingPath } from '../../app/routes'
+import { HISTORY_PATH, reportPath, routinePath, routineTrainingPath } from '../../app/routes'
 import { ROUTINE_ACCENT } from '../../components/routines/routineTheme'
 import type { FollowAlongRegion } from '../../features/routines/followAlong/matcher'
 import {
@@ -9,7 +9,7 @@ import { chapterDisplayName, formatClock, scopeTitle } from '../../features/rout
 import { cn } from '../../lib/cn'
 import { formatDate, formatDuration, formatShortDate, scoreTone } from './reportPresentation'
 import { RoutineAnalyzerSection } from './RoutineAnalyzerSection'
-import { FocusCard, FocusPanel, MiniBar, ReportActions, ReportLayout, ReportSummary, SectionHeading, type ReportTakeaway } from './reportShell'
+import { FocusCard, FocusPanel, MiniBar, ReportActions, ReportFold, ReportLayout, ReportSummary, SectionHeading, type ReportNextAction, type ReportTakeaway } from './reportShell'
 import { RoutineTechniqueSection } from './scoreExplanation'
 
 const REGIONS: ReadonlyArray<FollowAlongRegion> = ['arms', 'torso', 'legs']
@@ -92,7 +92,101 @@ export function RoutineReportHero({ report }: { report: RoutineReport }) {
         { icon: Layers, label: '章节', value: chapterCount > 1 ? `${chapterCount} 段` : '单独一段' },
       ]}
       takeaways={routineTakeaways(report)}
+      problem={routineProblem(report)}
+      nextActions={routineNextActions(report)}
     />
+  )
+}
+
+/** 主要问题: the weakest chapter (when the report names one below 高度一致) with its own cue; otherwise the takeaway. */
+function routineProblem(report: RoutineReport) {
+  const weakest = report.weakestChapter
+  if (!weakest || weakest.similarity === null || weakest.band === 'high') return undefined
+  const below = report.similarity !== null ? report.similarity - weakest.similarity : null
+  return (
+    <div className="mt-3 min-w-0" data-testid="routine-report-problem" data-chapter-id={weakest.chapter.id}>
+      <p className="text-balance text-xl font-bold text-slate-950">{chapterDisplayName(weakest.chapter)}</p>
+      <p className="mt-2"><span className="inline-flex rounded-lg bg-coral-50 px-2.5 py-1 text-xs font-bold tabular-nums text-coral-600 ring-1 ring-coral-500/25">相似度 {weakest.similarity}%{below !== null && below > 0 ? ` · 比本次平均低 ${below} 个百分点` : ''}</span></p>
+      <p className="mt-3 text-pretty text-sm leading-6 text-slate-600">要领：{weakest.chapter.cue}</p>
+      {weakest.tempo ? <p className="mt-1 text-xs text-slate-500">节奏：{weakest.tempo === 'behind' ? '这一段常慢于视频' : '这一段常快于视频'}</p> : null}
+    </div>
+  )
+}
+
+function routineNextActions(report: RoutineReport): ReportNextAction[] {
+  const scope = report.record.scope
+  const focusChapter = report.focusItems.find((item) => item.chapterId)?.chapterId ?? null
+  const chapter = focusChapter ? report.program.chapters.find((item) => item.id === focusChapter) : undefined
+  const again = { label: scope.kind === 'full' ? '整套再练一次' : '再练这一段', href: routineTrainingPath(report.program.id, scope.kind === 'form' ? scope.chapterId : undefined), testId: 'routine-next-again' }
+  const detail = { label: '看示范与动作要领', href: routinePath(report.program.id), testId: 'routine-next-detail' }
+  if (chapter && !(scope.kind === 'form' && scope.chapterId === chapter.id)) {
+    return [{ label: `单练${chapter.label}`, href: routineTrainingPath(report.program.id, chapter.id), primary: true, testId: 'routine-next-form' }, again, detail]
+  }
+  return [{ ...again, primary: true }, detail]
+}
+
+const STRIP_FILL: Readonly<Record<SimilarityBand, string>> = {
+  high: 'bg-emerald-300/80 text-emerald-950',
+  fair: 'bg-amber-300/90 text-amber-950',
+  low: 'bg-coral-500/80 text-white',
+}
+
+/** 分段表现 at a glance: one bar per chapter, width = chapter length, colour = the chapter's own similarity band. */
+function SegmentsSection({ report }: { report: RoutineReport }) {
+  if (report.chapters.length < 2) return null
+  const weak = report.chapters
+    .filter((item) => item.similarity !== null && item.band !== 'high')
+    .sort((left, right) => (left.similarity as number) - (right.similarity as number))
+  const highCount = report.chapters.filter((item) => item.band === 'high').length
+  const flex = (item: RoutineChapterReport) => `${Math.max(1, item.chapter.endSeconds - item.chapter.startSeconds)} 1 0%`
+  return (
+    <section className="report-panel p-5 sm:p-6" aria-labelledby="routine-segments-title" data-testid="routine-report-segments">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div className="flex flex-wrap items-baseline gap-x-3">
+          <h2 id="routine-segments-title" className="text-lg font-bold text-slate-950">分段表现</h2>
+          <span className="text-xs text-slate-500">宽度 = 段落时长 · 颜色 = 跟练相似度</span>
+        </div>
+        <div className="flex flex-wrap gap-3 text-xs text-slate-600" aria-label="颜色说明">
+          <span className="inline-flex items-center gap-1.5"><i className="size-2.5 rounded-full bg-emerald-300" aria-hidden="true" />≥ 80% {SIMILARITY_BAND_LABEL.high}</span>
+          <span className="inline-flex items-center gap-1.5"><i className="size-2.5 rounded-full bg-amber-300" aria-hidden="true" />60–79% {SIMILARITY_BAND_LABEL.fair}</span>
+          <span className="inline-flex items-center gap-1.5"><i className="size-2.5 rounded-full bg-coral-500" aria-hidden="true" />&lt; 60% {SIMILARITY_BAND_LABEL.low}</span>
+          <span className="inline-flex items-center gap-1.5"><i className="size-2.5 rounded-full bg-slate-200" aria-hidden="true" />数据不足</span>
+        </div>
+      </div>
+      <div className="mt-4 flex h-11 gap-1" role="img" aria-label={report.chapters.map((item) => `${chapterDisplayName(item.chapter)} ${item.similarity === null ? '数据不足' : `${item.similarity}%`}`).join('，')}>
+        {report.chapters.map((item) => (
+          <div
+            key={item.chapter.id}
+            className={cn('grid min-w-0 place-items-center overflow-hidden rounded-lg text-xs font-bold tabular-nums', item.band ? STRIP_FILL[item.band] : 'bg-slate-200/80 text-slate-500')}
+            style={{ flex: flex(item) }}
+            title={chapterDisplayName(item.chapter)}
+            data-segment-id={item.chapter.id}
+            data-segment-band={item.band ?? 'none'}
+          >
+            {item.similarity ?? '—'}
+          </div>
+        ))}
+      </div>
+      <div className="mt-1.5 hidden gap-1 text-[11px] text-slate-500 sm:flex" aria-hidden="true">
+        {report.chapters.map((item) => (
+          <span key={item.chapter.id} className={cn('min-w-0 truncate', report.weakestChapter?.chapter.id === item.chapter.id && 'font-bold text-coral-600')} style={{ flex: flex(item) }}>
+            {item.chapter.kind === 'form' ? `${item.chapter.formNumber} ${item.chapter.name.slice(0, 4)}` : item.chapter.label}
+          </span>
+        ))}
+      </div>
+      {weak.length ? (
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {weak.slice(0, 2).map((item) => (
+            <div key={item.chapter.id} className="flex min-w-0 items-center gap-3 rounded-2xl bg-white/70 px-4 py-3 ring-1 ring-slate-200/70" data-testid="routine-report-weak-segment">
+              <span className={cn('rounded-lg px-2 py-0.5 text-xs font-bold tabular-nums', BAND_TONE[item.band as SimilarityBand])}>{item.similarity}%</span>
+              <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold text-slate-900">{chapterDisplayName(item.chapter)}</p>{item.syncShare !== null ? <p className="text-xs tabular-nums text-slate-500">节奏同步 {item.syncShare}%</p> : null}</div>
+              {item.chapter.kind === 'form' ? <a href={routineTrainingPath(report.program.id, item.chapter.id)} className="secondary-button shrink-0 px-3 py-1.5 text-xs">单练</a> : null}
+            </div>
+          ))}
+          {highCount ? <div className="grid place-items-center rounded-2xl px-4 py-3 text-center text-sm text-slate-600">其余 {highCount} 段{SIMILARITY_BAND_LABEL.high}（≥ 80%）</div> : null}
+        </div>
+      ) : null}
+    </section>
   )
 }
 
@@ -122,10 +216,12 @@ function RoutineFocusSection({ report }: { report: RoutineReport }) {
 }
 
 function OverviewSection({ report }: { report: RoutineReport }) {
+  const regionSummary = REGIONS.map((region) => `${REGION_LABEL[region]} ${report.regions[region] ?? '—'}`).join(' · ')
   return (
-    <section className="report-panel p-5 sm:p-6" aria-labelledby="routine-overview-title" data-testid="routine-report-overview">
-      <SectionHeading id="routine-overview-title" icon={Activity} title="核心表现" description="跟练相似度：你与标准视频在同一时刻的身体姿态与节奏的视觉接近程度，不等于动作规范评价；数值只来自识别可靠的时刻。" />
-      <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <section className="min-w-0" aria-labelledby="routine-overview-title" data-testid="routine-report-overview">
+      <ReportFold id="routine-overview-title" title="分区表现" summary={<span className="tabular-nums">{regionSummary} · 节奏同步 {report.syncShare === null ? '—' : `${report.syncShare}%`}</span>}>
+      <p className="flex items-start gap-2 px-1 text-pretty text-sm leading-6 text-slate-500"><Activity size={16} className="mt-1 shrink-0 text-blue-600" aria-hidden="true" />跟练相似度：你与标准视频在同一时刻的身体姿态与节奏的视觉接近程度，不等于动作规范评价；数值只来自识别可靠的时刻。</p>
+      <dl className="mt-3 grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl bg-slate-50 p-3.5">
           <dt className="text-xs text-slate-500">跟练相似度</dt>
           <dd className="mt-1 text-2xl font-bold tabular-nums text-slate-950">{report.similarity === null ? '—' : `${report.similarity}%`}</dd>
@@ -148,6 +244,7 @@ function OverviewSection({ report }: { report: RoutineReport }) {
           )
         })}
       </dl>
+      </ReportFold>
     </section>
   )
 }
@@ -190,7 +287,7 @@ function ChapterRow({ item, report }: { item: RoutineChapterReport; report: Rout
 function ChaptersSection({ report }: { report: RoutineReport }) {
   return (
     <section className="report-panel p-5 sm:p-6" aria-labelledby="routine-chapters-title" data-testid="routine-report-chapters">
-      <SectionHeading id="routine-chapters-title" icon={Target} title="分段表现" description="按标准视频的段落列出完成度、跟练相似度与节奏；需要时可以单独练习某一段。" />
+      <SectionHeading id="routine-chapters-title" icon={Target} title="分段明细" description="按标准视频的段落列出完成度、跟练相似度与节奏；需要时可以单独练习某一段。" />
       <ol className="mt-4 divide-y divide-slate-100">
         {report.chapters.map((item) => <ChapterRow key={item.chapter.id} item={item} report={report} />)}
       </ol>
@@ -238,13 +335,19 @@ export function RoutineReportView({ report }: { report: RoutineReport }) {
   return (
     <ReportLayout dataRoutine={report.program.id}>
       <RoutineReportHero report={report} />
+      <SegmentsSection report={report} />
       <RoutineFocusSection report={report} />
-      <OverviewSection report={report} />
-      <RoutineTechniqueSection report={report} />
-      <RoutineAnalyzerSection report={report} />
       <ChaptersSection report={report} />
+      <RoutineAnalyzerSection report={report} />
       <ProgressSection report={report} />
-      <NotesSection report={report} />
+      {/* Folded (C4): the region breakdown, the technique explanation and the data notes, opened on demand. */}
+      <div className="grid min-w-0 gap-3 lg:grid-cols-3 lg:items-start" data-testid="routine-report-folds">
+        <OverviewSection report={report} />
+        <ReportFold id="routine-technique-fold-title" title="评分说明 · 动作规范检查" summary={report.technique.score === null ? '查看已检查的动作要求与扣分依据' : <span className="tabular-nums">动作规范 {report.technique.score} 分 · 与跟练相似度分开评价</span>} testId="routine-technique-fold">
+          <RoutineTechniqueSection report={report} />
+        </ReportFold>
+        <NotesSection report={report} />
+      </div>
       <ReportActions
         title="带着重点，再练一次"
         description="下一次跟练会生成新的独立报告。"

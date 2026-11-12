@@ -102,6 +102,8 @@ test('Scoring v2 C: a routine report shows 动作规范评价 apart from 跟练�
   await expect(deduction).toContainText('第 4 次托举顶点（视频 01:36）双肘伸展角（较弯一侧） 131°，要求 ≥ 150°')
   await expect(deduction).toContainText('国家体育总局健身气功管理中心《健身气功•八段锦习惯性错误及纠正方法》（2018-01-10）')
   await expect(deduction).toContainText('由 FormPilot 按标准示范实测值标定')
+  // Web V1.1 C4: 评分说明 is folded on the report; open it first.
+  await page.getByTestId('routine-technique-fold').locator('summary').first().click()
   await page.getByTestId('routine-technique-details').locator('summary').click()
   await expect(page.getByTestId('technique-criterion-bdj.1.elbow_extension')).toContainText('6 次中 4 次达标')
   await expect(page.getByTestId('technique-chapter-bdj-1')).toContainText('眼随手走，先托后抬头')
