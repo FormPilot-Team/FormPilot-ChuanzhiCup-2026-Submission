@@ -1,9 +1,21 @@
 import { readFile } from 'node:fs/promises'
 import { expect, test, type Page } from '@playwright/test'
+import { CUSTOM_SESSION_STORAGE_KEY, type CustomActionSessionRecord } from '../../src/features/workshop/session'
 import { CUSTOM_ACTION_STORAGE_KEY, LEGACY_ACTION_LIBRARY_KEY, type CustomActionDefinition } from '../../src/features/workshop/types'
 import { markOnboardingSeen } from './support/onboarding'
 
 const storedActions = (page: Page) => page.evaluate((key) => (JSON.parse(localStorage.getItem(key) ?? '{"actions":[]}') as { actions: CustomActionDefinition[] }).actions, CUSTOM_ACTION_STORAGE_KEY)
+
+/** The synthetic camera is excluded from history; this verifies the live-record UI contract without claiming a hardware camera run. */
+async function simulateLiveHistoryRecord(page: Page) {
+  await page.evaluate((key) => {
+    const records = JSON.parse(localStorage.getItem(key) ?? '[]') as CustomActionSessionRecord[]
+    const completed = records.find((record) => record.source === 'synthetic' && record.outcome === 'completed')
+    if (!completed) throw new Error('Expected a completed synthetic session')
+    records.push({ ...completed, id: `custom-session-live-e5-${Date.now()}`, source: 'live', mode: 'normal', startedAt: Date.now() })
+    localStorage.setItem(key, JSON.stringify(records))
+  }, CUSTOM_SESSION_STORAGE_KEY)
+}
 
 /** Creates a lateral-raise action through the whole editor with the synthetic camera (DEV fixture). */
 async function createAction(page: Page, name: string, target = 5, saveButton: 'editor-save' | 'editor-save-train' = 'editor-save') {
@@ -20,7 +32,7 @@ async function createAction(page: Page, name: string, target = 5, saveButton: 'e
   await expect(page.getByTestId('pose-card-start')).toHaveAttribute('data-recorded', 'true', { timeout: 8_000 })
   await page.getByTestId('record-finish').click()
   await expect(page.getByTestId('pose-card-finish')).toHaveAttribute('data-recorded', 'true', { timeout: 8_000 })
-  await expect(page.getByTestId('calibration-summary')).toContainText('FormPilot 学会了这个动作')
+  await expect(page.getByTestId('calibration-summary')).toContainText('已记录开始和完成姿势')
   await expect(page.getByTestId('active-joints')).toContainText('左手腕')
   await page.getByTestId('editor-next').click()
   await expect(page.getByTestId('editor-step')).toHaveAttribute('data-step', 'test')
@@ -139,13 +151,26 @@ test('Workshop D: actions from the teammate workbench library can be imported, r
   expect(action).toMatchObject({ name: '直臂上举', recognition: { source: 'arm-raise', profile: 'upper-body' }, source: { kind: 'legacy-library', legacyId: 'ref-arm-raise' }, test: { status: 'not-tested' } })
   await expect(page.getByTestId(`workshop-action-${action.id}`)).toContainText('来自旧版动作库')
   expect(await page.evaluate((key) => localStorage.getItem(key), LEGACY_ACTION_LIBRARY_KEY)).toBe(JSON.stringify(library))
+  await page.getByTestId(`workshop-train-${action.id}`).click()
+  await expect(page.getByRole('heading', { level: 1, name: '直臂上举' })).toBeVisible()
+  await expect(page.getByTestId('custom-not-ready')).toHaveCount(0)
+  await page.goto('/workshop')
   await page.reload()
   await expect(page.getByTestId('workshop-legacy-banner')).toHaveCount(0)
 })
 
 test('Workshop E: deleting asks first, and the empty state comes back', async ({ page }) => {
   test.setTimeout(90_000)
-  await createAction(page, '临时动作', 3)
+  await page.goto('/workshop/new?fixture=synthetic')
+  await page.getByLabel('动作名称').fill('临时动作')
+  await page.getByTestId('editor-next').click()
+  await page.getByTestId('record-start').click()
+  await expect(page.getByTestId('pose-card-start')).toHaveAttribute('data-recorded', 'true', { timeout: 8_000 })
+  await page.getByTestId('record-finish').click()
+  await expect(page.getByTestId('pose-card-finish')).toHaveAttribute('data-recorded', 'true', { timeout: 8_000 })
+  await page.getByTestId('editor-next').click()
+  await page.getByTestId('editor-next').click()
+  await page.getByTestId('editor-save').click()
   await page.getByRole('button', { name: '删除 临时动作' }).click()
   const dialog = page.getByRole('alertdialog', { name: '删除「临时动作」？' })
   await expect(dialog).toBeVisible()
@@ -193,7 +218,7 @@ test('Workshop G: the workshop records with its own full pose model while the wa
         return (video as HTMLVideoElement & { captureStream: () => MediaStream }).captureStream()
       },
     })
-  }, '/assets/routines/baduanjin-standard.mp4')
+  }, '/assets/demos/lateral-raise.mp4')
 
   await page.goto('/workshop/new')
   await page.getByLabel('动作名称').fill('摄像头流水线')
@@ -220,12 +245,57 @@ test('Workshop H: the closed loop — create, test, save and start training, the
   await expect(page.getByRole('heading', { level: 1, name: '闭环动作' })).toBeVisible()
   const [saved] = await storedActions(page)
   await page.goto(`/workshop/${saved.id}/train?fixture=synthetic&fast=1`)
+  await expect(page.getByTestId('custom-coach-message')).toBeVisible()
   await expect(page.getByTestId('custom-complete-dialog')).toHaveAttribute('data-outcome', 'completed', { timeout: 60_000 })
   await page.getByRole('button', { name: '查看训练报告' }).click()
   await expect(page.getByRole('heading', { level: 1, name: '闭环动作训练报告' })).toBeVisible()
   await expect(page.getByTestId('report-summary')).toContainText('本次完成了 3 / 3 次，其中 3 次识别重点都达标')
   await page.goto('/')
   await expect(page.getByTestId('home-my-actions').getByRole('link', { name: '开始训练 · 闭环动作' })).toHaveAttribute('href', `/workshop/${saved.id}/train`)
+  await page.goto('/history')
+  await expect(page.getByTestId('history-list').locator('[data-kind="custom"]')).toHaveCount(0)
+  await simulateLiveHistoryRecord(page)
+  await page.reload()
+  const history = page.getByTestId('history-list').locator('[data-kind="custom"]')
+  await expect(history).toContainText('我的动作 · 闭环动作')
+  await expect(history).toContainText('完成 3 / 3 次')
+  await history.getByRole('link').click()
+  await expect(page.getByRole('heading', { level: 1, name: '闭环动作训练报告' })).toBeVisible()
+})
+
+test('Workshop H2: duration action saves, trains, reports and enters history', async ({ page }) => {
+  test.setTimeout(120_000)
+  await page.goto('/workshop/new?fixture=synthetic')
+  await page.getByLabel('动作名称').fill('保持动作')
+  await page.getByText('按时间', { exact: true }).click()
+  await expect(page.getByRole('radio', { name: /按时间/ })).toBeChecked()
+  await page.getByLabel('目标时间（秒）').fill('5')
+  await page.getByTestId('editor-next').click()
+  await page.getByTestId('record-start').click()
+  await expect(page.getByTestId('pose-card-start')).toHaveAttribute('data-recorded', 'true', { timeout: 8_000 })
+  await page.getByTestId('record-finish').click()
+  await expect(page.getByTestId('pose-card-finish')).toHaveAttribute('data-recorded', 'true', { timeout: 8_000 })
+  await page.getByTestId('editor-next').click()
+  await page.getByTestId('test-start').click()
+  await expect(page.getByTestId('test-feedback')).toContainText('做到完成姿势并保持住')
+  await page.evaluate(() => { (window as typeof window & { __workshopFixtureMode?: string }).__workshopFixtureMode = 'finish' })
+  await expect(page.getByTestId('test-passed')).toBeVisible({ timeout: 15_000 })
+  await page.evaluate(() => { delete (window as typeof window & { __workshopFixtureMode?: string }).__workshopFixtureMode })
+  await page.getByTestId('editor-next').click()
+  await page.getByTestId('editor-save').click()
+  const [saved] = await storedActions(page)
+  expect(saved.goal).toEqual({ type: 'duration', seconds: 5 })
+  await page.goto(`/workshop/${saved.id}/train?fixture=synthetic&fast=1`)
+  await expect(page.getByTestId('custom-state')).toHaveAttribute('data-course-state', 'ACTIVE', { timeout: 30_000 })
+  await page.evaluate(() => { (window as typeof window & { __workshopFixtureMode?: string }).__workshopFixtureMode = 'finish' })
+  await expect(page.getByTestId('custom-complete-dialog')).toHaveAttribute('data-outcome', 'completed', { timeout: 60_000 })
+  await page.getByRole('button', { name: '查看训练报告' }).click()
+  await expect(page.getByTestId('report-summary')).toContainText('5 / 5 秒')
+  await page.goto('/history')
+  await expect(page.getByTestId('history-list').locator('[data-kind="custom"]')).toHaveCount(0)
+  await simulateLiveHistoryRecord(page)
+  await page.reload()
+  await expect(page.getByTestId('history-list').locator('[data-kind="custom"]')).toContainText('保持动作')
 })
 
 test('Workshop I: the whole editor works from the keyboard alone', async ({ page }) => {

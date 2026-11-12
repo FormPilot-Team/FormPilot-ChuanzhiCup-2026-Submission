@@ -10,13 +10,13 @@ import {
 } from '../../features/workshop/definition'
 import { downloadJson } from '../../features/workshop/download'
 import { PoseCaptureSession, type CaptureProgress } from '../../features/workshop/recognition/capture'
-import { CustomActionRecognizer, resolveRecognition, type RecognizerSnapshot } from '../../features/workshop/recognition/recognizer'
+import { CustomActionRecognizer, resolveRecognition, workshopTestPasses, type RecognizerSnapshot } from '../../features/workshop/recognition/recognizer'
 import { PROFILE_BOUNDS } from '../../features/workshop/recognition/templates'
 import { LocalStorageCustomActionRepository, type CustomActionRepository } from '../../features/workshop/store'
 import { buildExport, exportFileName } from '../../features/workshop/transfer'
 import type { CustomActionDefinition, RequirementId } from '../../features/workshop/types'
 import { cn } from '../../lib/cn'
-import { BasicsStep, RequirementsStep, SaveStep, StepHeading, TestStep, type CaptureTarget } from './editorSteps'
+import { BasicsStep, RequirementsStep, SaveStep, StepHeading, TestStep, type CaptureTarget, type DemonstrationMethod } from './editorSteps'
 import { useWorkshopCamera, type WorkshopFrame } from './useWorkshopCamera'
 
 const localRepository = new LocalStorageCustomActionRepository()
@@ -34,11 +34,6 @@ const STEPS: ReadonlyArray<{ id: EditorStep; label: string; title: string; descr
 ]
 
 const stepIndex = (step: EditorStep) => STEPS.findIndex((item) => item.id === step)
-
-function testPasses(snapshot: RecognizerSnapshot, action: CustomActionDefinition): boolean {
-  if (action.goal.type === 'duration') return snapshot.holdMs >= 3000
-  return snapshot.reps >= Math.min(3, action.goal.target)
-}
 
 function captureMessage(capture: { target: CaptureTarget; progress: CaptureProgress | null } | null): string | undefined {
   if (!capture) return undefined
@@ -62,6 +57,7 @@ export function ActionEditorPage({ actionId, repository = localRepository }: { a
   const [saveProblems, setSaveProblems] = useState<string[]>([])
   const [dirty, setDirty] = useState(false)
   const [capture, setCapture] = useState<{ target: CaptureTarget; progress: CaptureProgress | null } | null>(null)
+  const [method, setMethod] = useState<DemonstrationMethod>('camera')
   const [testing, setTesting] = useState(false)
   const [snapshot, setSnapshot] = useState<RecognizerSnapshot | null>(null)
   const [announcement, setAnnouncement] = useState('')
@@ -117,7 +113,7 @@ export function ActionEditorPage({ actionId, repository = localRepository }: { a
       lastUiRef.current = frame.timestamp
       setSnapshot(next)
     }
-    if (!passedRef.current && testPasses(next, draftRef.current)) {
+    if (!passedRef.current && workshopTestPasses(next, draftRef.current.goal)) {
       passedRef.current = true
       setDraft((previous) => ({ ...previous, test: { status: 'passed', testedAt: new Date().toISOString(), repsDetected: next.reps, repsPassed: next.passedReps } }))
       setDirty(true)
@@ -163,7 +159,7 @@ export function ActionEditorPage({ actionId, repository = localRepository }: { a
     if (!cameraOn) void startCamera()
   }
 
-  const cameraStep = step === 'requirements' || step === 'test'
+  const cameraStep = step === 'test' || (step === 'requirements' && method === 'camera')
 
   // The camera runs only on the steps that need it; the synthetic fixture starts by itself there (DEV).
   useEffect(() => {
@@ -297,9 +293,37 @@ export function ActionEditorPage({ actionId, repository = localRepository }: { a
                   draft={draft}
                   setup={setup}
                   capture={capture}
+                  method={method}
+                  onMethodChange={(next) => {
+                    if (next === method) return
+                    cancelCapture()
+                    stopTest()
+                    if (next === 'video') stopCamera()
+                    setMethod(next)
+                  }}
                   onPoseDescription={(target, value) => change((previous) => target === 'start' ? { ...previous, startPose: { ...previous.startPose, description: value } } : { ...previous, finishPose: { ...previous.finishPose, description: value } })}
                   onRecord={record}
                   onCancelCapture={cancelCapture}
+                  onVideoCapture={(target, pose) => {
+                    cancelCapture()
+                    stopTest()
+                    stopCamera()
+                    changeRecognition((previous) => ({
+                      ...previous,
+                      ...(target === 'start' ? { startPose: { ...previous.startPose, capture: pose } } : { finishPose: { ...previous.finishPose, capture: pose } }),
+                    }))
+                    setAnnouncement(target === 'start' ? '已从视频记录开始姿势' : '已从视频记录完成姿势')
+                  }}
+                  onSuggestion={(suggestion) => {
+                    cancelCapture()
+                    stopTest()
+                    changeRecognition((previous) => ({ ...previous,
+                      startPose: { ...previous.startPose, capture: suggestion.start },
+                      finishPose: { ...previous.finishPose, capture: suggestion.finish },
+                      recognition: { ...previous.recognition, minRepMs: suggestion.suggestedMinRepMs },
+                    }))
+                    setAnnouncement('已采用连续示范建议，请检查并测试')
+                  }}
                   onToggleRequirement={(id: RequirementId, enabled) => changeRecognition((previous) => ({ ...previous, requirements: previous.requirements.map((item) => item.id === id ? { ...item, enabled } : item) }))}
                   onRequirementThreshold={(id, value) => changeRecognition((previous) => ({ ...previous, requirements: previous.requirements.map((item) => item.id === id ? { id: item.id, enabled: item.enabled, ...(value === undefined ? {} : { threshold: value }) } : item) }))}
                   onSource={(source) => changeRecognition((previous) => withSignalSource(previous, source))}

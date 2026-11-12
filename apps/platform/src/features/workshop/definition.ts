@@ -215,6 +215,9 @@ export function validateForSave(action: CustomActionDefinition): string[] {
   if (action.name.trim().length > NAME_MAX) problems.push(`动作名称最多 ${NAME_MAX} 个字`)
   if (action.description.length > DESCRIPTION_MAX) problems.push(`动作描述最多 ${DESCRIPTION_MAX} 个字`)
   if (!isRecognitionReady(action)) problems.push('请记录开始姿势和完成姿势，FormPilot 才能识别这个动作')
+  if (action.goal.type === 'duration' && action.recognition.source !== 'pose-match' && ['orbit', 'alternate'].includes(FEATURE_TEMPLATES[action.recognition.source].counting)) {
+    problems.push('这个动作模板按完整次数识别；请改为按次数，或选择可保持的识别方式。')
+  }
   try {
     normalizeCustomAction({ ...action, name: action.name || '未命名' })
   } catch (error) {
