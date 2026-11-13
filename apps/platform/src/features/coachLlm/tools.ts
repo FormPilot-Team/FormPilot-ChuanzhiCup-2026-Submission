@@ -297,8 +297,9 @@ async function compareRecentTraining(call: AgentToolCall, context: AgentToolCont
       const report = buildRoutineReport(current, records)
       const c = report?.comparison
       data = { ...data, comparable: !!c?.available, reason: c?.reason ?? null, previousDate: c?.previousStartedAt ? dateText(c.previousStartedAt) : null,
-        similarityChange: c?.similarityDelta !== null && c?.similarityDelta !== undefined ? `跟练相似度 ${c.similarityDelta > 0 ? '+' : ''}${c.similarityDelta} 个百分点（${trendText(c.similarityTrend)}；相似度不是动作规范分）` : null,
-        syncChange: c?.syncDelta !== null && c?.syncDelta !== undefined ? `节奏同步 ${c.syncDelta > 0 ? '+' : ''}${c.syncDelta} 个百分点（${trendText(c.syncTrend)}）` : null }
+        similarityChange: c?.similarityDelta !== null && c?.similarityDelta !== undefined ? `跟练相似度 ${c.similarityDelta > 0 ? '+' : ''}${c.similarityDelta} 个百分点（${trendText(c.similarityTrend)}）` : null,
+        syncChange: c?.syncDelta !== null && c?.syncDelta !== undefined ? `节奏同步 ${c.syncDelta > 0 ? '+' : ''}${c.syncDelta} 个百分点（${trendText(c.syncTrend)}）` : null,
+        notCompared: ['动作规范分（报告不比较两次的规范分）'] }
     }
   } catch { return fail(call, 'INSUFFICIENT_DATA', '近期记录不足以比较。', started) }
   const label = kind === 'warmup' ? '热身训练' : '功法跟练'
@@ -306,7 +307,7 @@ async function compareRecentTraining(call: AgentToolCall, context: AgentToolCont
     call, ok: true, errorCode: null, citations: [], elapsedMs: Math.round(performance.now() - started),
     summary: data.comparable ? `已比较近期${label}（${String(data.gate)}）` : `近期${label}不可比较`,
     evidence: [{ kind: 'comparison', label: `${label}历史比较`, detail: `${String(data.gate)}${data.reason ? ` · ${String(data.reason)}` : ''} · 使用报告页同一比较规则` }],
-    content: JSON.stringify({ ok: true, ...data, dataNotes: notes, rule: '只能使用这里的比较结论，指标名称照原样使用；没有给出的指标（如稳定性、波动）不要提。不可比时必须说无法判断进步，不要自己比较分数。' }),
+    content: JSON.stringify({ ok: true, ...data, dataNotes: notes, rule: '只能使用这里的比较结论，指标名称照原样使用；notCompared 中的指标和没有给出的指标（如动作规范、稳定性、波动）不要评价。不可比时必须说无法判断进步，不要自己比较分数。' }),
   }
 }
 

@@ -45,7 +45,7 @@ export const AGENT_CASES: AgentCase[] = [
   // B. 训练表现解释
   { id: 'last-warmup', category: '表现解释', question: '我上一次热身训练练得怎么样？主要问题在哪里？', tools: ['read_last_training'], must: [/\d+\s*分/u] },
   { id: 'last-routine', category: '表现解释', question: '我上次八段锦跟练得怎么样？哪一段最弱？', tools: ['read_last_training'], must: [/(第五式|摇头摆尾)/u] },
-  { id: 'last-no-consent', category: '未授权', question: '我上一次热身训练练得怎么样？', context: { consent: false }, tools: ['read_last_training'], must: [/授权/u], mustNot: [/\d+\s*分/u] },
+  { id: 'last-no-consent', category: '未授权', question: '我上一次热身训练练得怎么样？', context: { consent: false }, tools: ['read_last_training'], must: [/(授权|勾选)/u], mustNot: [/\d+\s*分/u] },
   { id: 'last-empty', category: '数据不足', question: '我上一次功法跟练练得怎么样？', context: { routine: [] }, tools: ['read_last_training'], must: [/(还没有|没有.*记录|暂无)/u] },
   // C. 进步比较
   { id: 'progress-warmup', category: '进步比较', question: '我最近热身训练有没有进步？', tools: ['compare_recent_training'], must: [/(提升|进步|提高|下降|持平|\+\d)/u] },

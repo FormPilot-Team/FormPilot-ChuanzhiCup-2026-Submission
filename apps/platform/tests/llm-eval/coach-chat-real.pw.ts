@@ -4,7 +4,16 @@ import { expect, test, type Page } from '@playwright/test'
 import { ROUTINE_SESSION_STORAGE_KEY } from '../../src/features/routines/session/RoutineSessionRepository'
 import { SESSION_STORAGE_KEY } from '../../src/features/training/LocalStorageTrainingSessionRepository'
 import { markOnboardingSeen } from '../e2e/support/onboarding'
-import { ROUTINE_RECORDS, WARMUP_RECORDS } from './fixtures'
+import { FULL_IMPROVEMENT, at } from '../analysis-fixtures'
+import { routineRecord } from '../helpers/routineFixtures'
+
+// Same TEST FIXTURES as tests/llm-eval/fixtures.ts (not imported: that module pulls the decision model, whose JSON
+// import Playwright's loader cannot evaluate).
+const WARMUP_RECORDS = [...FULL_IMPROVEMENT.history, FULL_IMPROVEMENT.current]
+const ROUTINE_RECORDS = [
+  routineRecord({ id: 'eval-bdj-old', startedAt: at(3), chapters: { 'bdj-5': { similarity: 0.6 } } }),
+  routineRecord({ id: 'eval-bdj-new', startedAt: at(5), chapters: { 'bdj-2': { similarity: 0.62 }, 'bdj-5': { similarity: 0.58 } } }),
+]
 
 // REAL MODEL UI evidence: every answer below is generated at run time by the local Qwen3-4B through the real bridge.
 // Training records are TEST FIXTURES (golden warm-up sessions + generated routine records), labelled in the report.
