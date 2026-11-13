@@ -18,15 +18,24 @@ for (const id of ROUTINES) {
   test(`routine ${id}: the packaged standard demonstration video loads and is playable`, async ({ page }) => {
     await page.goto(`/routines/${id}/train`)
     await expect(page.getByTestId('routine-stage')).toHaveAttribute('data-stage-status', 'ready', { timeout: 45_000 })
-    const video = await page.getByTestId('routine-demo-video').evaluate((node) => {
-      const element = node as HTMLVideoElement
-      return { src: element.currentSrc.replace(location.origin, ''), readyState: element.readyState, duration: Math.round(element.duration), width: element.videoWidth, height: element.videoHeight, error: element.error?.code ?? null }
+    const element = page.getByTestId('routine-stage-video')
+    // The stage is "ready" once metadata is in; frame data follows. Wait for it, then really play (muted) for a moment.
+    await expect.poll(() => element.evaluate((node) => (node as HTMLVideoElement).readyState), { timeout: 20_000 }).toBeGreaterThanOrEqual(2)
+    const video = await element.evaluate(async (node) => {
+      const media = node as HTMLVideoElement
+      media.muted = true
+      const start = media.currentTime
+      await media.play().catch(() => undefined)
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const advanced = Math.round((media.currentTime - start) * 10) / 10
+      media.pause()
+      return { src: media.currentSrc.replace(location.origin, ''), readyState: media.readyState, duration: Math.round(media.duration), width: media.videoWidth, height: media.videoHeight, error: media.error?.code ?? null, playedSeconds: advanced }
     })
     results[`routine-${id}`] = video
     expect(video.error).toBeNull()
-    expect(video.readyState).toBeGreaterThanOrEqual(2)
     expect(video.duration).toBeGreaterThan(60)
     expect(video.width).toBeGreaterThan(0)
+    expect(video.playedSeconds).toBeGreaterThan(0.5)
     await page.screenshot({ path: join(OUT, `routine-${id}.png`) })
   })
 }

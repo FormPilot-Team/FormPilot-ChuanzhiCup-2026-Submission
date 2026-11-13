@@ -77,7 +77,7 @@ test('Competition E: the orb plays as a transparent video, stops under reduced m
   await expect(page.getByTestId('coach-orb-stage')).toHaveAttribute('data-orb-state', 'video', { timeout: 15_000 })
   expect(await page.getByTestId('coach-orb-stage').locator('video').evaluate((video: HTMLVideoElement) => !video.paused)).toBe(true)
 
-  const reduced = await browser.newContext({ reducedMotion: 'reduce', baseURL: 'http://127.0.0.1:4175' })
+  const reduced = await browser.newContext({ reducedMotion: 'reduce', baseURL: test.info().project.use.baseURL })
   const still = await reduced.newPage()
   await still.goto('/coach')
   await expect(still.getByTestId('coach-orb-stage')).toHaveAttribute('data-orb-state', 'reduced-motion')
@@ -86,7 +86,7 @@ test('Competition E: the orb plays as a transparent video, stops under reduced m
   await expect(still.getByTestId('coach-orb-stage').locator('img')).toBeVisible()
   await reduced.close()
 
-  const broken = await browser.newContext({ baseURL: 'http://127.0.0.1:4175' })
+  const broken = await browser.newContext({ baseURL: test.info().project.use.baseURL })
   await broken.route('**/coach-orb-loop.webm', (route) => route.abort())
   const fallback = await broken.newPage()
   await fallback.goto('/coach')
