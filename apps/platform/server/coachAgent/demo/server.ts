@@ -34,7 +34,7 @@ const STATIC_TYPES: Readonly<Record<string, string>> = Object.freeze({
   '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp',
   '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
 })
-const CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self'; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+const CSP_BASE = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self'; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'"
 
 /** Calendar day in China Standard Time, for daily budgets. */
 const dayKey = (time: number) => new Date(time + 8 * 3600_000).toISOString().slice(0, 10)
@@ -44,6 +44,7 @@ export function createDemoGateway(input: DemoGatewayConfigInput, options: { now?
   const now = options.now ?? (() => Date.now())
   const log = options.log ?? ((line: string) => console.log(line))
   const root = resolve(config.staticDir)
+  const csp = `${CSP_BASE}; frame-ancestors ${config.frameAncestors.length ? config.frameAncestors.join(' ') : "'none'"}`
   const localModel = config.upstream === 'ollama'
     ? resolveLocalConfig({ model: config.model, modelDigest: config.modelDigest!, planningProtocol: 'native-tools', testModelPort: config.modelPort })
     : null
@@ -128,9 +129,9 @@ export function createDemoGateway(input: DemoGatewayConfigInput, options: { now?
     const started = now()
     res.setHeader('X-Content-Type-Options', 'nosniff')
     res.setHeader('Referrer-Policy', 'no-referrer')
-    res.setHeader('X-Frame-Options', 'DENY')
+    if (!config.frameAncestors.length) res.setHeader('X-Frame-Options', 'DENY')
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
-    res.setHeader('Content-Security-Policy', CSP)
+    res.setHeader('Content-Security-Policy', csp)
     if (duplicate(req, 'host') || !config.hosts.includes(req.headers.host ?? '')) { json(res, 421, { error: 'FORBIDDEN_ORIGIN' }); return }
     const origin = req.headers.origin
     if (origin !== undefined && (duplicate(req, 'origin') || !config.origins.includes(origin))) { json(res, 403, { error: 'FORBIDDEN_ORIGIN' }); return }

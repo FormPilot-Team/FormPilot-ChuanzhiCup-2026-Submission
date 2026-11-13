@@ -163,6 +163,15 @@ describe('public demo gateway: boundary', () => {
     expect((await raw(port, '/', { method: 'POST' })).status).toBe(405)
   })
 
+  it('allows framing only by configured https parents (hosting platforms that embed apps)', async () => {
+    const upstream = await fakeOpenAI()
+    expect(() => resolveDemoConfig({ frameAncestors: ['http://studio.example'] })).toThrow('INVALID_DEMO_CONFIG')
+    const { port } = await gatewayFor(upstream.port, { frameAncestors: ['https://studio.example'] })
+    const index = await raw(port, '/')
+    expect(index.headers['content-security-policy']).toContain('frame-ancestors https://studio.example')
+    expect(index.headers['x-frame-options']).toBeUndefined()
+  })
+
   it('health names the model and data policy but never the key or upstream address', async () => {
     const upstream = await fakeOpenAI()
     const { port } = await gatewayFor(upstream.port)

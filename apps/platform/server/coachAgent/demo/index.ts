@@ -21,6 +21,7 @@ export function startDemoGateway(env: NodeJS.ProcessEnv = process.env) {
     port: num(env.FP_DEMO_PORT),
     bind: env.FP_DEMO_BIND || undefined,
     publicOrigins: list(env.FP_DEMO_PUBLIC_ORIGINS),
+    frameAncestors: list(env.FP_DEMO_FRAME_ANCESTORS),
     staticDir: env.FP_DEMO_STATIC_DIR || undefined,
     upstream: (env.FP_DEMO_UPSTREAM as 'ollama' | 'openai' | undefined) || undefined,
     ollamaPort: num(env.FP_DEMO_OLLAMA_PORT),

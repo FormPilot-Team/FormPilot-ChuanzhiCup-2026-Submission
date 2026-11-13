@@ -19,6 +19,8 @@ export interface DemoGatewayConfigInput {
   bind?: string
   /** Exact browser origins of the demo page (https://… in production; http://127.0.0.1:<port> is always allowed). */
   publicOrigins?: string[]
+  /** https origins allowed to show the demo in an iframe (hosting platforms that embed apps). Default: none. */
+  frameAncestors?: string[]
   staticDir?: string
   upstream?: 'ollama' | 'openai'
   ollamaPort?: number
@@ -64,6 +66,12 @@ export function resolveDemoConfig(input: DemoGatewayConfigInput) {
   if (configured.length > 6) throw new Error('INVALID_DEMO_CONFIG')
   const origins = Object.freeze([...new Set([...configured, ...local])])
   const hosts = Object.freeze(origins.map((value) => new URL(value).host))
+  const frameAncestors = Object.freeze((input.frameAncestors ?? []).map((value) => {
+    const parsed = origin(value)
+    if (parsed.protocol !== 'https:') throw new Error('INVALID_DEMO_CONFIG')
+    return parsed.origin
+  }))
+  if (frameAncestors.length > 4) throw new Error('INVALID_DEMO_CONFIG')
 
   const upstream = input.upstream ?? 'ollama'
   if (upstream !== 'ollama' && upstream !== 'openai') throw new Error('INVALID_DEMO_CONFIG')
@@ -86,7 +94,7 @@ export function resolveDemoConfig(input: DemoGatewayConfigInput) {
 
   return Object.freeze({
     enabled: input.enabled === true,
-    port, bind, origins, hosts,
+    port, bind, origins, hosts, frameAncestors,
     staticDir: input.staticDir ?? 'dist-public-demo',
     upstream,
     // Ollama upstream: the same pinned identity as the local bridge (verifyInstalledModel checks the digest).
