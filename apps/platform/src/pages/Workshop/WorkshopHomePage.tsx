@@ -9,7 +9,7 @@ import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { PoseSketch } from '../../components/workshop/PoseSketch'
 import { BODY_AREAS, SIGNAL_SOURCE_OPTIONS } from '../../features/workshop/catalog'
-import { goalText } from '../../features/workshop/definition'
+import { goalText, isRecognitionReady } from '../../features/workshop/definition'
 import { downloadJson, readTextFile } from '../../features/workshop/download'
 import { LocalStorageCustomActionRepository, type CustomActionRepository } from '../../features/workshop/store'
 import { CustomActionImportError, buildExport, exportFileName, importSummary, planImport, readLegacyLibrary } from '../../features/workshop/transfer'
@@ -51,13 +51,17 @@ function ActionCard({ action, onExport, onDelete }: { action: CustomActionDefini
               <TestStatusBadge action={action} />
             </div>
             <p className="mt-1 text-sm tabular-nums text-slate-500">{area.label} · 目标 {goalText(action.goal)} · {recognitionLabel(action)}</p>
+            <p className={cn('mt-1.5 inline-flex items-center gap-1.5 text-xs font-semibold', isRecognitionReady(action) ? 'text-emerald-700' : 'text-amber-800')} data-testid={`workshop-ready-${action.id}`} data-ready={isRecognitionReady(action) ? 'true' : 'false'}>
+              <i className={cn('size-1.5 rounded-full', isRecognitionReady(action) ? 'bg-emerald-500' : 'bg-amber-500')} aria-hidden="true" />
+              {isRecognitionReady(action) ? '可以开始训练' : '还缺示范姿势，先编辑补齐'}
+            </p>
             {action.description ? <p className="mt-2 line-clamp-2 text-pretty text-sm leading-6 text-slate-600">{action.description}</p> : null}
             {action.source.kind !== 'workshop' ? <p className="mt-2 text-xs font-semibold text-slate-500">{action.source.kind === 'legacy-library' ? '来自旧版动作库' : '来自导入的动作文件'}</p> : null}
           </div>
           <PoseSketch start={action.startPose.capture} finish={action.finishPose.capture} className="h-24 w-20 shrink-0" />
         </div>
         <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
-          <a href={customTrainingPath(action.id)} className="primary-button inline-flex items-center gap-1.5 px-3.5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" aria-label={`开始训练 ${action.name}`} data-testid={`workshop-train-${action.id}`}><Play size={14} fill="currentColor" aria-hidden="true" />开始训练</a>
+          <a href={customTrainingPath(action.id)} className="fp-cta-dark px-3.5 py-2" aria-label={`开始训练 ${action.name}`} data-testid={`workshop-train-${action.id}`}><Play size={14} fill="currentColor" aria-hidden="true" />开始训练</a>
           <a href={workshopActionPath(action.id)} className="secondary-button inline-flex items-center gap-1.5 px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" aria-label={`编辑 ${action.name}`}><PencilLine size={15} aria-hidden="true" />编辑</a>
           <button type="button" onClick={onExport} className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100" aria-label={`导出 ${action.name}`}><Download size={15} aria-hidden="true" />导出</button>
           <AlertDialog.Root>
@@ -93,6 +97,8 @@ export function WorkshopHomePage({ repository = localRepository }: { repository?
   const fileRef = useRef<HTMLInputElement>(null)
   const actions = library.actions
   const legacyPending = legacy.candidates.filter((item) => !actions.some((action) => action.source.legacyId === item.id))
+  // 继续完善: the most recently edited action that has not passed its recognition test yet.
+  const resume = [...actions].filter((action) => action.test.status !== 'passed').sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0]
 
   const refresh = () => setLibrary(repository.load())
 
@@ -147,10 +153,10 @@ export function WorkshopHomePage({ repository = localRepository }: { repository?
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <a href={WORKSHOP_NEW_PATH} className="primary-button inline-flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" data-testid="workshop-create"><Plus size={17} aria-hidden="true" />创建动作</a>
-              <button type="button" onClick={() => fileRef.current?.click()} disabled={library.readOnly} className="secondary-button inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50" title="用于导入已导出的动作数据，不用于导入示范视频"><FileUp size={16} aria-hidden="true" />导入动作文件</button>
-              <button type="button" onClick={exportAll} disabled={!actions.length} className="secondary-button inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"><Download size={16} aria-hidden="true" />导出全部</button>
-              <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" tabIndex={-1} aria-label="选择要导入的动作文件" onChange={onFile} data-testid="workshop-import-input" />
+              <a href={WORKSHOP_NEW_PATH} className="fp-cta px-6 py-3 text-base" data-testid="workshop-create"><Plus size={18} aria-hidden="true" />创建动作</a>
+              {resume ? (
+                <a href={workshopActionPath(resume.id)} className="secondary-button inline-flex items-center gap-2 py-3" data-testid="workshop-continue"><PencilLine size={16} aria-hidden="true" />继续完善「{resume.name}」</a>
+              ) : null}
             </div>
           </div>
           <ol className="mt-6 flex flex-wrap items-center gap-x-1.5 gap-y-2 text-sm font-semibold text-slate-700" aria-label="动作工坊流程">
@@ -177,8 +183,16 @@ export function WorkshopHomePage({ repository = localRepository }: { repository?
 
         <section className="mt-6" aria-labelledby="my-actions-title">
           <div className="flex flex-wrap items-end justify-between gap-2">
-            <h2 id="my-actions-title" className="fp-section-title">我的动作</h2>
-            <p className="text-sm text-slate-500">{actions.length ? `共 ${actions.length} 个` : ''}</p>
+            <div className="flex items-baseline gap-3">
+              <h2 id="my-actions-title" className="fp-section-title">我的动作</h2>
+              <p className="text-sm text-slate-500">{actions.length ? `共 ${actions.length} 个` : ''}</p>
+            </div>
+            {/* Moving actions between devices is secondary: small buttons beside the library, not next to 创建动作. */}
+            <div className="flex flex-wrap items-center gap-1" data-testid="workshop-transfer">
+              <button type="button" onClick={() => fileRef.current?.click()} disabled={library.readOnly} className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50" title="用于导入已导出的动作数据，不用于导入示范视频"><FileUp size={15} aria-hidden="true" />导入动作文件</button>
+              <button type="button" onClick={exportAll} disabled={!actions.length} className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"><Download size={15} aria-hidden="true" />导出全部</button>
+              <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" tabIndex={-1} aria-label="选择要导入的动作文件" onChange={onFile} data-testid="workshop-import-input" />
+            </div>
           </div>
           {actions.length ? (
             <ul className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-testid="workshop-actions">
@@ -204,7 +218,7 @@ export function WorkshopHomePage({ repository = localRepository }: { repository?
                 <p className="font-bold text-slate-950">还没有自定义动作</p>
                 <p className="mt-1 text-pretty text-sm leading-6 text-slate-600">选一个你常做的动作，几分钟就能教会 FormPilot。</p>
               </div>
-              <a href={WORKSHOP_NEW_PATH} className="primary-button inline-flex shrink-0 items-center gap-2"><Plus size={17} aria-hidden="true" />创建第一个动作</a>
+              <a href={WORKSHOP_NEW_PATH} className="secondary-button inline-flex shrink-0 items-center gap-2"><Plus size={17} aria-hidden="true" />创建第一个动作</a>
             </div>
           )}
         </section>

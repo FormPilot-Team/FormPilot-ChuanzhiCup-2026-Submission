@@ -50,7 +50,8 @@ test('upper-body crop starts the first three exercises but full-body Step Jack w
 
 test('live camera preview uses contain and the smart-training entry explains action-specific positioning', async ({ page }) => {
   await page.goto('/train')
-  const cameraVideo = page.getByRole('region', { name: '实时动作检测' }).locator('video')
+  // Web V1.1 C3: the camera panel is titled 我的画面 on the immersive warm-up page.
+  const cameraVideo = page.getByTestId('camera-panel').locator('video')
   await expect(cameraVideo).toHaveClass(/object-contain/)
   await expect(cameraVideo).not.toHaveClass(/object-cover/)
 

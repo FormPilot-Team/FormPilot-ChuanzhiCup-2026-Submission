@@ -5,9 +5,13 @@ test('Hybrid AI Coach renders demo, camera, and coach-feedback columns without r
 
   const layout = page.getByTestId('hybrid-training-layout')
   await expect(layout).toBeVisible()
-  await expect(layout.locator(':scope > *')).toHaveCount(3)
+  // Web V1.1 C3: the camera is the main picture; the demonstration window, the count and the coach share one column.
+  await expect(layout.locator(':scope > *')).toHaveCount(2)
+  await expect(layout).toHaveAttribute('data-layout', 'camera-primary')
+  await expect(layout.locator('[data-layout-region="side"]').getByTestId('demonstration-panel')).toBeVisible()
   await expect(page.getByTestId('demonstration-panel')).toHaveAttribute('data-demo-exercise', 'lateral_raise')
-  await expect(page.getByRole('heading', { name: '实时动作检测' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /我的画面/ })).toBeVisible()
+  await expect(page.getByTestId('warmup-count')).toBeVisible()
   await expect(page.getByRole('img', { name: '演示模式中的侧平举人物' })).toBeVisible()
   await expect(page.getByTestId('ai-coach-feedback-dock')).toBeVisible()
   await expect(page.getByTestId('static-ai-coach-slot')).toBeVisible()

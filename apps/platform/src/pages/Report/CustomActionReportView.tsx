@@ -79,6 +79,9 @@ export function CustomActionReportView({ report, actionExists }: { report: Custo
           { icon: ListChecks, label: '识别重点全部达标', value: `${record.passedReps} ${unit}` },
         ]}
         takeaways={takeaways(report)}
+        nextActions={[
+          { label: actionExists ? '再练一次' : '去动作工坊', href: againHref, primary: true, testId: 'custom-next-again' },
+        ]}
       />
 
       {report.focus.length ? (

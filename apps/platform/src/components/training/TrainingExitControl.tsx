@@ -10,10 +10,12 @@ interface TrainingExitControlProps {
   label: string
   /** `preparing` (nothing started yet) and `complete` leave at once; `active` (running or paused) asks first. */
   phase: TrainingExitPhase
+  /** `dark` for the immersive training shell. */
+  tone?: 'light' | 'dark'
 }
 
 /** The one “← 返回 …” exit of every training page (热身训练 and the four follow-along routines). */
-export function TrainingExitControl({ href, label, phase }: TrainingExitControlProps) {
+export function TrainingExitControl({ href, label, phase, tone = 'light' }: TrainingExitControlProps) {
   const [confirming, setConfirming] = useState(false)
   const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (phase !== 'active' || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
@@ -25,11 +27,13 @@ export function TrainingExitControl({ href, label, phase }: TrainingExitControlP
       <a
         href={href}
         onClick={onClick}
-        className="mb-1 inline-flex items-center gap-1.5 rounded-lg px-1 py-0.5 text-sm font-semibold text-slate-500 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        className={tone === 'dark'
+          ? 'inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.07] px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-white/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300'
+          : 'mb-1 inline-flex items-center gap-1.5 rounded-lg px-1 py-0.5 text-sm font-semibold text-slate-500 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'}
         data-testid="training-exit"
         data-exit-phase={phase}
       >
-        <ArrowLeft size={15} aria-hidden="true" />{label}
+        <ArrowLeft size={15} aria-hidden="true" /><span className={tone === 'dark' ? 'max-sm:sr-only' : undefined}>{label}</span>
       </a>
       <AlertDialog.Root open={confirming} onOpenChange={setConfirming}>
         <AlertDialog.Portal>

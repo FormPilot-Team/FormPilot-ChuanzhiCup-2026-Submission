@@ -1,0 +1,70 @@
+{
+  "contract": "fp-coach-decision/v1",
+  "profile": {
+    "version": 1,
+    "goals": [
+      "upper_limb"
+    ],
+    "difficulties": [
+      "stiffness"
+    ],
+    "regions": [
+      "shoulders",
+      "arms"
+    ],
+    "preference": "mixed",
+    "risk": "none",
+    "acknowledged": true
+  },
+  "now": 1794110400000,
+  "trainingHistory": {
+    "origin": "synthetic_demo",
+    "chapters": [
+      {
+        "chapterId": "bdj-1",
+        "sessions": 5,
+        "completedSessions": 5,
+        "meanScore": 70,
+        "trend": "up",
+        "lastPracticedAt": 1793678400000
+      },
+      {
+        "chapterId": "bdj-2",
+        "sessions": 3,
+        "completedSessions": 2,
+        "meanScore": 64,
+        "trend": "flat",
+        "lastPracticedAt": 1793764800000
+      }
+    ]
+  },
+  "gameHistory": {
+    "origin": "synthetic_demo",
+    "games": [
+      {
+        "gameId": "apple",
+        "plays": 3,
+        "completedPlays": 3,
+        "lastPlayedAt": 1794024000000
+      }
+    ]
+  },
+  "latestReport": {
+    "origin": "synthetic_demo",
+    "createdAt": 1794024000000,
+    "findings": [
+      {
+        "focus": "stability",
+        "subjectId": "bdj-2",
+        "score": 52,
+        "trend": "worse"
+      }
+    ]
+  },
+  "availability": {
+    "snapshotRef": "web-demo-2026-11-08",
+    "unavailableIds": [
+      "racing"
+    ]
+  }
+}

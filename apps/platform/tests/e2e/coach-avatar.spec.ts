@@ -21,6 +21,8 @@ test.beforeEach(async ({ page }) => {
 
 test('Avatar A: the follow-along 实时反馈 card shows the coach bust at 40 px', async ({ page }) => {
   await page.goto('/routines/baduanjin/train?fixture=synthetic')
+  // Web V1.1 C2: the 实时反馈 card lives in 详细数据 (the training view keeps one coaching line).
+  await page.getByTestId('details-toggle').click()
   const entry = page.getByTestId('routine-coach-entry')
   await expect(entry).toContainText('AI 教练')
   await expectBust(entry.getByTestId('coach-avatar'), 40)
@@ -29,7 +31,8 @@ test('Avatar A: the follow-along 实时反馈 card shows the coach bust at 40 px
 
 test('Avatar B: the 问 AI 教练 button and its panel use the same bust', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
-  await page.goto('/')
+  // Web V1: the dock is no longer on Home; History keeps it.
+  await page.goto('/history')
   const trigger = page.getByTestId('ai-coach-trigger')
   await expectBust(trigger.getByTestId('coach-avatar'), 40)
   await trigger.click()

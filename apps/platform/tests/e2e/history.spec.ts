@@ -23,10 +23,11 @@ test('History A: zero records has a useful empty state and Home keeps the entry'
   await markOnboardingSeen(page)
   await page.goto('/history')
   await expect(page.getByTestId('history-empty')).toContainText('还没有训练记录')
+  // Web V1: Home's 最近训练记录 and 我的 lead to History.
   await page.goto('/')
-  await expect(page.getByTestId('home-training-history')).toContainText('还没有训练记录')
-  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '我的训练', exact: true })).toHaveAttribute('href', '/history')
-  await expect(page.getByTestId('home-history-link')).toHaveAttribute('href', '/history')
+  await expect(page.getByTestId('home-recent-empty')).toContainText('还没有训练记录')
+  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '我的', exact: true })).toHaveAttribute('href', '/me')
+  await expect(page.getByTestId('home-history-all')).toHaveAttribute('href', '/history')
 })
 
 test('History B: three complete courses show the list, trend, and recurring issue', async ({ page }) => {

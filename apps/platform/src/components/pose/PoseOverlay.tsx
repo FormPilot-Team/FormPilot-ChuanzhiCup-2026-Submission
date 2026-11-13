@@ -6,7 +6,15 @@ import { LANDMARK_INDEX, type PoseFrame } from '../../features/pose/types'
 export interface PoseOverlayHandle {
   draw(frame: PoseFrame | null, errors: ReadonlyArray<MotionError>, options?: PoseOverlayDrawOptions): void
   clear(): void
+  /**
+   * Every processed frame, whether or not the skeleton is shown (Web V1.1): the immersive stage uses it for body-aware
+   * framing and for the correction highlight. Optional; the plain overlay ignores it.
+   */
+  observe?(frame: PoseFrame | null, options?: PoseOverlayDrawOptions): void
 }
+
+/** A body region to mark on the user's own skeleton, from a confirmed follow-along correction. */
+export type PoseHighlightRegion = 'arms' | 'torso' | 'legs'
 
 export interface PoseOverlayDrawOptions {
   mirrored?: boolean
@@ -28,11 +36,29 @@ function activeSide(errors: ReadonlyArray<MotionError>): 'left' | 'right' | unde
 
 interface PoseOverlayProps {
   visible?: boolean
+  /** Marks a whole region (follow-along corrections name a region, not a side). */
+  highlight?: PoseHighlightRegion
+  /** Draw only the highlighted limbs (the full skeleton is hidden while following). */
+  highlightOnly?: boolean
 }
 
-export const PoseOverlay = forwardRef<PoseOverlayHandle, PoseOverlayProps>(function PoseOverlay({ visible = true }, ref) {
+const REGION_JOINTS: Readonly<Record<PoseHighlightRegion, ReadonlyArray<number>>> = {
+  arms: [11, 12, 13, 14, 15, 16],
+  torso: [11, 12, 23, 24],
+  legs: [23, 24, 25, 26, 27, 28],
+}
+
+const REGION_CONNECTIONS: Readonly<Record<PoseHighlightRegion, ReadonlyArray<readonly [number, number]>>> = {
+  arms: [[11, 13], [13, 15], [12, 14], [14, 16]],
+  torso: [[11, 12], [11, 23], [12, 24], [23, 24]],
+  legs: [[23, 25], [25, 27], [24, 26], [26, 28]],
+}
+
+export const PoseOverlay = forwardRef<PoseOverlayHandle, PoseOverlayProps>(function PoseOverlay({ visible = true, highlight, highlightOnly = false }, ref) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sizeRef = useRef({ width: 0, height: 0 })
+  const highlightRef = useRef({ highlight, highlightOnly })
+  highlightRef.current = { highlight, highlightOnly }
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -91,11 +117,16 @@ export const PoseOverlay = forwardRef<PoseOverlayHandle, PoseOverlayProps>(funct
           : [LANDMARK_INDEX.rightShoulder, LANDMARK_INDEX.rightElbow, LANDMARK_INDEX.rightWrist]
         return indices.includes(a) && indices.includes(b)
       }
+      const region = highlightRef.current.highlight
+      const only = highlightRef.current.highlightOnly
+      const isRegionConnection = (a: number, b: number) => Boolean(region && REGION_CONNECTIONS[region].some(([x, y]) => (x === a && y === b) || (x === b && y === a)))
+      if (only && !region && !side) return
 
       for (const [a, b] of CONNECTIONS) {
         const start = point(a)
         const end = point(b)
-        const highlighted = isSideConnection(a, b, side)
+        const highlighted = isSideConnection(a, b, side) || isRegionConnection(a, b)
+        if (only && !highlighted) continue
         context.strokeStyle = highlighted ? '#ff6b54' : 'rgba(121, 187, 255, 0.95)'
         context.lineWidth = (highlighted ? 5 : 3) * dpr
         context.beginPath()
@@ -110,7 +141,8 @@ export const PoseOverlay = forwardRef<PoseOverlayHandle, PoseOverlayProps>(funct
             ? [11, 13, 15].includes(index)
             : side === 'right'
               ? [12, 14, 16].includes(index)
-              : false
+              : Boolean(region && REGION_JOINTS[region].includes(index))
+        if (only && !highlighted) continue
         context.fillStyle = highlighted ? '#ff6b54' : '#ffffff'
         context.strokeStyle = highlighted ? '#ffffff' : '#4d9cf8'
         context.lineWidth = 2 * dpr
@@ -129,6 +161,7 @@ export const PoseOverlay = forwardRef<PoseOverlayHandle, PoseOverlayProps>(funct
       aria-hidden="true"
       data-testid="pose-overlay"
       data-overlay-visible={visible ? 'true' : 'false'}
+      data-overlay-highlight={highlight ?? ''}
       hidden={!visible}
     />
   )

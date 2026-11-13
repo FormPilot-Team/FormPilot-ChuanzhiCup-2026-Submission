@@ -97,7 +97,7 @@ export const TRAINING_MODES: readonly ModeHubEntry[] = Object.freeze([WARM_UP_MO
 export const WORKSHOP_ENTRY: ModeHubEntry = Object.freeze({
   id: 'motion-workshop',
   title: '动作工坊',
-  description: '教 FormPilot 学会你的动作：设置识别要求、测试并保存，之后就能直接训练。',
+  description: '教 FormPilot 学会你的动作：示范采集、识别测试并保存，之后就能直接训练。',
   status: 'available',
   route: WORKSHOP_PATH,
   cta: '进入动作工坊',
@@ -107,7 +107,7 @@ export const WORKSHOP_ENTRY: ModeHubEntry = Object.freeze({
 } satisfies ModeHubEntry)
 
 /** The workshop's user flow, in user language. */
-export const WORKSHOP_FLOW = ['创建动作', '设置识别要求', '测试', '保存', '开始训练'] as const
+export const WORKSHOP_FLOW = ['动作信息', '示范采集', '识别测试', '保存并训练'] as const
 
 /** 使用说明 is a utility, not a product area: a small entry next to the Home hero. */
 export const GUIDE_ENTRY = Object.freeze({

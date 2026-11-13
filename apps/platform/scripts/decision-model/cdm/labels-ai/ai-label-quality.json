@@ -1,0 +1,124 @@
+{
+ "schemaVersion": 1,
+ "generatedAt": "2026-11-07T20:59:39+0800",
+ "annotator": {
+  "kind": "ai",
+  "id": "AI-claude-opus-5.5",
+  "model": "Claude Opus 5.5 (claude-opus-5-5)",
+  "tool": "Claude Code (desktop app)",
+  "role": "ai_independent_annotator (not human, not clinical)",
+  "date": "2026-11-07",
+  "guidelines": "fp-cdm GUIDELINES v1.1",
+  "conflictOfInterest": "same agent that designed the PR #49 ranker and the fp-cdm feature set; not independent of the systems being compared",
+  "procedure": "blinded worksheet (no pool provenance, split or system ranks); three conditions of each family processed sequentially"
+ },
+ "scenarioSha256": "11ad3c42124f063d3909daa4bebc2ecdc498d93309095feaf9cefb6a736db2c2",
+ "integrity": {
+  "expected": 720,
+  "received": 720,
+  "problems": [],
+  "complete": true
+ },
+ "gradeDistribution": {
+  "all": [
+   0,
+   243,
+   336,
+   141
+  ],
+  "byCondition": {
+   "A_profile": [
+    0,
+    82,
+    114,
+    44
+   ],
+   "B_history": [
+    0,
+    84,
+    111,
+    45
+   ],
+   "C_history_report": [
+    0,
+    77,
+    111,
+    52
+   ]
+  },
+  "byStratum": {
+   "limited": [
+    0,
+    112,
+    137,
+    39
+   ],
+   "non_limited": [
+    0,
+    131,
+    199,
+    102
+   ]
+  },
+  "bySplit": {
+   "dev": [
+    0,
+    173,
+    255,
+    112
+   ],
+   "test": [
+    0,
+    70,
+    81,
+    29
+   ]
+  },
+  "byKind": {
+   "chapter": [
+    0,
+    189,
+    237,
+    117
+   ],
+   "game": [
+    0,
+    54,
+    99,
+    24
+   ]
+  }
+ },
+ "abstain": 0,
+ "uncertain": 26,
+ "needsReview": 12,
+ "safetyConcern": 0,
+ "zeroVarianceScenarios": [],
+ "crossConditionChanges": {
+  "count": 37,
+  "swingsOfTwoOrMore": []
+ },
+ "trainablePairs": {
+  "dev": 1593,
+  "test": 555
+ },
+ "circularityAudit": {
+  "rules_p0": {
+   "meanScenarioSpearman": 0.4451430528390059,
+   "scenarios": 72
+  },
+  "pr49": {
+   "meanScenarioSpearman": 0.412755217946922,
+   "scenarios": 72
+  },
+  "region_f1_feature": {
+   "meanScenarioSpearman": 0.4486240390996819,
+   "scenarios": 69
+  },
+  "top1OfSystemHasAiMaxGrade": {
+   "rules_p0": "38/72",
+   "pr49": "40/72"
+  }
+ },
+ "interAnnotatorAgreement": "NOT AVAILABLE: single AI annotator. No second annotator was simulated; AI-vs-AI repeat labelling would not be human agreement."
+}

@@ -27,10 +27,10 @@ const SYNTHETIC_BACKDROP = { portraitSrc: '/assets/camera-lateral-raise-demo.png
 type EditorStep = 'basics' | 'requirements' | 'test' | 'save'
 
 const STEPS: ReadonlyArray<{ id: EditorStep; label: string; title: string; description: string }> = [
-  { id: 'basics', label: '创建动作', title: '1 · 创建动作', description: '给动作起个名字，选好训练部位和计数方式。' },
-  { id: 'requirements', label: '设置识别要求', title: '2 · 设置识别要求', description: '示范开始姿势和完成姿势，再选出这个动作最重要的要求。' },
-  { id: 'test', label: '测试', title: '3 · 测试', description: '实际做几次，看看 FormPilot 能不能准确识别。' },
-  { id: 'save', label: '保存', title: '4 · 保存', description: '确认信息后保存，之后可以在“开始训练 · 我的动作”里直接练。' },
+  { id: 'basics', label: '动作信息', title: '1 · 动作信息', description: '给动作起个名字，选好训练部位和计数方式。' },
+  { id: 'requirements', label: '示范采集', title: '2 · 示范采集', description: '用摄像头或本地视频示范开始姿势和完成姿势，再确认这个动作最重要的要求。' },
+  { id: 'test', label: '识别测试', title: '3 · 识别测试', description: '实际做几次，看 FormPilot 的识别结果是否准确；没通过时按提示调整。' },
+  { id: 'save', label: '保存并训练', title: '4 · 保存并训练', description: '确认信息后保存，可以直接开始训练，之后也能在训练中心的“我的动作”里找到。' },
 ]
 
 const stepIndex = (step: EditorStep) => STEPS.findIndex((item) => item.id === step)
@@ -345,7 +345,7 @@ export function ActionEditorPage({ actionId, repository = localRepository }: { a
               {step === 'save' ? (
                 <span className="flex flex-wrap items-center gap-2">
                   <button type="button" onClick={() => save(false)} disabled={readOnly} className="secondary-button inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50" data-testid="editor-save"><Save size={17} aria-hidden="true" />保存动作</button>
-                  <button type="button" onClick={() => save(true)} disabled={readOnly} className="primary-button inline-flex items-center gap-2 px-6 disabled:cursor-not-allowed disabled:opacity-50" data-testid="editor-save-train"><Play size={16} fill="currentColor" aria-hidden="true" />保存并开始训练</button>
+                  <button type="button" onClick={() => save(true)} disabled={readOnly} className="fp-cta px-6 disabled:cursor-not-allowed disabled:opacity-50" data-testid="editor-save-train"><Play size={16} fill="currentColor" aria-hidden="true" />保存并开始训练</button>
                 </span>
               ) : (
                 <button type="button" onClick={() => goTo(STEPS[stepIndex(step) + 1].id)} className="primary-button inline-flex items-center gap-2" data-testid="editor-next">下一步：{STEPS[stepIndex(step) + 1].label}<ArrowRight size={16} aria-hidden="true" /></button>

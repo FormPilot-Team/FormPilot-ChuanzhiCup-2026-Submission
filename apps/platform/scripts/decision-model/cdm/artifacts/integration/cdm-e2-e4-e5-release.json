@@ -1,0 +1,118 @@
+{
+ "schemaVersion": 2,
+ "generatedAt": "2026-11-08T02:08:01.963Z",
+ "via": "public engine recommendCoachDecision",
+ "labelKind": "ai_single_annotator",
+ "weightsPath": "apps/platform/src/features/coachAgent/decisionModel/cdm/fp-cdm-m2.weights.json",
+ "scope": "self-report profile space (synthetic enumeration of the profile form), not real users",
+ "e2": {
+  "profiles": 22320,
+  "cdmAbstainedOrFellBack": 2133,
+  "distinctSlates": {
+   "rules_p0": 57,
+   "pr49": 433,
+   "cdm": 360
+  },
+  "normalisedEntropy": {
+   "rules_p0": 0.1983,
+   "pr49": 0.4024,
+   "cdm": 0.302
+  },
+  "meanRegionCoverage": {
+   "rules_p0": 0.8216,
+   "pr49": 0.8233,
+   "cdm": 0.845
+  },
+  "meanDistinctProgrammes": {
+   "rules_p0": 1.9823,
+   "pr49": 1.9358,
+   "cdm": 1.9965
+  }
+ },
+ "e4": {
+  "riskProfiles": {
+   "checked": 13392,
+   "held": 13392,
+   "modelExecutions": 0
+  },
+  "profileSpace": {
+   "profiles": 22320,
+   "executed": 22320,
+   "outcomes": {
+    "null": 20187,
+    "LOW_SUITABILITY": 1936,
+    "OUT_OF_DISTRIBUTION": 197
+   },
+   "limitedCautionItemsShown": 0,
+   "limitedCautionItemsRanked": 0,
+   "nonLaunchableChapters": 0
+  },
+  "adversarialCautionLovingWeights": {
+   "limitedProfiles": 6572,
+   "cautionItemsRankedOrShown": 0
+  },
+  "unavailableContentRankedOrShown": 0,
+  "lowConfidenceAbstain": {
+   "fallbackReason": "MODEL_ABSTAINED",
+   "abstainReason": "LOW_SUITABILITY",
+   "displayIsRules": true
+  },
+  "outOfDistributionAbstainInProfileSpace": 197,
+  "faults": {
+   "missingWeights": "MODEL_MISSING",
+   "placeholderWeights": "MODEL_NOT_TRAINED",
+   "tamperedWeights": "MODEL_VERSION_MISMATCH",
+   "inferenceException": "MODEL_ERROR",
+   "experimentalWithoutApproval": "EXPERIMENTAL_MODEL_NOT_APPROVED"
+  }
+ },
+ "e5": {
+  "engine": "fp-cdm-release/1.0.0 (release-bound)",
+  "weightsFileBytes": 12243,
+  "parameters": 337,
+  "singleRequestMs": {
+   "n": 22320,
+   "p50": 0.9705,
+   "p95": 1.7861,
+   "max": 3.9488
+  },
+  "withHistoryAndReportMs": {
+   "n": 3000,
+   "p50": 1.7105,
+   "p95": 2.2373
+  },
+  "rulesOnlyMs": {
+   "p50": 0.0461,
+   "p95": 0.1034
+  },
+  "batch5000": {
+   "totalMs": 5833.6189,
+   "perRequestMs": 1.1667
+  },
+  "heapUsedMB": 55.5261,
+  "cpu": "single thread, Node, development laptop",
+  "gpu": "not used",
+  "network": "none",
+  "bundle": {
+   "p0WebService": {
+    "minifiedBytes": 42664,
+    "gzipBytes": 11914,
+    "nodeBuiltinImports": 0,
+    "processReferences": 0
+   },
+   "engineCoreIncludingP0Pr49AndWeights": {
+    "minifiedBytes": 168163,
+    "gzipBytes": 46079,
+    "nodeBuiltinImports": 0,
+    "processReferences": 0
+   },
+   "engineWithLocalRecordHelpers": {
+    "minifiedBytes": 512124,
+    "gzipBytes": 133028,
+    "nodeBuiltinImports": 0,
+    "processReferences": 0
+   }
+  },
+  "coldStart": "measured separately by scripts/decision-model/cdm/cold-start.mjs (fresh process import + first call)"
+ }
+}

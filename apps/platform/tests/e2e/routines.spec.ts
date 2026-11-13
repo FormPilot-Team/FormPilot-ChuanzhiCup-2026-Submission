@@ -41,13 +41,15 @@ test.beforeEach(async ({ page }) => {
   await markOnboardingSeen(page)
 })
 
-test('Routine A: Home and the 跟练课程 index lead to every routine, its entry page and its training route', async ({ page }) => {
+test('Routine A: Home and the 功法训练 board lead to every routine, its entry page and its training route', async ({ page }) => {
+  // Web V1: Home → 功法训练 quick entry → routine card.
   await page.goto('/')
-  await page.getByTestId('mode-card-baduanjin').click()
+  await page.getByTestId('home-quick-routines').click()
+  await page.getByTestId('routine-open-baduanjin').click()
   await expect(page).toHaveURL(/\/routines\/baduanjin$/)
   await expect(page.getByRole('heading', { level: 1, name: '八段锦' })).toBeVisible()
   await expect(page.getByTestId('routine-forms').locator('li')).toHaveCount(10)
-  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '开始训练' })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '功法训练', exact: true })).toHaveAttribute('aria-current', 'page')
   await page.getByTestId('routine-start-full').click()
   await expect(page).toHaveURL(/\/routines\/baduanjin\/train$/)
   await expect(page.getByRole('heading', { level: 1, name: '八段锦 · 整套跟练' })).toBeVisible()
@@ -57,9 +59,9 @@ test('Routine A: Home and the 跟练课程 index lead to every routine, its entr
   await expect(routineState(page)).toContainText('启用摄像头后开始')
 
   await page.goto('/routines')
-  await expect(page.getByRole('heading', { level: 1, name: '跟练课程' })).toBeVisible()
-  for (const id of ['baduanjin', 'taijiquan', 'wuqinxi', 'yijinjing']) await expect(page.getByTestId(`routine-card-${id}`)).toHaveAttribute('href', `/routines/${id}`)
-  await page.getByTestId('routine-card-taijiquan').click()
+  await expect(page.getByRole('heading', { level: 1, name: '功法选择' })).toBeVisible()
+  for (const id of ['baduanjin', 'taijiquan', 'wuqinxi', 'yijinjing']) await expect(page.getByTestId(`routine-open-${id}`)).toHaveAttribute('href', `/routines/${id}`)
+  await page.getByTestId('routine-open-taijiquan').click()
   await expect(page.getByTestId('routine-forms').locator('li')).toHaveCount(24)
   await page.getByTestId('routine-form-tjq-10').click()
   await expect(page).toHaveURL(/\/routines\/taijiquan\/train\?form=tjq-10$/)
@@ -230,9 +232,10 @@ test('Routine I: History, Home and the report route show saved routine records',
   await page.getByTestId('history-card-routine-e2e-full').click()
   await expect(page).toHaveURL(/\/report\/routine-e2e-full$/)
   await expect(page.getByTestId('routine-report-focus')).toContainText('重点复习「第二式 · 左右开弓似射雕」')
+  // Web V1: Home's 最近训练记录 lists the record and links to its report.
   await page.goto('/')
-  await expect(page.getByTestId('home-training-history')).toContainText('八段锦 · 整套跟练')
-  await expect(page.getByTestId('home-training-history').getByRole('link', { name: '查看报告' })).toHaveAttribute('href', '/report/routine-e2e-full')
+  await expect(page.getByTestId('home-recent')).toContainText('八段锦 · 整套跟练')
+  await expect(page.getByTestId('home-recent').getByRole('link', { name: '查看报告：八段锦 · 整套跟练' })).toHaveAttribute('href', '/report/routine-e2e-full')
 })
 
 test('Routine J: the real camera pipeline follows the standard video', async ({ page }) => {

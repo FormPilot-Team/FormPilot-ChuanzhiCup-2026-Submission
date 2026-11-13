@@ -51,6 +51,8 @@ test('Polish D: every routine shows 本段要点, the camera status strip, 动�
   for (const id of ['baduanjin', 'taijiquan', 'wuqinxi', 'yijinjing']) {
     await page.goto(`/routines/${id}/train?fixture=synthetic`)
     await expect(page.getByTestId('routine-state')).toHaveAttribute('data-course-state', 'ACTIVE', { timeout: 30_000 })
+    // Web V1.1 C2: 本段要点, the camera status and 动作规范检查 are in 详细数据.
+    await page.getByTestId('details-toggle').click()
     const points = page.getByTestId('routine-chapter-points')
     await expect(points.getByRole('heading', { name: '本段要点' })).toBeVisible()
     await expect(page.getByTestId('routine-camera-requirement')).toContainText('本课程需要全身入镜')
@@ -60,13 +62,11 @@ test('Polish D: every routine shows 本段要点, the camera status strip, 动�
     await expect(page.locator('[data-check-id="follow-along.rhythm"]')).toHaveAttribute('data-check-status', 'met', { timeout: 15_000 })
     await expect(page.getByTestId('routine-next-chapter')).toContainText('下一段')
     await expect(page.getByTestId('routine-chapters-done')).toContainText(/已完成 0 \/ \d+ 段/)
-    // Video contract unchanged: the three regions sit side by side and end on one line.
-    const [demo, camera, feedback] = await Promise.all(['demonstration', 'camera', 'feedback'].map((region) => page.locator(`[data-layout-region="${region}"]`).boundingBox()))
+    // Video contract unchanged: demonstration and camera side by side, the pictures never stretched.
+    const [demo, camera] = await Promise.all(['demonstration', 'camera'].map((region) => page.locator(`[data-layout-region="${region}"]`).boundingBox()))
     expect(demo!.x + demo!.width).toBeLessThanOrEqual(camera!.x)
-    expect(camera!.x + camera!.width).toBeLessThanOrEqual(feedback!.x)
-    expect(Math.abs(demo!.y + demo!.height - (camera!.y + camera!.height))).toBeLessThanOrEqual(2)
-    expect(Math.abs(feedback!.y + feedback!.height - (camera!.y + camera!.height))).toBeLessThanOrEqual(2)
     expect(await page.getByTestId('routine-stage-video').evaluate((video) => getComputedStyle(video).objectFit)).toBe(id === 'taijiquan' ? 'cover' : 'contain')
+    await page.getByTestId('details-close').click()
   }
 })
 

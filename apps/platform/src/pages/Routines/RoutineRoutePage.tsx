@@ -4,7 +4,7 @@ import { findRoutineProgram } from '../../features/routines/programs'
 import { parseRoutineScope } from '../../features/routines/scope'
 import type { RoutineProgram } from '../../features/routines/types'
 import { RoutineEntryPage } from './RoutineEntryPage'
-import { RoutinesIndexPage } from './RoutinesIndexPage'
+import { RoutinesV1Page } from '../Web/RoutinesV1Page'
 import { RoutineTrainingPage } from './RoutineTrainingPage'
 
 function RoutineTrainingRoute({ program }: { program: RoutineProgram }) {
@@ -15,15 +15,15 @@ function RoutineTrainingRoute({ program }: { program: RoutineProgram }) {
 
 function routineDocumentTitle(route: RoutineRoute): string {
   const program = route.kind === 'index' ? undefined : findRoutineProgram(route.routineId)
-  if (!program) return 'FormPilot · 跟练课程'
+  if (!program) return 'FormPilot · 功法训练'
   return route.kind === 'train' ? `FormPilot · ${program.title}跟练` : `FormPilot · ${program.title}`
 }
 
 export function RoutineRoutePage({ route }: { route: RoutineRoute }) {
   document.title = routineDocumentTitle(route)
-  if (route.kind === 'index') return <RoutinesIndexPage />
+  if (route.kind === 'index') return <RoutinesV1Page />
   const program = findRoutineProgram(route.routineId)
-  if (!program) return <RoutinesIndexPage unknownRoutine />
+  if (!program) return <RoutinesV1Page unknownRoutine />
   if (route.kind === 'entry') return <RoutineEntryPage program={program} />
   return <RoutineTrainingRoute program={program} />
 }

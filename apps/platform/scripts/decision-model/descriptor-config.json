@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "fp-motion-descriptors/config-v1",
+  "preRegistration": "Thresholds below were fixed from 2D anatomical reasoning BEFORE any comparison with catalogue caution tags. They are engineering proxies on a single demonstrator's standard video, not clinical measurements.",
+  "minVisibility": 0.5,
+  "torsoScale": "p75 of shoulder-mid to hip-mid distance over all valid frames of the same video (standing reference; bending frames shorten it)",
+  "frameFlags": {
+    "overhead": "either side: wrist above nose (or above shoulder by 0.5 torso when nose hidden) AND elbow above shoulder",
+    "bending": "vertical torso component (hipMid.y - shoulderMid.y) below 0.6 torso scale, OR nose below shoulder line",
+    "balance": "ankle height difference above 0.35 torso scale (one foot clearly off the floor); heel raise (提踵) is NOT measurable",
+    "twist": "|ln((shoulderWidth/hipWidth) / videoMedianRatio)| above ln(1/0.7)",
+    "deepKnee": "either knee angle (hip-knee-ankle) below 110 degrees",
+    "weightBearing": "either wrist below (ankle.y - 0.15 torso scale), i.e. hand near floor level"
+  },
+  "thresholds": {
+    "bendingTorsoRatio": 0.6,
+    "balanceAnkleDiff": 0.35,
+    "twistLogRatio": 0.35667494393873245,
+    "deepKneeDegrees": 110,
+    "weightBearingAnkleMargin": 0.15,
+    "overheadNoNoseMargin": 0.5
+  },
+  "chapterFlagRule": { "minRunSeconds": 0.5, "minTotalSeconds": 1.5, "maxGapSeconds": 0.25 },
+  "reliability": { "minValidFrameFraction": 0.5, "minValidSeconds": 3 },
+  "regionInvolvement": {
+    "shoulders": "p90-p10 of upper-arm elevation angle (shoulder->elbow vs downward vertical), max of sides, degrees",
+    "arms": "p90-p10 of elbow angle, max of sides, degrees",
+    "neck": "p90-p10 of (ear distance / shoulder width) relative to video median, plus p90-p10 of ear-line tilt in radians",
+    "trunk": "p90-p10 of trunk side lean (degrees/90) + p90-p10 of vertical torso ratio + p90-p10 of |ln width ratio|",
+    "legs": "p90-p10 of knee angle (max of sides, degrees/180) + p90-p10 of hip-mid height / torso scale",
+    "normalisation": "divide by the 90th percentile of the same raw measure over all chapters with reliable data, clip to [0,1]"
+  }
+}

@@ -1,0 +1,232 @@
+{
+  "note": "合成场景自检：验证检查器本身，不是 SHADOW 验收证据（无真实设备、无本机记录）。",
+  "clean": {
+    "verdict": "INSUFFICIENT",
+    "hard": {
+      "H1_schema": {
+        "rule": "每条记录 schema = fp-coach-decision-shadow-log/v1",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H2_mode": {
+        "rule": "所有记录 mode = shadow",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H3_display_is_rules": {
+        "rule": "用户看到的（displayed）与规则结果完全相同，decisionOrigin = rules",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H4_release": {
+        "rule": "发布号 fp-cdm-release/1.0.0、权重指纹 fnv1a32x2:501683ad09c7bd0a，无模型文件完整性失败",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H5_wiring": {
+        "rule": "无 INPUT_INVALID / INVALID_AVAILABILITY，inputIssueCount = 0",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H6_model_faults": {
+        "rule": "无 MODEL_ERROR / OUTPUT_GUARD_REJECTED，Guard 违规为 0",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H7_safety": {
+        "rule": "safety_hold 时模型未运行且未展示任何内容",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      }
+    },
+    "latency": {
+      "rule": "调用耗时 p95 ≤ 10 ms",
+      "measured": 72,
+      "p50": 1.9215999999998985,
+      "p95": 2.5638000000000147,
+      "max": 12.932299999999941,
+      "status": "PASS"
+    },
+    "coverage": {
+      "C1_ready_entries": {
+        "need": 30,
+        "have": 72,
+        "status": "OK"
+      },
+      "C2_devices": {
+        "need": 3,
+        "have": 1,
+        "status": "SHORT"
+      },
+      "C3_live_history_entries": {
+        "need": 10,
+        "have": 0,
+        "status": "SHORT"
+      }
+    },
+    "observed": {
+      "entries": 72,
+      "devices": 1,
+      "status": {
+        "ready": 72
+      },
+      "fallbackReason": {
+        "SHADOW_MODE": 70,
+        "MODEL_ABSTAINED": 2
+      },
+      "modelExecutedShareOfReady": 1,
+      "abstainShareOfExecuted": 0.027777777777777776,
+      "abstainReason": {
+        "LOW_SUITABILITY": 2
+      },
+      "outOfDistributionFeatures": {
+        "(none)": 2
+      },
+      "rankingEffect": {
+        "changed": 44,
+        "reordered": 23,
+        "identical": 3
+      },
+      "top1ChapterAgreement": 0.6142857142857143,
+      "dataSources": {
+        "trainingHistory": {
+          "missing": 24,
+          "synthetic_demo": 48
+        },
+        "latestReport": {
+          "missing": 48,
+          "synthetic_demo": 24
+        },
+        "gameHistory": {
+          "missing": 44,
+          "synthetic_demo": 28
+        }
+      }
+    }
+  },
+  "negativeControlTampered": {
+    "verdict": "FAIL",
+    "hard": {
+      "H1_schema": {
+        "rule": "每条记录 schema = fp-coach-decision-shadow-log/v1",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H2_mode": {
+        "rule": "所有记录 mode = shadow",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H3_display_is_rules": {
+        "rule": "用户看到的（displayed）与规则结果完全相同，decisionOrigin = rules",
+        "status": "FAIL",
+        "violations": 6,
+        "examples": [
+          "self-test-tampered#0",
+          "self-test-tampered#27",
+          "self-test-tampered#36",
+          "self-test-tampered#45",
+          "self-test-tampered#54",
+          "self-test-tampered#63"
+        ]
+      },
+      "H4_release": {
+        "rule": "发布号 fp-cdm-release/1.0.0、权重指纹 fnv1a32x2:501683ad09c7bd0a，无模型文件完整性失败",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H5_wiring": {
+        "rule": "无 INPUT_INVALID / INVALID_AVAILABILITY，inputIssueCount = 0",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H6_model_faults": {
+        "rule": "无 MODEL_ERROR / OUTPUT_GUARD_REJECTED，Guard 违规为 0",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      },
+      "H7_safety": {
+        "rule": "safety_hold 时模型未运行且未展示任何内容",
+        "status": "PASS",
+        "violations": 0,
+        "examples": []
+      }
+    },
+    "latency": {
+      "rule": "调用耗时 p95 ≤ 10 ms",
+      "measured": 72,
+      "p50": 1.9215999999998985,
+      "p95": 2.5638000000000147,
+      "max": 12.932299999999941,
+      "status": "PASS"
+    },
+    "coverage": {
+      "C1_ready_entries": {
+        "need": 30,
+        "have": 72,
+        "status": "OK"
+      },
+      "C2_devices": {
+        "need": 3,
+        "have": 1,
+        "status": "SHORT"
+      },
+      "C3_live_history_entries": {
+        "need": 10,
+        "have": 0,
+        "status": "SHORT"
+      }
+    },
+    "observed": {
+      "entries": 72,
+      "devices": 1,
+      "status": {
+        "ready": 72
+      },
+      "fallbackReason": {
+        "SHADOW_MODE": 70,
+        "MODEL_ABSTAINED": 2
+      },
+      "modelExecutedShareOfReady": 1,
+      "abstainShareOfExecuted": 0.027777777777777776,
+      "abstainReason": {
+        "LOW_SUITABILITY": 2
+      },
+      "outOfDistributionFeatures": {
+        "(none)": 2
+      },
+      "rankingEffect": {
+        "changed": 44,
+        "reordered": 23,
+        "identical": 3
+      },
+      "top1ChapterAgreement": 0.6142857142857143,
+      "dataSources": {
+        "trainingHistory": {
+          "missing": 24,
+          "synthetic_demo": 48
+        },
+        "latestReport": {
+          "missing": 48,
+          "synthetic_demo": 24
+        },
+        "gameHistory": {
+          "missing": 44,
+          "synthetic_demo": 28
+        }
+      }
+    }
+  }
+}

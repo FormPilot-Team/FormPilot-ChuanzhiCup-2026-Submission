@@ -26,7 +26,7 @@ async function createAction(page: Page, name: string, target = 5, saveButton: 'e
   await page.getByLabel('目标次数').fill(String(target))
   await page.getByTestId('editor-next').click()
   await expect(page.getByTestId('editor-step')).toHaveAttribute('data-step', 'requirements')
-  await expect(page.getByRole('heading', { name: '2 · 设置识别要求' })).toBeFocused()
+  await expect(page.getByRole('heading', { name: '2 · 示范采集' })).toBeFocused()
   await page.getByLabel('怎么做（给自己看的提示）').first().fill('站直，双臂自然下垂')
   await page.getByTestId('record-start').click()
   await expect(page.getByTestId('pose-card-start')).toHaveAttribute('data-recorded', 'true', { timeout: 8_000 })
@@ -52,7 +52,7 @@ test.beforeEach(async ({ page }) => { await markOnboardingSeen(page) })
 test('Workshop A: create → record poses → test → save, then reload and edit', async ({ page }) => {
   test.setTimeout(90_000)
   await page.goto('/workshop')
-  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '动作工坊' })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '我的', exact: true })).toHaveAttribute('aria-current', 'page') // Web V1: 动作工坊 sits under 我的
   await expect(page.getByTestId('workshop-empty')).toContainText('还没有自定义动作')
   await expect(page.getByTestId('workshop-create')).toHaveAttribute('href', '/workshop/new')
 
@@ -250,8 +250,9 @@ test('Workshop H: the closed loop — create, test, save and start training, the
   await page.getByRole('button', { name: '查看训练报告' }).click()
   await expect(page.getByRole('heading', { level: 1, name: '闭环动作训练报告' })).toBeVisible()
   await expect(page.getByTestId('report-summary')).toContainText('本次完成了 3 / 3 次，其中 3 次识别重点都达标')
-  await page.goto('/')
-  await expect(page.getByTestId('home-my-actions').getByRole('link', { name: '开始训练 · 闭环动作' })).toHaveAttribute('href', `/workshop/${saved.id}/train`)
+  // Web V1: the user's own actions are listed in 训练中心.
+  await page.goto('/training')
+  await expect(page.getByTestId('training-my-actions').getByRole('link', { name: '开始训练 · 闭环动作' })).toHaveAttribute('href', `/workshop/${saved.id}/train`)
   await page.goto('/history')
   await expect(page.getByTestId('history-list').locator('[data-kind="custom"]')).toHaveCount(0)
   await simulateLiveHistoryRecord(page)
@@ -322,7 +323,7 @@ test('Workshop I: the whole editor works from the keyboard alone', async ({ page
 
   await page.getByTestId('editor-next').focus()
   await page.keyboard.press('Enter')
-  await expect(page.getByRole('heading', { name: '2 · 设置识别要求' })).toBeFocused()
+  await expect(page.getByRole('heading', { name: '2 · 示范采集' })).toBeFocused()
   await page.getByTestId('record-start').focus()
   await page.keyboard.press('Enter')
   await expect(page.getByTestId('pose-card-start')).toHaveAttribute('data-recorded', 'true', { timeout: 8_000 })

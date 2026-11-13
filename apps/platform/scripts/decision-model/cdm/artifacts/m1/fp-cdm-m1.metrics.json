@@ -1,0 +1,494 @@
+{
+ "schemaVersion": 1,
+ "generatedAt": "2026-11-07T20:21:15+0800",
+ "python": "3.12.0",
+ "sklearn": "1.8.0",
+ "numpy": "2.4.1",
+ "data": {
+  "path": "scripts/decision-model/cdm/data/m1-windows.v1.json",
+  "sha256": "86fe99bbfbfb81c40423379bc314fc3789e7437f608a97e56f5bd69f74016527",
+  "windows": 1677,
+  "chapters": 59,
+  "features": 76
+ },
+ "protocol": "leave-one-programme-out; chapter-level metrics over out-of-fold predictions; no test programme ever in training",
+ "trainSecondsBothFamilies": 7.88,
+ "chosenFamily": "hgb",
+ "selectionNote": "family chosen by LOPO macro-AUC, so the chosen family number is mildly optimistic; both are reported",
+ "results": {
+  "logreg": {
+   "perLabel": {
+    "region:shoulders": {
+     "positives": 29,
+     "n": 59,
+     "auc": 0.496551724137931,
+     "ap": 0.5594143521321269,
+     "f1_at_0_5": 0.5,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.44,
+      "taijiquan": 0.3968253968253968,
+      "wuqinxi": 0.42857142857142855,
+      "yijinjing": 0.75
+     },
+     "learnableLopo": true
+    },
+    "region:neck": {
+     "positives": 4,
+     "n": 59,
+     "auc": 0.6409090909090909,
+     "ap": 0.13561507936507936,
+     "f1_at_0_5": 0.0,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.5625,
+      "taijiquan": null,
+      "wuqinxi": 0.7272727272727273,
+      "yijinjing": 0.8461538461538461
+     },
+     "learnableLopo": true
+    },
+    "region:arms": {
+     "positives": 52,
+     "n": 59,
+     "auc": 0.7967032967032968,
+     "ap": 0.9635435546143417,
+     "f1_at_0_5": 0.8888888888888888,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.8571428571428571,
+      "taijiquan": 0.7380952380952381,
+      "wuqinxi": 1.0,
+      "yijinjing": 1.0
+     },
+     "learnableLopo": true
+    },
+    "region:trunk": {
+     "positives": 26,
+     "n": 59,
+     "auc": 0.7668997668997668,
+     "ap": 0.7279067733182919,
+     "f1_at_0_5": 0.6666666666666666,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 1.0,
+      "taijiquan": 0.5454545454545454,
+      "wuqinxi": 0.8333333333333334,
+      "yijinjing": 0.8979591836734694
+     },
+     "learnableLopo": true
+    },
+    "region:legs": {
+     "positives": 42,
+     "n": 59,
+     "auc": 0.8879551820728292,
+     "ap": 0.9524387518991791,
+     "f1_at_0_5": 0.8461538461538461,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.9166666666666667,
+      "taijiquan": 0.45454545454545453,
+      "wuqinxi": 0.96875,
+      "yijinjing": 0.7916666666666667
+     },
+     "learnableLopo": true
+    },
+    "caution:overhead": {
+     "positives": 12,
+     "n": 59,
+     "auc": 0.6418439716312057,
+     "ap": 0.28182715164842526,
+     "f1_at_0_5": 0.36065573770491804,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 1.0,
+      "taijiquan": 0.31666666666666665,
+      "wuqinxi": 0.6296296296296295,
+      "yijinjing": 0.9500000000000001
+     },
+     "learnableLopo": true
+    },
+    "caution:balance": {
+     "positives": 37,
+     "n": 59,
+     "auc": 0.7972972972972974,
+     "ap": 0.8847261199713345,
+     "f1_at_0_5": 0.8266666666666667,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.75,
+      "taijiquan": 0.7380952380952381,
+      "wuqinxi": 0.8285714285714286,
+      "yijinjing": 0.6222222222222223
+     },
+     "learnableLopo": true
+    },
+    "caution:twist": {
+     "positives": 14,
+     "n": 59,
+     "auc": 0.7015873015873015,
+     "ap": 0.34939512571550235,
+     "f1_at_0_5": 0.5777777777777777,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.75,
+      "taijiquan": 0.6764705882352942,
+      "wuqinxi": 0.7,
+      "yijinjing": 0.7749999999999999
+     },
+     "learnableLopo": true
+    },
+    "caution:bending": {
+     "positives": 7,
+     "n": 59,
+     "auc": 0.7774725274725275,
+     "ap": 0.6664010431758909,
+     "f1_at_0_5": 0.26666666666666666,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 1.0,
+      "taijiquan": 0.4545454545454546,
+      "wuqinxi": 1.0,
+      "yijinjing": 0.775
+     },
+     "learnableLopo": true
+    },
+    "caution:weight_bearing": {
+     "positives": 1,
+     "n": 59,
+     "auc": 0.11206896551724138,
+     "ap": 0.01694915254237288,
+     "f1_at_0_5": 0.0,
+     "perHeldOutProgramAuc": {
+      "baduanjin": null,
+      "taijiquan": null,
+      "wuqinxi": null,
+      "yijinjing": 0.5
+     },
+     "learnableLopo": false
+    }
+   },
+   "learnableLabels": [
+    "region:shoulders",
+    "region:neck",
+    "region:arms",
+    "region:trunk",
+    "region:legs",
+    "caution:overhead",
+    "caution:balance",
+    "caution:twist",
+    "caution:bending"
+   ],
+   "macroAuc": 0.7230244620790275,
+   "macroAucRegions": 0.7178038121445829,
+   "macroAucCautions": 0.729550274497083
+  },
+  "hgb": {
+   "perLabel": {
+    "region:shoulders": {
+     "positives": 29,
+     "n": 59,
+     "auc": 0.5528735632183908,
+     "ap": 0.5544649016783632,
+     "f1_at_0_5": 0.5333333333333333,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.84,
+      "taijiquan": 0.626984126984127,
+      "wuqinxi": 0.6571428571428571,
+      "yijinjing": 0.7708333333333334
+     },
+     "learnableLopo": true
+    },
+    "region:neck": {
+     "positives": 4,
+     "n": 59,
+     "auc": 0.7454545454545455,
+     "ap": 0.20058479532163742,
+     "f1_at_0_5": 0.0,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.75,
+      "taijiquan": null,
+      "wuqinxi": 0.8181818181818181,
+      "yijinjing": 0.8461538461538461
+     },
+     "learnableLopo": true
+    },
+    "region:arms": {
+     "positives": 52,
+     "n": 59,
+     "auc": 0.7225274725274725,
+     "ap": 0.9526843988862924,
+     "f1_at_0_5": 0.9369369369369369,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.8095238095238095,
+      "taijiquan": 0.9047619047619048,
+      "wuqinxi": 1.0,
+      "yijinjing": 0.6153846153846154
+     },
+     "learnableLopo": true
+    },
+    "region:trunk": {
+     "positives": 26,
+     "n": 59,
+     "auc": 0.719114219114219,
+     "ap": 0.6527387274391179,
+     "f1_at_0_5": 0.6440677966101694,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 1.0,
+      "taijiquan": 0.46212121212121215,
+      "wuqinxi": 0.888888888888889,
+      "yijinjing": 0.8163265306122449
+     },
+     "learnableLopo": true
+    },
+    "region:legs": {
+     "positives": 42,
+     "n": 59,
+     "auc": 0.8613445378151261,
+     "ap": 0.8944747074603736,
+     "f1_at_0_5": 0.891566265060241,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.75,
+      "taijiquan": 0.0,
+      "wuqinxi": 1.0,
+      "yijinjing": 0.75
+     },
+     "learnableLopo": true
+    },
+    "caution:overhead": {
+     "positives": 12,
+     "n": 59,
+     "auc": 0.7588652482269503,
+     "ap": 0.6455671841920578,
+     "f1_at_0_5": 0.5142857142857142,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 1.0,
+      "taijiquan": 0.41666666666666663,
+      "wuqinxi": 0.7037037037037037,
+      "yijinjing": 0.9500000000000001
+     },
+     "learnableLopo": true
+    },
+    "caution:balance": {
+     "positives": 37,
+     "n": 59,
+     "auc": 0.9041769041769043,
+     "ap": 0.946426378994158,
+     "f1_at_0_5": 0.8395061728395061,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.75,
+      "taijiquan": 0.7619047619047619,
+      "wuqinxi": 1.0,
+      "yijinjing": 0.7777777777777777
+     },
+     "learnableLopo": true
+    },
+    "caution:twist": {
+     "positives": 14,
+     "n": 59,
+     "auc": 0.7126984126984126,
+     "ap": 0.4934604368063015,
+     "f1_at_0_5": 0.46153846153846156,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.5625,
+      "taijiquan": 0.7156862745098039,
+      "wuqinxi": 0.9500000000000001,
+      "yijinjing": 0.8500000000000001
+     },
+     "learnableLopo": true
+    },
+    "caution:bending": {
+     "positives": 7,
+     "n": 59,
+     "auc": 0.8736263736263736,
+     "ap": 0.6924192665571975,
+     "f1_at_0_5": 0.38461538461538464,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 1.0,
+      "taijiquan": 0.40909090909090906,
+      "wuqinxi": 1.0,
+      "yijinjing": 0.9249999999999999
+     },
+     "learnableLopo": true
+    },
+    "caution:weight_bearing": {
+     "positives": 1,
+     "n": 59,
+     "auc": 0.11206896551724138,
+     "ap": 0.01694915254237288,
+     "f1_at_0_5": 0.0,
+     "perHeldOutProgramAuc": {
+      "baduanjin": null,
+      "taijiquan": null,
+      "wuqinxi": null,
+      "yijinjing": 0.5
+     },
+     "learnableLopo": false
+    }
+   },
+   "learnableLabels": [
+    "region:shoulders",
+    "region:neck",
+    "region:arms",
+    "region:trunk",
+    "region:legs",
+    "caution:overhead",
+    "caution:balance",
+    "caution:twist",
+    "caution:bending"
+   ],
+   "macroAuc": 0.7611868085398217,
+   "macroAucRegions": 0.7202628676259508,
+   "macroAucCautions": 0.8123417346821603
+  },
+  "pr49_descriptors_baseline": {
+   "perLabel": {
+    "region:shoulders": {
+     "positives": 29,
+     "n": 59,
+     "auc": 0.6068965517241379,
+     "ap": 0.6566425323572777,
+     "f1_at_0_5": 0.5714285714285714,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.62,
+      "taijiquan": 0.38095238095238093,
+      "wuqinxi": 0.7142857142857143,
+      "yijinjing": 0.7291666666666666
+     },
+     "learnableLopo": true
+    },
+    "region:neck": {
+     "positives": 4,
+     "n": 59,
+     "auc": 0.4636363636363636,
+     "ap": 0.07494414601884114,
+     "f1_at_0_5": 0.0,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 1.0,
+      "taijiquan": null,
+      "wuqinxi": 0.36363636363636365,
+      "yijinjing": 0.7692307692307692
+     },
+     "learnableLopo": true
+    },
+    "region:arms": {
+     "positives": 52,
+     "n": 59,
+     "auc": 0.8598901098901099,
+     "ap": 0.9803008986734774,
+     "f1_at_0_5": 0.8260869565217391,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.9523809523809524,
+      "taijiquan": 0.6190476190476191,
+      "wuqinxi": 0.9090909090909091,
+      "yijinjing": 1.0
+     },
+     "learnableLopo": true
+    },
+    "region:trunk": {
+     "positives": 26,
+     "n": 59,
+     "auc": 0.7529137529137528,
+     "ap": 0.6706818361682602,
+     "f1_at_0_5": 0.5652173913043478,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 1.0,
+      "taijiquan": 0.44318181818181823,
+      "wuqinxi": 0.8333333333333334,
+      "yijinjing": 0.8367346938775511
+     },
+     "learnableLopo": true
+    },
+    "region:legs": {
+     "positives": 42,
+     "n": 59,
+     "auc": 0.8676470588235294,
+     "ap": 0.9070281117906905,
+     "f1_at_0_5": 0.7605633802816901,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.7916666666666666,
+      "taijiquan": 0.06818181818181818,
+      "wuqinxi": 1.0,
+      "yijinjing": 0.6666666666666666
+     },
+     "learnableLopo": true
+    },
+    "caution:overhead": {
+     "positives": 12,
+     "n": 59,
+     "auc": 0.8705673758865248,
+     "ap": 0.5655257936507937,
+     "f1_at_0_5": 0.5714285714285714,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.9375,
+      "taijiquan": 0.8833333333333333,
+      "wuqinxi": 0.5925925925925926,
+      "yijinjing": 0.8999999999999999
+     },
+     "learnableLopo": true
+    },
+    "caution:balance": {
+     "positives": 37,
+     "n": 59,
+     "auc": 0.7027027027027027,
+     "ap": 0.7782867613376085,
+     "f1_at_0_5": 0.5769230769230769,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.5,
+      "taijiquan": 0.6904761904761905,
+      "wuqinxi": 0.9285714285714286,
+      "yijinjing": 0.6
+     },
+     "learnableLopo": true
+    },
+    "caution:twist": {
+     "positives": 14,
+     "n": 59,
+     "auc": 0.6015873015873016,
+     "ap": 0.3024008804567412,
+     "f1_at_0_5": 0.43478260869565216,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 0.5,
+      "taijiquan": 0.43137254901960786,
+      "wuqinxi": 0.44999999999999996,
+      "yijinjing": 0.8499999999999999
+     },
+     "learnableLopo": true
+    },
+    "caution:bending": {
+     "positives": 7,
+     "n": 59,
+     "auc": 0.9107142857142857,
+     "ap": 0.7689899688689035,
+     "f1_at_0_5": 0.75,
+     "perHeldOutProgramAuc": {
+      "baduanjin": 1.0,
+      "taijiquan": 0.5,
+      "wuqinxi": 1.0,
+      "yijinjing": 0.9500000000000001
+     },
+     "learnableLopo": true
+    },
+    "caution:weight_bearing": {
+     "positives": 1,
+     "n": 59,
+     "auc": 0.9655172413793104,
+     "ap": 0.3333333333333333,
+     "f1_at_0_5": 0.25,
+     "perHeldOutProgramAuc": {
+      "baduanjin": null,
+      "taijiquan": null,
+      "wuqinxi": null,
+      "yijinjing": 0.923076923076923
+     },
+     "learnableLopo": false
+    }
+   },
+   "learnableLabels": [
+    "region:shoulders",
+    "region:neck",
+    "region:arms",
+    "region:trunk",
+    "region:legs",
+    "caution:overhead",
+    "caution:balance",
+    "caution:twist",
+    "caution:bending"
+   ],
+   "macroAuc": 0.7373950558754121,
+   "macroAucRegions": 0.7101967673975789,
+   "macroAucCautions": 0.7713929164727037
+  }
+ }
+}

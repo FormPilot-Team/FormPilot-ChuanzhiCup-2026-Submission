@@ -1,0 +1,139 @@
+{
+ "release": "fp-cdm-release/1.0.0",
+ "generatedAt": "2026-11-07T17:20:24.666Z",
+ "computed": {
+  "weightsFingerprint": "fnv1a32x2:501683ad09c7bd0a",
+  "weightsSha256": "d8bfd9ed8ad64d7b7832a4fefd063a6216af65ee3fc156b01b6dada484ac8b5c",
+  "contentTableFingerprint": "fnv1a32x2:ba463a0d4bd82785",
+  "contentTableSha256": "c42f8f521154ff8531cdd84be103c999a1160f88737bd652bebd7d0bbb93d5c2",
+  "catalogueFingerprint": "fnv1a32x2:e01fd2104d0ef965"
+ },
+ "m2": {
+  "id": "fp-cdm-m2",
+  "version": "1.0.0",
+  "runtimeVersion": "1.2.0",
+  "featureSet": "fp-cdm-features/v1",
+  "tier": "ai_experimental",
+  "weightsFile": "apps/platform/src/features/coachAgent/decisionModel/cdm/fp-cdm-m2.weights.json",
+  "weightsFingerprint": "fnv1a32x2:501683ad09c7bd0a",
+  "weightsSha256": "d8bfd9ed8ad64d7b7832a4fefd063a6216af65ee3fc156b01b6dada484ac8b5c",
+  "labels": "ai_single_annotator",
+  "labelsSha256": "6ba82c3eebbad378e8d13e6a4c979044471b1e65c5800d3b64387d691e02a327",
+  "matrixSha256": "300c2f6c437d5d7474d3690a903752499ee01912c10fdebe2666939ecc93dd56",
+  "parameters": 337
+ },
+ "m1": {
+  "id": "fp-cdm-m1",
+  "contentTableVersion": "1.0.0",
+  "contentTableFile": "apps/platform/src/features/coachAgent/decisionModel/cdm/m1ContentFeatures.json",
+  "contentTableFingerprint": "fnv1a32x2:ba463a0d4bd82785",
+  "contentTableSha256": "c42f8f521154ff8531cdd84be103c999a1160f88737bd652bebd7d0bbb93d5c2",
+  "modelOfRecord": "fp-cdm-m1 v1.1（嵌套留一功法验证 macro AUC 0.777；M2 v1.0 绑定 v1.0 的 out-of-fold 内容表）"
+ },
+ "files": [
+  {
+   "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/fp-cdm-m2.weights.json",
+   "bytes": 12243,
+   "sha256": "d8bfd9ed8ad64d7b7832a4fefd063a6216af65ee3fc156b01b6dada484ac8b5c"
+  },
+  {
+   "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/m1ContentFeatures.json",
+   "bytes": 19686,
+   "sha256": "c42f8f521154ff8531cdd84be103c999a1160f88737bd652bebd7d0bbb93d5c2"
+  },
+  {
+   "path": "apps/platform/src/features/coachAgent/decisionModel/motionDescriptors.json",
+   "bytes": 68977,
+   "sha256": "28cd4d4df529ba2312545801e14e664c3aaf17f121ca13834bc0b25b3f5cbe5b"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/artifacts/m2-ai-experiment/fp-cdm-m2.ai-experiment.weights.json",
+   "bytes": 10987,
+   "sha256": "ad7162d63e305b7c2f5722c0cdd4aa390ded764928d88e0dc1f8c07344b2f018"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/artifacts/m2-ai-experiment/fp-cdm-m2.ai-experiment.weights+ranges.json",
+   "bytes": 12243,
+   "sha256": "d8bfd9ed8ad64d7b7832a4fefd063a6216af65ee3fc156b01b6dada484ac8b5c"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/artifacts/m2-ai-experiment/fp-cdm-m2.ai-experiment.report.json",
+   "bytes": 21233,
+   "sha256": "1ae572c919a0241fc73fc4f6162a21842b4a98050b7e16c7d4ef5bdef9ebd3c4"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1/fp-cdm-m1.metrics.json",
+   "bytes": 13056,
+   "sha256": "237ac48bf32a075699b46b2879ba352d5ee543773f0f77a2a68625f6f6475431"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1/fp-cdm-m1.model.json",
+   "bytes": 1865,
+   "sha256": "4eb6f32bd41f0ade3864eda0e14f36bd160b82bb9fc4d38e955ff02ae4b6710c"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1/fp-cdm-m1.oof-content-features.json",
+   "bytes": 19686,
+   "sha256": "c42f8f521154ff8531cdd84be103c999a1160f88737bd652bebd7d0bbb93d5c2"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1-v11/fp-cdm-m1-v11.report.json",
+   "bytes": 10397,
+   "sha256": "d4eea2ab8a0f52d4830cc6126dcb4de46275ebb44dd96f6723e2a44b2d3f4081"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1-v11/fp-cdm-m1-v11.oof-content-features.json",
+   "bytes": 19868,
+   "sha256": "74b730fc3351dc379a7d7c472db4b86bb58ad19796b064e992d561fdc31626cb"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1-v11/fp-cdm-m1-robustness.json",
+   "bytes": 1110,
+   "sha256": "47d6526c83b1767684976942494a8d214f8108bb19c38d75f2f0a9d9901186e9"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/data/scenarios.v1.json",
+   "bytes": 112468,
+   "sha256": "11ad3c42124f063d3909daa4bebc2ecdc498d93309095feaf9cefb6a736db2c2"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/labels-ai/fp-cdm-ai-labels-v1.json",
+   "bytes": 163508,
+   "sha256": "6ba82c3eebbad378e8d13e6a4c979044471b1e65c5800d3b64387d691e02a327"
+  },
+  {
+   "path": "apps/platform/scripts/decision-model/cdm/annotation-kit/GUIDELINES.md",
+   "bytes": 5000,
+   "sha256": "9274491f6f3f880d256015c7c6e91db6b9572ad4578b4b93df3233d0a44b51f0"
+  },
+  {
+   "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/features.ts",
+   "bytes": 9218,
+   "sha256": "a6676fc8ac17902ae835953d2f72e36a201d8ba6fdac6242bcbeccea356848a7"
+  },
+  {
+   "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/model.ts",
+   "bytes": 16770,
+   "sha256": "d69c569d4c09dc79e5ce64b0ef686cfb8d3f17a40d41171e3eec17da59ffcd0c"
+  },
+  {
+   "path": "apps/platform/src/features/coachAgent/decisionModel/engine/contract.ts",
+   "bytes": 8276,
+   "sha256": "b5f9d7a1d0906c245088f39f1de65ce9fc9e2c7c4f94cc94237a0a31181c3f81"
+  }
+ ],
+ "rollback": [
+  {
+   "to": "rules (Agent Web P0)",
+   "how": "mode \"off\" (default) — no code change"
+  },
+  {
+   "to": "fp-coach-ranker v1 (PR #49, deterministic, no trained weights)",
+   "how": "getCoachDecisionRecommendation from decisionModel/adapter.ts (unchanged)"
+  },
+  {
+   "to": "fp-cdm runtime 1.1.0 with placeholder weights (always rules)",
+   "how": "git show 34818ec:apps/platform/src/features/coachAgent/decisionModel/cdm/fp-cdm-m2.weights.json"
+  }
+ ]
+}

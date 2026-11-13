@@ -1,0 +1,3588 @@
+{
+ "schemaVersion": 1,
+ "id": "fp-motion-descriptors/v1",
+ "extractorVersion": "1.0.1",
+ "configId": "fp-motion-descriptors/config-v1",
+ "configSha256": "6e95c22d55e456fa0f150d476f4fee0e8862bf9cbbecda1bcb62de28fa8e03cd",
+ "dataOrigin": "project reference pose tracks of the standard demonstration videos (single demonstrator, MediaPipe Pose Lite, 2D); not user data",
+ "validity": "engineering 2D proxies for catalogue auditing and ranking refinement; not clinical range-of-motion or load measurements",
+ "tracks": [
+  {
+   "programId": "baduanjin",
+   "path": "apps/platform/public/assets/routines/baduanjin-standard.pose.json",
+   "sha256": "3e89dd299bad05be3828c373a44fe76d3b8b5ed8014debc3914bca18a238689e",
+   "frames": 7284,
+   "fps": 10
+  },
+  {
+   "programId": "taijiquan",
+   "path": "apps/platform/public/assets/routines/taijiquan-standard.pose.json",
+   "sha256": "dda67ebb28f22014a253000b0133f4cd30a586bc6c989fb591c38c2d7f0ae659",
+   "frames": 3404,
+   "fps": 10
+  },
+  {
+   "programId": "wuqinxi",
+   "path": "apps/platform/public/assets/routines/wuqinxi-standard.pose.json",
+   "sha256": "6635cca9c0bed39a76ae78c908e5d87badf6d7eb2fe524bbae5d73ea3a209bd9",
+   "frames": 8226,
+   "fps": 10
+  },
+  {
+   "programId": "yijinjing",
+   "path": "apps/platform/public/assets/routines/yijinjing-standard.pose.json",
+   "sha256": "5a8085b04ca5ed1651954897240c8d1f8f9cdad1d09a92715c9d9d7b03420138",
+   "frames": 7656,
+   "fps": 10
+  }
+ ],
+ "regionScale": {
+  "shoulders": 138.0153,
+  "arms": 149.1361,
+  "neck": 2.3674,
+  "trunk": 2.1246,
+  "legs": 1.0183
+ },
+ "chapters": [
+  {
+   "chapterId": "bdj-open",
+   "programId": "baduanjin",
+   "kind": "opening",
+   "window": {
+    "startSeconds": 0,
+    "endSeconds": 42
+   },
+   "trackFrames": 420,
+   "validFrames": 420,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0024,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 29.0296,
+    "arms": 86.8454,
+    "neck": 0.1335,
+    "trunk": 0.2132,
+    "legs": 0.2109
+   },
+   "involvement": {
+    "shoulders": 0.21,
+    "arms": 0.582,
+    "neck": 0.056,
+    "trunk": 0.1,
+    "legs": 0.207
+   }
+  },
+  {
+   "chapterId": "bdj-1",
+   "programId": "baduanjin",
+   "kind": "form",
+   "window": {
+    "startSeconds": 42,
+    "endSeconds": 135.5
+   },
+   "trackFrames": 935,
+   "validFrames": 935,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 45.2,
+     "frameFraction": 0.4834,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 154.8453,
+    "arms": 118.7751,
+    "neck": 0.2704,
+    "trunk": 0.2954,
+    "legs": 0.255
+   },
+   "involvement": {
+    "shoulders": 1,
+    "arms": 0.796,
+    "neck": 0.114,
+    "trunk": 0.139,
+    "legs": 0.25
+   }
+  },
+  {
+   "chapterId": "bdj-2",
+   "programId": "baduanjin",
+   "kind": "form",
+   "window": {
+    "startSeconds": 135.5,
+    "endSeconds": 222
+   },
+   "trackFrames": 865,
+   "validFrames": 865,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 1.1,
+     "frameFraction": 0.0127,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 79.902,
+    "arms": 149.0194,
+    "neck": 0.5739,
+    "trunk": 0.3521,
+    "legs": 0.7786
+   },
+   "involvement": {
+    "shoulders": 0.579,
+    "arms": 0.999,
+    "neck": 0.242,
+    "trunk": 0.166,
+    "legs": 0.765
+   }
+  },
+  {
+   "chapterId": "bdj-3",
+   "programId": "baduanjin",
+   "kind": "form",
+   "window": {
+    "startSeconds": 222,
+    "endSeconds": 295.5
+   },
+   "trackFrames": 735,
+   "validFrames": 735,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 33.9,
+     "frameFraction": 0.4612,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 127.7414,
+    "arms": 125.5414,
+    "neck": 0.184,
+    "trunk": 0.1844,
+    "legs": 0.2205
+   },
+   "involvement": {
+    "shoulders": 0.926,
+    "arms": 0.842,
+    "neck": 0.078,
+    "trunk": 0.087,
+    "legs": 0.217
+   }
+  },
+  {
+   "chapterId": "bdj-4",
+   "programId": "baduanjin",
+   "kind": "form",
+   "window": {
+    "startSeconds": 295.5,
+    "endSeconds": 366
+   },
+   "trackFrames": 705,
+   "validFrames": 705,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 1.8,
+     "frameFraction": 0.0255,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 32.1495,
+    "arms": 28.1914,
+    "neck": 0.6879,
+    "trunk": 0.2222,
+    "legs": 0.1884
+   },
+   "involvement": {
+    "shoulders": 0.233,
+    "arms": 0.189,
+    "neck": 0.291,
+    "trunk": 0.105,
+    "legs": 0.185
+   }
+  },
+  {
+   "chapterId": "bdj-5",
+   "programId": "baduanjin",
+   "kind": "form",
+   "window": {
+    "startSeconds": 366,
+    "endSeconds": 466
+   },
+   "trackFrames": 1000,
+   "validFrames": 1000,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 6.5,
+     "frameFraction": 0.068,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 23.8,
+     "frameFraction": 0.238,
+     "flagged": true
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 8.6,
+     "frameFraction": 0.09,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0.8,
+     "frameFraction": 0.008,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 59.6286,
+    "arms": 76.5075,
+    "neck": 1.1518,
+    "trunk": 1.1484,
+    "legs": 0.848
+   },
+   "involvement": {
+    "shoulders": 0.432,
+    "arms": 0.513,
+    "neck": 0.487,
+    "trunk": 0.541,
+    "legs": 0.833
+   }
+  },
+  {
+   "chapterId": "bdj-6",
+   "programId": "baduanjin",
+   "kind": "form",
+   "window": {
+    "startSeconds": 466,
+    "endSeconds": 592.5
+   },
+   "trackFrames": 1265,
+   "validFrames": 1253,
+   "validFraction": 0.9905,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 36.5,
+     "frameFraction": 0.2905,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 49.7,
+     "frameFraction": 0.3855,
+     "flagged": true
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0008,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0024,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 29.3,
+     "frameFraction": 0.2298,
+     "flagged": true
+    }
+   },
+   "raw": {
+    "shoulders": 149.3838,
+    "arms": 122.7275,
+    "neck": 0.3363,
+    "trunk": 2.7986,
+    "legs": 0.3183
+   },
+   "involvement": {
+    "shoulders": 1,
+    "arms": 0.823,
+    "neck": 0.142,
+    "trunk": 1,
+    "legs": 0.313
+   }
+  },
+  {
+   "chapterId": "bdj-7",
+   "programId": "baduanjin",
+   "kind": "form",
+   "window": {
+    "startSeconds": 592.5,
+    "endSeconds": 651.5
+   },
+   "trackFrames": 590,
+   "validFrames": 590,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 1.3,
+     "frameFraction": 0.022,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 25.6063,
+    "arms": 117.4053,
+    "neck": 0.273,
+    "trunk": 0.3101,
+    "legs": 0.4726
+   },
+   "involvement": {
+    "shoulders": 0.186,
+    "arms": 0.787,
+    "neck": 0.115,
+    "trunk": 0.146,
+    "legs": 0.464
+   }
+  },
+  {
+   "chapterId": "bdj-8",
+   "programId": "baduanjin",
+   "kind": "form",
+   "window": {
+    "startSeconds": 651.5,
+    "endSeconds": 705
+   },
+   "trackFrames": 535,
+   "validFrames": 535,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 5.6355,
+    "arms": 12.5874,
+    "neck": 0.0753,
+    "trunk": 0.1135,
+    "legs": 0.1407
+   },
+   "involvement": {
+    "shoulders": 0.041,
+    "arms": 0.084,
+    "neck": 0.032,
+    "trunk": 0.053,
+    "legs": 0.138
+   }
+  },
+  {
+   "chapterId": "bdj-close",
+   "programId": "baduanjin",
+   "kind": "closing",
+   "window": {
+    "startSeconds": 705,
+    "endSeconds": 728.3
+   },
+   "trackFrames": 234,
+   "validFrames": 234,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 32.8371,
+    "arms": 44.0178,
+    "neck": 0.1037,
+    "trunk": 0.1695,
+    "legs": 0.1384
+   },
+   "involvement": {
+    "shoulders": 0.238,
+    "arms": 0.295,
+    "neck": 0.044,
+    "trunk": 0.08,
+    "legs": 0.136
+   }
+  },
+  {
+   "chapterId": "tjq-1",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 0,
+    "endSeconds": 17
+   },
+   "trackFrames": 170,
+   "validFrames": 169,
+   "validFraction": 0.9941,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 40.0509,
+    "arms": 145.3558,
+    "neck": 0.19,
+    "trunk": 0.2901,
+    "legs": 0.4446
+   },
+   "involvement": {
+    "shoulders": 0.29,
+    "arms": 0.975,
+    "neck": 0.08,
+    "trunk": 0.137,
+    "legs": 0.437
+   }
+  },
+  {
+   "chapterId": "tjq-2",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 17,
+    "endSeconds": 41
+   },
+   "trackFrames": 240,
+   "validFrames": 240,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0375,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 5.3,
+     "frameFraction": 0.2083,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 8.9,
+     "frameFraction": 0.3667,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 65.8849,
+    "arms": 109.371,
+    "neck": 2.3289,
+    "trunk": 0.9979,
+    "legs": 0.7578
+   },
+   "involvement": {
+    "shoulders": 0.477,
+    "arms": 0.733,
+    "neck": 0.984,
+    "trunk": 0.47,
+    "legs": 0.744
+   }
+  },
+  {
+   "chapterId": "tjq-3",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 41,
+    "endSeconds": 48
+   },
+   "trackFrames": 70,
+   "validFrames": 70,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 2.5,
+     "frameFraction": 0.3571,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 5.5,
+     "frameFraction": 0.6429,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.1857,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 119.4655,
+    "arms": 59.4327,
+    "neck": 3.315,
+    "trunk": 1.697,
+    "legs": 0.4411
+   },
+   "involvement": {
+    "shoulders": 0.866,
+    "arms": 0.399,
+    "neck": 1,
+    "trunk": 0.799,
+    "legs": 0.433
+   }
+  },
+  {
+   "chapterId": "tjq-4",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 48,
+    "endSeconds": 75.5
+   },
+   "trackFrames": 275,
+   "validFrames": 275,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 1.9,
+     "frameFraction": 0.0836,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0182,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 13.8,
+     "frameFraction": 0.4691,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 4.3,
+     "frameFraction": 0.1891,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 68.4411,
+    "arms": 130.2236,
+    "neck": 2.0798,
+    "trunk": 1.45,
+    "legs": 0.5777
+   },
+   "involvement": {
+    "shoulders": 0.496,
+    "arms": 0.873,
+    "neck": 0.879,
+    "trunk": 0.682,
+    "legs": 0.567
+   }
+  },
+  {
+   "chapterId": "tjq-5",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 75.5,
+    "endSeconds": 83
+   },
+   "trackFrames": 75,
+   "validFrames": 75,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 3.1,
+     "frameFraction": 0.44,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 1.7,
+     "frameFraction": 0.2133,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 58.0347,
+    "arms": 28.3045,
+    "neck": 1.3238,
+    "trunk": 0.8903,
+    "legs": 0.5681
+   },
+   "involvement": {
+    "shoulders": 0.42,
+    "arms": 0.19,
+    "neck": 0.559,
+    "trunk": 0.419,
+    "legs": 0.558
+   }
+  },
+  {
+   "chapterId": "tjq-6",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 83,
+    "endSeconds": 114
+   },
+   "trackFrames": 310,
+   "validFrames": 310,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 1.8,
+     "frameFraction": 0.0613,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0.5,
+     "frameFraction": 0.0355,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 9.9,
+     "frameFraction": 0.3097,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 3.8,
+     "frameFraction": 0.1387,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 51.8508,
+    "arms": 71.3555,
+    "neck": 1.9765,
+    "trunk": 1.3241,
+    "legs": 0.6209
+   },
+   "involvement": {
+    "shoulders": 0.376,
+    "arms": 0.478,
+    "neck": 0.835,
+    "trunk": 0.623,
+    "legs": 0.61
+   }
+  },
+  {
+   "chapterId": "tjq-7",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 114,
+    "endSeconds": 137
+   },
+   "trackFrames": 230,
+   "validFrames": 230,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0.5,
+     "frameFraction": 0.0304,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 16,
+     "frameFraction": 0.6652,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 8.3,
+     "frameFraction": 0.3565,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 64.3072,
+    "arms": 97.851,
+    "neck": 3.032,
+    "trunk": 2.0781,
+    "legs": 0.5391
+   },
+   "involvement": {
+    "shoulders": 0.466,
+    "arms": 0.656,
+    "neck": 1,
+    "trunk": 0.978,
+    "legs": 0.529
+   }
+  },
+  {
+   "chapterId": "tjq-8",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 137,
+    "endSeconds": 166.5
+   },
+   "trackFrames": 295,
+   "validFrames": 295,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0136,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0068,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 14.4,
+     "frameFraction": 0.4678,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 11.1,
+     "frameFraction": 0.3797,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 70.079,
+    "arms": 95.4865,
+    "neck": 1.4725,
+    "trunk": 1.0834,
+    "legs": 0.6049
+   },
+   "involvement": {
+    "shoulders": 0.508,
+    "arms": 0.64,
+    "neck": 0.622,
+    "trunk": 0.51,
+    "legs": 0.594
+   }
+  },
+  {
+   "chapterId": "tjq-9",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 166.5,
+    "endSeconds": 178
+   },
+   "trackFrames": 115,
+   "validFrames": 115,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0.6,
+     "frameFraction": 0.0783,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 1.6,
+     "frameFraction": 0.1565,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 32.7679,
+    "arms": 105.4248,
+    "neck": 1.2729,
+    "trunk": 0.5388,
+    "legs": 0.6132
+   },
+   "involvement": {
+    "shoulders": 0.237,
+    "arms": 0.707,
+    "neck": 0.538,
+    "trunk": 0.254,
+    "legs": 0.602
+   }
+  },
+  {
+   "chapterId": "tjq-10",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 178,
+    "endSeconds": 200.5
+   },
+   "trackFrames": 225,
+   "validFrames": 225,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 1.9,
+     "frameFraction": 0.1022,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 1.4,
+     "frameFraction": 0.0578,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 35.4243,
+    "arms": 81.297,
+    "neck": 1.5268,
+    "trunk": 0.6464,
+    "legs": 0.4422
+   },
+   "involvement": {
+    "shoulders": 0.257,
+    "arms": 0.545,
+    "neck": 0.645,
+    "trunk": 0.304,
+    "legs": 0.434
+   }
+  },
+  {
+   "chapterId": "tjq-11",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 200.5,
+    "endSeconds": 209
+   },
+   "trackFrames": 85,
+   "validFrames": 85,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 3.1,
+     "frameFraction": 0.3412,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 1.8,
+     "frameFraction": 0.2118,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 28.5183,
+    "arms": 99.417,
+    "neck": 1.7182,
+    "trunk": 1.827,
+    "legs": 0.7099
+   },
+   "involvement": {
+    "shoulders": 0.207,
+    "arms": 0.667,
+    "neck": 0.726,
+    "trunk": 0.86,
+    "legs": 0.697
+   }
+  },
+  {
+   "chapterId": "tjq-12",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 209,
+    "endSeconds": 217.5
+   },
+   "trackFrames": 85,
+   "validFrames": 85,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0235,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 2.3,
+     "frameFraction": 0.3059,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0.8,
+     "frameFraction": 0.1059,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 39.0246,
+    "arms": 52.5057,
+    "neck": 1.2289,
+    "trunk": 0.5649,
+    "legs": 0.4523
+   },
+   "involvement": {
+    "shoulders": 0.283,
+    "arms": 0.352,
+    "neck": 0.519,
+    "trunk": 0.266,
+    "legs": 0.444
+   }
+  },
+  {
+   "chapterId": "tjq-13",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 217.5,
+    "endSeconds": 227.5
+   },
+   "trackFrames": 100,
+   "validFrames": 100,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.05,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 5.4,
+     "frameFraction": 0.56,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 1.6,
+     "frameFraction": 0.2,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 2.2,
+     "frameFraction": 0.25,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 81.5659,
+    "arms": 101.5151,
+    "neck": 0.7259,
+    "trunk": 0.76,
+    "legs": 0.9901
+   },
+   "involvement": {
+    "shoulders": 0.591,
+    "arms": 0.681,
+    "neck": 0.307,
+    "trunk": 0.358,
+    "legs": 0.972
+   }
+  },
+  {
+   "chapterId": "tjq-14",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 227.5,
+    "endSeconds": 237.5
+   },
+   "trackFrames": 100,
+   "validFrames": 100,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 1.7,
+     "frameFraction": 0.17,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 1.7,
+     "frameFraction": 0.17,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 6,
+     "frameFraction": 0.48,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 4.8,
+     "frameFraction": 0.48,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 79.8475,
+    "arms": 52.28,
+    "neck": 3.5501,
+    "trunk": 1.6296,
+    "legs": 0.9185
+   },
+   "involvement": {
+    "shoulders": 0.579,
+    "arms": 0.351,
+    "neck": 1,
+    "trunk": 0.767,
+    "legs": 0.902
+   }
+  },
+  {
+   "chapterId": "tjq-15",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 237.5,
+    "endSeconds": 246
+   },
+   "trackFrames": 85,
+   "validFrames": 85,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 4.2,
+     "frameFraction": 0.4824,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 2.4,
+     "frameFraction": 0.3059,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 58.4589,
+    "arms": 39.4212,
+    "neck": 0.8048,
+    "trunk": 0.2917,
+    "legs": 1.2177
+   },
+   "involvement": {
+    "shoulders": 0.424,
+    "arms": 0.264,
+    "neck": 0.34,
+    "trunk": 0.137,
+    "legs": 1
+   }
+  },
+  {
+   "chapterId": "tjq-16",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 246,
+    "endSeconds": 260.5
+   },
+   "trackFrames": 145,
+   "validFrames": 144,
+   "validFraction": 0.9931,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 5.9,
+     "frameFraction": 0.4306,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 2.6,
+     "frameFraction": 0.1597,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 5.6,
+     "frameFraction": 0.4375,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 68.2311,
+    "arms": 54.82,
+    "neck": 1.979,
+    "trunk": 1.2514,
+    "legs": 1.7067
+   },
+   "involvement": {
+    "shoulders": 0.494,
+    "arms": 0.368,
+    "neck": 0.836,
+    "trunk": 0.589,
+    "legs": 1
+   }
+  },
+  {
+   "chapterId": "tjq-17",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 260.5,
+    "endSeconds": 274.5
+   },
+   "trackFrames": 140,
+   "validFrames": 140,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 2.2,
+     "frameFraction": 0.15,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 3.6,
+     "frameFraction": 0.2143,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 9.9,
+     "frameFraction": 0.7,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0.6,
+     "frameFraction": 0.0357,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 50.9418,
+    "arms": 77.3688,
+    "neck": 1.4803,
+    "trunk": 1.2779,
+    "legs": 1.8602
+   },
+   "involvement": {
+    "shoulders": 0.369,
+    "arms": 0.519,
+    "neck": 0.625,
+    "trunk": 0.601,
+    "legs": 1
+   }
+  },
+  {
+   "chapterId": "tjq-18",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 274.5,
+    "endSeconds": 290.5
+   },
+   "trackFrames": 160,
+   "validFrames": 160,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 2,
+     "frameFraction": 0.15,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 1.2,
+     "frameFraction": 0.0938,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 8.6,
+     "frameFraction": 0.5,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 2.1,
+     "frameFraction": 0.175,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 115.4824,
+    "arms": 80.3464,
+    "neck": 1.8286,
+    "trunk": 1.4894,
+    "legs": 0.7088
+   },
+   "involvement": {
+    "shoulders": 0.837,
+    "arms": 0.539,
+    "neck": 0.772,
+    "trunk": 0.701,
+    "legs": 0.696
+   }
+  },
+  {
+   "chapterId": "tjq-19",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 290.5,
+    "endSeconds": 298.5
+   },
+   "trackFrames": 80,
+   "validFrames": 80,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 1.4,
+     "frameFraction": 0.175,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0.8,
+     "frameFraction": 0.2,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 2,
+     "frameFraction": 0.3375,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 128.0432,
+    "arms": 47.1239,
+    "neck": 1.2022,
+    "trunk": 0.773,
+    "legs": 0.6938
+   },
+   "involvement": {
+    "shoulders": 0.928,
+    "arms": 0.316,
+    "neck": 0.508,
+    "trunk": 0.364,
+    "legs": 0.681
+   }
+  },
+  {
+   "chapterId": "tjq-20",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 298.5,
+    "endSeconds": 305.5
+   },
+   "trackFrames": 70,
+   "validFrames": 70,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 1.2,
+     "frameFraction": 0.2429,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 1.2,
+     "frameFraction": 0.1714,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 4.2,
+     "frameFraction": 0.6143,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 62.6123,
+    "arms": 59.5472,
+    "neck": 2.0234,
+    "trunk": 0.6553,
+    "legs": 0.7341
+   },
+   "involvement": {
+    "shoulders": 0.454,
+    "arms": 0.399,
+    "neck": 0.855,
+    "trunk": 0.308,
+    "legs": 0.721
+   }
+  },
+  {
+   "chapterId": "tjq-21",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 305.5,
+    "endSeconds": 320.5
+   },
+   "trackFrames": 150,
+   "validFrames": 150,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 3.2,
+     "frameFraction": 0.2133,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0267,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 5.3,
+     "frameFraction": 0.34,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 2.9,
+     "frameFraction": 0.22,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 103.9,
+    "arms": 58.5877,
+    "neck": 2.521,
+    "trunk": 1.3534,
+    "legs": 0.6366
+   },
+   "involvement": {
+    "shoulders": 0.753,
+    "arms": 0.393,
+    "neck": 1,
+    "trunk": 0.637,
+    "legs": 0.625
+   }
+  },
+  {
+   "chapterId": "tjq-22",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 320.5,
+    "endSeconds": 329.5
+   },
+   "trackFrames": 90,
+   "validFrames": 90,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 9,
+     "frameFraction": 0.9556,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 4.4,
+     "frameFraction": 0.4778,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 64.1621,
+    "arms": 52.6125,
+    "neck": 3.7405,
+    "trunk": 2.3107,
+    "legs": 0.3965
+   },
+   "involvement": {
+    "shoulders": 0.465,
+    "arms": 0.353,
+    "neck": 1,
+    "trunk": 1,
+    "legs": 0.389
+   }
+  },
+  {
+   "chapterId": "tjq-23",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 329.5,
+    "endSeconds": 337.5
+   },
+   "trackFrames": 80,
+   "validFrames": 80,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.025,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 2.2,
+     "frameFraction": 0.3125,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 69.6903,
+    "arms": 101.7804,
+    "neck": 1.1876,
+    "trunk": 0.3985,
+    "legs": 1.024
+   },
+   "involvement": {
+    "shoulders": 0.505,
+    "arms": 0.682,
+    "neck": 0.502,
+    "trunk": 0.188,
+    "legs": 1
+   }
+  },
+  {
+   "chapterId": "tjq-24",
+   "programId": "taijiquan",
+   "kind": "form",
+   "window": {
+    "startSeconds": 337.5,
+    "endSeconds": 340.3
+   },
+   "trackFrames": 28,
+   "validFrames": 28,
+   "validFraction": 1,
+   "reliable": false,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 21.1837,
+    "arms": 39.8147,
+    "neck": 0.2685,
+    "trunk": 0.1694,
+    "legs": 0.082
+   },
+   "involvement": {
+    "shoulders": null,
+    "arms": null,
+    "neck": null,
+    "trunk": null,
+    "legs": null
+   }
+  },
+  {
+   "chapterId": "wqx-open",
+   "programId": "wuqinxi",
+   "kind": "opening",
+   "window": {
+    "startSeconds": 0,
+    "endSeconds": 66.5
+   },
+   "trackFrames": 665,
+   "validFrames": 665,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0075,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0015,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 30.5642,
+    "arms": 166.0268,
+    "neck": 0.1794,
+    "trunk": 0.1369,
+    "legs": 0.0931
+   },
+   "involvement": {
+    "shoulders": 0.221,
+    "arms": 1,
+    "neck": 0.076,
+    "trunk": 0.064,
+    "legs": 0.091
+   }
+  },
+  {
+   "chapterId": "wqx-1",
+   "programId": "wuqinxi",
+   "kind": "form",
+   "window": {
+    "startSeconds": 66.5,
+    "endSeconds": 140
+   },
+   "trackFrames": 735,
+   "validFrames": 735,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 27.5,
+     "frameFraction": 0.3741,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0.9,
+     "frameFraction": 0.019,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 150.4847,
+    "arms": 145.4051,
+    "neck": 0.671,
+    "trunk": 0.2987,
+    "legs": 0.136
+   },
+   "involvement": {
+    "shoulders": 1,
+    "arms": 0.975,
+    "neck": 0.283,
+    "trunk": 0.141,
+    "legs": 0.134
+   }
+  },
+  {
+   "chapterId": "wqx-2",
+   "programId": "wuqinxi",
+   "kind": "form",
+   "window": {
+    "startSeconds": 140,
+    "endSeconds": 229
+   },
+   "trackFrames": 890,
+   "validFrames": 890,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 17.5,
+     "frameFraction": 0.1966,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 20.1,
+     "frameFraction": 0.2247,
+     "flagged": true
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0045,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0.8,
+     "frameFraction": 0.0169,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 2.2,
+     "frameFraction": 0.0315,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 123.3405,
+    "arms": 149.603,
+    "neck": 0.4047,
+    "trunk": 0.6412,
+    "legs": 0.6983
+   },
+   "involvement": {
+    "shoulders": 0.894,
+    "arms": 1,
+    "neck": 0.171,
+    "trunk": 0.302,
+    "legs": 0.686
+   }
+  },
+  {
+   "chapterId": "wqx-3",
+   "programId": "wuqinxi",
+   "kind": "form",
+   "window": {
+    "startSeconds": 229,
+    "endSeconds": 280.5
+   },
+   "trackFrames": 515,
+   "validFrames": 515,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 28.4,
+     "frameFraction": 0.5515,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 7.5,
+     "frameFraction": 0.1476,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 0.7,
+     "frameFraction": 0.0117,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0058,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 119.5189,
+    "arms": 67.6159,
+    "neck": 1.7618,
+    "trunk": 0.9698,
+    "legs": 0.5235
+   },
+   "involvement": {
+    "shoulders": 0.866,
+    "arms": 0.453,
+    "neck": 0.744,
+    "trunk": 0.456,
+    "legs": 0.514
+   }
+  },
+  {
+   "chapterId": "wqx-4",
+   "programId": "wuqinxi",
+   "kind": "form",
+   "window": {
+    "startSeconds": 280.5,
+    "endSeconds": 354
+   },
+   "trackFrames": 735,
+   "validFrames": 735,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 19.2,
+     "frameFraction": 0.2599,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 8.6,
+     "frameFraction": 0.1252,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0027,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 2.8,
+     "frameFraction": 0.0449,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 135.1732,
+    "arms": 142.9687,
+    "neck": 0.4581,
+    "trunk": 0.3527,
+    "legs": 0.3694
+   },
+   "involvement": {
+    "shoulders": 0.979,
+    "arms": 0.959,
+    "neck": 0.193,
+    "trunk": 0.166,
+    "legs": 0.363
+   }
+  },
+  {
+   "chapterId": "wqx-5",
+   "programId": "wuqinxi",
+   "kind": "form",
+   "window": {
+    "startSeconds": 354,
+    "endSeconds": 395
+   },
+   "trackFrames": 410,
+   "validFrames": 410,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 17.1559,
+    "arms": 74.5495,
+    "neck": 1.4834,
+    "trunk": 0.6692,
+    "legs": 0.1278
+   },
+   "involvement": {
+    "shoulders": 0.124,
+    "arms": 0.5,
+    "neck": 0.627,
+    "trunk": 0.315,
+    "legs": 0.125
+   }
+  },
+  {
+   "chapterId": "wqx-6",
+   "programId": "wuqinxi",
+   "kind": "form",
+   "window": {
+    "startSeconds": 395,
+    "endSeconds": 462
+   },
+   "trackFrames": 670,
+   "validFrames": 670,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 12.5,
+     "frameFraction": 0.1866,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 2.8,
+     "frameFraction": 0.0448,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 43.1347,
+    "arms": 57.3306,
+    "neck": 0.6155,
+    "trunk": 0.8414,
+    "legs": 0.7109
+   },
+   "involvement": {
+    "shoulders": 0.313,
+    "arms": 0.384,
+    "neck": 0.26,
+    "trunk": 0.396,
+    "legs": 0.698
+   }
+  },
+  {
+   "chapterId": "wqx-7",
+   "programId": "wuqinxi",
+   "kind": "form",
+   "window": {
+    "startSeconds": 462,
+    "endSeconds": 509.5
+   },
+   "trackFrames": 475,
+   "validFrames": 475,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 36.5882,
+    "arms": 148.0687,
+    "neck": 0.3476,
+    "trunk": 0.2418,
+    "legs": 0.3499
+   },
+   "involvement": {
+    "shoulders": 0.265,
+    "arms": 0.993,
+    "neck": 0.147,
+    "trunk": 0.114,
+    "legs": 0.344
+   }
+  },
+  {
+   "chapterId": "wqx-8",
+   "programId": "wuqinxi",
+   "kind": "form",
+   "window": {
+    "startSeconds": 509.5,
+    "endSeconds": 587
+   },
+   "trackFrames": 775,
+   "validFrames": 775,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 14.4,
+     "frameFraction": 0.1806,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0142,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 5,
+     "frameFraction": 0.0723,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 29.1,
+     "frameFraction": 0.3406,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 9,
+     "frameFraction": 0.1174,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 117.3945,
+    "arms": 112.2063,
+    "neck": 1.787,
+    "trunk": 2.0079,
+    "legs": 0.9235
+   },
+   "involvement": {
+    "shoulders": 0.851,
+    "arms": 0.752,
+    "neck": 0.755,
+    "trunk": 0.945,
+    "legs": 0.907
+   }
+  },
+  {
+   "chapterId": "wqx-9",
+   "programId": "wuqinxi",
+   "kind": "form",
+   "window": {
+    "startSeconds": 587,
+    "endSeconds": 639
+   },
+   "trackFrames": 520,
+   "validFrames": 520,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 12.7,
+     "frameFraction": 0.2442,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 13.1,
+     "frameFraction": 0.2712,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0.6,
+     "frameFraction": 0.0231,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 170.1219,
+    "arms": 121.0358,
+    "neck": 0.3207,
+    "trunk": 0.4856,
+    "legs": 0.4704
+   },
+   "involvement": {
+    "shoulders": 1,
+    "arms": 0.812,
+    "neck": 0.135,
+    "trunk": 0.229,
+    "legs": 0.462
+   }
+  },
+  {
+   "chapterId": "wqx-10",
+   "programId": "wuqinxi",
+   "kind": "form",
+   "window": {
+    "startSeconds": 639,
+    "endSeconds": 697
+   },
+   "trackFrames": 580,
+   "validFrames": 580,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 15.6,
+     "frameFraction": 0.2672,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 22.6,
+     "frameFraction": 0.3897,
+     "flagged": true
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 14.8,
+     "frameFraction": 0.2621,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 151.1133,
+    "arms": 25.9655,
+    "neck": 0.3001,
+    "trunk": 0.3043,
+    "legs": 1.0168
+   },
+   "involvement": {
+    "shoulders": 1,
+    "arms": 0.174,
+    "neck": 0.127,
+    "trunk": 0.143,
+    "legs": 0.999
+   }
+  },
+  {
+   "chapterId": "wqx-close",
+   "programId": "wuqinxi",
+   "kind": "closing",
+   "window": {
+    "startSeconds": 697,
+    "endSeconds": 822.5
+   },
+   "trackFrames": 1255,
+   "validFrames": 1215,
+   "validFraction": 0.9681,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 14.7,
+     "frameFraction": 0.121,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 99.3241,
+    "arms": 138.8761,
+    "neck": 0.1549,
+    "trunk": 0.1694,
+    "legs": 0.0868
+   },
+   "involvement": {
+    "shoulders": 0.72,
+    "arms": 0.931,
+    "neck": 0.065,
+    "trunk": 0.08,
+    "legs": 0.085
+   }
+  },
+  {
+   "chapterId": "yjj-open",
+   "programId": "yijinjing",
+   "kind": "opening",
+   "window": {
+    "startSeconds": 0,
+    "endSeconds": 34
+   },
+   "trackFrames": 340,
+   "validFrames": 340,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 1.1516,
+    "arms": 6.3441,
+    "neck": 0.0982,
+    "trunk": 0.0754,
+    "legs": 0.0425
+   },
+   "involvement": {
+    "shoulders": 0.008,
+    "arms": 0.043,
+    "neck": 0.041,
+    "trunk": 0.035,
+    "legs": 0.042
+   }
+  },
+  {
+   "chapterId": "yjj-1",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 34,
+    "endSeconds": 48
+   },
+   "trackFrames": 140,
+   "validFrames": 140,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 9.8908,
+    "arms": 160.0705,
+    "neck": 0.0541,
+    "trunk": 0.0976,
+    "legs": 0.0811
+   },
+   "involvement": {
+    "shoulders": 0.072,
+    "arms": 1,
+    "neck": 0.023,
+    "trunk": 0.046,
+    "legs": 0.08
+   }
+  },
+  {
+   "chapterId": "yjj-2",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 48,
+    "endSeconds": 73.5
+   },
+   "trackFrames": 255,
+   "validFrames": 255,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 70.4045,
+    "arms": 157.6064,
+    "neck": 0.1714,
+    "trunk": 0.1468,
+    "legs": 0.1044
+   },
+   "involvement": {
+    "shoulders": 0.51,
+    "arms": 1,
+    "neck": 0.072,
+    "trunk": 0.069,
+    "legs": 0.103
+   }
+  },
+  {
+   "chapterId": "yjj-3",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 73.5,
+    "endSeconds": 96.5
+   },
+   "trackFrames": 230,
+   "validFrames": 230,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 17.1,
+     "frameFraction": 0.7435,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 84.908,
+    "arms": 159.7044,
+    "neck": 0.3863,
+    "trunk": 0.3199,
+    "legs": 0.1036
+   },
+   "involvement": {
+    "shoulders": 0.615,
+    "arms": 1,
+    "neck": 0.163,
+    "trunk": 0.151,
+    "legs": 0.102
+   }
+  },
+  {
+   "chapterId": "yjj-4",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 96.5,
+    "endSeconds": 121.5
+   },
+   "trackFrames": 250,
+   "validFrames": 250,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 15.9,
+     "frameFraction": 0.628,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0.9,
+     "frameFraction": 0.028,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 128.241,
+    "arms": 122.0587,
+    "neck": 1.0657,
+    "trunk": 0.3466,
+    "legs": 0.1224
+   },
+   "involvement": {
+    "shoulders": 0.929,
+    "arms": 0.818,
+    "neck": 0.45,
+    "trunk": 0.163,
+    "legs": 0.12
+   }
+  },
+  {
+   "chapterId": "yjj-5",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 121.5,
+    "endSeconds": 183
+   },
+   "trackFrames": 615,
+   "validFrames": 615,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 4.6,
+     "frameFraction": 0.0764,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0081,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 6,
+     "frameFraction": 0.1154,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0.6,
+     "frameFraction": 0.0163,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 71.1096,
+    "arms": 108.6045,
+    "neck": 0.6471,
+    "trunk": 0.5764,
+    "legs": 0.3277
+   },
+   "involvement": {
+    "shoulders": 0.515,
+    "arms": 0.728,
+    "neck": 0.273,
+    "trunk": 0.271,
+    "legs": 0.322
+   }
+  },
+  {
+   "chapterId": "yjj-6",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 183,
+    "endSeconds": 249
+   },
+   "trackFrames": 660,
+   "validFrames": 660,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 55.6981,
+    "arms": 95.2716,
+    "neck": 0.2001,
+    "trunk": 0.1613,
+    "legs": 0.0996
+   },
+   "involvement": {
+    "shoulders": 0.404,
+    "arms": 0.639,
+    "neck": 0.085,
+    "trunk": 0.076,
+    "legs": 0.098
+   }
+  },
+  {
+   "chapterId": "yjj-7",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 249,
+    "endSeconds": 355
+   },
+   "trackFrames": 1060,
+   "validFrames": 1057,
+   "validFraction": 0.9972,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 24.8,
+     "frameFraction": 0.2394,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 29.4,
+     "frameFraction": 0.2734,
+     "flagged": true
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 11.2,
+     "frameFraction": 0.1154,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 155.199,
+    "arms": 135.5998,
+    "neck": 2.3023,
+    "trunk": 1.4889,
+    "legs": 0.3006
+   },
+   "involvement": {
+    "shoulders": 1,
+    "arms": 0.909,
+    "neck": 0.973,
+    "trunk": 0.701,
+    "legs": 0.295
+   }
+  },
+  {
+   "chapterId": "yjj-8",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 355,
+    "endSeconds": 407.5
+   },
+   "trackFrames": 525,
+   "validFrames": 525,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 1.8,
+     "frameFraction": 0.0381,
+     "flagged": true
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 6,
+     "frameFraction": 0.1143,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0038,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 31.639,
+    "arms": 12.2021,
+    "neck": 0.1745,
+    "trunk": 0.6347,
+    "legs": 1.0959
+   },
+   "involvement": {
+    "shoulders": 0.229,
+    "arms": 0.082,
+    "neck": 0.074,
+    "trunk": 0.299,
+    "legs": 1
+   }
+  },
+  {
+   "chapterId": "yjj-9",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 407.5,
+    "endSeconds": 472.5
+   },
+   "trackFrames": 650,
+   "validFrames": 649,
+   "validFraction": 0.9985,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 25.2,
+     "frameFraction": 0.3883,
+     "flagged": true
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0092,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 10.6,
+     "frameFraction": 0.1803,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0046,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 12.4,
+     "frameFraction": 0.1818,
+     "flagged": true
+    }
+   },
+   "raw": {
+    "shoulders": 67.1131,
+    "arms": 98.0711,
+    "neck": 1.9129,
+    "trunk": 3.572,
+    "legs": 0.377
+   },
+   "involvement": {
+    "shoulders": 0.486,
+    "arms": 0.658,
+    "neck": 0.808,
+    "trunk": 1,
+    "legs": 0.37
+   }
+  },
+  {
+   "chapterId": "yjj-10",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 472.5,
+    "endSeconds": 518
+   },
+   "trackFrames": 455,
+   "validFrames": 455,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0.6,
+     "frameFraction": 0.0198,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 9.6,
+     "frameFraction": 0.2176,
+     "flagged": true
+    },
+    "balance": {
+     "sustainedSeconds": 0.5,
+     "frameFraction": 0.0198,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 38.2,
+     "frameFraction": 0.7978,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 18.4,
+     "frameFraction": 0.4066,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 15.6,
+     "frameFraction": 0.3429,
+     "flagged": true
+    }
+   },
+   "raw": {
+    "shoulders": 68.6141,
+    "arms": 89.5267,
+    "neck": 3.4763,
+    "trunk": 2.9937,
+    "legs": 1.3914
+   },
+   "involvement": {
+    "shoulders": 0.497,
+    "arms": 0.6,
+    "neck": 1,
+    "trunk": 1,
+    "legs": 1
+   }
+  },
+  {
+   "chapterId": "yjj-11",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 518,
+    "endSeconds": 614.5
+   },
+   "trackFrames": 965,
+   "validFrames": 960,
+   "validFraction": 0.9948,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 42.1,
+     "frameFraction": 0.426,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 39.4,
+     "frameFraction": 0.4083,
+     "flagged": true
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 7.6,
+     "frameFraction": 0.0948,
+     "flagged": true
+    },
+    "deepKnee": {
+     "sustainedSeconds": 4.6,
+     "frameFraction": 0.0448,
+     "flagged": true
+    },
+    "weightBearing": {
+     "sustainedSeconds": 2.4,
+     "frameFraction": 0.025,
+     "flagged": true
+    }
+   },
+   "raw": {
+    "shoulders": 114.5931,
+    "arms": 159.1159,
+    "neck": 0.7002,
+    "trunk": 2.4174,
+    "legs": 0.5353
+   },
+   "involvement": {
+    "shoulders": 0.83,
+    "arms": 1,
+    "neck": 0.296,
+    "trunk": 1,
+    "legs": 0.526
+   }
+  },
+  {
+   "chapterId": "yjj-12",
+   "programId": "yijinjing",
+   "kind": "form",
+   "window": {
+    "startSeconds": 614.5,
+    "endSeconds": 694.5
+   },
+   "trackFrames": 800,
+   "validFrames": 694,
+   "validFraction": 0.8675,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0029,
+     "flagged": false
+    },
+    "bending": {
+     "sustainedSeconds": 60.6,
+     "frameFraction": 0.8588,
+     "flagged": true
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 1.2,
+     "frameFraction": 0.0259,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0.0072,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 44.8,
+     "frameFraction": 0.6556,
+     "flagged": true
+    }
+   },
+   "raw": {
+    "shoulders": 53.3087,
+    "arms": 143.6977,
+    "neck": 0.6249,
+    "trunk": 3.8476,
+    "legs": 0.5333
+   },
+   "involvement": {
+    "shoulders": 0.386,
+    "arms": 0.964,
+    "neck": 0.264,
+    "trunk": 1,
+    "legs": 0.524
+   }
+  },
+  {
+   "chapterId": "yjj-close",
+   "programId": "yijinjing",
+   "kind": "closing",
+   "window": {
+    "startSeconds": 694.5,
+    "endSeconds": 765.5
+   },
+   "trackFrames": 710,
+   "validFrames": 710,
+   "validFraction": 1,
+   "reliable": true,
+   "flags": {
+    "overhead": {
+     "sustainedSeconds": 15.9,
+     "frameFraction": 0.2239,
+     "flagged": true
+    },
+    "bending": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "balance": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "twist": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "deepKnee": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    },
+    "weightBearing": {
+     "sustainedSeconds": 0,
+     "frameFraction": 0,
+     "flagged": false
+    }
+   },
+   "raw": {
+    "shoulders": 130.673,
+    "arms": 120.0361,
+    "neck": 0.1445,
+    "trunk": 0.1825,
+    "legs": 0.0945
+   },
+   "involvement": {
+    "shoulders": 0.947,
+    "arms": 0.805,
+    "neck": 0.061,
+    "trunk": 0.086,
+    "legs": 0.093
+   }
+  }
+ ]
+}

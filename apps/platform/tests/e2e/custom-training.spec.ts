@@ -38,7 +38,9 @@ test('Custom A: a saved action trains to completion, and its record reaches Repo
   await seedActions(page, [lateralRaise('custom-e2e-raise')])
   await page.goto('/workshop/custom-e2e-raise/train?fixture=synthetic&fast=1')
   await expect(page.getByRole('heading', { level: 1, name: '侧平举练习' })).toBeVisible()
-  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '开始训练' })).toHaveAttribute('aria-current', 'page')
+  // Web V1.1: training pages are immersive (no first-level navigation); the way out goes back to 动作工坊.
+  await expect(page.getByRole('navigation', { name: '主导航' })).toHaveCount(0)
+  await expect(page.getByTestId('custom-training-shell').getByRole('link', { name: '动作工坊' })).toHaveAttribute('href', '/workshop')
   await expect(courseState(page)).toHaveAttribute('data-course-state', 'ACTIVE', { timeout: 20_000 })
   const dialog = page.getByTestId('custom-complete-dialog')
   await expect(dialog).toHaveAttribute('data-outcome', 'completed', { timeout: 60_000 })
@@ -80,11 +82,13 @@ test('Custom A: a saved action trains to completion, and its record reaches Repo
   await page.getByRole('group', { name: '按训练模式筛选' }).getByRole('button', { name: '热身训练' }).click()
   await expect(page.getByTestId('history-incomplete-hidden')).toBeVisible()
 
+  // Web V1: Home shows the latest record; the user's own actions are listed in 训练中心.
   await page.goto('/')
-  await expect(page.getByTestId('home-training-history')).toContainText('我的动作 · 侧平举练习')
-  const myActions = page.getByTestId('home-my-actions')
+  await expect(page.getByTestId('home-recent')).toContainText('我的动作 · 侧平举练习')
+  await page.goto('/training')
+  const myActions = page.getByTestId('training-my-actions')
   await expect(myActions.getByRole('link', { name: '开始训练 · 侧平举练习' })).toHaveAttribute('href', '/workshop/custom-e2e-raise/train')
-  await expect(myActions.getByTestId('home-my-actions-manage')).toHaveAttribute('href', '/workshop')
+  await expect(page.getByTestId('training-manage-actions')).toHaveAttribute('href', '/workshop')
 })
 
 test('Custom B: ending early saves an incomplete record; pausing works by button, Space and losing the pose', async ({ page }) => {

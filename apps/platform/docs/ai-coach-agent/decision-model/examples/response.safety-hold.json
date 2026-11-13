@@ -1,0 +1,121 @@
+{
+  "contract": "fp-coach-decision/v1",
+  "mode": "active",
+  "status": "safety_hold",
+  "decisionOrigin": "rules",
+  "display": {
+    "result": {
+      "status": "safety_hold",
+      "message": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。",
+      "routines": [],
+      "chapters": [],
+      "games": [],
+      "focus": [],
+      "evidence": [],
+      "limitations": []
+    },
+    "answers": {
+      "suitable": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。",
+      "first_game": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。",
+      "recent_issues": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。",
+      "why": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。",
+      "next_focus": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。"
+    }
+  },
+  "ranking": [],
+  "programmes": [],
+  "model": {
+    "release": "fp-cdm-release/1.0.0",
+    "id": "fp-cdm-m2",
+    "version": "1.0.0",
+    "runtimeVersion": "1.2.0",
+    "family": "pairwise_lr",
+    "featureSet": "fp-cdm-features/v1",
+    "tier": "ai_experimental",
+    "tierLabel": "实验性模型：AI 标注训练，项目负责人已审阅标签，尚未进行独立人工或专家标注",
+    "binding": "release_bound",
+    "weightsFingerprint": "fnv1a32x2:501683ad09c7bd0a",
+    "weightsSha256": "d8bfd9ed8ad64d7b7832a4fefd063a6216af65ee3fc156b01b6dada484ac8b5c",
+    "contentModel": {
+      "id": "fp-cdm-m1",
+      "tableVersion": "1.0.0",
+      "fingerprint": "fnv1a32x2:ba463a0d4bd82785",
+      "modelOfRecord": "fp-cdm-m1 v1.1（嵌套留一功法验证 macro AUC 0.777；M2 v1.0 绑定 v1.0 的 out-of-fold 内容表）"
+    },
+    "catalogueFingerprint": "fnv1a32x2:e01fd2104d0ef965",
+    "trainedOn": {
+      "labelsSha256": "6ba82c3eebbad378e8d13e6a4c979044471b1e65c5800d3b64387d691e02a327",
+      "matrixSha256": "300c2f6c437d5d7474d3690a903752499ee01912c10fdebe2666939ecc93dd56",
+      "devFamilies": 18
+    },
+    "validation": {
+      "offlineTechnical": "passed",
+      "humanValidation": "pending",
+      "productAcceptance": "not_accepted"
+    }
+  },
+  "execution": "not_run",
+  "confidence": null,
+  "abstained": false,
+  "abstainReason": null,
+  "outOfDistributionFeatures": [],
+  "fallbackReason": "SAFETY_HOLD",
+  "comparison": null,
+  "guard": {
+    "checked": false,
+    "violations": []
+  },
+  "inputIssues": [],
+  "dataSources": {
+    "profile": "self_reported",
+    "trainingHistory": "missing",
+    "gameHistory": "missing",
+    "latestReport": "missing",
+    "catalogue": "trusted_project_catalogue"
+  },
+  "rules": {
+    "schemaVersion": 1,
+    "status": "safety_hold",
+    "source": {
+      "mode": "rules",
+      "synthetic": false,
+      "label": "自述画像的本地规则建议；未读取真实历史。",
+      "historyStatus": "not_connected",
+      "decisionStatus": "not_connected",
+      "recommendationMode": "profile_rules"
+    },
+    "result": {
+      "status": "safety_hold",
+      "message": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。",
+      "routines": [],
+      "chapters": [],
+      "games": [],
+      "focus": [],
+      "evidence": [],
+      "limitations": []
+    },
+    "answers": {
+      "suitable": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。",
+      "first_game": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。",
+      "recent_issues": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。",
+      "why": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。",
+      "next_focus": "你报告了急性疼痛、眩晕或近期损伤。本次暂停动作推荐，请先咨询医生或康复专业人员；本工具不提供诊断或替代医疗建议。"
+    },
+    "availability": {
+      "routines": "empty",
+      "chapters": "empty",
+      "games": "empty"
+    },
+    "evidenceStatus": "missing",
+    "reportStatus": "missing",
+    "error": null
+  },
+  "error": null,
+  "limitations": [
+    "rules 为 Agent Web P0 规则服务的原输出，未修改；模型只在安全筛选之后的候选内排序，不能解除任何限制。",
+    "当前模型为实验性版本：训练标签来自单一 AI 标注者（弱监督），未经人工、专家或真实用户验证。",
+    "游戏历史未提供（平台暂无游戏历史仓储），模型按缺失处理。",
+    "不做诊断、不承诺疗效、不提供剂量；出现不适即停止。"
+  ],
+  "executedActions": false
+}

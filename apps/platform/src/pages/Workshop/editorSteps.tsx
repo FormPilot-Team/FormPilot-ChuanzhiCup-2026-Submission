@@ -30,7 +30,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   return <p id={id} className="mt-1.5 flex items-center gap-1.5 text-sm font-semibold text-coral-600"><AlertTriangle size={15} aria-hidden="true" />{message}</p>
 }
 
-// ---- 1 · 创建动作 ------------------------------------------------------------------------------------------------------
+// ---- 1 · 动作信息 ------------------------------------------------------------------------------------------------------
 
 export function BasicsStep({ draft, errors, onChange }: {
   draft: CustomActionDefinition
@@ -127,7 +127,7 @@ export function BasicsStep({ draft, errors, onChange }: {
   )
 }
 
-// ---- 2 · 设置识别要求 ----------------------------------------------------------------------------------------------------
+// ---- 2 · 示范采集 ----------------------------------------------------------------------------------------------------
 
 export type CaptureTarget = 'start' | 'finish'
 export type DemonstrationMethod = 'camera' | 'video'
@@ -382,7 +382,7 @@ export function RequirementsStep({ draft, setup, capture, method, onMethodChange
   )
 }
 
-// ---- 3 · 测试 ----------------------------------------------------------------------------------------------------------
+// ---- 3 · 识别测试 ----------------------------------------------------------------------------------------------------------
 
 export function TestStep({ draft, setup, snapshot, testing, passed, onStart, cameraReady }: {
   draft: CustomActionDefinition
@@ -437,7 +437,7 @@ export function TestStep({ draft, setup, snapshot, testing, passed, onStart, cam
   )
 }
 
-// ---- 4 · 保存 ----------------------------------------------------------------------------------------------------------
+// ---- 4 · 保存并训练 ----------------------------------------------------------------------------------------------------------
 
 function SummaryRow({ label, children }: { label: string; children: ReactNode }) {
   return <div className="grid gap-1 py-2.5 sm:grid-cols-[120px_minmax(0,1fr)]"><dt className="text-sm text-slate-500">{label}</dt><dd className="min-w-0 text-sm font-semibold text-slate-900">{children}</dd></div>

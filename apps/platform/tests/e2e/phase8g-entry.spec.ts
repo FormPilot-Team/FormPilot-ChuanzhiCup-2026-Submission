@@ -29,11 +29,12 @@ test.describe('8G onboarding', () => {
     await expect(page.getByRole('button', { name: '下一步' })).toHaveCount(0)
     await page.getByRole('button', { name: '开始使用' }).click()
     await expect(dialog(page)).toBeHidden()
-    await expect(page.getByRole('heading', { name: '开始训练', exact: true })).toBeVisible()
+    // Web V1: back on the six-board Home.
+    await expect(page.getByTestId('home-get-started')).toBeVisible()
     expect(await storedOnboarding(page)).toMatchObject({ version: 1, outcome: 'completed' })
 
     await page.reload()
-    await expect(page.getByTestId('mode-card-smart-training')).toBeVisible()
+    await expect(page.getByTestId('home-get-started')).toBeVisible()
     await expect(dialog(page)).toBeHidden()
   })
 
@@ -59,7 +60,7 @@ test.describe('8G onboarding', () => {
     await expect(dialog(page)).toBeHidden()
     expect(await storedOnboarding(page)).toMatchObject({ version: 1, outcome: 'dismissed' })
     await page.reload()
-    await expect(page.getByTestId('mode-card-smart-training')).toBeVisible()
+    await expect(page.getByTestId('home-get-started')).toBeVisible()
     await expect(dialog(page)).toBeHidden()
 
     await page.evaluate((key) => localStorage.removeItem(key), ONBOARDING_STORAGE_KEY)
@@ -76,20 +77,21 @@ test.describe('8G onboarding', () => {
     expect(await storedOnboarding(page)).toMatchObject({ outcome: 'dismissed' })
   })
 
+  // Web V1: 使用说明 is the topbar 帮助 button on every board.
   test('B: 使用说明 reopens the guide from the start, and closing it keeps the earlier completion', async ({ page }) => {
     await markOnboardingSeen(page)
     await page.goto('/')
     await expect(dialog(page)).toBeHidden()
-    await page.getByTestId('home-guide').click()
+    await page.getByTestId('web-help').click()
     await expect(dialog(page)).toBeVisible()
     await expect(step(page)).toHaveAttribute('data-step', 'welcome')
     await page.getByRole('button', { name: '下一步' }).click()
     await page.keyboard.press('Escape')
     await expect(dialog(page)).toBeHidden()
-    await expect(page.getByTestId('home-guide')).toBeFocused()
+    await expect(page.getByTestId('web-help')).toBeFocused()
     expect(await storedOnboarding(page)).toMatchObject({ outcome: 'completed', at: 1 })
 
-    await page.getByTestId('home-guide').click()
+    await page.getByTestId('web-help').click()
     await expect(step(page)).toHaveAttribute('data-step', 'welcome')
     await page.getByRole('button', { name: '关闭使用说明' }).click()
 
@@ -102,77 +104,78 @@ test.describe('8G onboarding', () => {
 test.describe('8G Mode Hub and smart-training entry', () => {
   test.beforeEach(async ({ page }) => { await markOnboardingSeen(page) })
 
-  test('C: Home → 热身训练 → 完整训练 opens the standard six-step course on /train', async ({ page }) => {
+  test('C: Home → 训练中心 → 智能训练 → 完整训练 opens the standard six-step course on /train', async ({ page }) => {
     await page.goto('/')
-    await expect(page).toHaveTitle('FormPilot')
-    await page.getByRole('link', { name: '开始训练 · 热身训练' }).click()
+    await expect(page).toHaveTitle('FormPilot · AI 动作训练')
+    await page.getByTestId('home-get-started').click()
+    await expect(page).toHaveURL(/\/training$/)
+    await page.getByTestId('training-start-smart').click()
     await expect(page).toHaveURL(/\/smart-training$/)
     await expect(page).toHaveTitle('FormPilot · 热身训练')
     await expect(page.getByRole('heading', { level: 1, name: '热身训练' })).toBeVisible()
-    await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '开始训练' })).toHaveAttribute('aria-current', 'page')
+    await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '训练中心', exact: true })).toHaveAttribute('aria-current', 'page')
     const order = page.getByRole('list', { name: '完整训练动作顺序' }).getByRole('listitem')
     await expect(order).toHaveText(['1肩部环绕', '2双臂上举', '3侧平举', '4侧步开合', '5徒手深蹲', '6交替提膝'])
     await page.getByRole('link', { name: /开始完整训练/ }).click()
     await expect(page).toHaveURL(/\/train$/)
     await expect(page.getByRole('heading', { name: '今日训练 · 肩部活动引导' })).toBeVisible()
-    await expect(page.getByText('第 1 / 6 项 · 实时姿态识别与动作纠正')).toBeVisible()
+    // Web V1.1 C3: the immersive top bar names the step and the exercise.
+    await expect(page.getByText('第 1 / 6 项 · 肩部环绕')).toBeVisible()
   })
 
-  test('D: Home → 热身训练 → 徒手深蹲 opens free training on /train?exercise=squat without fast', async ({ page }) => {
-    await page.goto('/')
-    await page.getByTestId('mode-card-smart-training').click()
+  test('D: 训练中心 → 智能训练 → 徒手深蹲 opens free training on /train?exercise=squat without fast', async ({ page }) => {
+    await page.goto('/training')
+    await page.getByTestId('training-start-smart').click()
     await page.getByRole('link', { name: '开始徒手深蹲' }).click()
     await expect(page).toHaveURL(/\/train\?exercise=squat$/)
     expect(new URL(page.url()).searchParams.has('fast')).toBe(false)
     await expect(page.getByRole('heading', { name: '自由训练 · 徒手深蹲专项' })).toBeVisible()
-    await expect(page.getByText('单个动作 · 实时姿态识别与动作纠正')).toBeVisible()
-    await expect(page.getByText('自由训练 · 单个动作，达到目标后自动保存')).toBeVisible()
+    await expect(page.getByText('单个动作 · 徒手深蹲')).toBeVisible()
+    await expect(page.getByTestId('training-footer')).toContainText('达到目标后自动保存')
     await expect(page.getByRole('button', { name: '启用摄像头' })).toBeVisible()
 
     await page.goto('/smart-training')
     for (const [name, id] of [['肩部环绕', 'shoulder_rotation'], ['双臂上举', 'overhead_raise'], ['侧平举', 'lateral_raise'], ['侧步开合', 'step_jack'], ['徒手深蹲', 'squat'], ['交替提膝', 'knee_raise']]) {
       await expect(page.getByRole('link', { name: `开始${name}` })).toHaveAttribute('href', `/train?exercise=${id}`)
+      await expect(page.getByTestId(`training-free-${id}`)).toHaveCount(0)
     }
+    await page.goto('/training')
+    for (const id of ['shoulder_rotation', 'overhead_raise', 'lateral_raise', 'step_jack', 'squat', 'knee_raise']) await expect(page.getByTestId(`training-free-${id}`)).toHaveAttribute('href', `/train?exercise=${id}`)
   })
 
   test('E: the four routines lead to their entry pages and 动作工坊 leads to the workshop', async ({ page }) => {
-    await page.goto('/')
     for (const [id, title] of [['baduanjin', '八段锦'], ['taijiquan', '太极拳'], ['wuqinxi', '五禽戏'], ['yijinjing', '易筋经']]) {
-      const card = page.getByTestId(`mode-card-${id}`)
+      await page.goto('/routines')
+      const card = page.getByTestId(`routine-open-${id}`)
       await expect(card, id).toHaveAttribute('href', `/routines/${id}`)
-      await expect(card, id).toHaveAccessibleName(`开始训练 · ${title}`)
-      await expect(card, id).not.toContainText('即将开放')
+      await expect(page.getByTestId(`routine-card-${id}`), id).not.toContainText('即将开放')
       await card.click()
       await expect(page).toHaveURL(new RegExp(`/routines/${id}$`))
       await expect(page.getByRole('heading', { level: 1, name: title })).toBeVisible()
-      await page.goto('/')
     }
-    const workshop = page.getByTestId('home-workshop')
-    await expect(workshop).not.toContainText('即将开放')
-    await workshop.getByRole('link', { name: '进入动作工坊' }).click()
+    await page.goto('/training')
+    await page.getByTestId('training-open-workshop').click()
     await expect(page).toHaveURL(/\/workshop$/)
     await expect(page.getByRole('heading', { level: 1, name: '动作工坊' })).toBeVisible()
   })
 
-  test('F: Home → 我的训练 opens History, and every page can get back Home', async ({ page }) => {
+  test('F: Home → 我的 → History, and every page can get back Home', async ({ page }) => {
     await page.goto('/')
-    await page.getByTestId('home-history-link').click()
+    await page.getByRole('navigation', { name: '主导航' }).getByRole('link', { name: '我的', exact: true }).click()
+    await expect(page).toHaveURL(/\/me$/)
+    await page.getByTestId('me-history-all').click()
     await expect(page).toHaveURL(/\/history$/)
     await expect(page.getByRole('heading', { level: 1, name: '我的训练', exact: true })).toBeVisible()
     await page.getByRole('link', { name: '返回首页' }).click()
     await expect(page).toHaveURL(/\/$/)
+    // Web V1.1: training pages are immersive — no first-level navigation; the way back is the exit control.
     await page.goto('/train?exercise=knee_raise')
-    const nav = page.getByRole('navigation', { name: '主导航' })
-    await expect(nav.getByRole('link', { name: '首页' })).toHaveAttribute('href', '/')
-    await expect(nav.getByRole('link', { name: '我的训练' })).toHaveAttribute('href', '/history')
-    await expect(nav.getByRole('link', { name: '开始训练' })).toHaveAttribute('aria-current', 'page')
-    await expect(nav).not.toContainText(/智能训练|功法跟练/)
-    // 开始训练 returns to Home's training section instead of a separate page.
-    await nav.getByRole('link', { name: '开始训练' }).click()
-    await expect(page).toHaveURL(/\/#start-training$/)
-    await expect(page.getByRole('heading', { name: '开始训练', exact: true })).toBeFocused()
-    await expect(page.getByTestId('mode-card-yijinjing')).toBeInViewport()
-    await expect(page.getByTestId('home-training-history')).toContainText('还没有训练记录')
+    await expect(page.getByRole('navigation', { name: '主导航' })).toHaveCount(0)
+    await expect(page.getByTestId('training-exit')).toHaveAttribute('href', '/smart-training')
+    await expect(page.locator('header')).toContainText('FormPilot')
+    await page.goto('/training')
+    await expect(page).toHaveURL(/\/training$/)
+    await expect(page.getByTestId('training-free-options')).toBeVisible()
   })
 
   test('responsive audit: Home and smart-training never overflow the target viewports', async ({ page }) => {
@@ -184,7 +187,7 @@ test.describe('8G Mode Hub and smart-training entry', () => {
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${path} ${viewport.width}`).toBe(true)
       }
       await page.goto('/')
-      await expect(page.getByTestId('mode-card-smart-training')).toBeInViewport()
+      await expect(page.getByTestId('home-get-started')).toBeInViewport()
       await page.screenshot({ path: `test-results/phase8g-home-${viewport.width}x${viewport.height}.png`, fullPage: true })
       await page.goto('/smart-training')
       await page.screenshot({ path: `test-results/phase8g-smart-training-${viewport.width}x${viewport.height}.png`, fullPage: true })

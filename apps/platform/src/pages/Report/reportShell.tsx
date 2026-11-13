@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ArrowLeft, ArrowRight, Check, CircleDashed, type LucideIcon } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, ChevronDown, CircleDashed, type LucideIcon } from 'lucide-react'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { cn } from '../../lib/cn'
 
@@ -86,11 +86,6 @@ export interface ReportTakeaway {
   tone: 'attention' | 'focus' | 'good'
 }
 
-const TAKEAWAY_TONE: Readonly<Record<ReportTakeaway['tone'], string>> = {
-  attention: 'border-coral-500/25 bg-coral-50/70 text-coral-600',
-  focus: 'border-blue-200 bg-blue-50/80 text-blue-700',
-  good: 'border-emerald-200 bg-emerald-50/80 text-emerald-700',
-}
 
 export interface ReportSummaryProps {
   kind: 'smart' | 'routine' | 'custom'
@@ -105,66 +100,111 @@ export interface ReportSummaryProps {
   comparison?: string | null
   metrics: ReadonlyArray<ReportMetric>
   takeaways?: ReadonlyArray<ReportTakeaway>
+  /** A richer 主要问题 card built from the report's own fields (routine: the weakest chapter). */
+  problem?: ReactNode
+  /** The actions of 下次怎么练: the primary one is the page's only lime button. */
+  nextActions?: ReadonlyArray<ReportNextAction>
 }
 
-/** First screen of every report: completion, the main result, one sentence, compact facts and the two takeaways. */
-export function ReportSummary({ kind, modeLabel, complete, statusLabel, title, score, trend, summary, comparison, metrics, takeaways = [] }: ReportSummaryProps) {
+export interface ReportNextAction {
+  label: string
+  href?: string
+  onClick?: () => void
+  primary?: boolean
+  testId?: string
+}
+
+function NextActionButton({ action }: { action: ReportNextAction }) {
+  const className = action.primary ? 'fp-cta w-full' : 'secondary-button inline-flex w-full items-center justify-center gap-1.5'
+  return action.href
+    ? <a href={action.href} className={className} data-testid={action.testId}>{action.label}{action.primary ? <ArrowRight size={15} aria-hidden="true" /> : null}</a>
+    : <button type="button" onClick={action.onClick} className={className} data-testid={action.testId}>{action.label}{action.primary ? <ArrowRight size={15} aria-hidden="true" /> : null}</button>
+}
+
+/**
+ * First screen of every report (Web V1.1, C4): three questions side by side — 这次怎么样 (the main result, its band,
+ * the comparison with last time), 主要问题 (only the one biggest problem) and 下次怎么练 (the first focus item and how
+ * to start it) — with the compact facts above. Every value is a field the report already had; nothing is added.
+ */
+export function ReportSummary({ kind, modeLabel, complete, statusLabel, title, score, trend, summary, comparison, metrics, takeaways = [], problem, nextActions = [] }: ReportSummaryProps) {
   const StatusIcon = complete ? Check : CircleDashed
+  const problemItem = takeaways.find((item) => item.tone !== 'focus')
+  const nextItem = takeaways.find((item) => item.tone === 'focus')
   return (
-    <section className="fp-card overflow-hidden" aria-labelledby="report-title" data-testid="report-summary" data-report-kind={kind}>
-      <div className="grid min-w-0 lg:grid-cols-[minmax(0,1.45fr)_minmax(300px,.8fr)]">
-        <div className="fp-hero min-w-0 p-5 sm:p-7">
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-semibold', complete ? 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200' : 'bg-white text-slate-700 ring-1 ring-slate-200')}>
-              <StatusIcon size={15} aria-hidden="true" />{statusLabel}
-            </span>
-            <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">{modeLabel}</span>
+    <section className="min-w-0" aria-labelledby="report-title" data-testid="report-summary" data-report-kind={kind}>
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <span className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-semibold', complete ? 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200' : 'bg-white text-slate-700 ring-1 ring-slate-200')}>
+          <StatusIcon size={15} aria-hidden="true" />{statusLabel}
+        </span>
+        <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">{modeLabel}</span>
+      </div>
+      <h1 id="report-title" className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">{title}</h1>
+      <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2" data-testid="report-facts">
+        {metrics.map(({ icon: Icon, label, value, progress }) => (
+          <div key={label} className="flex min-w-0 items-center gap-2 text-sm">
+            <dt className="flex items-center gap-1.5 text-slate-500"><Icon size={14} className="shrink-0 text-blue-500" aria-hidden="true" />{label}</dt>
+            <dd className="font-bold tabular-nums text-slate-900">{value}</dd>
+            {typeof progress === 'number' ? (
+              <span className="block h-1.5 w-14 overflow-hidden rounded-full bg-slate-200/70" aria-hidden="true">
+                <span className="fp-energy-gradient block h-full rounded-full" style={{ width: `${Math.round(Math.min(1, Math.max(0, progress)) * 100)}%` }} />
+              </span>
+            ) : null}
           </div>
-          <h1 id="report-title" className="mt-4 text-balance text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">{title}</h1>
-          <div className="mt-5 flex min-w-0 flex-wrap items-center gap-x-5 gap-y-3" data-testid={score.testId}>
+        ))}
+      </dl>
+
+      <div className="mt-4 grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1.1fr)_minmax(0,.9fr)]">
+        <article className="fp-card flex min-w-0 flex-col p-5 sm:p-6" aria-label="这次练得怎么样" data-testid="report-q-result">
+          <p className="text-xs font-bold tracking-[0.08em] text-slate-500">这次练得怎么样</p>
+          <div className="mt-3 flex min-w-0 flex-wrap items-center gap-x-5 gap-y-3" data-testid={score.testId}>
             <span className="relative grid size-24 shrink-0 place-items-center sm:size-28">
               <span className="absolute inset-0"><ScoreRing value={score.value} tone={score.tone} /></span>
               {score.value === null
                 ? <span className="relative px-2 text-center text-xs font-semibold leading-4 text-slate-500">暂无</span>
                 : <span className="relative text-3xl font-bold tabular-nums text-slate-950 sm:text-4xl">{score.value}{score.suffix ? <span className="text-lg">{score.suffix}</span> : null}</span>}
             </span>
-            <span className="min-w-0 max-w-sm">
+            <span className="min-w-0 flex-1">
               {score.value === null
-                ? <span className="block text-balance text-xl font-bold text-slate-900 sm:text-2xl">{score.emptyText}</span>
-                : <span className="block text-base font-semibold text-slate-700">{score.label}</span>}
+                ? <span className="block text-balance text-lg font-bold text-slate-900">{score.emptyText}</span>
+                : <span className="block text-base font-bold text-slate-800">{score.label}</span>}
               {trend ? <span className={cn('mt-1 block text-sm font-semibold', trend.tone === 'down' ? 'text-amber-700' : trend.tone === 'up' ? 'text-emerald-700' : 'text-slate-600')}>{trend.text}</span> : null}
             </span>
           </div>
-          {summary ? <p className="mt-5 max-w-2xl text-pretty text-[15px] font-medium leading-7 text-slate-800">{summary}</p> : null}
-          {comparison ? <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-slate-500">{comparison}</p> : null}
-        </div>
-        <div className="flex min-w-0 flex-col gap-4 border-t border-slate-100 p-5 sm:p-6 lg:border-l lg:border-t-0">
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
-            {metrics.map(({ icon: Icon, label, value, progress }) => (
-              <div key={label} className="min-w-0">
-                <dt className="flex items-center gap-1.5 text-xs font-medium text-slate-500"><Icon size={14} className="shrink-0 text-blue-500" aria-hidden="true" />{label}</dt>
-                <dd className="mt-1 text-sm font-bold tabular-nums text-slate-900">{value}</dd>
-                {typeof progress === 'number' ? (
-                  <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
-                    <span className="fp-energy-gradient block h-full rounded-full" style={{ width: `${Math.round(Math.min(1, Math.max(0, progress)) * 100)}%` }} />
-                  </span>
-                ) : null}
-              </div>
-            ))}
-          </dl>
-          {takeaways.length ? (
-            <ul className="mt-auto grid gap-2" aria-label="本次要点" data-testid="report-takeaways">
-              {takeaways.map((item) => (
-                <li key={item.label} className={cn('rounded-xl border px-3 py-2', TAKEAWAY_TONE[item.tone])}>
-                  <span className="block text-xs font-bold">{item.label}</span>
-                  <span className="mt-0.5 block text-pretty text-sm font-semibold leading-6 text-slate-800">{item.text}</span>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
+          {summary ? <p className="mt-4 text-pretty text-[15px] font-medium leading-7 text-slate-800">{summary}</p> : null}
+          {comparison ? <p className="mt-2 text-pretty text-sm leading-6 text-slate-500">{comparison}</p> : null}
+        </article>
+        <ul className="contents" aria-label="本次要点" data-testid="report-takeaways">
+          <li className={cn('fp-card flex min-w-0 flex-col p-5 sm:p-6', problemItem?.tone === 'attention' || problem ? 'ring-1 ring-coral-500/30' : undefined)} data-testid="report-q-problem" data-problem-tone={problemItem?.tone ?? 'none'}>
+            <p className={cn('text-xs font-bold tracking-[0.08em]', problemItem?.tone === 'good' && !problem ? 'text-emerald-700' : 'text-coral-600')}>主要问题 · 只看这一处</p>
+            {problem ?? (problemItem
+              ? <p className="mt-3 text-pretty text-lg font-bold leading-7 text-slate-900">{problemItem.text}</p>
+              : <p className="mt-3 text-pretty text-sm leading-6 text-slate-500">本次识别数据不足，暂时无法判断主要问题。</p>)}
+          </li>
+          <li className="fp-card flex min-w-0 flex-col bg-gradient-to-br from-[#fff7d6]/80 to-white/70 p-5 sm:p-6" data-testid="report-q-next">
+            <p className="text-xs font-bold tracking-[0.08em] text-slate-500">下次怎么练</p>
+            <p className="mt-3 text-pretty text-lg font-bold leading-7 text-slate-900">{nextItem ? nextItem.text : '按原计划再练一次'}</p>
+            <p className="mt-1 text-pretty text-xs text-slate-500">下一次会生成新的独立报告，并与本次同范围比较。</p>
+            {nextActions.length ? <div className="mt-auto grid gap-2 pt-4">{nextActions.map((action) => <NextActionButton key={action.label} action={action} />)}</div> : null}
+          </li>
+        </ul>
       </div>
     </section>
+  )
+}
+
+/** A folded section of a report: the title and its key values stay visible, the details open on demand. */
+export function ReportFold({ id, title, summary, testId, children, defaultOpen = false }: { id: string; title: string; summary: ReactNode; testId?: string; children: ReactNode; defaultOpen?: boolean }) {
+  return (
+    <details className="group report-panel min-w-0 overflow-hidden" open={defaultOpen} data-testid={testId}>
+      <summary className="flex cursor-pointer list-none items-center gap-3 p-4 marker:content-none sm:px-5">
+        <div className="min-w-0 flex-1">
+          <h2 id={id} className="text-balance font-bold text-slate-950">{title}</h2>
+          <div className="mt-0.5 text-pretty text-sm text-slate-500">{summary}</div>
+        </div>
+        <ChevronDown size={18} className="shrink-0 text-slate-400 transition-transform duration-150 group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+      </summary>
+      <div className="border-t border-slate-100 p-3 sm:p-4">{children}</div>
+    </details>
   )
 }
 

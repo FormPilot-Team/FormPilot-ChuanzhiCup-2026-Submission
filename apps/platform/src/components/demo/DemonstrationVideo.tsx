@@ -12,6 +12,8 @@ interface DemonstrationVideoProps {
   currentExerciseId: ExerciseId
   nextExerciseId?: ExerciseId
   courseSnapshot: CourseSnapshot
+  /** `compact`: the small demonstration window of the immersive warm-up (Web V1.1 C3). */
+  variant?: 'panel' | 'compact'
 }
 
 type MediaStatus = 'loading' | 'ready' | 'unavailable' | 'error'
@@ -23,7 +25,8 @@ function playbackLabel(playback: DemonstrationPlayback): string {
   return '标准动作预览'
 }
 
-export function DemonstrationVideo({ currentExerciseId, nextExerciseId, courseSnapshot }: DemonstrationVideoProps) {
+export function DemonstrationVideo({ currentExerciseId, nextExerciseId, courseSnapshot, variant = 'panel' }: DemonstrationVideoProps) {
+  const compact = variant === 'compact'
   const videoRef = useRef<HTMLVideoElement>(null)
   const directive = useMemo(
     () => resolveDemonstrationDirective(courseSnapshot, currentExerciseId, nextExerciseId),
@@ -57,7 +60,7 @@ export function DemonstrationVideo({ currentExerciseId, nextExerciseId, courseSn
 
   return (
     <section
-      className="panel flex min-h-0 min-w-0 flex-col overflow-hidden p-3"
+      className={compact ? 'imm-panel' : 'panel flex min-h-0 min-w-0 flex-col overflow-hidden p-3'}
       aria-labelledby="demonstration-video-title"
       data-testid="demonstration-panel"
       data-demo-exercise={directive.exerciseId}
@@ -65,7 +68,12 @@ export function DemonstrationVideo({ currentExerciseId, nextExerciseId, courseSn
       data-demo-source={source?.src ?? ''}
       data-media-status={mediaStatus}
     >
-      <div className="flex h-12 min-w-0 items-center gap-2 px-2">
+      {compact ? (
+        <div className="imm-panel-head">
+          <h2 id="demonstration-video-title" className="imm-chip"><i className="size-2 rounded-full bg-violet-300" aria-hidden="true" />标准示范 · 真人</h2>
+          <span className="imm-chip ml-auto min-w-0 truncate">{directive.playback === 'playing' ? <Play size={12} fill="currentColor" aria-hidden="true" /> : <Pause size={12} fill="currentColor" aria-hidden="true" />}<span className="truncate">{source?.displayName ?? '未知动作'}</span><span className="text-slate-400">· 循环</span></span>
+        </div>
+      ) : <div className="flex h-12 min-w-0 items-center gap-2 px-2">
         <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"><Clapperboard size={18} /></span>
         <div className="min-w-0">
           <h2 id="demonstration-video-title" className="truncate text-balance font-bold text-slate-900">真人标准动作</h2>
@@ -75,9 +83,9 @@ export function DemonstrationVideo({ currentExerciseId, nextExerciseId, courseSn
           {directive.playback === 'playing' ? <Play size={14} fill="currentColor" /> : <Pause size={14} fill="currentColor" />}
           {playbackLabel(directive.playback)}
         </span>
-      </div>
+      </div>}
 
-      <div className="relative min-h-[380px] flex-1 overflow-hidden rounded-2xl bg-slate-950">
+      <div className={compact ? 'relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-950' : 'relative min-h-[380px] flex-1 overflow-hidden rounded-2xl bg-slate-950'}>
         {source ? (
           <video
             key={source.src}
