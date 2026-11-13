@@ -2,7 +2,7 @@ import {
   Activity, AlertTriangle, ArrowLeft, CalendarDays, ChevronDown, Clock3, Dumbbell, Gauge, History, Info, ShieldCheck,
   Target, TrendingUp,
 } from 'lucide-react'
-import { HISTORY_PATH, START_TRAINING_PATH, freeTrainingPath, trainingEntryPath } from '../../app/routes'
+import { COACH_PATH, HISTORY_PATH, START_TRAINING_PATH, freeTrainingPath, trainingEntryPath } from '../../app/routes'
 import { AICoach } from '../../components/aiCoach/AICoach'
 import { AppHeader } from '../../components/layout/AppHeader'
 import { customDigest, routineDigest, warmUpDigest } from '../../features/aiCoach/digests'
@@ -501,6 +501,7 @@ export function TrainingReportView({ analysis: analyzed, session }: { analysis: 
         historyHref={HISTORY_PATH}
         againLabel="再次训练"
         onAgain={() => window.location.assign(trainingEntryPath(scope))}
+        coachHref={`${COACH_PATH}?view=questions&ask=${encodeURIComponent('我上一次热身训练练得怎么样？主要问题在哪里？')}`}
       />
     </ReportLayout>
   )

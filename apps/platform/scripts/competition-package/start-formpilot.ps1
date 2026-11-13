@@ -1,4 +1,4 @@
-﻿# FormPilot Web V1.1 — offline launcher for the competition package (Windows PowerShell 5.1+, no Node / pnpm needed).
+﻿# FormPilot Web V1.2 — offline launcher for the competition package (Windows PowerShell 5.1+, no Node / pnpm needed).
 # Serves the packaged builds from this folder:
 #   platform\  -> http://localhost:4175/   (FormPilot Web V1, competition build: AI Coach ACTIVE)
 #   games\     -> http://localhost:5181/   (Motion Games Lab: 摘苹果 / 林间划船 / 林间射箭)
@@ -81,7 +81,7 @@ $handler = {
 $pool = [RunspaceFactory]::CreateRunspacePool(1, 16)
 $pool.Open()
 Write-Host ''
-Write-Host 'FormPilot Web V1.1 is running:' -ForegroundColor Green
+Write-Host 'FormPilot Web V1.2 is running:' -ForegroundColor Green
 Write-Host "  FormPilot         http://localhost:$PlatformPort/"
 Write-Host "  Motion Games Lab  http://localhost:$GamesPort/"
 Write-Host 'Use Microsoft Edge or Chrome. Keep this window open; close it (or press Ctrl+C) to stop.'

@@ -17,6 +17,7 @@ missing). Nothing from the user's browser (training records, logs) is ever read 
 from __future__ import annotations
 
 import argparse
+import json
 import hashlib
 import os
 import shutil
@@ -33,6 +34,11 @@ REQUIRED_MEDIA = [
     'assets/routines/wuqinxi-standard.mp4', 'assets/routines/yijinjing-standard.mp4',
     'web-v1/assets/coach-orb-loop.webm', 'web-v1/assets/coach-orb-poster.png',
 ]
+LOCAL_AI_SOURCES = [
+    'server/coachAgent/agent/config.ts', 'server/coachAgent/agent/index.ts', 'server/coachAgent/agent/server.ts',
+    'server/coachAgent/local/config.ts', 'server/coachAgent/local/transport.ts', 'src/features/coachLlm/protocol.ts',
+]
+FORBIDDEN_SUFFIXES = ('.gguf', '.safetensors')
 FORBIDDEN_NAMES = ('.env', '.env.local', 'members.local.json', 'id_rsa', '.npmrc')
 
 
@@ -52,7 +58,7 @@ def sha256(path: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--out', required=True)
-    parser.add_argument('--version', default='1.1.0')
+    parser.add_argument('--version', default='1.2.1')
     args = parser.parse_args()
 
     for media in REQUIRED_MEDIA:
@@ -78,9 +84,32 @@ def main() -> int:
     for doc in sorted((HERE / 'docs').glob('*.md')):
         shutil.copy2(doc, package / doc.name)
     shutil.copy2(PLATFORM / 'public' / 'web-v1' / 'ASSET_SOURCES.md', package / '素材来源.md')
+    # Optional V1.2 local AI coach: the agent bridge sources (Node runs them as-is) + a launcher that only checks for and
+    # starts against an already-installed local Ollama. No model, no Ollama, no key in the package.
+    local_ai = package / 'ai-coach-local'
+    for source in LOCAL_AI_SOURCES:
+        (local_ai / source).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(PLATFORM / source, local_ai / source)
+    for launcher in ('start-ai-coach-local.cmd', 'start-ai-coach-local.ps1'):
+        shutil.copy2(HERE / 'ai-coach-local' / launcher, local_ai / launcher)
+    (local_ai / 'package.json').write_text(json.dumps({'name': 'formpilot-ai-coach-local', 'private': True, 'type': 'module'}, indent=2) + chr(10), encoding='utf-8')
 
+    # Traceability: the exact source commit this package was built from (and whether the tree had local edits).
+    commit = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=PLATFORM, capture_output=True, text=True, check=True).stdout.strip()
+    dirty = subprocess.run(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=PLATFORM, capture_output=True, text=True, check=True).stdout.strip()
+    built = __import__('datetime').datetime.now().astimezone().isoformat(timespec='seconds')
+    (package / 'VERSION.txt').write_text('\n'.join([
+        f'FormPilot Web V{args.version} competition package',
+        f'source commit: {commit}' + (' (WITH UNCOMMITTED CHANGES)' if dirty else ''),
+        f'built: {built}',
+        'platform: vite build --mode competition (AI Coach decision model ACTIVE; free-text questions need a local model, see 01)',
+        'games: Motion Games Lab (apps/motion-games-lab/app) production build',
+        'not included: model weights, Ollama, API keys, personal training records',
+        'file list and SHA-256: SHA256SUMS.txt',
+        '',
+    ]), encoding='utf-8')
     files = sorted(p for p in package.rglob('*') if p.is_file())
-    leaked = [p for p in files if p.name in FORBIDDEN_NAMES]
+    leaked = [p for p in files if p.name in FORBIDDEN_NAMES or p.suffix.lower() in FORBIDDEN_SUFFIXES or p.name.lower().startswith('ollama')]
     if leaked:
         print('refusing to package sensitive files:', leaked, file=sys.stderr)
         return 3

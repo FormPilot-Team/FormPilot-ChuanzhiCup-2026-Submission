@@ -1,5 +1,5 @@
 import { Activity, CalendarDays, ChevronDown, Clock3, History, Info, Layers, Play, Target } from 'lucide-react'
-import { HISTORY_PATH, reportPath, routinePath, routineTrainingPath } from '../../app/routes'
+import { COACH_PATH, HISTORY_PATH, reportPath, routinePath, routineTrainingPath } from '../../app/routes'
 import { ROUTINE_ACCENT } from '../../components/routines/routineTheme'
 import type { FollowAlongRegion } from '../../features/routines/followAlong/matcher'
 import {
@@ -354,6 +354,7 @@ export function RoutineReportView({ report }: { report: RoutineReport }) {
         historyHref={HISTORY_PATH}
         againLabel="再练一次"
         onAgain={() => window.location.assign(routineTrainingPath(report.program.id, scope.kind === 'form' ? scope.chapterId : undefined))}
+        coachHref={`${COACH_PATH}?view=questions&ask=${encodeURIComponent('我上次功法跟练得怎么样？哪一段最弱？')}`}
       />
     </ReportLayout>
   )
