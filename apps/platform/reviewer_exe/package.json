@@ -1,0 +1,53 @@
+{
+  "name": "ai-electronic-coach-reviewer",
+  "version": "1.0.10",
+  "private": true,
+  "description": "AI 电子教练 Windows 评审版包装器",
+  "main": "src/main.cjs",
+  "scripts": {
+    "prepare:dist": "node scripts/prepare-dist.cjs",
+    "test": "node --test tests/staticServer.test.cjs tests/diagnosticsLog.test.cjs tests/permissions.test.cjs tests/windowsCameraPrivacy.test.cjs",
+    "build:reviewer": "node scripts/build-reviewer.cjs",
+    "test:packaged": "playwright test -c playwright.config.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "electron": "44.3.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.aielectroniccoach.reviewer",
+    "productName": "AI电子教练评审版",
+    "asar": true,
+    "asarUnpack": [
+      "app-dist/**/*",
+      "build/icon.ico"
+    ],
+    "electronDist": "node_modules/electron/dist",
+    "directories": {
+      "output": "../release",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "app-dist/**/*",
+      "build/icon.ico",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        },
+        {
+          "target": "dir",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "FormPilot_v3_测试版_${version}.${ext}"
+    },
+    "publish": null
+  }
+}

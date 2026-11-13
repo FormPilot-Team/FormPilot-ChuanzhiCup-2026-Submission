@@ -1,5 +1,7 @@
 # fp-cdm 训练流水线（Competition Decision Model V1）
 
+> 独立提交版请先读[训练复现说明](../../../../../docs/submission/TRAINING_REPRODUCTION.md)：下文历史 `VN` 内部哈希路径应替换为 `scripts/submission/run_ts.mjs` 解析器；Python 固定依赖已补充。研究记录和冻结权重保持原样。
+
 两级模型，借鉴 StartLux 的决策架构（观测/状态 → 结构化协议 → 模型 → 校准置信度与弃权 → 独立 Guard → 不执行；off/shadow/active）：
 
 | 模型 | 输入 | 标签 | 状态 |

@@ -1,0 +1,104 @@
+{
+  "app": "platform",
+  "purpose": "Local validation media overlay; not in Git",
+  "files": [
+    {
+      "path": "public/assets/routines/baduanjin-poster.jpg",
+      "bytes": 32274,
+      "sha256": "c1e147f04941168457879e081f5f6d54e38850fecd40a1f7d3ed91bfee500b49",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/routines/baduanjin-standard.mp4",
+      "bytes": 35321928,
+      "sha256": "28018188a4b05f06012ecfb943d35212140c1b5370d0ed0766eed3aedc24f19c",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/routines/taijiquan-poster.jpg",
+      "bytes": 36687,
+      "sha256": "e2fc40e7a9411fc95a7a3cd2300a0e4030c2a71a57dec0227a71188c5b166f5f",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/routines/taijiquan-standard.mp4",
+      "bytes": 11922229,
+      "sha256": "2f8f06fcbee2120c1a91e4b8da52527545527d120b9c25f839edb76a41cbb5fd",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/routines/wuqinxi-poster.jpg",
+      "bytes": 29864,
+      "sha256": "73f26a3f15ae389dac0a8b3d8af3d85ba14386d64240779697bf1d1f513fb9ac",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/routines/wuqinxi-standard.mp4",
+      "bytes": 40986092,
+      "sha256": "0e4e180717a8bfef5a29327a412f4f9e808f7d2fb6f0cf811d2ea3e830c8a8f6",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/routines/yijinjing-poster.jpg",
+      "bytes": 27927,
+      "sha256": "a99f7d58d22de3a95bd61dd8329eb0329f29c8018e4248d911a17ce4b2cf23ad",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/routines/yijinjing-standard.mp4",
+      "bytes": 11411390,
+      "sha256": "0c1a6b325435055257cb6df1381244ac2477cb9b0ba7e1a005d38af3172fd4cd",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/demos/alternating-knee-raise.mp4",
+      "bytes": 2570547,
+      "sha256": "715e864bc7e2fdd92b4d2a1e2d535d5a123fdfc12a53bc4e91e587cfc3aa5464",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/demos/lateral-raise.mp4",
+      "bytes": 2713738,
+      "sha256": "08577e1a8ee9798c04c56f0ec16dbba103a07b2e5bb2cc48ff2119086b7e8b14",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/demos/overhead-raise.mp4",
+      "bytes": 1145294,
+      "sha256": "b2b4b6e07277208c2ee51f5acccd6f870eb32094cbff7290975def56215e1b09",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/demos/shoulder-rotation.mp4",
+      "bytes": 2039763,
+      "sha256": "e90472520831abf18f2415239a3bf4c2897f78a5503865c4f2659f591aadb2bd",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/demos/squat.mp4",
+      "bytes": 1731319,
+      "sha256": "6e39cfab986ca8b49f8a218e9580c650bdffc6542d1650986d0fe8a1c4d9b084",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    },
+    {
+      "path": "public/assets/demos/step-jack.mp4",
+      "bytes": 1082346,
+      "sha256": "4f4bedc6384acb57b29f93236d6fee3fe7e901439732456607a08168c2bad486",
+      "licence": "unconfirmed",
+      "distribution": "local-only; owner permission required"
+    }
+  ]
+}

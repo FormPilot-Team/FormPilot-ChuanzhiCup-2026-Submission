@@ -1,0 +1,5140 @@
+{
+  "baseline": "f6e081202d2f5f7652f11198af2542d755d88b3a",
+  "files": [
+    {
+      "path": "apps/motion-games-lab/PRODUCT.md",
+      "mode": "100644",
+      "blob": "bdf16fafd01690e97ffaf8cd48263b3054977562"
+    },
+    {
+      "path": "apps/motion-games-lab/app/.gitignore",
+      "mode": "100644",
+      "blob": "74fbe073869b1bec73353bf50e6399e5b25f7c54"
+    },
+    {
+      "path": "apps/motion-games-lab/app/README.md",
+      "mode": "100644",
+      "blob": "fa94324a70647a03d4cd0440f71372d1d3af0fff"
+    },
+    {
+      "path": "apps/motion-games-lab/app/e2e/apple.spec.ts",
+      "mode": "100644",
+      "blob": "f169dce6ae5ec6e9f3b48bd4122256277bfd28da"
+    },
+    {
+      "path": "apps/motion-games-lab/app/e2e/archery.spec.ts",
+      "mode": "100644",
+      "blob": "91d1a4edb7281b60e242fb4ed91c64d24e66bfe7"
+    },
+    {
+      "path": "apps/motion-games-lab/app/e2e/boating.spec.ts",
+      "mode": "100644",
+      "blob": "16998d6e05fa27073c19732372c06c3e25f13ded"
+    },
+    {
+      "path": "apps/motion-games-lab/app/e2e/debug.spec.ts",
+      "mode": "100644",
+      "blob": "50549f4be9cc10263cfba0f43fe01711a539c0fa"
+    },
+    {
+      "path": "apps/motion-games-lab/app/e2e/desktop.spec.ts",
+      "mode": "100644",
+      "blob": "9ba7ef2465627e35359cbefcf5b98125ab9395b2"
+    },
+    {
+      "path": "apps/motion-games-lab/app/e2e/helpers.ts",
+      "mode": "100644",
+      "blob": "b2f7a8c7457d9f8524b7f08fc9a765b623c1c14c"
+    },
+    {
+      "path": "apps/motion-games-lab/app/e2e/round1.spec.ts",
+      "mode": "100644",
+      "blob": "5fd5f453c9f9e3a3dd105c5825fdbbe846c06e19"
+    },
+    {
+      "path": "apps/motion-games-lab/app/eslint.config.js",
+      "mode": "100644",
+      "blob": "79513cbbe5b538997fda81c7b95fcbd656910b26"
+    },
+    {
+      "path": "apps/motion-games-lab/app/index.html",
+      "mode": "100644",
+      "blob": "62294fa2554ffc5cc2392847e04b54c2fbd590cb"
+    },
+    {
+      "path": "apps/motion-games-lab/app/package.json",
+      "mode": "100644",
+      "blob": "88dddd071afa4285df6294837b351d7c6e8dbda5"
+    },
+    {
+      "path": "apps/motion-games-lab/app/playwright.config.ts",
+      "mode": "100644",
+      "blob": "8381d8ef03690806c3864a3a959485026d8b7256"
+    },
+    {
+      "path": "apps/motion-games-lab/app/pnpm-lock.yaml",
+      "mode": "100644",
+      "blob": "5b7f5c783b620e61c395e2e15c9c33db52c21785"
+    },
+    {
+      "path": "apps/motion-games-lab/app/pnpm-workspace.yaml",
+      "mode": "100644",
+      "blob": "5ed0b5af0d45919f64c66edfb16a5f4512461fa1"
+    },
+    {
+      "path": "apps/motion-games-lab/app/public/models/pose_landmarker_lite.task",
+      "mode": "100644",
+      "blob": "09576a930167d58ba3cd759a1521a1f7b159b0f2"
+    },
+    {
+      "path": "apps/motion-games-lab/app/scripts/copy-mediapipe-wasm.mjs",
+      "mode": "100644",
+      "blob": "7a476c3279b7ac8ffdf90bd7750e782d081f44ee"
+    },
+    {
+      "path": "apps/motion-games-lab/app/scripts/desktop-smoke.mjs",
+      "mode": "100644",
+      "blob": "2417b1dd926b68b2ee3c97de49dffb894768410c"
+    },
+    {
+      "path": "apps/motion-games-lab/app/scripts/make-icon.py",
+      "mode": "100644",
+      "blob": "e7ccce41bde31a7b0aa141214c6e4eeb064928ee"
+    },
+    {
+      "path": "apps/motion-games-lab/app/scripts/perf.mjs",
+      "mode": "100644",
+      "blob": "ed0586d60924072f8c5a3061eb56282df2ee1b14"
+    },
+    {
+      "path": "apps/motion-games-lab/app/scripts/release.mjs",
+      "mode": "100644",
+      "blob": "59d71d08f20e9cd31588d48d6e200fae1e46e2a5"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/.gitignore",
+      "mode": "100644",
+      "blob": "489be3277b72bf4d8ad55d549769bc7a4a94ef25"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/Cargo.lock",
+      "mode": "100644",
+      "blob": "10d204c45f735d60d5c1cb8d305f8743e3c6786a"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/Cargo.toml",
+      "mode": "100644",
+      "blob": "89b4eb38849bc851ee561bf7bd86050fbb22998c"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/app-icon.png",
+      "mode": "100644",
+      "blob": "9a87ff9f6d8812f9113a32c1edadd0dd86bfc2f5"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/build.rs",
+      "mode": "100644",
+      "blob": "50c721e358bb3cd542c9f2a4fcb80e393a6ff4a4"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/capabilities/default.json",
+      "mode": "100644",
+      "blob": "76a392b5e3222eb6dfcf82c7be57fa473b202fab"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/128x128.png",
+      "mode": "100644",
+      "blob": "583f966ec6721f7c727e5402cc582afae6d2185a"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/128x128@2x.png",
+      "mode": "100644",
+      "blob": "9f45a71275d86e9f986c296d00ee94df4fe517e8"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/32x32.png",
+      "mode": "100644",
+      "blob": "ef175e41059d9a078231e20af3cd6a85b066e4bb"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/64x64.png",
+      "mode": "100644",
+      "blob": "55259030810abf38bbce0d638a237cada363ad4c"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/Square107x107Logo.png",
+      "mode": "100644",
+      "blob": "969850cd62d12aca22da7b601a06e4c0fce13558"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/Square142x142Logo.png",
+      "mode": "100644",
+      "blob": "b9e7e3f742b30b8b981699ceb0479f1e5618c050"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/Square150x150Logo.png",
+      "mode": "100644",
+      "blob": "7f7ac814961a5e0b2a296bb8c4fe1b5880c65a44"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/Square284x284Logo.png",
+      "mode": "100644",
+      "blob": "e29948a3c8104efe6bb41d86187a46cc83b8bf2a"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/Square30x30Logo.png",
+      "mode": "100644",
+      "blob": "154813952bf3b76414c7834edb613149119a5787"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/Square310x310Logo.png",
+      "mode": "100644",
+      "blob": "0f393f3c66f4f49fac74405eb927514949121b78"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/Square44x44Logo.png",
+      "mode": "100644",
+      "blob": "5e789ca603c781941ebf3f3a4389737119bb74b9"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/Square71x71Logo.png",
+      "mode": "100644",
+      "blob": "a6824824621ecfdff728a798241988e82fe208a1"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/Square89x89Logo.png",
+      "mode": "100644",
+      "blob": "8c064e5caed86cee460f839956d6039288efbcca"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/StoreLogo.png",
+      "mode": "100644",
+      "blob": "dcea44b6657c8d4f9758918f1c1023dd3e5b8b66"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/icon.icns",
+      "mode": "100644",
+      "blob": "20fc76b211675bfaa0f646e8050d335921e3024c"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/icon.ico",
+      "mode": "100644",
+      "blob": "a54ab9751ffc915f7d169c3f1ee6344d7bd1ae17"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/icons/icon.png",
+      "mode": "100644",
+      "blob": "28d5c33bc5b9c046a0defaf2210393b79fdcca6f"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/src/lib.rs",
+      "mode": "100644",
+      "blob": "67b8419ebceaab62f5f1b55078579d2a969e1992"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/src/main.rs",
+      "mode": "100644",
+      "blob": "c65ff15a038c85ca52c89130617458dfc4108742"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src-tauri/tauri.conf.json",
+      "mode": "100644",
+      "blob": "60dc4baeed723a3a7b63febef1d3afab3ccaee70"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/App.tsx",
+      "mode": "100644",
+      "blob": "f99b8ff91bb711b6009266c0f74b76d447977245"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/data/copy.test.ts",
+      "mode": "100644",
+      "blob": "b955cef5b4e58d59cc65fc831b6f95555760c9df"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/data/games.ts",
+      "mode": "100644",
+      "blob": "21a3b813b29d223a8949c2b45f63743c4d3a4896"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/apple/ApplePlay.tsx",
+      "mode": "100644",
+      "blob": "8e11449b9ccb2b9674d957594525039a3ec901e8"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/apple/AppleScene.ts",
+      "mode": "100644",
+      "blob": "231f06754b5e13859503aafec3729a315c1fdffb"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/apple/apple.test.ts",
+      "mode": "100644",
+      "blob": "06d46a129f49b432c0da482323e1c7b4dec66fc0"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/apple/config.ts",
+      "mode": "100644",
+      "blob": "a2961662ca309f3804a46d0408c266e6655858c8"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/apple/controller.ts",
+      "mode": "100644",
+      "blob": "e65661b0848287a96f74e25927f6a2b418b2ca94"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/apple/reach.ts",
+      "mode": "100644",
+      "blob": "2aaf83327b86fd3bd2ce808ce7a31f16994c5f28"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/apple/round.ts",
+      "mode": "100644",
+      "blob": "0723498b47cc5ec7c71504329777ee8a29234d6d"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/archery/ArcheryPlay.tsx",
+      "mode": "100644",
+      "blob": "8f4103e0af352291dbd98b841bb2f593798bca69"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/archery/ArcheryScene.ts",
+      "mode": "100644",
+      "blob": "11406d591f9d9ba5ee2f8c20b3448f2d048cb298"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/archery/README.md",
+      "mode": "100644",
+      "blob": "83519679007481a3ffeae4829a88a5f489549426"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/archery/archery.test.ts",
+      "mode": "100644",
+      "blob": "447dbc5c0595ab4a595389f6ddfbdf3de13d0138"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/archery/config.ts",
+      "mode": "100644",
+      "blob": "1da208e7c0b166b7fa847c43773f8c1144945a5b"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/archery/controller.ts",
+      "mode": "100644",
+      "blob": "65b9da68f25e46d7ad9e74d774f37b14acb7b9d1"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/archery/round.ts",
+      "mode": "100644",
+      "blob": "53ee176414d13ca4b6e2de1a562e7b5f43039a5a"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/boating/BoatScene.ts",
+      "mode": "100644",
+      "blob": "4a11bb5f70efcf153866b0bc4c4ffde311b8825f"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/boating/BoatingPlay.tsx",
+      "mode": "100644",
+      "blob": "711aaa0482c31be6188857c7a7a5f0ca5da78ad4"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/boating/README.md",
+      "mode": "100644",
+      "blob": "915110fe8be7a65bf16985bbf8826aecdb93307e"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/boating/boating.test.ts",
+      "mode": "100644",
+      "blob": "58a88809192a55d72b39eedb770beedc8f4a6f10"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/boating/config.ts",
+      "mode": "100644",
+      "blob": "d2ec4b0e17d4aa4ae2242879081c51abc9a12319"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/boating/controller.ts",
+      "mode": "100644",
+      "blob": "30fd69d315a40332369a100627d41125450f5d4e"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/boating/round.ts",
+      "mode": "100644",
+      "blob": "b69247d6753373b8ffe7eb8ee308ef652cfdc9f1"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/registry.tsx",
+      "mode": "100644",
+      "blob": "bbe2bb54edcb7b941d3c0748517abc1864a1a525"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/games/types.ts",
+      "mode": "100644",
+      "blob": "9f6f199d45866dc9b36a9d65d2079b62ee7f7b6c"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/main.tsx",
+      "mode": "100644",
+      "blob": "efbb365cf46e2600d6bacdaac1ba1383abbcec3b"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/MotionAdapter.ts",
+      "mode": "100644",
+      "blob": "fb98923be9510e47248ecc9d18c9ba7998a8449b"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/calibration.ts",
+      "mode": "100644",
+      "blob": "28355a3185b1aeb928c8b10d7677bfcc3237cd55"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/contracts.ts",
+      "mode": "100644",
+      "blob": "52a63fc174354aecf6d22d745a154801f3e166a6"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/detectors.test.ts",
+      "mode": "100644",
+      "blob": "ebe1b82e8ceae5c556314783ca836060e6637abf"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/drawDetector.ts",
+      "mode": "100644",
+      "blob": "780a18ed043ed5d5a7c890012fb1330a4b511cad"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/frameBuilder.ts",
+      "mode": "100644",
+      "blob": "7a7f5ce687204a5001d8ab6514a3b9251ab20105"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/framing.ts",
+      "mode": "100644",
+      "blob": "493f564c34c0c90d8135fdf116bf3dc00dc19bd7"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/humanArcher.fixture.ts",
+      "mode": "100644",
+      "blob": "ab4ebdf3e354420945167c2fbcc3c180f6f1d2a5"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/motion.test.ts",
+      "mode": "100644",
+      "blob": "133d8c1e02a1628f3f90e1da7c362b7a6b6cd853"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/poseSource.ts",
+      "mode": "100644",
+      "blob": "ad7d773fcf34bd914287632b3db0e9ebc2b91d99"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/poseWorker.ts",
+      "mode": "100644",
+      "blob": "0befc58603d4d2de28e1466ac0f8b2144aa0251d"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/posture.ts",
+      "mode": "100644",
+      "blob": "03ac15a0b9c75f93d734ce56498fe71119398bf6"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/session.ts",
+      "mode": "100644",
+      "blob": "52661392dbaf096dd79b5909f5887289877b56cd"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/strokeDetector.ts",
+      "mode": "100644",
+      "blob": "e6396631173eee6a1a2a0bf84157ba14f714f41f"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/synthetic.ts",
+      "mode": "100644",
+      "blob": "ccdd6fbc0d6baf0ae9da0a060bc2a5dbe300a0fd"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/targetTracker.ts",
+      "mode": "100644",
+      "blob": "a6118f036d4f0f8649a3f40db96814763bf20c43"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/vendor/BrowserCameraAdapter.ts",
+      "mode": "100644",
+      "blob": "7f2f4a38413a579c1ddadff3f491defac949d8eb"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/vendor/PoseDetector.ts",
+      "mode": "100644",
+      "blob": "8b1892f4e653f6bb18d81bfcee9a2cb75fc246bf"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/vendor/PoseFilter.ts",
+      "mode": "100644",
+      "blob": "ddcc56c00280289531d407de7c35a9df80ce17fa"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/vendor/fitMapping.ts",
+      "mode": "100644",
+      "blob": "42022d06c3f1bf09f15c866f6d187d57912fd4bf"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/vendor/geometry.ts",
+      "mode": "100644",
+      "blob": "4a9405210734866f08d9dfbfe3f28d647bfb6837"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/motion/vendor/poseTypes.ts",
+      "mode": "100644",
+      "blob": "a326f0899706033e3be2b13b380a939a3e2aacb9"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/audio.ts",
+      "mode": "100644",
+      "blob": "d54ab8b6526383671b42ada049ff2a0cc9135a7e"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/desktop.ts",
+      "mode": "100644",
+      "blob": "e57bce49d810d2eba6febf38ab35d953735e0a20"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/flags.ts",
+      "mode": "100644",
+      "blob": "960dfe95d18966c190622ed47746a9f5b95fc855"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/handCursor.ts",
+      "mode": "100644",
+      "blob": "03595586516828655d40b4871efc9f83dd418de9"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/metrics.ts",
+      "mode": "100644",
+      "blob": "7e20ec397aae2982e512fc848f36c3688a209670"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/perf.ts",
+      "mode": "100644",
+      "blob": "405288ae92442c6a3b4941e56f6564a0ca42e2f2"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/phaserHost.ts",
+      "mode": "100644",
+      "blob": "fa19a76af5c13bae85b4281daeb7fc02d8240adb"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/play/PlayController.ts",
+      "mode": "100644",
+      "blob": "0980fb85284b5dad1c6922c04ccf0f47f28e78f0"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/play/debugOverlay.ts",
+      "mode": "100644",
+      "blob": "50baaecd34c84223d6a4f3e20142f8f334bd3f50"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/random.ts",
+      "mode": "100644",
+      "blob": "f453ab01dd5695db8af4fefd6c1ba7395f5044be"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/round1.test.ts",
+      "mode": "100644",
+      "blob": "5169d0c77bc52d93b809100a44d768b95aff55a1"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/settings.ts",
+      "mode": "100644",
+      "blob": "5525f4c56846e665c0ae9e13c8261b0f75e55997"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/smoothing.test.ts",
+      "mode": "100644",
+      "blob": "05970c8d39108d8bbb8dbb7276d760819503fec4"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/smoothing.ts",
+      "mode": "100644",
+      "blob": "e07b883732de5de2fe0d6710a789f6b275a4a192"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/world/hands.ts",
+      "mode": "100644",
+      "blob": "de05ff2403815515cae32aee06a45224db829d91"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/world/painters.ts",
+      "mode": "100644",
+      "blob": "3bcf0b5eef21b5741fe675c008c4e9140810edb4"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/world/palette.ts",
+      "mode": "100644",
+      "blob": "f62b422aa714384045d22a04e6c662528f486e23"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/world/range.ts",
+      "mode": "100644",
+      "blob": "710a79f15c7f499f75015580dd3a26b575987731"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/shared/world/river.ts",
+      "mode": "100644",
+      "blob": "aa014f4613138eca8c958dcab7e76d29aae65596"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/CameraStep.tsx",
+      "mode": "100644",
+      "blob": "37c870ec6b99a741ab3dac2d9fdae9173f150dea"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/DebugPanel.tsx",
+      "mode": "100644",
+      "blob": "5a693d2f0675cdc68a825d96c40b746d5e78a885"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/GameFlow.tsx",
+      "mode": "100644",
+      "blob": "ba6331f807d625947395748c4e4b6524abc5dd8b"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/GamePlay.tsx",
+      "mode": "100644",
+      "blob": "8802d721896721a9034debb948b5c81a6ff9dcd5"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/Hub.tsx",
+      "mode": "100644",
+      "blob": "bbff3993897e9b157349cb2c6c090ec341000e9d"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/Illustrations.tsx",
+      "mode": "100644",
+      "blob": "ac449988dd53d24100de5dd361f5500718fd864c"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/MirrorView.tsx",
+      "mode": "100644",
+      "blob": "15f2c14978566992e1539a9c3ede797dce0fd03c"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/ResultScreen.tsx",
+      "mode": "100644",
+      "blob": "cc413853ce31d1d16e6d31eca61f52887c718ca5"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/SettingsDialog.tsx",
+      "mode": "100644",
+      "blob": "784cfc3b26d1d6adbb5e4b7eb599708ba483f538"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/Steps.tsx",
+      "mode": "100644",
+      "blob": "ee08971b531bbbea53310d37d1e5e68072486c9e"
+    },
+    {
+      "path": "apps/motion-games-lab/app/src/ui/styles.css",
+      "mode": "100644",
+      "blob": "11b959ded7d4f55df176db4d76f70831eaf33c7b"
+    },
+    {
+      "path": "apps/motion-games-lab/app/tsconfig.app.json",
+      "mode": "100644",
+      "blob": "097767674343d3a97a5faea712947eab0299a865"
+    },
+    {
+      "path": "apps/motion-games-lab/app/tsconfig.json",
+      "mode": "100644",
+      "blob": "d32ff682003e0ff5d8a6e6bb3663d4c35a45b116"
+    },
+    {
+      "path": "apps/motion-games-lab/app/tsconfig.node.json",
+      "mode": "100644",
+      "blob": "ad681667022e0838b34f3b228235b78add3c87b3"
+    },
+    {
+      "path": "apps/motion-games-lab/app/vite.config.ts",
+      "mode": "100644",
+      "blob": "579fea606dac23a1db5dc4dfd1c8cb839fd46ef7"
+    },
+    {
+      "path": "apps/platform/.gitignore",
+      "mode": "100644",
+      "blob": "5280cfff0957382de1278d523adcadb1b2b65d50"
+    },
+    {
+      "path": "apps/platform/PRODUCT.md",
+      "mode": "100644",
+      "blob": "4fbaeb801f3ab653c6611be94098e6ea8af08392"
+    },
+    {
+      "path": "apps/platform/README.md",
+      "mode": "100644",
+      "blob": "c947c04d929d62fb1628b4f04b90c74732d25ea6"
+    },
+    {
+      "path": "apps/platform/coach-agent-lab.html",
+      "mode": "100644",
+      "blob": "480e08d8a8b8f786cd6b715c497b42d6ca5914b4"
+    },
+    {
+      "path": "apps/platform/coach-agent-sprint.html",
+      "mode": "100644",
+      "blob": "bed0745e4568b13111b69b0e3e2ce08278a626b9"
+    },
+    {
+      "path": "apps/platform/docs/ANALYZER_AUDIT.md",
+      "mode": "100644",
+      "blob": "424460d161ac0808ba54a845b972c77f9b9e093b"
+    },
+    {
+      "path": "apps/platform/docs/MOTION_ASSET_REQUIRED.md",
+      "mode": "100644",
+      "blob": "4b2127fa3473d6c69281a3f7f214e91b7763015c"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/PUBLIC_DEMO.md",
+      "mode": "100644",
+      "blob": "23810403c2a358b6bf31cbec9105000f315c3ac0"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/WEB_V12_LLM_AGENT.md",
+      "mode": "100644",
+      "blob": "08be6f45da6a83b082ae0b6bee9381cecc64dc3f"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/agent.env.example",
+      "mode": "100644",
+      "blob": "820b7b371f8261bb7fa2c71b5851db80a7e2b7db"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/AI_LABEL_ROUND.md",
+      "mode": "100644",
+      "blob": "4b39db010d4b418852e72642950ad1f1d628d7f8"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/CDM_TRAINED_MODEL.md",
+      "mode": "100644",
+      "blob": "8060579a8002db11adb866e8db302f736d839db7"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/CODEX_WIRING_BRIEF.md",
+      "mode": "100644",
+      "blob": "218ec9db3acf9389da810b5b1dc6d974d954c67c"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/MODEL_REPORT.md",
+      "mode": "100644",
+      "blob": "a1f177c60e73699b2f305c1043a445c63b4fd438"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/OWNER_LABEL_REVIEW.md",
+      "mode": "100644",
+      "blob": "9b67df73e7b37063cdbf5441115beaf3e1e52403"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/README.md",
+      "mode": "100644",
+      "blob": "a707e79f21c666869e334b9adc58261cc0cf46be"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/WEB_INTEGRATION.md",
+      "mode": "100644",
+      "blob": "4a3b88bf0b9814cc804b15a8d8846767e7e2a1c7"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/WEB_INTEGRATION_CDM.md",
+      "mode": "100644",
+      "blob": "4c78c44aec8dd679fa2a59fb505523daaa18159b"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/WEB_INTEGRATION_READY.md",
+      "mode": "100644",
+      "blob": "503cadc23f659f64a82ec7456aa63d474db76961"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/request.full.json",
+      "mode": "100644",
+      "blob": "5fbf1c799ce0a71b9d6634073bd4c88b0a745e25"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/request.minimal.json",
+      "mode": "100644",
+      "blob": "e25436250a6aac1f68f0b8092c6a94834045d4e6"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/response.abstain-out-of-distribution.json",
+      "mode": "100644",
+      "blob": "930d328790f662bcd92b864cbbdd464925346014"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/response.abstain-recent-practice.json",
+      "mode": "100644",
+      "blob": "db040fc639c1d2abd1b005f69456dfb5abca88b0"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/response.active-approved.json",
+      "mode": "100644",
+      "blob": "26c6f183bf3b23e912a35a0daa1f5024d6908d67"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/response.active-not-approved.json",
+      "mode": "100644",
+      "blob": "1228c0167ea44912c5cc2bbaa57632ed95f8598d"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/response.error-invalid-envelope.json",
+      "mode": "100644",
+      "blob": "3a9cfdda92105429b51f44e2f4c24edb6adfdd76"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/response.input-invalid.json",
+      "mode": "100644",
+      "blob": "904e206b1736d9eb654fb921bf7c620e2c095a55"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/response.model-missing.json",
+      "mode": "100644",
+      "blob": "e37368b6ce59e74941a4eb5d7e52f766dc61a3c5"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/response.off.json",
+      "mode": "100644",
+      "blob": "618ad9c83546d9b9e16dafd735d24fbc58c99114"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/response.safety-hold.json",
+      "mode": "100644",
+      "blob": "fc2a086add3878a1efa44331ac7b12f8e647166c"
+    },
+    {
+      "path": "apps/platform/docs/ai-coach-agent/decision-model/examples/response.shadow.json",
+      "mode": "100644",
+      "blob": "671e425012ea14987701805f4fb20a15babd53e4"
+    },
+    {
+      "path": "apps/platform/docs/analysis/ANALYSIS_V1_SPEC.md",
+      "mode": "100644",
+      "blob": "4872b386e888b3782ec2704bb3ffb6dcb6dd87f0"
+    },
+    {
+      "path": "apps/platform/docs/architecture.md",
+      "mode": "100644",
+      "blob": "7cd5f2f65f85c4de1b696b11b5abba69ceb25c53"
+    },
+    {
+      "path": "apps/platform/docs/calibration-protocol.md",
+      "mode": "100644",
+      "blob": "2bcc41d500f107f9635d55390d7d1539029a8685"
+    },
+    {
+      "path": "apps/platform/docs/coach-card-state-spec.md",
+      "mode": "100644",
+      "blob": "1caf9c032531136a1ea8b5e1cf95985966010605"
+    },
+    {
+      "path": "apps/platform/docs/coach-reference-spec.md",
+      "mode": "100644",
+      "blob": "7888479673aeb6e14be4d61da5d9b102ee8beab0"
+    },
+    {
+      "path": "apps/platform/docs/coach-trusted-input-offline.md",
+      "mode": "100644",
+      "blob": "f70c69a966bdd6f8c59536720e16bbc6ee0ab5dc"
+    },
+    {
+      "path": "apps/platform/docs/course-orchestration.md",
+      "mode": "100644",
+      "blob": "96a33196aa059079c46b343f1408fb34347f1756"
+    },
+    {
+      "path": "apps/platform/docs/course-v1-spec.md",
+      "mode": "100644",
+      "blob": "e6f8e69c37527ffd66fd6619dd9adfc7bca1cdb3"
+    },
+    {
+      "path": "apps/platform/docs/framing/FRAMING_ASSIST_V1.md",
+      "mode": "100644",
+      "blob": "b3faf13c45b2366ea95b2a7e8840bcee018c92f3"
+    },
+    {
+      "path": "apps/platform/docs/knee-raise-spec.md",
+      "mode": "100644",
+      "blob": "5af239c65b18751952890e397baf099bc7df27b9"
+    },
+    {
+      "path": "apps/platform/docs/lateral-raise-spec.md",
+      "mode": "100644",
+      "blob": "e638c385fb01d58212111e479870ef6ae2f1e857"
+    },
+    {
+      "path": "apps/platform/docs/overhead-raise-spec.md",
+      "mode": "100644",
+      "blob": "c6f7b0746bc5b5a6a012c179e9b60b2f86f78b3a"
+    },
+    {
+      "path": "apps/platform/docs/report-data-contract.md",
+      "mode": "100644",
+      "blob": "bb172d708b5c83fd47d3e036c942c02966d31d65"
+    },
+    {
+      "path": "apps/platform/docs/scoring/SCORING_V2.md",
+      "mode": "100644",
+      "blob": "6e0b8034f54f214b858ea9450410288f2835ef9d"
+    },
+    {
+      "path": "apps/platform/docs/shoulder-rotation-spec.md",
+      "mode": "100644",
+      "blob": "c21bd1082fde6d1184ccddf0e633179b569364ad"
+    },
+    {
+      "path": "apps/platform/docs/squat-spec.md",
+      "mode": "100644",
+      "blob": "d1fa88652dbac02b8413d5ec842687d60a9bb72e"
+    },
+    {
+      "path": "apps/platform/docs/step-jack-spec.md",
+      "mode": "100644",
+      "blob": "83fa33cf69011efecaeb93f8948f62812e36aef9"
+    },
+    {
+      "path": "apps/platform/docs/training-report-spec.md",
+      "mode": "100644",
+      "blob": "199e57170f72b10cb61a90bf64465590ec0eaeec"
+    },
+    {
+      "path": "apps/platform/docs/web-v1/README.md",
+      "mode": "100644",
+      "blob": "26decb0f1a2ab2c9f2a42711568325ded3a0324e"
+    },
+    {
+      "path": "apps/platform/docs/web-v1/V1_1_UI_INTEGRATION.md",
+      "mode": "100644",
+      "blob": "55633ae1f5476913a142a2a73e7563f3000826af"
+    },
+    {
+      "path": "apps/platform/docs/workshop/E4_TEMPORAL_COMPARISON.md",
+      "mode": "100644",
+      "blob": "eb9aa163299cb63619c327cc0646a8154eed55cd"
+    },
+    {
+      "path": "apps/platform/docs/workshop/E5_ACCEPTANCE.md",
+      "mode": "100644",
+      "blob": "9eb89fca3c25abc3e4b2da7aa32d99387d6ee791"
+    },
+    {
+      "path": "apps/platform/eslint.config.js",
+      "mode": "100644",
+      "blob": "6f3bcc481cab0c1834bf5429846b5d09f6d12fa7"
+    },
+    {
+      "path": "apps/platform/index.html",
+      "mode": "100644",
+      "blob": "a7dd39ce891c1af0d7e1d0bac7ba8eec9868725e"
+    },
+    {
+      "path": "apps/platform/package.json",
+      "mode": "100644",
+      "blob": "ff7d6d14734000788735fcc92da46638cc28acb5"
+    },
+    {
+      "path": "apps/platform/playwright.config.ts",
+      "mode": "100644",
+      "blob": "91b7556f32373d265a25e743ee2da214f0a8ed01"
+    },
+    {
+      "path": "apps/platform/playwright.llm-demo.config.ts",
+      "mode": "100644",
+      "blob": "5cb68c522a4a606c3f5bdac9c6a504f6b8c50f40"
+    },
+    {
+      "path": "apps/platform/playwright.package-smoke.config.ts",
+      "mode": "100644",
+      "blob": "6b01ad72f8a4747ab0bfe1f87634adec0888a3a6"
+    },
+    {
+      "path": "apps/platform/playwright.public-demo.config.ts",
+      "mode": "100644",
+      "blob": "3ad985d2e574f2c1c9e2e5500d6fe63d509cc9bf"
+    },
+    {
+      "path": "apps/platform/playwright.web-v1-visual.config.ts",
+      "mode": "100644",
+      "blob": "d587311ffaa7de52faf45b5ba9adf3a9bf0378d0"
+    },
+    {
+      "path": "apps/platform/pnpm-lock.yaml",
+      "mode": "100644",
+      "blob": "7270263e6232c18888d3032e01b541fd2cc4291d"
+    },
+    {
+      "path": "apps/platform/pnpm-workspace.yaml",
+      "mode": "100644",
+      "blob": "5ed0b5af0d45919f64c66edfb16a5f4512461fa1"
+    },
+    {
+      "path": "apps/platform/public/app-icon-192.png",
+      "mode": "100644",
+      "blob": "dc15d7894fc39de8888d9d49041d6a4e34e6ee48"
+    },
+    {
+      "path": "apps/platform/public/assets/camera-lateral-raise-demo.png",
+      "mode": "100644",
+      "blob": "4e8015c666fcba2791e3251bf013b2147fd3e900"
+    },
+    {
+      "path": "apps/platform/public/assets/camera-squat-demo.png",
+      "mode": "100644",
+      "blob": "056df81dab97146495cc93de6b0e28b563e7e286"
+    },
+    {
+      "path": "apps/platform/public/assets/camera-step-jack-demo.png",
+      "mode": "100644",
+      "blob": "b2b6a20fab0fe40ad026fcae18584e8450b55b51"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-knee-raise.png",
+      "mode": "100644",
+      "blob": "b4b6367e6c86f924775659107b5da3b4e6a04520"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-knee-raise.pose.json",
+      "mode": "100644",
+      "blob": "bc3e815a43e2d8082a162825c8825e223f53c735"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-lateral-raise.png",
+      "mode": "100644",
+      "blob": "ab25b95d06230adbc247c9fbd9004c4fb7ce8e2e"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-lateral-raise.pose.json",
+      "mode": "100644",
+      "blob": "ad2c52bff6bd32024bc47737fa9d464bc323b381"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-overhead-raise.png",
+      "mode": "100644",
+      "blob": "f1a1485f083aa29c5348ab0ce344726f571f2309"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-overhead-raise.pose.json",
+      "mode": "100644",
+      "blob": "3d01358961c5651f58dc8d8fdcc99d0b89f9d877"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-shoulder-rotation.png",
+      "mode": "100644",
+      "blob": "5e4c7d42e2a4f1fdfdcd1bea3d494b14067dc148"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-shoulder-rotation.pose.json",
+      "mode": "100644",
+      "blob": "ce788a810d8e598cf36e310ad8882ec689508ee0"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-squat.png",
+      "mode": "100644",
+      "blob": "b59ec9328df807f4bd0ccbad7b403eb588dcbb20"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-squat.pose.json",
+      "mode": "100644",
+      "blob": "71f5c85aa4ffa6bd9f31bdad94c829f6de0bf3c1"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-step-jack.png",
+      "mode": "100644",
+      "blob": "1f931ce9e8dbc37bb55bb8502cb85b18e64eae8f"
+    },
+    {
+      "path": "apps/platform/public/assets/coach-step-jack.pose.json",
+      "mode": "100644",
+      "blob": "77e736c0d66a0e2f61a8f78fe82be77fc661fa1d"
+    },
+    {
+      "path": "apps/platform/public/assets/coach/coach-avatar.webp",
+      "mode": "100644",
+      "blob": "dbd9903e3e06c22cb7c9b0f1c139c342b5c7404e"
+    },
+    {
+      "path": "apps/platform/public/assets/coach/coach-welcome.webp",
+      "mode": "100644",
+      "blob": "9f3d9567d07f901a9249151b4aa44d844a34ce51"
+    },
+    {
+      "path": "apps/platform/public/assets/knee-raise-demo-center.png",
+      "mode": "100644",
+      "blob": "c23d27e58e1b25a1bfbdfcb8360fbba211c20fea"
+    },
+    {
+      "path": "apps/platform/public/assets/knee-raise-demo-left-half.png",
+      "mode": "100644",
+      "blob": "11c2a47fc5efa1a3b3e0dfbaace0ee53f5a8c341"
+    },
+    {
+      "path": "apps/platform/public/assets/knee-raise-demo-left-top.png",
+      "mode": "100644",
+      "blob": "b4b6367e6c86f924775659107b5da3b4e6a04520"
+    },
+    {
+      "path": "apps/platform/public/assets/knee-raise-demo-right-half.png",
+      "mode": "100644",
+      "blob": "a9b93fe9eb4f6a9098c9f3e66faa9a2463db9381"
+    },
+    {
+      "path": "apps/platform/public/assets/knee-raise-demo-right-top.png",
+      "mode": "100644",
+      "blob": "888ccdd7b660368e307bc1f2ed6eb2060acd5d2e"
+    },
+    {
+      "path": "apps/platform/public/assets/overhead-raise-demo-half.png",
+      "mode": "100644",
+      "blob": "5e4c7d42e2a4f1fdfdcd1bea3d494b14067dc148"
+    },
+    {
+      "path": "apps/platform/public/assets/overhead-raise-demo-start.png",
+      "mode": "100644",
+      "blob": "20a2e14783c260f94f30b25f9ce21e0293847904"
+    },
+    {
+      "path": "apps/platform/public/assets/overhead-raise-demo-top.png",
+      "mode": "100644",
+      "blob": "f1a1485f083aa29c5348ab0ce344726f571f2309"
+    },
+    {
+      "path": "apps/platform/public/assets/routines/baduanjin-standard.pose.json",
+      "mode": "100644",
+      "blob": "5b0c5120d52dd4bf90df4aaba3ecc4665659763f"
+    },
+    {
+      "path": "apps/platform/public/assets/routines/taijiquan-standard.pose.json",
+      "mode": "100644",
+      "blob": "1a34eb46746fbc46a0099df802e7f6b97825b6aa"
+    },
+    {
+      "path": "apps/platform/public/assets/routines/wuqinxi-standard.pose.json",
+      "mode": "100644",
+      "blob": "34700bd638eb34b2b222adaf0c02456a622665b3"
+    },
+    {
+      "path": "apps/platform/public/assets/routines/yijinjing-standard.pose.json",
+      "mode": "100644",
+      "blob": "1174b56df624b3c8b166c3d3afc72abda8dda800"
+    },
+    {
+      "path": "apps/platform/public/assets/shoulder-rotation-demo-high.png",
+      "mode": "100644",
+      "blob": "f1a1485f083aa29c5348ab0ce344726f571f2309"
+    },
+    {
+      "path": "apps/platform/public/assets/shoulder-rotation-demo-low.png",
+      "mode": "100644",
+      "blob": "20a2e14783c260f94f30b25f9ce21e0293847904"
+    },
+    {
+      "path": "apps/platform/public/assets/shoulder-rotation-demo-mid.png",
+      "mode": "100644",
+      "blob": "5e4c7d42e2a4f1fdfdcd1bea3d494b14067dc148"
+    },
+    {
+      "path": "apps/platform/public/assets/squat-demo-bottom.png",
+      "mode": "100644",
+      "blob": "e4d3858f48d0f1a0f0f1153ede689affb3217a04"
+    },
+    {
+      "path": "apps/platform/public/assets/squat-demo-half.png",
+      "mode": "100644",
+      "blob": "cce0321ea86fc3e86072bff234a036b8881c2282"
+    },
+    {
+      "path": "apps/platform/public/assets/squat-demo-standing.png",
+      "mode": "100644",
+      "blob": "c0227edd71a2dc2416c278402aca73f8da1120f5"
+    },
+    {
+      "path": "apps/platform/public/favicon.ico",
+      "mode": "100644",
+      "blob": "e8398e40b35bcb6158a6040e0170ace2be06a810"
+    },
+    {
+      "path": "apps/platform/public/favicon.svg",
+      "mode": "100644",
+      "blob": "886fafb2ac53a64eabe5af79bffea2cda507e958"
+    },
+    {
+      "path": "apps/platform/public/models/pose_landmarker_full.task",
+      "mode": "100644",
+      "blob": "300a181ec73dc0eb45859faad179b1ef5d882497"
+    },
+    {
+      "path": "apps/platform/public/models/pose_landmarker_lite.task",
+      "mode": "100644",
+      "blob": "09576a930167d58ba3cd759a1521a1f7b159b0f2"
+    },
+    {
+      "path": "apps/platform/public/wasm/vision_wasm_internal.js",
+      "mode": "100644",
+      "blob": "164a2410225ffc8479fe3d57bf8ab04ff5af4827"
+    },
+    {
+      "path": "apps/platform/public/wasm/vision_wasm_internal.wasm",
+      "mode": "100644",
+      "blob": "7ca3e0582b3bf153fbdbb46ea63d683a1537814a"
+    },
+    {
+      "path": "apps/platform/public/wasm/vision_wasm_module_internal.js",
+      "mode": "100644",
+      "blob": "8cd5730029d34580c621232de05d1eb4b7f227c8"
+    },
+    {
+      "path": "apps/platform/public/wasm/vision_wasm_module_internal.wasm",
+      "mode": "100644",
+      "blob": "9c82447f2324b403f17abe0c63b11c849800b9de"
+    },
+    {
+      "path": "apps/platform/public/wasm/vision_wasm_nosimd_internal.js",
+      "mode": "100644",
+      "blob": "3dffe5f4b0c44e6d6d98c1e480a11254370d3095"
+    },
+    {
+      "path": "apps/platform/public/wasm/vision_wasm_nosimd_internal.wasm",
+      "mode": "100644",
+      "blob": "82cd2e165e24d9e88a07106c4b5af06120c925ad"
+    },
+    {
+      "path": "apps/platform/public/web-v1/ASSET_SOURCES.md",
+      "mode": "100644",
+      "blob": "ae836e20af24cd018b2986ddc84b95083b1fe2fa"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/badanjin.jpg",
+      "mode": "100644",
+      "blob": "6d9120f27ece7fda108277e24ecb14993eeeab40"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/coach-orb-loop.webm",
+      "mode": "100644",
+      "blob": "91b4783450a7c47d9ddffc25b10ac3a7ffdd7a62"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/coach-orb-poster.png",
+      "mode": "100644",
+      "blob": "0457866d2663c4db2e36cfb8921e4ae958d31161"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/coach-orb.jpg",
+      "mode": "100644",
+      "blob": "334101aecb8f81e9229fd83bbb83b5e977bd10f6"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/mute-icon-preview.png",
+      "mode": "100644",
+      "blob": "bf12686f84dad0d52a3d93e36e18ded7ebd3fbb2"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/mute-icon.jpg",
+      "mode": "100644",
+      "blob": "d70253c94e79081da31b714e778d99e4304aa244"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/mute-icon.png",
+      "mode": "100644",
+      "blob": "2dfa393c574d40fd60a06e3ba4fe8e5db44d6686"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/taichi.jpg",
+      "mode": "100644",
+      "blob": "38904f6d744c36b8093a149e8d0dacdc50c91254"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/workshop-pose-transparent.png",
+      "mode": "100644",
+      "blob": "17cc1e8d82b6676dc0fe709da4e01df1a5b17711"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/workshop-pose.jpg",
+      "mode": "100644",
+      "blob": "7f643a7e75da617df3631075affcc98d52a163a3"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/wuxinqi.jpg",
+      "mode": "100644",
+      "blob": "ab18daeb88528e1fe144118af61f4b45ac0b3af2"
+    },
+    {
+      "path": "apps/platform/public/web-v1/assets/yijinjing.jpg",
+      "mode": "100644",
+      "blob": "0ca61fe0980557249f52a71a72f9b24f12367742"
+    },
+    {
+      "path": "apps/platform/public/web-v1/formpilot-orb-bg.png",
+      "mode": "100644",
+      "blob": "185c2d8823c80465f179fa7e37a1dd06ea51a76d"
+    },
+    {
+      "path": "apps/platform/public/web-v1/game/apple-app-icon.jpg",
+      "mode": "100644",
+      "blob": "5120c77e31f1c95decef98075c1314c752c0978f"
+    },
+    {
+      "path": "apps/platform/public/web-v1/game/apple-orchard.jpg",
+      "mode": "100644",
+      "blob": "15545f3faf79fc4d1249518962095a7adafd9fd8"
+    },
+    {
+      "path": "apps/platform/public/web-v1/game/bubble-background.jpg",
+      "mode": "100644",
+      "blob": "aa41722208b9f958133426722a3dc91126717d8d"
+    },
+    {
+      "path": "apps/platform/public/web-v1/game/forest-archery.jpg",
+      "mode": "100644",
+      "blob": "0869b28c8fa9e3d052f1cfc72304da4efd570177"
+    },
+    {
+      "path": "apps/platform/public/web-v1/game/forest-boating.jpg",
+      "mode": "100644",
+      "blob": "00caeb11809013e5ce13a2cfb26d32f15c3fb567"
+    },
+    {
+      "path": "apps/platform/scripts/adaptive-evaluate.ts",
+      "mode": "100644",
+      "blob": "31cd54b1d8adacd25863e7387ac55c3f39036734"
+    },
+    {
+      "path": "apps/platform/scripts/analyze-calibration.d.mts",
+      "mode": "100644",
+      "blob": "188cf3fed8beef05e48266c721862bdfaa978eed"
+    },
+    {
+      "path": "apps/platform/scripts/analyze-calibration.mjs",
+      "mode": "100644",
+      "blob": "ac7834e068af63400e8a47c53ad97150afd712fe"
+    },
+    {
+      "path": "apps/platform/scripts/brand/generate-app-icon.mjs",
+      "mode": "100644",
+      "blob": "d266832e93907c5c4ea0c66475284e54eeafc643"
+    },
+    {
+      "path": "apps/platform/scripts/build-web-v1-styles.mjs",
+      "mode": "100644",
+      "blob": "25f854f525ee58a668756f273ef3ec98fd52c289"
+    },
+    {
+      "path": "apps/platform/scripts/competition-package/ai-coach-local/start-ai-coach-local.cmd",
+      "mode": "100644",
+      "blob": "ba62ec721316aac7d4fd47c0a788274ffbaf712c"
+    },
+    {
+      "path": "apps/platform/scripts/competition-package/ai-coach-local/start-ai-coach-local.ps1",
+      "mode": "100644",
+      "blob": "2d90919c0132bec7b78d90d0dbc4ec245b8458da"
+    },
+    {
+      "path": "apps/platform/scripts/competition-package/build_package.py",
+      "mode": "100644",
+      "blob": "12f7d04c40233af6c695d08ba2819390cdbf7194"
+    },
+    {
+      "path": "apps/platform/scripts/competition-package/docs/01-启动说明.md",
+      "mode": "100644",
+      "blob": "2362137632cf2ecd8d59349e6a402b3bb9b97ae2"
+    },
+    {
+      "path": "apps/platform/scripts/competition-package/docs/02-产品功能说明.md",
+      "mode": "100644",
+      "blob": "a4a5c327bbbae95846375ab6a384ee62f3f964c3"
+    },
+    {
+      "path": "apps/platform/scripts/competition-package/docs/03-Agent工作流说明.md",
+      "mode": "100644",
+      "blob": "a4fae96da4ae0a62a3af2801c500a972d75c83c9"
+    },
+    {
+      "path": "apps/platform/scripts/competition-package/docs/04-决策模型说明.md",
+      "mode": "100644",
+      "blob": "3ba240dffc4a6eedc47233e53b92d0466a1a5bb0"
+    },
+    {
+      "path": "apps/platform/scripts/competition-package/docs/05-竞赛演示流程.md",
+      "mode": "100644",
+      "blob": "f1d39ee8385a0f243e57a3f81d456bf50030fa84"
+    },
+    {
+      "path": "apps/platform/scripts/competition-package/start-formpilot.cmd",
+      "mode": "100644",
+      "blob": "a4afa9c3ca20f0d64ee2b2c803b7af440a5666b8"
+    },
+    {
+      "path": "apps/platform/scripts/competition-package/start-formpilot.ps1",
+      "mode": "100644",
+      "blob": "5abb2e413953702d1002dff2ea801fe2b44b2b8d"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/audit-descriptors.ts",
+      "mode": "100644",
+      "blob": "d5acb3539a359d5fc2d5ee54f5e36130c83cde0a"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/README.md",
+      "mode": "100644",
+      "blob": "5c4e915241ab21be1330ca71ec539a7f8fcdca50"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/ai-annotation/build-worksheet.ts",
+      "mode": "100644",
+      "blob": "0b0f46cf86a36439b6e7afd50e48a2e93860f65f"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/ai-annotation/ingest_ai_labels.py",
+      "mode": "100644",
+      "blob": "9cacbdcbae06fae83b6d195701f3706f1c2fdb77"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/annotation-kit/GUIDELINES.md",
+      "mode": "100644",
+      "blob": "ba5d6e21d53175af4f900a46346ad03504626260"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/annotation-kit/fp-cdm-annotation-v1-testfamilies.html",
+      "mode": "100644",
+      "blob": "f74299a22c52f8108b1f0d01fc22f5f6574a95cc"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/annotation-kit/fp-cdm-annotation-v1.html",
+      "mode": "100644",
+      "blob": "6ba6101ca722f0938f2b4ba8edec91c9937f1ea1"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/annotation-kit/packages/ANNOTATOR_README.template.md",
+      "mode": "100644",
+      "blob": "9d2776c0eadaff527dd86d3d5875d72ba57dcc32"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/annotation-kit/packages/HANDOFF_PACKAGES.md",
+      "mode": "100644",
+      "blob": "3f7780d5e79de6d36d44b6c3a2fdd64dc8876c8e"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/annotation-kit/packages/build-packages.mjs",
+      "mode": "100644",
+      "blob": "33059574b4a5cda41da7c6a3506d663a7d6558b0"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/.gitignore",
+      "mode": "100644",
+      "blob": "139743217850aba6104c241f72e52dfd6ce6d20a"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/cdm-e2-e4-e5-release.json",
+      "mode": "100644",
+      "blob": "72d5486456d41f7a0eca9dd97d9ce336b01d1a1f"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/cold-start.json",
+      "mode": "100644",
+      "blob": "fce7a5ec0b20f623d620014063f6f250215348ac"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/fuzz-engine.json",
+      "mode": "100644",
+      "blob": "6934513d778314673b528b3c3654cf52703c4ac5"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/integration-experiments.json",
+      "mode": "100644",
+      "blob": "e995b430155068155c59386745d8cd54f6b75e5c"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/probes.json",
+      "mode": "100644",
+      "blob": "4e0bbfbc959e03aeec80fc61c6f317b733bc388b"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/release-manifest.json",
+      "mode": "100644",
+      "blob": "be56dcba444167d064c556ff036ec06619be57d4"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/shadow-acceptance-selftest.json",
+      "mode": "100644",
+      "blob": "37328d5a80a3f06836b3c552284386ba26946133"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/variants/fp-cdm-m2.variant-full-refit.weights.json",
+      "mode": "100644",
+      "blob": "0cb590369e7e2a3c9adac7e2027825f91cfe522e"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/variants/fp-cdm-m2.variant-no-history.weights.json",
+      "mode": "100644",
+      "blob": "8fbd2eac0074ee3bd6c4a6d8724c5c87f3b696b8"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/variants/fp-cdm-m2.variant-no-m1.weights.json",
+      "mode": "100644",
+      "blob": "56871972a15b7f43ae067b80a0f485f0fff6fac5"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/variants/fp-cdm-m2.variant-no-profile-crosses.weights.json",
+      "mode": "100644",
+      "blob": "281c1f2e6ff54333d0e5616d04f91c26abec1b22"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/variants/fp-cdm-m2.variant-no-report.weights.json",
+      "mode": "100644",
+      "blob": "9351bede78595de1ce4b9fa797c94db698b10398"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/variants/fp-cdm-m2.variant-profile-content-only.weights.json",
+      "mode": "100644",
+      "blob": "a4c8211b27e47db1f250d98574978e5f2302c8b1"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/variants/fp-cdm-m2.variant-stage-100.weights.json",
+      "mode": "100644",
+      "blob": "e8bb28fb2e293b71f6c1372dd1841ecfd25c7967"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/variants/fp-cdm-m2.variant-stage-25.weights.json",
+      "mode": "100644",
+      "blob": "7d2cd69a7eee1fddee174cbb1f01e88173cc2ab2"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/variants/fp-cdm-m2.variant-stage-50.weights.json",
+      "mode": "100644",
+      "blob": "aaad65d90b7a969d122d60a051d424a3f409e678"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/integration/variants/fp-cdm-m2.variant-stage-75.weights.json",
+      "mode": "100644",
+      "blob": "bf93da9ac4df2e3a6e7770e672766834a84c6c4f"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1-v11/fp-cdm-m1-robustness.json",
+      "mode": "100644",
+      "blob": "a02eac447dd3211e9acf9093d9b86fa45960fac9"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1-v11/fp-cdm-m1-v11.oof-content-features.json",
+      "mode": "100644",
+      "blob": "b963dbf6ab9d26dd196e1dcf1cc386c6f346dcaa"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1-v11/fp-cdm-m1-v11.report.json",
+      "mode": "100644",
+      "blob": "654882dd925f80039400ed00004bee653a9340dd"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1/fp-cdm-m1.metrics.json",
+      "mode": "100644",
+      "blob": "f2a476471e2880c6103a748298beaa20e274565e"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1/fp-cdm-m1.model.json",
+      "mode": "100644",
+      "blob": "1467aee9ec89eeabb442b8aebfb3623a7436baa5"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m1/fp-cdm-m1.oof-content-features.json",
+      "mode": "100644",
+      "blob": "dee43bd2a2d6188a009f7357477b62d821eb5cd9"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m2-ai-experiment/cdm-e2-e4-e5-ai_single_annotator.json",
+      "mode": "100644",
+      "blob": "10aa15d33deab9110f4f51cd55cba3513ed2e73d"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m2-ai-experiment/cold-start.json",
+      "mode": "100644",
+      "blob": "73f033cd8b2c1e08c63af5559926b9799f8ae367"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m2-ai-experiment/fp-cdm-m2.ai-experiment.report.json",
+      "mode": "100644",
+      "blob": "730d1c64e9cb04995275d4ac94a73b9c20c209fa"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m2-ai-experiment/fp-cdm-m2.ai-experiment.weights+ranges.json",
+      "mode": "100644",
+      "blob": "350921bc43e49c8b53cc554a89f9a2df453baf19"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m2-ai-experiment/fp-cdm-m2.ai-experiment.weights.json",
+      "mode": "100644",
+      "blob": "b902408c6f314bfb596fb91de7c96a4243ad16da"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m2-research/m2-research-ai-v1-features.json",
+      "mode": "100644",
+      "blob": "1f652c7674f8d148a1a18d88061218c4095cdb28"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/artifacts/m2-research/m2-research-ai-v1.1-features-NOT-ADOPTED.json",
+      "mode": "100644",
+      "blob": "e84bb78375953489c8c4d8b4d230a94050f18c65"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/attach_feature_ranges.py",
+      "mode": "100644",
+      "blob": "207e6ff56bd6a231ca2b74dfdc72d12358bc7553"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/build-annotation-kit.ts",
+      "mode": "100644",
+      "blob": "01f09309cb324c0c6d28cd8cfc354051661a4f34"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/build-scenarios.ts",
+      "mode": "100644",
+      "blob": "cc0bc38b234415c859969b6bb54b906a972e58de"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/cold-start.mjs",
+      "mode": "100644",
+      "blob": "ee7fa9593a59b54b8700a005e52abfa8010731e6"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/data/.gitignore",
+      "mode": "100644",
+      "blob": "8a1d091fbc84623f00aaf4e24fd015f52280b810"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/data/scenarios.v1.json",
+      "mode": "100644",
+      "blob": "b67c4c553dea83a167c2ef725483a551d2a47634"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/evaluate-cdm.ts",
+      "mode": "100644",
+      "blob": "1cebfa6184d2ca68b0d48cd74375dfb266c3a5ec"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/evaluate_human_test.py",
+      "mode": "100644",
+      "blob": "ba71c27289ea9827b0e2e89088fe2ed69d388476"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/evidence.ts",
+      "mode": "100644",
+      "blob": "51fa11714419c7d418635a8ddd65b4b64065290d"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/export-examples.ts",
+      "mode": "100644",
+      "blob": "48bf98effaf2afd366a839ad1480880d31fd059d"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/export-ranking-matrix.ts",
+      "mode": "100644",
+      "blob": "009f0836007bf9ae294cd64a56f4f375749cffe5"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/export-window-features.ts",
+      "mode": "100644",
+      "blob": "5e30ac68c04dd996a431c798e392fa6e2b0b01bf"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/freeze-release.ts",
+      "mode": "100644",
+      "blob": "8f2f8dea8c4bc019efeac2dde6e6fa88a38f60ad"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/fuzz-engine.ts",
+      "mode": "100644",
+      "blob": "0a9ccef7c59b17771039e7af3a25625f0af32a7d"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/ingest_labels.py",
+      "mode": "100644",
+      "blob": "ec6ce5de8514425c02f20ead666db81c7d448397"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/integration_experiments.py",
+      "mode": "100644",
+      "blob": "999c3f1a69fd4cdc4255ba3913d3a448241e5995"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/lab/build-lab.mjs",
+      "mode": "100644",
+      "blob": "35f14008e5895dd7115f35d14c0ee07327ac3116"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/lab/check-lab.mjs",
+      "mode": "100644",
+      "blob": "e89d2f9df7bc0ab085598cc0a393b98eba29eb06"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/lab/entry.ts",
+      "mode": "100644",
+      "blob": "5a35653d210cb2233c3a43f2976a04d20351107a"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/lab/run-cases.ts",
+      "mode": "100644",
+      "blob": "0db21b1193e33362e0d22126640ebfa5e184df5f"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/labels-ai/ai-label-quality.json",
+      "mode": "100644",
+      "blob": "74758c1a854d734446ab49270511063842047b0e"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/labels-ai/fp-cdm-ai-labels-v1.json",
+      "mode": "100644",
+      "blob": "a267f06d8d689ed8dc7802b6ef2b1137125175b1"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/labels-ai/raw-frozen.sha256.txt",
+      "mode": "100644",
+      "blob": "201395f0e71a0738b298cdcf85e098592bd2ecdd"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/labels-ai/raw/batch-01.json",
+      "mode": "100644",
+      "blob": "439207ae462d9a46ac502ad22613356ee7df5e41"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/labels-ai/raw/batch-02.json",
+      "mode": "100644",
+      "blob": "85723a384731f9cc377cdee0afcc42bebe1ce4db"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/labels-ai/raw/batch-03.json",
+      "mode": "100644",
+      "blob": "6147733d829748c2db84696dba977c3b172bb0d9"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/labels-ai/raw/batch-04.json",
+      "mode": "100644",
+      "blob": "a9694a58923b4203e505a061ae5662f4b394870b"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/labels-ai/raw/batch-05.json",
+      "mode": "100644",
+      "blob": "4f78b3ddffa60400e4ba53db193ac22f7867ee76"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/labels-ai/raw/batch-06.json",
+      "mode": "100644",
+      "blob": "f857e34f8da05408672e070fca5cbf00c8b1ddbd"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/probes.ts",
+      "mode": "100644",
+      "blob": "685fd70dc339b80c54073457b8193ff5eabb3778"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/research_m2.py",
+      "mode": "100644",
+      "blob": "eb1872d36e473b128433587d782d868eff37833e"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/robustness_m1.py",
+      "mode": "100644",
+      "blob": "cf1d6466b47632e23a46c7acdd01beebd0aa9790"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/scenarioTypes.ts",
+      "mode": "100644",
+      "blob": "6a344185f115ef45b303e41ad17e316be91afff0"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/shadow-acceptance.ts",
+      "mode": "100644",
+      "blob": "4c70a931826e26786503b88198a3d298e90eb0e0"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/shadowCheck.ts",
+      "mode": "100644",
+      "blob": "3ac33c4a06396e31075788d0f1610acef6b743c6"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/train_m1.py",
+      "mode": "100644",
+      "blob": "c810f3c4d041f582950446a31a208a2cb2567071"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/train_m1_v11.py",
+      "mode": "100644",
+      "blob": "fee613efbec8bd84e78c65b63b136c509a905de1"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/cdm/train_m2.py",
+      "mode": "100644",
+      "blob": "2db14450ddc94eea4e3226f5fea6db3107de14d1"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/descriptor-config.json",
+      "mode": "100644",
+      "blob": "b6c59db4e20dad83517ba792c505f251cfff72c7"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/evaluate.ts",
+      "mode": "100644",
+      "blob": "2c9ba343d0ab61930c24dffc4a3767901773f5f5"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/extract-motion-descriptors.ts",
+      "mode": "100644",
+      "blob": "9042888cc16d02b921104c02131c3d4e196a90dd"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/personas.dev.json",
+      "mode": "100644",
+      "blob": "2afb52c898b101a6e9d135e8a399e7b18610703b"
+    },
+    {
+      "path": "apps/platform/scripts/decision-model/personas.frozen-test.json",
+      "mode": "100644",
+      "blob": "ccf020a6457b1c903f18f2d6ebfcb208a1d947ed"
+    },
+    {
+      "path": "apps/platform/scripts/extract-video-reference.mjs",
+      "mode": "100644",
+      "blob": "deb7e13e337d06fe7bac4822a02108dd3384fe1b"
+    },
+    {
+      "path": "apps/platform/scripts/jev-dev.mjs",
+      "mode": "100644",
+      "blob": "83cfc3114c04a3dcec94015b0041a56d05021c55"
+    },
+    {
+      "path": "apps/platform/scripts/jev-evaluate.ts",
+      "mode": "100644",
+      "blob": "e7d2ee7d54db2aa3bd82d34a1cf781a31ddb3bf8"
+    },
+    {
+      "path": "apps/platform/scripts/measure-pose-assets.mjs",
+      "mode": "100644",
+      "blob": "ffaa4977ab3a0c05095a60bbd4c87b7e32743105"
+    },
+    {
+      "path": "apps/platform/scripts/public-demo/build.mjs",
+      "mode": "100644",
+      "blob": "a039ba67999c0c531276929d613e8d778975373e"
+    },
+    {
+      "path": "apps/platform/scripts/public-demo/pack.mjs",
+      "mode": "100644",
+      "blob": "930a3a7775f146328503776ca6a770acf7abe3fc"
+    },
+    {
+      "path": "apps/platform/scripts/visual/coach_cutouts.py",
+      "mode": "100644",
+      "blob": "cfe8f495879ff1345c3f2e2d593be2805d24eacd"
+    },
+    {
+      "path": "apps/platform/scripts/visual/mode_figures.py",
+      "mode": "100644",
+      "blob": "20e46856470b6fb69fb1fe6b2a9096e3412f0123"
+    },
+    {
+      "path": "apps/platform/server/JevDecisionService.ts",
+      "mode": "100644",
+      "blob": "039792884a9f330531ada7b9ab0a2348529aabcf"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/agent/config.ts",
+      "mode": "100644",
+      "blob": "0ef59ec73746ff9146767edf0f611943f38d70a1"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/agent/index.ts",
+      "mode": "100644",
+      "blob": "cec96d905dc3df3c625efde349f4b97dec3e87d5"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/agent/server.ts",
+      "mode": "100644",
+      "blob": "7bddfef5107cf6c00389f9ad9847d4fb8da8b6ba"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/config.ts",
+      "mode": "100644",
+      "blob": "599b8190c0aace4bb24d8fa0605bba235d7942d6"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/demo/config.ts",
+      "mode": "100644",
+      "blob": "37cbe04100c80b6ecd950a65196e854ba2bd7ea8"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/demo/index.ts",
+      "mode": "100644",
+      "blob": "61209978869d0119f8cf111bfac39ce405bd77a8"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/demo/openaiRelay.ts",
+      "mode": "100644",
+      "blob": "eaa1d09b12988b70081d2b2dac96d46a417db044"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/demo/server.ts",
+      "mode": "100644",
+      "blob": "fba63eaf800286b5e4aa6c47a90a1f9eb95396ec"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/demo/upstreamSmoke.ts",
+      "mode": "100644",
+      "blob": "b4236fa9c80f5d30bea5478117210cc84e73b2c9"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/index.ts",
+      "mode": "100644",
+      "blob": "e8882c770893ab65cc213cd52ba27abda7a2c8b8"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/local/config.ts",
+      "mode": "100644",
+      "blob": "63201289c356216eef1e6e448764277f5573e406"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/local/index.ts",
+      "mode": "100644",
+      "blob": "acb2c511c5f8ec91e3cdac231b9aa887b559e796"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/local/planning.ts",
+      "mode": "100644",
+      "blob": "a48e11d22ddfd1b345c5a270e1805f396f268518"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/local/server.ts",
+      "mode": "100644",
+      "blob": "160df0fc3f1803cc50a9fc39609fbe154268c4a6"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/local/transport.ts",
+      "mode": "100644",
+      "blob": "3b54c4b8d7db0578d033a7dac893c746f177f33d"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/modelTransport.ts",
+      "mode": "100644",
+      "blob": "6a79859065ce7f79ff437b2b891f635fa683c0b2"
+    },
+    {
+      "path": "apps/platform/server/coachAgent/server.ts",
+      "mode": "100644",
+      "blob": "4292cce3d7ef8d887ab0eb739f9ff5927f7c194d"
+    },
+    {
+      "path": "apps/platform/server/jevProxy.ts",
+      "mode": "100644",
+      "blob": "7c925f0bd8bd1382a0c9e501057f5e14abffc310"
+    },
+    {
+      "path": "apps/platform/src/adapters/camera/BrowserCameraAdapter.ts",
+      "mode": "100644",
+      "blob": "642b007fa1bd7af4d0756ac6b0c274a273aa5192"
+    },
+    {
+      "path": "apps/platform/src/adapters/coachAnimation/PlaceholderCoachAnimationAdapter.ts",
+      "mode": "100644",
+      "blob": "e8ed86115e9514d8f272797d62b2116608c706cf"
+    },
+    {
+      "path": "apps/platform/src/adapters/coachAnimation/types.ts",
+      "mode": "100644",
+      "blob": "4df913de4027a5b1e1793a01a55ade7db55a72d1"
+    },
+    {
+      "path": "apps/platform/src/adapters/speech/BrowserSpeechAdapter.ts",
+      "mode": "100644",
+      "blob": "15d82fcb26a3726e8c5d5e934e9e5fefefdfd92f"
+    },
+    {
+      "path": "apps/platform/src/app/App.tsx",
+      "mode": "100644",
+      "blob": "ccf9d8264c92678bd1f3c3d5ec5f3f4b553cf5c5"
+    },
+    {
+      "path": "apps/platform/src/app/coachDecisionConfig.ts",
+      "mode": "100644",
+      "blob": "760d68e9ded6e073946c889c0112cea006066b52"
+    },
+    {
+      "path": "apps/platform/src/app/modeCatalog.ts",
+      "mode": "100644",
+      "blob": "c6f17b4240f70a94c7f9dd5427eeffeb71da6020"
+    },
+    {
+      "path": "apps/platform/src/app/routes.ts",
+      "mode": "100644",
+      "blob": "6165535b3f561aaf33fc171a3648be24ecb5891f"
+    },
+    {
+      "path": "apps/platform/src/components/aiCoach/AICoach.tsx",
+      "mode": "100644",
+      "blob": "708a30e735fe793a5f8811eeeb74cb88edf8af2c"
+    },
+    {
+      "path": "apps/platform/src/components/camera/CameraCountdown.tsx",
+      "mode": "100644",
+      "blob": "694d9c5d0f9abc10445ea8d35db9d960897583d0"
+    },
+    {
+      "path": "apps/platform/src/components/camera/CameraFailureNotice.tsx",
+      "mode": "100644",
+      "blob": "42f987c8da282935ac0e40ad3aecd62f155bc655"
+    },
+    {
+      "path": "apps/platform/src/components/camera/CameraPanel.tsx",
+      "mode": "100644",
+      "blob": "ff30acd7b37a31c85889fcca6fe2f784bbab0fa9"
+    },
+    {
+      "path": "apps/platform/src/components/camera/cameraStatus.ts",
+      "mode": "100644",
+      "blob": "f303cc84abed1b1b91dc8c6d28354478752576bc"
+    },
+    {
+      "path": "apps/platform/src/components/coach/AICoachDock.tsx",
+      "mode": "100644",
+      "blob": "e44cac347f7ce70f7506ca5117f52c73d0148c01"
+    },
+    {
+      "path": "apps/platform/src/components/coach/CoachAvatar.tsx",
+      "mode": "100644",
+      "blob": "a6fb86c6864d6fb0c1c8bb8669cd9eefa8945f43"
+    },
+    {
+      "path": "apps/platform/src/components/coach/CoachHighlightOverlay.tsx",
+      "mode": "100644",
+      "blob": "29c6c23e632ff278cc3596458c06db9d92601144"
+    },
+    {
+      "path": "apps/platform/src/components/coach/CoachMotion.tsx",
+      "mode": "100644",
+      "blob": "35a81d9cb1a4f96bb282364eb8d51c67f2d8093b"
+    },
+    {
+      "path": "apps/platform/src/components/coach/CoachPanel.tsx",
+      "mode": "100644",
+      "blob": "c95d6a2028c22fb357ef95394e8bacd265058406"
+    },
+    {
+      "path": "apps/platform/src/components/coach/PrimaryFeedback.tsx",
+      "mode": "100644",
+      "blob": "c530522616a3ab79b09dbb152fd3395f49ed4d00"
+    },
+    {
+      "path": "apps/platform/src/components/coach/coachIdentity.ts",
+      "mode": "100644",
+      "blob": "4847b3157b9cd1accf22ea4728c38c3b30b88625"
+    },
+    {
+      "path": "apps/platform/src/components/demo/DemonstrationVideo.tsx",
+      "mode": "100644",
+      "blob": "3c8c64de53df6c960cf835af6b44ee0443e61567"
+    },
+    {
+      "path": "apps/platform/src/components/diagnostics/DiagnosticsDetails.tsx",
+      "mode": "100644",
+      "blob": "6e93b7f94ec0a46586dd27f43d79b1af80ab63e3"
+    },
+    {
+      "path": "apps/platform/src/components/feedback/DebugPanel.tsx",
+      "mode": "100644",
+      "blob": "6c27476fcad64f49fb2f44fc63467027e1bbe88b"
+    },
+    {
+      "path": "apps/platform/src/components/home/HomeHero.tsx",
+      "mode": "100644",
+      "blob": "cb6666bb40aa5dd175049e3580ca4872de033dc6"
+    },
+    {
+      "path": "apps/platform/src/components/home/ModeFigure.tsx",
+      "mode": "100644",
+      "blob": "998aa6de0e10f19b5c5c3f7aff06c52eedbad2e0"
+    },
+    {
+      "path": "apps/platform/src/components/home/ModeMotifArt.tsx",
+      "mode": "100644",
+      "blob": "86b25bed47d4561d616e3fa17b17d5953f625d3c"
+    },
+    {
+      "path": "apps/platform/src/components/home/MyActionsStrip.tsx",
+      "mode": "100644",
+      "blob": "9f877407aaeada34945756757a3d4acb85f7532a"
+    },
+    {
+      "path": "apps/platform/src/components/home/MyTrainingSummary.tsx",
+      "mode": "100644",
+      "blob": "88d161ae6db8b0b1bd2743e92b4c8dc180874805"
+    },
+    {
+      "path": "apps/platform/src/components/home/ScoringBasisDialog.tsx",
+      "mode": "100644",
+      "blob": "39c1fa7ca214adfd846494785ec548c77d47e0c5"
+    },
+    {
+      "path": "apps/platform/src/components/home/TrainingModeCard.tsx",
+      "mode": "100644",
+      "blob": "2c218d549efb5d81a66645bd9eb4094c792c075a"
+    },
+    {
+      "path": "apps/platform/src/components/home/WorkshopTeaser.tsx",
+      "mode": "100644",
+      "blob": "6f98cdb0e67c7a2fe52b2f9689bec801e96ef825"
+    },
+    {
+      "path": "apps/platform/src/components/home/modeAccent.ts",
+      "mode": "100644",
+      "blob": "2089f54a929571c8f2a34588746524087de6dc8a"
+    },
+    {
+      "path": "apps/platform/src/components/home/modeFigures.ts",
+      "mode": "100644",
+      "blob": "4134fea807d4d2a768523623673b9c4b1bb225bd"
+    },
+    {
+      "path": "apps/platform/src/components/home/workshopTeaserArt.ts",
+      "mode": "100644",
+      "blob": "0bfd11f3bb4b44d308ceebbbc9d81b23f9461aef"
+    },
+    {
+      "path": "apps/platform/src/components/immersive/DemoStage.tsx",
+      "mode": "100644",
+      "blob": "8a0dd42cc26e591ce7175ff929ef9ea700a47e10"
+    },
+    {
+      "path": "apps/platform/src/components/immersive/ImmersiveCameraPanel.tsx",
+      "mode": "100644",
+      "blob": "170a05363b60b0983bdebe6854f34690ddd5c8d4"
+    },
+    {
+      "path": "apps/platform/src/components/immersive/ImmersiveShell.tsx",
+      "mode": "100644",
+      "blob": "12eb64847a3846d655de48655c6f7fdea9b8d82d"
+    },
+    {
+      "path": "apps/platform/src/components/immersive/useBodyFraming.ts",
+      "mode": "100644",
+      "blob": "d6a73c6cd183b1fb2b240b954c86867a72483964"
+    },
+    {
+      "path": "apps/platform/src/components/immersive/useMediaArrangement.ts",
+      "mode": "100644",
+      "blob": "d061838eec94cfb25659d6b4b7853a2eb345d65d"
+    },
+    {
+      "path": "apps/platform/src/components/layout/AppHeader.tsx",
+      "mode": "100644",
+      "blob": "e6fc7f265df762003fccd80b4927ab6fae518d3e"
+    },
+    {
+      "path": "apps/platform/src/components/layout/FormPilotMark.tsx",
+      "mode": "100644",
+      "blob": "b5d3b475600a0b1ab68c085d3bcaed0d86eb8ac6"
+    },
+    {
+      "path": "apps/platform/src/components/metrics/MetricsPanel.tsx",
+      "mode": "100644",
+      "blob": "f1286df2ceaad7d5e3e84eece2ff3e7591c526af"
+    },
+    {
+      "path": "apps/platform/src/components/onboarding/OnboardingDialog.tsx",
+      "mode": "100644",
+      "blob": "fbd37986746e57ccbd679a09e6a88e2f78978e92"
+    },
+    {
+      "path": "apps/platform/src/components/onboarding/OnboardingIllustrations.tsx",
+      "mode": "100644",
+      "blob": "d39a4041b95ea8b563ec7c088b3f8c98cdcece69"
+    },
+    {
+      "path": "apps/platform/src/components/pose/PoseOverlay.tsx",
+      "mode": "100644",
+      "blob": "5009240e9f6e362e107cf698fab6a788d78ddfa5"
+    },
+    {
+      "path": "apps/platform/src/components/pose/ReferencePoseOverlay.tsx",
+      "mode": "100644",
+      "blob": "f9c29c2e25c3039d19d16c28c939c5ac15bead28"
+    },
+    {
+      "path": "apps/platform/src/components/report/CapabilityRadar.tsx",
+      "mode": "100644",
+      "blob": "1a527d613514f96fa51761e6119a92848b903859"
+    },
+    {
+      "path": "apps/platform/src/components/routines/RoutineAnalyzerLive.tsx",
+      "mode": "100644",
+      "blob": "96581bb0b2927897e806f9ba6d6e412a9c3343f5"
+    },
+    {
+      "path": "apps/platform/src/components/routines/RoutineCameraStatus.tsx",
+      "mode": "100644",
+      "blob": "5150672a06cc68e141d2556362c165b2bb3590ba"
+    },
+    {
+      "path": "apps/platform/src/components/routines/RoutineChapterPoints.tsx",
+      "mode": "100644",
+      "blob": "15b3f11dd7b3344540b7a08b7ad1454e2af87d59"
+    },
+    {
+      "path": "apps/platform/src/components/routines/RoutineDemoVideo.tsx",
+      "mode": "100644",
+      "blob": "b8917679e413927144e94c96050f61a6108b45ad"
+    },
+    {
+      "path": "apps/platform/src/components/routines/RoutineFeedbackPanel.tsx",
+      "mode": "100644",
+      "blob": "6a8cddee0eb0114f6a524169deca94b2ce8d68c5"
+    },
+    {
+      "path": "apps/platform/src/components/routines/RoutineFooter.tsx",
+      "mode": "100644",
+      "blob": "b3d9a7428a8fb42b722584599970c460e99ddcfb"
+    },
+    {
+      "path": "apps/platform/src/components/routines/routineTheme.ts",
+      "mode": "100644",
+      "blob": "1ed6d0fa1ef1123d40fa9310b502f019e45d2af0"
+    },
+    {
+      "path": "apps/platform/src/components/routines/useMatchedMediaHeight.ts",
+      "mode": "100644",
+      "blob": "09601430eeaa2a976c0058cfc3038058947dbea1"
+    },
+    {
+      "path": "apps/platform/src/components/training/AICoachFeedbackDock.tsx",
+      "mode": "100644",
+      "blob": "ed73c7c3c8055845200c8c358381f2b4805f118b"
+    },
+    {
+      "path": "apps/platform/src/components/training/AdaptiveDecisionPanel.tsx",
+      "mode": "100644",
+      "blob": "08ef1e13fe54f369f9c8358043ff2af1156a938d"
+    },
+    {
+      "path": "apps/platform/src/components/training/TrainingExitControl.tsx",
+      "mode": "100644",
+      "blob": "e0128d92c22eeef1734a5617093f36cc99be7417"
+    },
+    {
+      "path": "apps/platform/src/components/training/TrainingFooter.tsx",
+      "mode": "100644",
+      "blob": "9b9e4f534affdfc48a16d49d3bdc31c801635ee6"
+    },
+    {
+      "path": "apps/platform/src/components/training/WarmupCountCard.tsx",
+      "mode": "100644",
+      "blob": "9003600815886fb7240ee80547915c9adcc8ca0b"
+    },
+    {
+      "path": "apps/platform/src/components/web/CoachAgentChat.tsx",
+      "mode": "100644",
+      "blob": "3f2988abc822fe6bd35ccc2d59de1b8625dda553"
+    },
+    {
+      "path": "apps/platform/src/components/web/CoachOrb.tsx",
+      "mode": "100644",
+      "blob": "cddf51670aa6da6cf1f1e2a8ac5ab3a05710ac95"
+    },
+    {
+      "path": "apps/platform/src/components/web/WebShell.tsx",
+      "mode": "100644",
+      "blob": "fda2043ae24391ffd865e5789eb23182c7e5f6dd"
+    },
+    {
+      "path": "apps/platform/src/components/web/useCoachAgentChat.ts",
+      "mode": "100644",
+      "blob": "c62593054fa6a6787f670bf50c19557ae16fabe5"
+    },
+    {
+      "path": "apps/platform/src/components/workshop/PoseSketch.tsx",
+      "mode": "100644",
+      "blob": "630b9ffd3ad9398f0ae453fae9cf82553aa85a7f"
+    },
+    {
+      "path": "apps/platform/src/components/workshop/RecognitionReadout.tsx",
+      "mode": "100644",
+      "blob": "2a2b414cdc465775aa77df2ec4cd4584483a9252"
+    },
+    {
+      "path": "apps/platform/src/components/workshop/VideoDemonstrationInput.tsx",
+      "mode": "100644",
+      "blob": "335c1880b81f5f788faf867347c3e13b17105111"
+    },
+    {
+      "path": "apps/platform/src/data/demoPose.ts",
+      "mode": "100644",
+      "blob": "71d64323111b38dd8bf22fa73b5bc895848e9be4"
+    },
+    {
+      "path": "apps/platform/src/features/adaptiveTraining/JevDecisionClient.ts",
+      "mode": "100644",
+      "blob": "798cb2116d0a4668f042fba7808566521d417682"
+    },
+    {
+      "path": "apps/platform/src/features/adaptiveTraining/LocalAdaptiveDecisionEngine.ts",
+      "mode": "100644",
+      "blob": "fe46118fdcbf3f12c48237acaf1ff0036a6b2471"
+    },
+    {
+      "path": "apps/platform/src/features/adaptiveTraining/TrainingDecisionObserver.ts",
+      "mode": "100644",
+      "blob": "213fa5a27af03ff0dbad5c2d3b7823c4a8321d15"
+    },
+    {
+      "path": "apps/platform/src/features/adaptiveTraining/decisionPolicy.ts",
+      "mode": "100644",
+      "blob": "ddda5858678cc96f3498ffb840bcf32135e5c853"
+    },
+    {
+      "path": "apps/platform/src/features/adaptiveTraining/localGuidance.ts",
+      "mode": "100644",
+      "blob": "09d01c1b61981a937c98c21350c45e1e4bed880f"
+    },
+    {
+      "path": "apps/platform/src/features/adaptiveTraining/localScenarioReplay.ts",
+      "mode": "100644",
+      "blob": "6bfa9559916df1136f5875c6c712e91e8a421dc8"
+    },
+    {
+      "path": "apps/platform/src/features/adaptiveTraining/protocol.ts",
+      "mode": "100644",
+      "blob": "ab6e9d69fb06ee80dce30b2272952c3a5517ee32"
+    },
+    {
+      "path": "apps/platform/src/features/adaptiveTraining/scenarios.ts",
+      "mode": "100644",
+      "blob": "62e43dc023cbc8dfc0f1221554ce1d02e4d12d64"
+    },
+    {
+      "path": "apps/platform/src/features/adaptiveTraining/useAdaptiveTraining.ts",
+      "mode": "100644",
+      "blob": "c490cf944cc855cead29ef06c2857d307c1299d4"
+    },
+    {
+      "path": "apps/platform/src/features/aiCoach/digests.ts",
+      "mode": "100644",
+      "blob": "c5b7c0e48fc7387cd1fa01114b9f9ae1faf2c7f7"
+    },
+    {
+      "path": "apps/platform/src/features/aiCoach/intents.ts",
+      "mode": "100644",
+      "blob": "3cf06da4f8725fa75ee19824c527d24962644693"
+    },
+    {
+      "path": "apps/platform/src/features/aiCoach/types.ts",
+      "mode": "100644",
+      "blob": "f9feb1403703525f4b20400cffe87de80a21dff8"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/TrainingAnalysisEngine.ts",
+      "mode": "100644",
+      "blob": "211ae9e3083f3a66de93152a4e5a2efb7a56a3a2"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/capability.ts",
+      "mode": "100644",
+      "blob": "8a7d70984055d2e5a40b974e20b2eca4a53d7f7e"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/comparison.ts",
+      "mode": "100644",
+      "blob": "cb5d0d96dfb20b6a90591ce6bb44819c5061e19f"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/config.ts",
+      "mode": "100644",
+      "blob": "c87307488862a3dc2831dd731f82c187c37db796"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/copy.ts",
+      "mode": "100644",
+      "blob": "8a3a2386f01be679f9dd2fdc5667275e604a053d"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/dataQuality.ts",
+      "mode": "100644",
+      "blob": "17604b6a97a90b14ebc9ad6f12864a9f66dbc1c0"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/exerciseAnalysis.ts",
+      "mode": "100644",
+      "blob": "d5a4da6b996700b2226069adce809d3edaa21011"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/findings.ts",
+      "mode": "100644",
+      "blob": "a4782213c8f8e2bc159e3f65fc97a57ff814791a"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/index.ts",
+      "mode": "100644",
+      "blob": "f5160043cd1c2c5cfa6939d55cd82b7145040b3e"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/issueAnalysis.ts",
+      "mode": "100644",
+      "blob": "158ac5f357ea1f019c65e7d4ec84a74260db89e2"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/issueEvidence.ts",
+      "mode": "100644",
+      "blob": "495b29719115a2d0e1a0d53c5a1f89ba17d954e4"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/issueTaxonomy.ts",
+      "mode": "100644",
+      "blob": "255b6c81e860a78b0475cdb5ba28f14180527bcb"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/nextFocus.ts",
+      "mode": "100644",
+      "blob": "9fe86d5c6838d6ab167248fbe19dd398b6a1fa27"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/priorityRanking.ts",
+      "mode": "100644",
+      "blob": "02cfe68473fdd009146cf52b469a85bbed6fa1e3"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/ratio.ts",
+      "mode": "100644",
+      "blob": "e8df6f71db4b650a8bbddddb4aa0700952c317b8"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/repetitionValidity.ts",
+      "mode": "100644",
+      "blob": "d1b714c704fefe329876abe0e677ef15cb5b3d5e"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/rulesSupport.ts",
+      "mode": "100644",
+      "blob": "03191623af35a1b975700939c8e1cda875212bbe"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/sessionFacts.ts",
+      "mode": "100644",
+      "blob": "ed6a693972bc45a2e8daec600a9630f6743978ad"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/summary.ts",
+      "mode": "100644",
+      "blob": "0a3d09cef894468ed1596d0ad69eb53515d83886"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/tempo.ts",
+      "mode": "100644",
+      "blob": "04537f11bafa0501118ce3943f4da0d49eda6048"
+    },
+    {
+      "path": "apps/platform/src/features/analysis/types.ts",
+      "mode": "100644",
+      "blob": "1ee494ed0f306ade31c15745696e54a720be4785"
+    },
+    {
+      "path": "apps/platform/src/features/camera/cameraDiagnostics.ts",
+      "mode": "100644",
+      "blob": "21c0e02eaabca2ede5e3a2cfb324ca86226db891"
+    },
+    {
+      "path": "apps/platform/src/features/camera/useCameraFailure.ts",
+      "mode": "100644",
+      "blob": "fbe2e287320c25a07014b44a8f2fe4d42eedfc75"
+    },
+    {
+      "path": "apps/platform/src/features/coach/CoachCardStateResolver.ts",
+      "mode": "100644",
+      "blob": "a801e05ccf97e98eaf7657d8fc9584a1bd0abb5e"
+    },
+    {
+      "path": "apps/platform/src/features/coach/coachDockState.ts",
+      "mode": "100644",
+      "blob": "b92013aedbd451707d6d34cf40b195aaac798c86"
+    },
+    {
+      "path": "apps/platform/src/features/coach/coachMotionPolicy.ts",
+      "mode": "100644",
+      "blob": "e6e8553ef607b3c514b73e0f2d4b05fd6a72eb17"
+    },
+    {
+      "path": "apps/platform/src/features/coach/correctionPresentation.ts",
+      "mode": "100644",
+      "blob": "86ffc4261b93476f9bd94464a31bdc517c2e009c"
+    },
+    {
+      "path": "apps/platform/src/features/coach/poseAnchorMapping.ts",
+      "mode": "100644",
+      "blob": "e607457457018adae3f723e390c84ea1725564ac"
+    },
+    {
+      "path": "apps/platform/src/features/coach/types.ts",
+      "mode": "100644",
+      "blob": "831d1e0d47dd97793ec74d2df2ef495b19ee9a09"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/answer.ts",
+      "mode": "100644",
+      "blob": "16d5f976900f82325772c78e3654d22202f9fd14"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/contracts.ts",
+      "mode": "100644",
+      "blob": "e7a8420ecb339f4e7d2416418cf94dd4ce642dbd"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/adapter.ts",
+      "mode": "100644",
+      "blob": "a1878c3e475e86dffd37c77e2ea951575a9120fe"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/explain.ts",
+      "mode": "100644",
+      "blob": "456b9e9e9ca9b93fd5228aa9ac6b97c7a7d73c61"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/features.ts",
+      "mode": "100644",
+      "blob": "9561b1dd2adbda526a6fcbf9ecfebb881126fdb3"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/fp-cdm-m2.weights.json",
+      "mode": "100644",
+      "blob": "350921bc43e49c8b53cc554a89f9a2df453baf19"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/guard.ts",
+      "mode": "100644",
+      "blob": "1fe096c9f3c85d57e98cc25a98d3f87720c96fee"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/index.ts",
+      "mode": "100644",
+      "blob": "98c08f8c1271950d1cea696c4641b6663bdbaf53"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/m1ContentFeatures.json",
+      "mode": "100644",
+      "blob": "dee43bd2a2d6188a009f7357477b62d821eb5cd9"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/model.ts",
+      "mode": "100644",
+      "blob": "c79205f5835cd844580347147dd186a9a716183e"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/cdm/state.ts",
+      "mode": "100644",
+      "blob": "e42abeae1d26c5e51232c5ffc80923b47fe928c5"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/descriptors.ts",
+      "mode": "100644",
+      "blob": "f06c29c3a0f7a3f519eae29ada02f1d2eb5291d9"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/engine/contract.ts",
+      "mode": "100644",
+      "blob": "5510db30da413f0cec18b703eb636f2e68c4316f"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/engine/engine.ts",
+      "mode": "100644",
+      "blob": "1feda3c92c2bd013c8effd73e1c6c0eab7a1e47e"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/engine/index.ts",
+      "mode": "100644",
+      "blob": "f5716b80fd4c0329ee01af81738a6b1af545a7d6"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/engine/input.ts",
+      "mode": "100644",
+      "blob": "f2c3dd3acd3a017a980d47bd72339cdfc10029dc"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/engine/platform.ts",
+      "mode": "100644",
+      "blob": "53ceef3fbcc32dc8c24a5a8dba6ae6de600f1f3a"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/engine/release.ts",
+      "mode": "100644",
+      "blob": "164994dbb525b120a28553b20191396672c141d2"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/engine/shadow.ts",
+      "mode": "100644",
+      "blob": "b3ca4c885d285c8de76a5bf602b8e3a025642aae"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/guard.ts",
+      "mode": "100644",
+      "blob": "4a51f15344d3ebf68cc4a954f36ad2f4352abdec"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/index.ts",
+      "mode": "100644",
+      "blob": "a63432d97327554ba619669b28e8603cf5b461ac"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/motionDescriptors.json",
+      "mode": "100644",
+      "blob": "fa6fb1a5474b6f7048afd5d8ad6969856cf6213e"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/ranker.ts",
+      "mode": "100644",
+      "blob": "2e7c5b15f812b3676f232714fd394ef74ad69f64"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/decisionModel/types.ts",
+      "mode": "100644",
+      "blob": "1fab550a3653bd993d4ae2ea3b5c80a7b8208be2"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/dispatchTypes.ts",
+      "mode": "100644",
+      "blob": "5a34193c32dd4ae2f1c0955285bee33caffffaf7"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/dispatcher.ts",
+      "mode": "100644",
+      "blob": "c117c3ee34266f1846bc025e59cf2e82075e11dc"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/execution.ts",
+      "mode": "100644",
+      "blob": "315e468760d05bcc27d525ab605ddb813c97058d"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/index.ts",
+      "mode": "100644",
+      "blob": "98ac09d05f5edb7dbe0c4f3e5d8097c34b46dfa0"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/lab/CoachAgentLab.tsx",
+      "mode": "100644",
+      "blob": "44131c3ac78df7a5dc01fd14310ef79e2c7403fc"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/lab/controller.ts",
+      "mode": "100644",
+      "blob": "b0ce9ef4ae3ca9b83a3d573698beed0015e49c6f"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/lab/fixtures.ts",
+      "mode": "100644",
+      "blob": "4b8f306fe4bd9b68b2141e71507a45cf50ef0768"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/lab/lab.css",
+      "mode": "100644",
+      "blob": "8ac4330a51a78366ebdc4064e66097c94a157ff6"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/lab/main.tsx",
+      "mode": "100644",
+      "blob": "a163898f483d1d6d1eafe9df32967bd3793cb443"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/lab/types.ts",
+      "mode": "100644",
+      "blob": "10e145157c218648c407337d54caa36843ab7152"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/localProtocolV2.ts",
+      "mode": "100644",
+      "blob": "a14dd6d1a8e1f17b8b33c8ba82bf7aa5482d2e70"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/localProvider.ts",
+      "mode": "100644",
+      "blob": "b7e5cf67998947e50069d7658baafebbcb938d7e"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/mockProvider.ts",
+      "mode": "100644",
+      "blob": "4f61d85ea929a31005d15f00d14574e4a9917e9f"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/orchestrator.ts",
+      "mode": "100644",
+      "blob": "de9a5c95a7467c9597a534fd0f130aeb990e754b"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/provider.ts",
+      "mode": "100644",
+      "blob": "a984ce86267a4f17150d0ba52de1cf9054a2b064"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/questionAdmission.ts",
+      "mode": "100644",
+      "blob": "91a5ee20d87cbbadb8a92fce023426c2a314d652"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/readerTypes.ts",
+      "mode": "100644",
+      "blob": "85e1af67b11b4b012d3d6b442b38e631e18ff566"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/readers.ts",
+      "mode": "100644",
+      "blob": "88525da83adca509c023a10da16dbbbb5f942e69"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/recommendation/catalogue.ts",
+      "mode": "100644",
+      "blob": "3672418a045cc4a2968e9c45bb81c56d716e731e"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/recommendation/context.ts",
+      "mode": "100644",
+      "blob": "0b2617090415dd7b980567105966a6eaafc78bb8"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/recommendation/decision.ts",
+      "mode": "100644",
+      "blob": "20bca9def3d1b4856e93c5e9fffceee2a88884a0"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/recommendation/engine.ts",
+      "mode": "100644",
+      "blob": "5e704447a1340f7f7c5d4fcc7fe6dbbe498db286"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/recommendation/fixtures.ts",
+      "mode": "100644",
+      "blob": "b3302597b1a65fbc372097a2fe49435a6e0433b8"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/recommendation/types.ts",
+      "mode": "100644",
+      "blob": "a5f2030c6d167ad050ff902c1df1dce18342672d"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/recommendation/webContracts.ts",
+      "mode": "100644",
+      "blob": "3b7860b7edb975b28521698cce7e60d0d5359b3f"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/recommendation/webService.ts",
+      "mode": "100644",
+      "blob": "5026a442e3fae3e73d12cd060227ed79a7f3fdd0"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/remoteProtocol.ts",
+      "mode": "100644",
+      "blob": "d5d2bd562517b255b8ce1f65e540e4667e74e52e"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/remoteProvider.ts",
+      "mode": "100644",
+      "blob": "8f436a522f16586d416ddeb61a42abdbd70e6c30"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/routineReader.ts",
+      "mode": "100644",
+      "blob": "70b54b6eecdf56e9567da5e1624d31c314e071b5"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/sessionReader.ts",
+      "mode": "100644",
+      "blob": "5ac9f2e2c137e906e1584d60435653ab754545ea"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/sprint/CoachSprint.tsx",
+      "mode": "100644",
+      "blob": "87865b7a5d0dbe2c87da5077d7e4818a5d24812a"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/sprint/main.tsx",
+      "mode": "100644",
+      "blob": "1cc5a72f6adbdc14a0b58d7fc8aab697865215b2"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/sprint/sprint.css",
+      "mode": "100644",
+      "blob": "db40a2b93c11a263592b3987f16eb86412544655"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/toolQuery.ts",
+      "mode": "100644",
+      "blob": "9544e791e90f6ae93f4eae79515dba2a4e7494c3"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/trustedCoach.ts",
+      "mode": "100644",
+      "blob": "328ec9d342b9d608c98862b61e2dbe679bb30091"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/validation.ts",
+      "mode": "100644",
+      "blob": "fce774c0803877e945b68e13d5c5e6666aa7f0df"
+    },
+    {
+      "path": "apps/platform/src/features/coachAgent/warmupReader.ts",
+      "mode": "100644",
+      "blob": "b604a08128936d9f9073cf67bdfa762fc9a58bc2"
+    },
+    {
+      "path": "apps/platform/src/features/coachContext/liveCoachContexts.ts",
+      "mode": "100644",
+      "blob": "e4d04d9e4753d0fd2f5dcc9c722c9ca383c60b6d"
+    },
+    {
+      "path": "apps/platform/src/features/coachContext/recentReports.ts",
+      "mode": "100644",
+      "blob": "dc1ad3670efb105b10be1f7fd72b997bd31245b7"
+    },
+    {
+      "path": "apps/platform/src/features/coachContext/routineCoachContext.ts",
+      "mode": "100644",
+      "blob": "46c659e00680e8df32dbab789c8cc94104a6b1bf"
+    },
+    {
+      "path": "apps/platform/src/features/coachContext/types.ts",
+      "mode": "100644",
+      "blob": "c77f284b1c133a30205b1d6ece91cf71e7806e8c"
+    },
+    {
+      "path": "apps/platform/src/features/coachLlm/agent.ts",
+      "mode": "100644",
+      "blob": "4e4ca7946d98fdf25db2f8d80ac2d2d10b94b1d5"
+    },
+    {
+      "path": "apps/platform/src/features/coachLlm/guard.ts",
+      "mode": "100644",
+      "blob": "fd4465311e340c149180f0767a816d2ef6216205"
+    },
+    {
+      "path": "apps/platform/src/features/coachLlm/knowledge.ts",
+      "mode": "100644",
+      "blob": "b981442f0a033f09eee8dc0fe3692476959ea9ad"
+    },
+    {
+      "path": "apps/platform/src/features/coachLlm/protocol.ts",
+      "mode": "100644",
+      "blob": "0f9158d693794bd6098505ac0d8de514d376d266"
+    },
+    {
+      "path": "apps/platform/src/features/coachLlm/retrieval.ts",
+      "mode": "100644",
+      "blob": "1621b9e5236e210c3405ad25ab1ea4fee963b279"
+    },
+    {
+      "path": "apps/platform/src/features/coachLlm/router.ts",
+      "mode": "100644",
+      "blob": "b9f039b4d27840549f6bdb1e4be21d1a84e5e354"
+    },
+    {
+      "path": "apps/platform/src/features/coachLlm/tools.ts",
+      "mode": "100644",
+      "blob": "e9563f1736ba2a1f12d1523541ef76658ece2f09"
+    },
+    {
+      "path": "apps/platform/src/features/coachLlm/transport.ts",
+      "mode": "100644",
+      "blob": "d6d39e727d3bc447b692ad05c8edee7a3d5fd4e9"
+    },
+    {
+      "path": "apps/platform/src/features/course/CourseController.ts",
+      "mode": "100644",
+      "blob": "7b79531ad5cb2bd78cc381ee1f89273678b8f2c7"
+    },
+    {
+      "path": "apps/platform/src/features/course/CourseDefinition.ts",
+      "mode": "100644",
+      "blob": "41930e7861bf00594c40a8fe1fbbcbf81c378c59"
+    },
+    {
+      "path": "apps/platform/src/features/course/countdownCue.ts",
+      "mode": "100644",
+      "blob": "ea3a1afd7ec3573f8f27629039e96ef52dcc3d71"
+    },
+    {
+      "path": "apps/platform/src/features/course/freeTraining.ts",
+      "mode": "100644",
+      "blob": "0962c7c42e73db40f80000269e534d61c153a4f6"
+    },
+    {
+      "path": "apps/platform/src/features/demo/demoPresenter.ts",
+      "mode": "100644",
+      "blob": "af5f950e3a8041aab0e6a11fd81d5c82d47582ed"
+    },
+    {
+      "path": "apps/platform/src/features/demo/demonstrationSources.ts",
+      "mode": "100644",
+      "blob": "423d84e7a71c4f192559de236f0c52750bc763f2"
+    },
+    {
+      "path": "apps/platform/src/features/diagnostics/PerformanceTracker.ts",
+      "mode": "100644",
+      "blob": "7bf74b513ec614387925344ab3ad549a19965a5c"
+    },
+    {
+      "path": "apps/platform/src/features/diagnostics/SessionDiagnosticsRecorder.ts",
+      "mode": "100644",
+      "blob": "ba522fa66308989adae694428a1f5bd80b61adbb"
+    },
+    {
+      "path": "apps/platform/src/features/diagnostics/desktopBridge.ts",
+      "mode": "100644",
+      "blob": "166cb6187cdec95c7342442bd27b4f33b4d6875b"
+    },
+    {
+      "path": "apps/platform/src/features/diagnostics/diagnosticsReport.ts",
+      "mode": "100644",
+      "blob": "a8d396fff8e0975c49b0836d152b2e44c6515653"
+    },
+    {
+      "path": "apps/platform/src/features/diagnostics/videoDiagnostics.ts",
+      "mode": "100644",
+      "blob": "9fc8629edb1986819915241d0b6f24b4639580f4"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/contract.ts",
+      "mode": "100644",
+      "blob": "91ef95b593aacd9fe8279782d6c34b29fb81cafe"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/createEngine.ts",
+      "mode": "100644",
+      "blob": "e397c7fe519f70a42e694631e72f296001eb6ae3"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/errors.ts",
+      "mode": "100644",
+      "blob": "a60eb45807f5bceaa1e6d362ae73dac13a562b5a"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/kneeRaise/FeatureExtractor.ts",
+      "mode": "100644",
+      "blob": "a498cf643c518ecd79cb1ff676a3e44b83b3a238"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/kneeRaise/baseline.ts",
+      "mode": "100644",
+      "blob": "51fad9b11a8abdfcdb1ee30133d5563801bbd0af"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/kneeRaise/config.ts",
+      "mode": "100644",
+      "blob": "4d096b581dc99731342f6514ee21c4a4cad77fb4"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/kneeRaise/definition.ts",
+      "mode": "100644",
+      "blob": "22e5e26c4f493fac957690feddeeae90813b297e"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/kneeRaise/engine.ts",
+      "mode": "100644",
+      "blob": "bcda15929db53000b1ee02732dc14355d07941d8"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/kneeRaise/rules.ts",
+      "mode": "100644",
+      "blob": "e0db29dac0f37044b0876fcd8ee7b5fab0d24cfd"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/kneeRaise/scoring.ts",
+      "mode": "100644",
+      "blob": "31f357d2fe16645a1ae6afbebb79b6b7ada8b0d0"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/kneeRaise/stateMachine.ts",
+      "mode": "100644",
+      "blob": "b79e5bc2ba25f3c32d9f7ea27b84e7e4f840ce26"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/lateralRaise/FeatureExtractor.ts",
+      "mode": "100644",
+      "blob": "39d334a1eb352d372654263f44c6da9d7eee5665"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/lateralRaise/config.ts",
+      "mode": "100644",
+      "blob": "37793b6edf93122a7e2ced5b55a70c0321979228"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/lateralRaise/definition.ts",
+      "mode": "100644",
+      "blob": "9832543f72d81ea286ac1f39e5559049af83a43f"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/lateralRaise/engine.ts",
+      "mode": "100644",
+      "blob": "f6e9220a19edac09eb31d1d63374fe9588a9b558"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/lateralRaise/rules.ts",
+      "mode": "100644",
+      "blob": "67295921b6467098a2acdab1d98c6b051160942d"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/lateralRaise/scoring.ts",
+      "mode": "100644",
+      "blob": "afcd95ffbe16eb4e54309ae87eb7bb7e6e0cd592"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/lateralRaise/stateMachine.ts",
+      "mode": "100644",
+      "blob": "830c804888d4c964feefe735f0d3de816ee4c2d3"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/order.ts",
+      "mode": "100644",
+      "blob": "55fb606042608ea8d19deeb5d60e97acad3b9483"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/overheadRaise/FeatureExtractor.ts",
+      "mode": "100644",
+      "blob": "36eff29dbb1a2c3ea450a86e22ac0a0df7d6fa7f"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/overheadRaise/config.ts",
+      "mode": "100644",
+      "blob": "ab775049ebaaf778d1aad5e290a69f80d08b4a56"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/overheadRaise/definition.ts",
+      "mode": "100644",
+      "blob": "41a70b828a17abfba531d312a171325246d2e7d7"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/overheadRaise/engine.ts",
+      "mode": "100644",
+      "blob": "1568c225c11c0a9934a027077d263207779943d2"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/overheadRaise/rules.ts",
+      "mode": "100644",
+      "blob": "21175ae478fa3615ce74be33c077fa464306f940"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/overheadRaise/scoring.ts",
+      "mode": "100644",
+      "blob": "9ea31e2166ab6cacb917ea5958ad473e48d93b70"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/overheadRaise/stateMachine.ts",
+      "mode": "100644",
+      "blob": "d3b6105a57dc6bda4ff5b1a37f34b182f1ffa488"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/phasePersistence.ts",
+      "mode": "100644",
+      "blob": "1763c9e25841d349a5e9baa402f2a0db87435d30"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/registry.ts",
+      "mode": "100644",
+      "blob": "3828d9b21f233ce92df796eed2f24bc384a18037"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/runtime.ts",
+      "mode": "100644",
+      "blob": "daf987ce13b7a387d8e12cb5a77b47e02bc4b7a3"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/scoring.ts",
+      "mode": "100644",
+      "blob": "8050ad653c9a2fbccae9bbfe21b2ebb7f6775b99"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/shoulderRotation/FeatureExtractor.ts",
+      "mode": "100644",
+      "blob": "cc7bd31107f9fcf79b222b67d9652ab0a71fa25d"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/shoulderRotation/config.ts",
+      "mode": "100644",
+      "blob": "fa4c25ee887c284453175c78a650caf45c65bf52"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/shoulderRotation/definition.ts",
+      "mode": "100644",
+      "blob": "f507e7fb1071ac13179462abe1369cff30320e6c"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/shoulderRotation/engine.ts",
+      "mode": "100644",
+      "blob": "7d4d98c3b221ac70bcec72973f7aeddd8c3baa2e"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/shoulderRotation/rules.ts",
+      "mode": "100644",
+      "blob": "1f0f79350bfaa61d9bef45d57e706774a9a7d385"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/shoulderRotation/stateMachine.ts",
+      "mode": "100644",
+      "blob": "831ad599bfccea2b7636368eb58ad8faaafa90af"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/squat/FeatureExtractor.ts",
+      "mode": "100644",
+      "blob": "9451cd132f29fc04eec121ecdd3b11b7aba86f18"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/squat/baseline.ts",
+      "mode": "100644",
+      "blob": "1174f87ffd7307378667bad2394eb801b9e7bf27"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/squat/config.ts",
+      "mode": "100644",
+      "blob": "ce99fbc19835a04d94636eabe34b3e24419dcd99"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/squat/definition.ts",
+      "mode": "100644",
+      "blob": "b8c55f0ecbe5cefb8e0a411ed03466422bd35863"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/squat/engine.ts",
+      "mode": "100644",
+      "blob": "f809e3695eef1bca68444b887ea64a260223c538"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/squat/rules.ts",
+      "mode": "100644",
+      "blob": "55b5c59f3464aff66691fb9eba5fa455b86d8a49"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/squat/scoring.ts",
+      "mode": "100644",
+      "blob": "d0ee4026a4644c0d8154ae43be378cf328165564"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/squat/stateMachine.ts",
+      "mode": "100644",
+      "blob": "f7ed97bb62262cf032839efe56debbabbeafb24d"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/stepJack/FeatureExtractor.ts",
+      "mode": "100644",
+      "blob": "a05d22812f204563143696bf14b03f50438158fe"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/stepJack/config.ts",
+      "mode": "100644",
+      "blob": "3dae884a9350bb123d564f04781953a26f461896"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/stepJack/definition.ts",
+      "mode": "100644",
+      "blob": "44282be8aaf495976183282dee9bcf0fce121f95"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/stepJack/engine.ts",
+      "mode": "100644",
+      "blob": "422e4417b3da2f7f3ffaf9b6a0c9532d7073295d"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/stepJack/rules.ts",
+      "mode": "100644",
+      "blob": "d6d4561469a0013d84bb20924a26989fae30b7ed"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/stepJack/scoring.ts",
+      "mode": "100644",
+      "blob": "a677cf7c04f93517a9396435fc30c79edb3ef5d7"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/stepJack/stateMachine.ts",
+      "mode": "100644",
+      "blob": "36280d45742c789189a7fa8407ab32ee937864b0"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/thresholdVersioning.ts",
+      "mode": "100644",
+      "blob": "5f9aad5b9a6cafc91775a59f09d37b63976bbbe4"
+    },
+    {
+      "path": "apps/platform/src/features/exercises/types.ts",
+      "mode": "100644",
+      "blob": "5665ebbe2113ef3b31087fadf0e1244d1576db91"
+    },
+    {
+      "path": "apps/platform/src/features/feedback/FeedbackPolicy.ts",
+      "mode": "100644",
+      "blob": "b1727dea24cfbc77b261b6f15b23795bd84fad5b"
+    },
+    {
+      "path": "apps/platform/src/features/feedback/types.ts",
+      "mode": "100644",
+      "blob": "419f346d33596e11010bac2924156c313d1d068a"
+    },
+    {
+      "path": "apps/platform/src/features/framing/FramingAssist.ts",
+      "mode": "100644",
+      "blob": "fb53bc0eabf0c5172e8a94122eb2733333c6d1b9"
+    },
+    {
+      "path": "apps/platform/src/features/framing/bodyFraming.ts",
+      "mode": "100644",
+      "blob": "41d803e1a9409f297a2cc810c60ce9a328ff90e2"
+    },
+    {
+      "path": "apps/platform/src/features/framing/framingProfiles.ts",
+      "mode": "100644",
+      "blob": "7fff182aede4998ad1fad5318f6ff4aefb464357"
+    },
+    {
+      "path": "apps/platform/src/features/gesture/GestureHoldController.ts",
+      "mode": "100644",
+      "blob": "05229ed3c3eb46b092e327b9aaa514d4e2cb37ca"
+    },
+    {
+      "path": "apps/platform/src/features/gesture/GestureRuntimeController.ts",
+      "mode": "100644",
+      "blob": "c33c4ab17d34eeb94e91eb20dc7dfeb302f09634"
+    },
+    {
+      "path": "apps/platform/src/features/gesture/gestureDetection.ts",
+      "mode": "100644",
+      "blob": "369aebfd0077997dfceeddddec07e3b22c12c685"
+    },
+    {
+      "path": "apps/platform/src/features/history/TrainingHistory.ts",
+      "mode": "100644",
+      "blob": "efcc2481a3febd7ef6f411046273f20418566a09"
+    },
+    {
+      "path": "apps/platform/src/features/history/customHistory.ts",
+      "mode": "100644",
+      "blob": "3e969baa73c56c8d1bd2d202ed5fb0e95402ebb2"
+    },
+    {
+      "path": "apps/platform/src/features/history/historyEntries.ts",
+      "mode": "100644",
+      "blob": "892119ad0d97e9518bbfed29fb9515533916bfc1"
+    },
+    {
+      "path": "apps/platform/src/features/history/homeSummary.ts",
+      "mode": "100644",
+      "blob": "df84f4c0e8854ea4c772e670d6b7cb621b25768f"
+    },
+    {
+      "path": "apps/platform/src/features/history/routineHistory.ts",
+      "mode": "100644",
+      "blob": "38caa7f1c551266646d085b28cc29b4d0e4e3968"
+    },
+    {
+      "path": "apps/platform/src/features/motion/geometry.ts",
+      "mode": "100644",
+      "blob": "eff3908320cae01ad8c48066a35bdf2cfc26d11d"
+    },
+    {
+      "path": "apps/platform/src/features/motion/sharedFeatures.ts",
+      "mode": "100644",
+      "blob": "69ca82b7d2fda67e7aa09e8cb3f5f4085eca778e"
+    },
+    {
+      "path": "apps/platform/src/features/motion/types.ts",
+      "mode": "100644",
+      "blob": "b7c19fcd939658dbc1afba921f7eb3c1c2b1d392"
+    },
+    {
+      "path": "apps/platform/src/features/onboarding/onboarding.ts",
+      "mode": "100644",
+      "blob": "6eaf68125cc2be843c445f855a423a1c216143d2"
+    },
+    {
+      "path": "apps/platform/src/features/pose/PoseDetector.ts",
+      "mode": "100644",
+      "blob": "31f4f77cc5378f6f675a9092bf09189862d05ec0"
+    },
+    {
+      "path": "apps/platform/src/features/pose/PoseFilter.ts",
+      "mode": "100644",
+      "blob": "91b1ff88c9bc46554f13549e84611d10c2c8ad44"
+    },
+    {
+      "path": "apps/platform/src/features/pose/PoseNormalizer.ts",
+      "mode": "100644",
+      "blob": "b5db8e8bac5c3a33a9c84254541210728ebf2cdf"
+    },
+    {
+      "path": "apps/platform/src/features/pose/fitMapping.ts",
+      "mode": "100644",
+      "blob": "0585ac49d5727a5116b4ffe37646beb55725e356"
+    },
+    {
+      "path": "apps/platform/src/features/pose/poseOverlayVisibility.ts",
+      "mode": "100644",
+      "blob": "d9f53fe4a8799a4aa8f8af537849aefd49bdc74f"
+    },
+    {
+      "path": "apps/platform/src/features/pose/types.ts",
+      "mode": "100644",
+      "blob": "3fa840eefe720a72afad628e771dec019560256f"
+    },
+    {
+      "path": "apps/platform/src/features/referencePose/coachAssetValidation.ts",
+      "mode": "100644",
+      "blob": "7093e6f41df1182285a6c74bfb28af385ed4d5aa"
+    },
+    {
+      "path": "apps/platform/src/features/referencePose/definitions.ts",
+      "mode": "100644",
+      "blob": "bdd17eeeefa04d514131cd31cb69f7241687e7b7"
+    },
+    {
+      "path": "apps/platform/src/features/referencePose/mirrorReferencePose.ts",
+      "mode": "100644",
+      "blob": "b0664d87a13e9889dc1217036b83764b82545430"
+    },
+    {
+      "path": "apps/platform/src/features/referencePose/types.ts",
+      "mode": "100644",
+      "blob": "283cd1c24c49f050395b47b7b57641337eb851e5"
+    },
+    {
+      "path": "apps/platform/src/features/report/TrainingReportBuilder.ts",
+      "mode": "100644",
+      "blob": "615b5ed8bc3b6ffb502996b517f03f3765aa40d8"
+    },
+    {
+      "path": "apps/platform/src/features/report/capabilityAggregation.ts",
+      "mode": "100644",
+      "blob": "6e8c6b927bce1ebac6fd848faf323715d00d8d45"
+    },
+    {
+      "path": "apps/platform/src/features/report/issueAggregation.ts",
+      "mode": "100644",
+      "blob": "7d953110bf20d3d19a79215c509313564b5660af"
+    },
+    {
+      "path": "apps/platform/src/features/report/presentation.ts",
+      "mode": "100644",
+      "blob": "4de7a9cbdba7914321ff4b001546c249d948a09e"
+    },
+    {
+      "path": "apps/platform/src/features/report/recommendationRules.ts",
+      "mode": "100644",
+      "blob": "dcd2fc2865391782949338df09f2e71965798896"
+    },
+    {
+      "path": "apps/platform/src/features/report/types.ts",
+      "mode": "100644",
+      "blob": "f9e3dc404f64ada0b1b2ef402e5411cab93057aa"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/RoutineAnalysisEngine.ts",
+      "mode": "100644",
+      "blob": "7ecf893dafd4a3e2447fe6bdd244018f09055847"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/analysisRecord.ts",
+      "mode": "100644",
+      "blob": "ff154cbfb5a81f7e51ef1fb746d5d5030be04cbe"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/baduanjin/BaduanjinAnalyzer.ts",
+      "mode": "100644",
+      "blob": "03cd8ecf23b2ab7f34ce1c94f5df0b56eeec149b"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/baduanjin/config.ts",
+      "mode": "100644",
+      "blob": "b832733f8b425329744ec93a6550295a6fb852ce"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/baduanjin/features.ts",
+      "mode": "100644",
+      "blob": "2b8e158b0c20fa0edcc1061c399d2016bdee3d2d"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/baduanjin/steps.ts",
+      "mode": "100644",
+      "blob": "8c2d3b4a5d33e5b432d4a187efaabc087d6330ec"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/bodyFrame.ts",
+      "mode": "100644",
+      "blob": "f9c4940ea13b84a0195014dd3e26ed422521329f"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/format.ts",
+      "mode": "100644",
+      "blob": "1e1264806c56875d3b4ca2ca3d0fb78a1b4b39ca"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/reference.ts",
+      "mode": "100644",
+      "blob": "b9c4b86fe063a80dcce6e61b16f6d1deb3fc8020"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/registry.ts",
+      "mode": "100644",
+      "blob": "7830c8def6bf84a6d862440d54eb5feda25ab9f8"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/selfCheckConfig.ts",
+      "mode": "100644",
+      "blob": "7428ddb0fb73cb1d705a6a3c4b3ec25824694c71"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/signal.ts",
+      "mode": "100644",
+      "blob": "69b2b56c0137cfcafe35c518e6b15a575a28c2ee"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/taijiquan/TaijiquanAnalyzer.ts",
+      "mode": "100644",
+      "blob": "49750ce6a18264e060677f11435186521dca7c0b"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/taijiquan/config.ts",
+      "mode": "100644",
+      "blob": "7fa5dc531b48a54073ab81e2f5024b663f3cd3b6"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/taijiquan/features.ts",
+      "mode": "100644",
+      "blob": "9b81ab0ef982f87545ecd87f289d8ca7f8fd928e"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/taijiquan/steps.ts",
+      "mode": "100644",
+      "blob": "3ae2685f1d5e20a32144861e6d6a5d665005ab22"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/timeWindow.ts",
+      "mode": "100644",
+      "blob": "31105181b6ee5b943270561f419b6f74bb267e1b"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/types.ts",
+      "mode": "100644",
+      "blob": "2cdd83ba9b5914f2e61af696ab75542df054f0cc"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/wuqinxi/WuqinxiAnalyzer.ts",
+      "mode": "100644",
+      "blob": "4b1ec437f984474d19608764bd3f68101f5b1d1a"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/wuqinxi/config.ts",
+      "mode": "100644",
+      "blob": "858fd12cfde12d14665bcb0896d6859fd1724c8b"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/wuqinxi/features.ts",
+      "mode": "100644",
+      "blob": "02d4cddbfb226d1a84a577f64bde5c9dc0c0a829"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/wuqinxi/steps.ts",
+      "mode": "100644",
+      "blob": "03ce3e4bb0cf86d7d8e86f7273bbe589bb3b1812"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/yijinjing/YijinjingAnalyzer.ts",
+      "mode": "100644",
+      "blob": "18dca135bdd3fad204d69e86f6d7b75da06c67dd"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/yijinjing/config.ts",
+      "mode": "100644",
+      "blob": "3b6de2e71ee60490c44347f885d0fdfe1846cb1c"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/yijinjing/features.ts",
+      "mode": "100644",
+      "blob": "36b347be232cf9e832807b3834de919f0c94b5c7"
+    },
+    {
+      "path": "apps/platform/src/features/routines/analyzers/yijinjing/steps.ts",
+      "mode": "100644",
+      "blob": "55b8e42a2af1a28cb8cefba80a96e8f494cdb32e"
+    },
+    {
+      "path": "apps/platform/src/features/routines/followAlong/feedbackPolicy.ts",
+      "mode": "100644",
+      "blob": "49135d0c401d761d587bf4da5a00811d68585549"
+    },
+    {
+      "path": "apps/platform/src/features/routines/followAlong/liveChecks.ts",
+      "mode": "100644",
+      "blob": "bf737a70735b5f6cc9c2c84336a0e2c02713a282"
+    },
+    {
+      "path": "apps/platform/src/features/routines/followAlong/matcher.ts",
+      "mode": "100644",
+      "blob": "caf86d1674f9b9bf616cd1611a43388d9e01deb5"
+    },
+    {
+      "path": "apps/platform/src/features/routines/followAlong/referencePoseFrame.ts",
+      "mode": "100644",
+      "blob": "017b326c3f62568ce8ce1c93d3efa719563b855c"
+    },
+    {
+      "path": "apps/platform/src/features/routines/followAlong/referenceTrack.ts",
+      "mode": "100644",
+      "blob": "6db3e96c4d267e67701f98f3403f5a943e0a2c3a"
+    },
+    {
+      "path": "apps/platform/src/features/routines/programs.ts",
+      "mode": "100644",
+      "blob": "13339330be853ce28c21a06b00ecf9ac76adec7e"
+    },
+    {
+      "path": "apps/platform/src/features/routines/report/routineReport.ts",
+      "mode": "100644",
+      "blob": "219c890d1b18474a50e078a52a29980940e5f1a3"
+    },
+    {
+      "path": "apps/platform/src/features/routines/routineCourse.ts",
+      "mode": "100644",
+      "blob": "6a8faab3f0e8d3940622691ae35d6e6ac09ade95"
+    },
+    {
+      "path": "apps/platform/src/features/routines/scope.ts",
+      "mode": "100644",
+      "blob": "31506cf52300d31a9583650b0525798da1c6d3e5"
+    },
+    {
+      "path": "apps/platform/src/features/routines/session/RoutineProgressRecorder.ts",
+      "mode": "100644",
+      "blob": "39b105d0e01024babb057f479c33ecca53eedde5"
+    },
+    {
+      "path": "apps/platform/src/features/routines/session/RoutineSessionRepository.ts",
+      "mode": "100644",
+      "blob": "3bb3c7dd3c66ec3e0fd73fb9efec137900ebc2de"
+    },
+    {
+      "path": "apps/platform/src/features/routines/session/types.ts",
+      "mode": "100644",
+      "blob": "213679e350518fbbb0699c84799b178ced7e1a7c"
+    },
+    {
+      "path": "apps/platform/src/features/routines/types.ts",
+      "mode": "100644",
+      "blob": "b8f1c192b7ed0cf52859e88058e2225becf7e2c9"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/criteria/baduanjin.ts",
+      "mode": "100644",
+      "blob": "7180a45379fc48bd74233a1a8857566a0a5b3c71"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/criteria/define.ts",
+      "mode": "100644",
+      "blob": "0e325b0375b54ab7e85aa517ce9045cfdd028bc2"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/criteria/index.ts",
+      "mode": "100644",
+      "blob": "e29b04e9e1a9a448d77dff6ba71c5dc6e95ca2b1"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/criteria/routineHelpers.ts",
+      "mode": "100644",
+      "blob": "3e9828c72fe26f50ebdbd7497dcf7edde30e7546"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/criteria/taijiquan.ts",
+      "mode": "100644",
+      "blob": "df398f309592b0d8509e9043e7a8ad823662a60d"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/criteria/warmUp.ts",
+      "mode": "100644",
+      "blob": "640db8e0600101d557c73511afe54340dded5555"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/criteria/wuqinxi.ts",
+      "mode": "100644",
+      "blob": "18d6de715ee72507bb528efc929f7697c8a84ef3"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/criteria/yijinjing.ts",
+      "mode": "100644",
+      "blob": "8ca89c80b85f880127eeb41d439a6f8e1ad7c507"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/index.ts",
+      "mode": "100644",
+      "blob": "5045872a23114c780515fe11f6b74004b23f2e5d"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/presentation.ts",
+      "mode": "100644",
+      "blob": "b8386db0ea4fa700bb02e67396031fae07ad1b32"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/routine/RoutineTechniqueEvaluator.ts",
+      "mode": "100644",
+      "blob": "34f49bc55f8fe3fdbceedca5b101fa63cec6471d"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/routine/phaseWindows.ts",
+      "mode": "100644",
+      "blob": "c8d65706f0d163ec45d039c87c43cb59f961432b"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/routine/poseMetrics.ts",
+      "mode": "100644",
+      "blob": "0f28c2e0054f7309b856c81543fe0155020d2c86"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/routine/techniqueRecord.ts",
+      "mode": "100644",
+      "blob": "69c762a4a1d91cc59395e8727e6e115b3231797c"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/routine/techniqueReport.ts",
+      "mode": "100644",
+      "blob": "6fffa185fd7804c347a86cb8b29c92b47c028a9f"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/scoringBasis.ts",
+      "mode": "100644",
+      "blob": "3ef4b5ef67d604b562f82c2034dcbf2f323034ce"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/sources.ts",
+      "mode": "100644",
+      "blob": "bb29486e8de675a7684d4de8708a9f6e62c0864b"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/targetScore.ts",
+      "mode": "100644",
+      "blob": "ea265182e4968a64d9db886688de38e336476f03"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/types.ts",
+      "mode": "100644",
+      "blob": "cb0306915a4c327b8739f8d0a95d881f898379cd"
+    },
+    {
+      "path": "apps/platform/src/features/scoring/warmUp/explainWarmUp.ts",
+      "mode": "100644",
+      "blob": "d04d626410d7591f85dcc86b51bdb144a4dc5fd6"
+    },
+    {
+      "path": "apps/platform/src/features/training/LocalStorageTrainingSessionRepository.ts",
+      "mode": "100644",
+      "blob": "915ad6472b9752cd3b4949d7578a9c17557fcf21"
+    },
+    {
+      "path": "apps/platform/src/features/training/MemoryTrainingSessionRepository.ts",
+      "mode": "100644",
+      "blob": "997bb75e3a26938eccff3f75c1babe0c409a0f9a"
+    },
+    {
+      "path": "apps/platform/src/features/training/TrainingSession.ts",
+      "mode": "100644",
+      "blob": "429b83aa102355073c3adb19cae3cd2fce19f485"
+    },
+    {
+      "path": "apps/platform/src/features/training/TrainingSessionRepository.ts",
+      "mode": "100644",
+      "blob": "b1b1a20bd22cf271ab8dbf6f68f8763c4e6f917a"
+    },
+    {
+      "path": "apps/platform/src/features/training/feedbackCounts.ts",
+      "mode": "100644",
+      "blob": "73a712d3c36b4255dd095ba96ef4ac2d8e85a317"
+    },
+    {
+      "path": "apps/platform/src/features/training/trainingExit.ts",
+      "mode": "100644",
+      "blob": "877f00fc6ccd52700251b47f7cc66a501561c125"
+    },
+    {
+      "path": "apps/platform/src/features/training/trainingMode.ts",
+      "mode": "100644",
+      "blob": "b9a814748061b6b76ebec1a96389035461e2fe11"
+    },
+    {
+      "path": "apps/platform/src/features/training/trainingScope.ts",
+      "mode": "100644",
+      "blob": "f05b9a47d613454023a5406d562860f5ec3b01eb"
+    },
+    {
+      "path": "apps/platform/src/features/training/types.ts",
+      "mode": "100644",
+      "blob": "f661f1944a65e543b4437657e08f252193974fb7"
+    },
+    {
+      "path": "apps/platform/src/features/voice/EncouragementPolicy.ts",
+      "mode": "100644",
+      "blob": "c068b76f54a14b9a996d7e1ce94ea54ad8f14a92"
+    },
+    {
+      "path": "apps/platform/src/features/voice/VoiceGuidePolicy.ts",
+      "mode": "100644",
+      "blob": "c398a009c81080566ed4ab51010db5a9e982e7f5"
+    },
+    {
+      "path": "apps/platform/src/features/web/games.ts",
+      "mode": "100644",
+      "blob": "ac2ef29f9704f15180dff92d2f9f7adb11e991f2"
+    },
+    {
+      "path": "apps/platform/src/features/web/webHistory.ts",
+      "mode": "100644",
+      "blob": "f685b81712e10a3030d16eae9ef192dade69ddc9"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/catalog.ts",
+      "mode": "100644",
+      "blob": "c49e403cc57e07b01d16d6e15372b6665ea97c4c"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/customCourse.ts",
+      "mode": "100644",
+      "blob": "cc38e06268f45ff93111076baef80d81d8c3b7ef"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/definition.ts",
+      "mode": "100644",
+      "blob": "cbc48317c58b845832015a582c6bccc945df051f"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/detector.ts",
+      "mode": "100644",
+      "blob": "b746d4cef2c7f8c6175bacdd4e6dcc739e77f9f7"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/download.ts",
+      "mode": "100644",
+      "blob": "ebd4f27a9b07b4aaaaecac46a970757a554667d4"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/fixture.ts",
+      "mode": "100644",
+      "blob": "c2a03f79aae960b34d6d5cb31a4a1c2460110d9f"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/recognition/capture.ts",
+      "mode": "100644",
+      "blob": "e5b6f7b95b97ec784e3bce0d974599b7145009df"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/recognition/continuous.ts",
+      "mode": "100644",
+      "blob": "b14298d14b9d9d507d544f1a69e7e42e891fd809"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/recognition/geometry.ts",
+      "mode": "100644",
+      "blob": "42c42dd616f712d982182073b39dc8a89ea6ef1a"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/recognition/poseMatch.ts",
+      "mode": "100644",
+      "blob": "93b56e01337902a115fbf051e604d74d7d89dd0d"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/recognition/recognizer.ts",
+      "mode": "100644",
+      "blob": "ef0574d0b6a55de2d7d7f402d4a59335f07f2cbe"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/recognition/requirements.ts",
+      "mode": "100644",
+      "blob": "bad726080331d0fa9e23883e1584bb0248d27aea"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/recognition/templateSignal.ts",
+      "mode": "100644",
+      "blob": "625b6f00c799cdd8c82853f7bf9acd276f386e45"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/recognition/templates.ts",
+      "mode": "100644",
+      "blob": "40513d4549b508b70d5bc1052803414207ee2a51"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/recognition/temporalPrototype.ts",
+      "mode": "100644",
+      "blob": "8f07795b08de8b530732b9ff26f405d10fedfac0"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/report.ts",
+      "mode": "100644",
+      "blob": "a3abdde1da7e1fc3f8dfa5142d499d6b2606a24e"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/session.ts",
+      "mode": "100644",
+      "blob": "7d685bb0fb0103bfab3b9db0a5a43ab96207e308"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/store.ts",
+      "mode": "100644",
+      "blob": "5c60ae5ae36ddeeb4ca7e3a465d6ce5005b33c1b"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/transfer.ts",
+      "mode": "100644",
+      "blob": "8901deb88c2b24624233b00070b2d12eea258320"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/types.ts",
+      "mode": "100644",
+      "blob": "0217112b6965b7b3b29ae888f9188e90d9220580"
+    },
+    {
+      "path": "apps/platform/src/features/workshop/videoCapture.ts",
+      "mode": "100644",
+      "blob": "daca6f5f68ab73d6dcafeceb13ec75c4644692af"
+    },
+    {
+      "path": "apps/platform/src/lib/cn.ts",
+      "mode": "100644",
+      "blob": "b057456de7ac0907f5f4bb742f1baa3520e9c11f"
+    },
+    {
+      "path": "apps/platform/src/main.tsx",
+      "mode": "100644",
+      "blob": "32ef1099ecab2aa25c99a19846ad0902d3066b18"
+    },
+    {
+      "path": "apps/platform/src/pages/History/CustomActionHistoryCard.tsx",
+      "mode": "100644",
+      "blob": "53f3767584ecee4e613c37ae9757e4eaff6fba50"
+    },
+    {
+      "path": "apps/platform/src/pages/History/RoutineHistoryCard.tsx",
+      "mode": "100644",
+      "blob": "e76d0a3c742f443dec578f60fb816323fbcbd79a"
+    },
+    {
+      "path": "apps/platform/src/pages/History/TrainingHistoryPage.tsx",
+      "mode": "100644",
+      "blob": "526a41e62a583e2a018043188b2913c2e3a2ed45"
+    },
+    {
+      "path": "apps/platform/src/pages/Home/HomePage.tsx",
+      "mode": "100644",
+      "blob": "0769e0cfe3ff18e8d041f27c798a38ffc0d3c43a"
+    },
+    {
+      "path": "apps/platform/src/pages/Report/CustomActionReportView.tsx",
+      "mode": "100644",
+      "blob": "93a18890d638561cf7ece33e16201c287de015aa"
+    },
+    {
+      "path": "apps/platform/src/pages/Report/RoutineAnalyzerSection.tsx",
+      "mode": "100644",
+      "blob": "1a2813f32cd00467cc348a538d830b24ed572e9f"
+    },
+    {
+      "path": "apps/platform/src/pages/Report/RoutineReportView.tsx",
+      "mode": "100644",
+      "blob": "615f6128f5123895ac24ee13cc92df9768ff8d60"
+    },
+    {
+      "path": "apps/platform/src/pages/Report/TrainingReportPage.tsx",
+      "mode": "100644",
+      "blob": "3fdfc0265a6344f02055971f3995a0490de2ecc5"
+    },
+    {
+      "path": "apps/platform/src/pages/Report/reportPresentation.ts",
+      "mode": "100644",
+      "blob": "8c9e905a75e577646c0e0e21fb1429cd168515ae"
+    },
+    {
+      "path": "apps/platform/src/pages/Report/reportShell.tsx",
+      "mode": "100644",
+      "blob": "3e13fc2da573d37266399b9e816edda0e180da46"
+    },
+    {
+      "path": "apps/platform/src/pages/Report/scoreExplanation.tsx",
+      "mode": "100644",
+      "blob": "4be28e74c71b0f716cd17492ba510b45d42f608f"
+    },
+    {
+      "path": "apps/platform/src/pages/Report/useCustomActionReport.ts",
+      "mode": "100644",
+      "blob": "7f335be1d5d0c80f19da36e7b9f33a253ee8ddf4"
+    },
+    {
+      "path": "apps/platform/src/pages/Report/useRoutineReport.ts",
+      "mode": "100644",
+      "blob": "48c6ed8298a132e94ca45a561a5c474a2fe36796"
+    },
+    {
+      "path": "apps/platform/src/pages/Report/useTrainingReportAnalysis.ts",
+      "mode": "100644",
+      "blob": "e690e20509d783c76baf4a63367eda434065bedb"
+    },
+    {
+      "path": "apps/platform/src/pages/Routines/RoutineCompleteDialog.tsx",
+      "mode": "100644",
+      "blob": "b4cb89735928f44e81e6c6d5a8beb4297c34abd3"
+    },
+    {
+      "path": "apps/platform/src/pages/Routines/RoutineEntryPage.tsx",
+      "mode": "100644",
+      "blob": "4485c2fd00f6f1b492ef125b66d114ad184e2b48"
+    },
+    {
+      "path": "apps/platform/src/pages/Routines/RoutineRoutePage.tsx",
+      "mode": "100644",
+      "blob": "460f302cb876e4654c227a3ec52cb7f270726233"
+    },
+    {
+      "path": "apps/platform/src/pages/Routines/RoutineTrainingPage.tsx",
+      "mode": "100644",
+      "blob": "2bca7c4af205b04a58c3d7cfbe2169f7b75ee8b8"
+    },
+    {
+      "path": "apps/platform/src/pages/Routines/RoutinesIndexPage.tsx",
+      "mode": "100644",
+      "blob": "50dcb1daffe3f2ed019db176f151ec91d5dfd816"
+    },
+    {
+      "path": "apps/platform/src/pages/Routines/useRoutineRuntime.ts",
+      "mode": "100644",
+      "blob": "f7563176df64dcbb758b14bab64de02f7d66d5e5"
+    },
+    {
+      "path": "apps/platform/src/pages/SmartTraining/SmartTrainingPage.tsx",
+      "mode": "100644",
+      "blob": "3c3a49a0bc3596e0bb7f22ad7f4e5cfeed2c55c0"
+    },
+    {
+      "path": "apps/platform/src/pages/SmartTraining/freeTrainingOptions.ts",
+      "mode": "100644",
+      "blob": "9e84da7a37995f76ca0e5aa405c93ac600eacd9c"
+    },
+    {
+      "path": "apps/platform/src/pages/Training/SessionCompleteDialog.tsx",
+      "mode": "100644",
+      "blob": "7684a9197234913c14ad4e4766c54f944a6cf714"
+    },
+    {
+      "path": "apps/platform/src/pages/Training/TrainingPage.tsx",
+      "mode": "100644",
+      "blob": "fd6b43e14ed090be30e8476c08ab6e6dfe5ad7dd"
+    },
+    {
+      "path": "apps/platform/src/pages/Training/useTrainingRuntime.ts",
+      "mode": "100644",
+      "blob": "4c8a8e59e8e41e75e8fad8daf8dee45eef90246c"
+    },
+    {
+      "path": "apps/platform/src/pages/Web/CoachPage.tsx",
+      "mode": "100644",
+      "blob": "bd674dbe155bb9f2a67173a1afd12469b43c08f3"
+    },
+    {
+      "path": "apps/platform/src/pages/Web/GamesCenterPage.tsx",
+      "mode": "100644",
+      "blob": "2ad0c1cd0274260ef3f2f3977add68a1d12a1110"
+    },
+    {
+      "path": "apps/platform/src/pages/Web/HomeV1Page.tsx",
+      "mode": "100644",
+      "blob": "1acb7a4a0dcf85b81692ad42061f188c7483e13e"
+    },
+    {
+      "path": "apps/platform/src/pages/Web/MePage.tsx",
+      "mode": "100644",
+      "blob": "9c23aa85e07f452e1b33474b9c360edb7a01685d"
+    },
+    {
+      "path": "apps/platform/src/pages/Web/RoutinesV1Page.tsx",
+      "mode": "100644",
+      "blob": "9586e37b1678984b0b23c8066a54ccdbccb2211a"
+    },
+    {
+      "path": "apps/platform/src/pages/Web/SettingsPage.tsx",
+      "mode": "100644",
+      "blob": "0ec1d9b46e5ddf9b9ebfe42fa1ab40ad1592e29f"
+    },
+    {
+      "path": "apps/platform/src/pages/Web/TrainingCenterPage.tsx",
+      "mode": "100644",
+      "blob": "7609902bc416e82dd92f86fe974ed674aa571b6e"
+    },
+    {
+      "path": "apps/platform/src/pages/Web/webParts.tsx",
+      "mode": "100644",
+      "blob": "b5fb885cdbc7061b7d04c7f81ad09f5750ae7593"
+    },
+    {
+      "path": "apps/platform/src/pages/Workshop/ActionEditorPage.tsx",
+      "mode": "100644",
+      "blob": "d1b2842966342a149043dabe73eda649d3192829"
+    },
+    {
+      "path": "apps/platform/src/pages/Workshop/CustomActionTrainingPage.tsx",
+      "mode": "100644",
+      "blob": "e227ffa5446b29a0663bd364c9260a0c243f9ed3"
+    },
+    {
+      "path": "apps/platform/src/pages/Workshop/WorkshopHomePage.tsx",
+      "mode": "100644",
+      "blob": "8cd56ad691dcaeb73a262f84a17121d0b1441aa4"
+    },
+    {
+      "path": "apps/platform/src/pages/Workshop/WorkshopRoutePage.tsx",
+      "mode": "100644",
+      "blob": "951fb9279e36edefe5e239b65565db8834819710"
+    },
+    {
+      "path": "apps/platform/src/pages/Workshop/editorSteps.tsx",
+      "mode": "100644",
+      "blob": "edb5ba42d86d4b1ffaeaa5745ea5e40077fc6ad2"
+    },
+    {
+      "path": "apps/platform/src/pages/Workshop/useCustomActionRuntime.ts",
+      "mode": "100644",
+      "blob": "1f5252496726a6bba3286811d89f4a7698a4fc7f"
+    },
+    {
+      "path": "apps/platform/src/pages/Workshop/useWorkshopCamera.ts",
+      "mode": "100644",
+      "blob": "fb3b5f80522b374b994d3361ca1fef4e4b33db1a"
+    },
+    {
+      "path": "apps/platform/src/publicDemo/PublicDemoApp.tsx",
+      "mode": "100644",
+      "blob": "7cedfb209cfa1717f2a8b09e4ce6572addf5980c"
+    },
+    {
+      "path": "apps/platform/src/publicDemo/syntheticDataset.ts",
+      "mode": "100644",
+      "blob": "6e90729ab77b07f5a1df210afd71ba94881df3da"
+    },
+    {
+      "path": "apps/platform/src/styles/immersive.css",
+      "mode": "100644",
+      "blob": "d69a31077c1f7be52774fb76d7e9b8ae3883e88f"
+    },
+    {
+      "path": "apps/platform/src/styles/index.css",
+      "mode": "100644",
+      "blob": "093bd5295c24a44bee47b48508530a5aeed4f7ee"
+    },
+    {
+      "path": "apps/platform/src/styles/web-v1-platform.css",
+      "mode": "100644",
+      "blob": "e0774ad4fc734a65cd5d9aa496232643f68a83fa"
+    },
+    {
+      "path": "apps/platform/src/styles/web-v1.css",
+      "mode": "100644",
+      "blob": "9d55f087f0c9fd7a1fe82253d182abacacc2da45"
+    },
+    {
+      "path": "apps/platform/src/vite-env.d.ts",
+      "mode": "100644",
+      "blob": "11f02fe2a0061d6e6e1f271b21da95423b448b32"
+    },
+    {
+      "path": "apps/platform/tests/ai-coach-dock-identity.test.ts",
+      "mode": "100644",
+      "blob": "e99893f042c40bde6a14166460b3e518f887f160"
+    },
+    {
+      "path": "apps/platform/tests/ai-coach.test.ts",
+      "mode": "100644",
+      "blob": "1577eb541e32085939e6565fe32ff43234842c05"
+    },
+    {
+      "path": "apps/platform/tests/analysis-fixtures.ts",
+      "mode": "100644",
+      "blob": "63b472981860ec64b4cd87f7000ae55b14f7b800"
+    },
+    {
+      "path": "apps/platform/tests/app-icon.test.ts",
+      "mode": "100644",
+      "blob": "d24cb7e423504e0ace002f6c25a4c723e47b3dba"
+    },
+    {
+      "path": "apps/platform/tests/body-framing.test.ts",
+      "mode": "100644",
+      "blob": "dcd3309f036f18e1f9dd955b9c71add1f0f54d08"
+    },
+    {
+      "path": "apps/platform/tests/browser-speech-adapter.test.ts",
+      "mode": "100644",
+      "blob": "69a851af5735ea56a733d17a8b79537c7994f4ae"
+    },
+    {
+      "path": "apps/platform/tests/calibration-analyzer.test.ts",
+      "mode": "100644",
+      "blob": "c121357082c5cf27946f68e31410bc25770b489b"
+    },
+    {
+      "path": "apps/platform/tests/camera-countdown.test.ts",
+      "mode": "100644",
+      "blob": "7b6dd4c2d88e9fb8229c3fc10480847dad26f789"
+    },
+    {
+      "path": "apps/platform/tests/camera-error-presentation.test.ts",
+      "mode": "100644",
+      "blob": "36b6ed49dcff67489dc612420fbb9ea5a6ea13df"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-bridge-v12.test.ts",
+      "mode": "100644",
+      "blob": "d5b3a0e264139ec8820769d98da1acafa5014364"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-contracts.test.ts",
+      "mode": "100644",
+      "blob": "f82f66c5503f5fd33016407794c3dbfcae646821"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-demo-gateway.test.ts",
+      "mode": "100644",
+      "blob": "324e1134c88271ce03255d9b8dbea3d963318ae3"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-demo.test.ts",
+      "mode": "100644",
+      "blob": "cf78ddc3cbf0fde21ea8f512a91cc6fa43e6c6d2"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-dispatcher.test.ts",
+      "mode": "100644",
+      "blob": "4ee83cd03ac5f1de698f92f906dd8eb6e9223a81"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-lab.test.ts",
+      "mode": "100644",
+      "blob": "97c7931d091e877083b9254bf38b26fa498aa5f7"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-local-provider.test.ts",
+      "mode": "100644",
+      "blob": "293bf76c74bb71fdb4906e711bb68565ca3a2c35"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-orchestrator.test.ts",
+      "mode": "100644",
+      "blob": "c3280ca40f2aa1814612e693be118f8ead1aef5d"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-protocol-evaluation.test.ts",
+      "mode": "100644",
+      "blob": "6f771c783bf2bcade2c9d6e7632376fa18027848"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-protocol-http.test.ts",
+      "mode": "100644",
+      "blob": "73036b4bed07213c70e30c3a6ec19d019941c937"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-protocol-v2.test.ts",
+      "mode": "100644",
+      "blob": "026e1022bd208a996998bd483c0dc90b8b66a662"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-question-admission.test.ts",
+      "mode": "100644",
+      "blob": "5528d3fd0937b77a4512a8e00daac142a02d402b"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-question-projection.test.ts",
+      "mode": "100644",
+      "blob": "ec052389d3be0b567f9ddb74d8c64856762c836a"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-qwen4b-budget.test.ts",
+      "mode": "100644",
+      "blob": "cb89d1921c6218c2e89b410fb6a114025fd92bd6"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-qwen4b-config.test.ts",
+      "mode": "100644",
+      "blob": "95bf90a81e1050b415c5a0d1f24e8b7a80a13a4c"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-recommendation.test.ts",
+      "mode": "100644",
+      "blob": "3c948c116b25960f8dbb02b9e4155e9c22374b8d"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-remote-demo.test.ts",
+      "mode": "100644",
+      "blob": "93c8973fb4c9b559c09cc19c8edfaf0ff937087c"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-remote-fixtures.ts",
+      "mode": "100644",
+      "blob": "0c57f4d09cc65bf4942a1bb99879ab98d48cb775"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-remote-provider.test.ts",
+      "mode": "100644",
+      "blob": "613649b3cc2b4a02f6da8d8b824f2fe4d379dc2d"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-routine-reader.test.ts",
+      "mode": "100644",
+      "blob": "26544bd725494ec57208e56ba7ffbfe4a9ddc1dd"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-server.test.ts",
+      "mode": "100644",
+      "blob": "384374dfbeeb204c0b24f87ba3337c78f08504df"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-session-reader.test.ts",
+      "mode": "100644",
+      "blob": "39be9cc48b4a52d84f551bc786a439fd291e3e63"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-trusted-calling.test.ts",
+      "mode": "100644",
+      "blob": "1d9bfdea096ae91532e290072987021b00d260cd"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-warmup-reader.test.ts",
+      "mode": "100644",
+      "blob": "b19f25d3c4b0809401df460b4407a18a00dd7600"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-web-empty.test.ts",
+      "mode": "100644",
+      "blob": "d2b62a214c0647cd471f7e434fec0741d6100a1f"
+    },
+    {
+      "path": "apps/platform/tests/coach-agent-web-service.test.ts",
+      "mode": "100644",
+      "blob": "d55cd7460822ce7cbfc797e02b39d6ad12e370b7"
+    },
+    {
+      "path": "apps/platform/tests/coach-asset-validation.test.ts",
+      "mode": "100644",
+      "blob": "e65ffa4ebdd26d2c5ff76a76c0f60c4cee0d8311"
+    },
+    {
+      "path": "apps/platform/tests/coach-avatar.test.ts",
+      "mode": "100644",
+      "blob": "d307dcf781f5f89ca24bb38aedc017d714a6bc72"
+    },
+    {
+      "path": "apps/platform/tests/coach-card-state-resolver.test.ts",
+      "mode": "100644",
+      "blob": "4a3a0e163c05dc90649afd22a3a47d8a9a1a1227"
+    },
+    {
+      "path": "apps/platform/tests/coach-cdm.test.ts",
+      "mode": "100644",
+      "blob": "1ad760d3236a9c0d96d70ec234913b9a4111b8bd"
+    },
+    {
+      "path": "apps/platform/tests/coach-correction-presentation.test.ts",
+      "mode": "100644",
+      "blob": "1beaac8648896e3ef86b4d87e20292cb61a31fd1"
+    },
+    {
+      "path": "apps/platform/tests/coach-decision-engine.test.ts",
+      "mode": "100644",
+      "blob": "098e5d70e618f393cd9a31ad3effaf9bd513969d"
+    },
+    {
+      "path": "apps/platform/tests/coach-decision-model-descriptors.test.ts",
+      "mode": "100644",
+      "blob": "32270829c1708db0cb5a79b730cdb7a7af94c692"
+    },
+    {
+      "path": "apps/platform/tests/coach-decision-model.test.ts",
+      "mode": "100644",
+      "blob": "73124db58101670092a02d0268db78e6ec563ed4"
+    },
+    {
+      "path": "apps/platform/tests/coach-dock-state.test.ts",
+      "mode": "100644",
+      "blob": "06ba7ab6b77e9d7dd31b45cfc262540d673f4432"
+    },
+    {
+      "path": "apps/platform/tests/coach-llm-agent.test.ts",
+      "mode": "100644",
+      "blob": "af24d3e2432b8ae950e0f047d50c087fcb122ca8"
+    },
+    {
+      "path": "apps/platform/tests/coach-llm-guard-router.test.ts",
+      "mode": "100644",
+      "blob": "868b64ddfc013bc318ade35e36a32b51d513de16"
+    },
+    {
+      "path": "apps/platform/tests/coach-llm-retrieval.test.ts",
+      "mode": "100644",
+      "blob": "396d8b16df1fb99f563e2ddd68c85cac8b7882c5"
+    },
+    {
+      "path": "apps/platform/tests/coach-motion.test.ts",
+      "mode": "100644",
+      "blob": "797abecfe45e56301f6f3bac965067099cf78d84"
+    },
+    {
+      "path": "apps/platform/tests/coach-pose-anchor-mapping.test.ts",
+      "mode": "100644",
+      "blob": "2ae61137ed358157a3a0baf01567f8e5d4601c82"
+    },
+    {
+      "path": "apps/platform/tests/demo-presenter.test.ts",
+      "mode": "100644",
+      "blob": "25d85a36bf97a100d4e9e108131037984833b53c"
+    },
+    {
+      "path": "apps/platform/tests/demonstration-video.test.ts",
+      "mode": "100644",
+      "blob": "d40a0af0ae5495bbdceb82a2560b60ca67ccc6f7"
+    },
+    {
+      "path": "apps/platform/tests/diagnostics.test.ts",
+      "mode": "100644",
+      "blob": "bca42121170feb51927ec62cbf4566585fb1ed1c"
+    },
+    {
+      "path": "apps/platform/tests/e2e/ai-coach.spec.ts",
+      "mode": "100644",
+      "blob": "8c1c88b202bd4a898427946bd16d5766f33030fb"
+    },
+    {
+      "path": "apps/platform/tests/e2e/coach-agent-lab.spec.ts",
+      "mode": "100644",
+      "blob": "8ec4e4b1908b370da447df27e6598d734f813315"
+    },
+    {
+      "path": "apps/platform/tests/e2e/coach-agent-sprint.spec.ts",
+      "mode": "100644",
+      "blob": "128a0ce6e11afdde0fcaa5ba8ee76b09702a0cea"
+    },
+    {
+      "path": "apps/platform/tests/e2e/coach-avatar.spec.ts",
+      "mode": "100644",
+      "blob": "5ccc14a447cb912e00c61535f934b08c0f212bc4"
+    },
+    {
+      "path": "apps/platform/tests/e2e/compat-camera.spec.ts",
+      "mode": "100644",
+      "blob": "e87534b6a77d45dccc64de11c6b4718eba8758e8"
+    },
+    {
+      "path": "apps/platform/tests/e2e/compat.spec.ts",
+      "mode": "100644",
+      "blob": "1fab18f6ae3c019cea5c0d40e3445d09bbc84c3a"
+    },
+    {
+      "path": "apps/platform/tests/e2e/custom-training.spec.ts",
+      "mode": "100644",
+      "blob": "aac47ce55242710f7b72bfae63dcca3fedf3dcfe"
+    },
+    {
+      "path": "apps/platform/tests/e2e/framing-assist.spec.ts",
+      "mode": "100644",
+      "blob": "08c14bc66eeb57de815637b04f2f5461d1635ba0"
+    },
+    {
+      "path": "apps/platform/tests/e2e/history.spec.ts",
+      "mode": "100644",
+      "blob": "1cc50a141acc96715bc7fd8c91742969692d5c0d"
+    },
+    {
+      "path": "apps/platform/tests/e2e/human-smoke-ux-fix.spec.ts",
+      "mode": "100644",
+      "blob": "06b63fd1115c2db0549f21d4fc754d615320036c"
+    },
+    {
+      "path": "apps/platform/tests/e2e/jev-adaptive.spec.ts",
+      "mode": "100644",
+      "blob": "c9bfc9b3cd040a5c0a2cd4138e6b8004bb9969a5"
+    },
+    {
+      "path": "apps/platform/tests/e2e/performance.spec.ts",
+      "mode": "100644",
+      "blob": "3c108046c883af3eb3ebfea0f5f314f4fc2b10ca"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase4.spec.ts",
+      "mode": "100644",
+      "blob": "fc47fac72ff7389e252ffba2b7c5ca5c336994a9"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase5.spec.ts",
+      "mode": "100644",
+      "blob": "dafdc1a7ee4a0973f43f3e9a995e206a5be479cd"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase6a.spec.ts",
+      "mode": "100644",
+      "blob": "6ea04d595a550f7ceebf839830b00e54d5d91e7b"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase6b.spec.ts",
+      "mode": "100644",
+      "blob": "3f9c15dba6fe624655f9fff4c9710483b9ab0054"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase6c-evidence.spec.ts",
+      "mode": "100644",
+      "blob": "d60a8505e3cc160ff6a8b22621c03f134a4b2807"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase6c.spec.ts",
+      "mode": "100644",
+      "blob": "52a4507911857bfbe91dab6e9d485a11671d2c7e"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase8bc.spec.ts",
+      "mode": "100644",
+      "blob": "2b0a5cfdab2e2085df874fec9280610d8f8e937d"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase8d.spec.ts",
+      "mode": "100644",
+      "blob": "4165b00558e2bd888353d4e569e9022ece8b43e8"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase8d1.spec.ts",
+      "mode": "100644",
+      "blob": "6ee6bb6cb502706980c8e67aa6f488e379f8639f"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase8e.spec.ts",
+      "mode": "100644",
+      "blob": "4e74af0fae4e1955c2211905be7b3475989676bb"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase8e1-gesture.spec.ts",
+      "mode": "100644",
+      "blob": "d3c33dad01a591efde7837ea2b0d48abe33b02dc"
+    },
+    {
+      "path": "apps/platform/tests/e2e/phase8g-entry.spec.ts",
+      "mode": "100644",
+      "blob": "b65dcff655ec3a7e8da1e42cb547ed1b5ea67996"
+    },
+    {
+      "path": "apps/platform/tests/e2e/reference-audit.spec.ts",
+      "mode": "100644",
+      "blob": "5a767dece0935a626677fb67993d1bffc07903e8"
+    },
+    {
+      "path": "apps/platform/tests/e2e/reference-visual.spec.ts",
+      "mode": "100644",
+      "blob": "f25e5a69c6264e812b36033b0d3534f5fc8bec16"
+    },
+    {
+      "path": "apps/platform/tests/e2e/report-v2.spec.ts",
+      "mode": "100644",
+      "blob": "dd2ca9d37a7e5532e2379c0cd6c8ce45aa33886e"
+    },
+    {
+      "path": "apps/platform/tests/e2e/round2-usability.spec.ts",
+      "mode": "100644",
+      "blob": "8b2d842b03cf43e6c4fbe35eb9d532390cc34127"
+    },
+    {
+      "path": "apps/platform/tests/e2e/routine-analyzers.spec.ts",
+      "mode": "100644",
+      "blob": "0b99b9ca74d044f588467122712d981845507b0d"
+    },
+    {
+      "path": "apps/platform/tests/e2e/routine-layout.spec.ts",
+      "mode": "100644",
+      "blob": "4ac0a9f11d315282a006c62c6ec23b2c3a9c9c75"
+    },
+    {
+      "path": "apps/platform/tests/e2e/routines.spec.ts",
+      "mode": "100644",
+      "blob": "8ab61a46e36c5d1b8ba88618ce0df525262e124e"
+    },
+    {
+      "path": "apps/platform/tests/e2e/scoring-v2.spec.ts",
+      "mode": "100644",
+      "blob": "3d96f745f644b5fdcec2b0b8b3504d10579f508f"
+    },
+    {
+      "path": "apps/platform/tests/e2e/squat-dynamic-demo.spec.ts",
+      "mode": "100644",
+      "blob": "17a224c497f8e0956cae7bd621c5d520cb80c52b"
+    },
+    {
+      "path": "apps/platform/tests/e2e/support/onboarding.ts",
+      "mode": "100644",
+      "blob": "c3c37c606aeb497f8a1df6626adf609326e048ea"
+    },
+    {
+      "path": "apps/platform/tests/e2e/training-ui-polish.spec.ts",
+      "mode": "100644",
+      "blob": "42188c4baf35dff28ee8aecf6485d2d1ec5e2d49"
+    },
+    {
+      "path": "apps/platform/tests/e2e/training.spec.ts",
+      "mode": "100644",
+      "blob": "eba93578c9a78988c0defa51681be897afa078cb"
+    },
+    {
+      "path": "apps/platform/tests/e2e/visual.spec.ts",
+      "mode": "100644",
+      "blob": "00cb93d9dad2930214a87a7cfed5c76e4ba63e78"
+    },
+    {
+      "path": "apps/platform/tests/e2e/web-v1.spec.ts",
+      "mode": "100644",
+      "blob": "5a15117e1dd236f062ac119ddb0e245676eb2eec"
+    },
+    {
+      "path": "apps/platform/tests/e2e/web-v11-evidence.spec.ts",
+      "mode": "100644",
+      "blob": "791f9202ab5e709a66cb15460e267107ce0272d3"
+    },
+    {
+      "path": "apps/platform/tests/e2e/web-v12-agent.spec.ts",
+      "mode": "100644",
+      "blob": "0f98404c6cf46111e94d9eb6333453e5ad7024e1"
+    },
+    {
+      "path": "apps/platform/tests/e2e/workshop-video.spec.ts",
+      "mode": "100644",
+      "blob": "20066397b2c1d5a1aa8381f6780b66a3b8357578"
+    },
+    {
+      "path": "apps/platform/tests/e2e/workshop.spec.ts",
+      "mode": "100644",
+      "blob": "98651df6b424717871f9f3aebc74cf9be3eb8f1c"
+    },
+    {
+      "path": "apps/platform/tests/exercise-runtime.test.ts",
+      "mode": "100644",
+      "blob": "a63d7dc92562d92e6c858b6df121cfda431c2fa1"
+    },
+    {
+      "path": "apps/platform/tests/feature-extractor.test.ts",
+      "mode": "100644",
+      "blob": "e1a3f2f98aabe83ccb2b4cb30921432869be5e6d"
+    },
+    {
+      "path": "apps/platform/tests/feedback-policy.test.ts",
+      "mode": "100644",
+      "blob": "5311c8a84134b9c00c7d82112e930bfad88e34c2"
+    },
+    {
+      "path": "apps/platform/tests/feedback-recovery-event.test.ts",
+      "mode": "100644",
+      "blob": "8459bb2b7c67e74b80e1584bd8617f8fe806cdea"
+    },
+    {
+      "path": "apps/platform/tests/fit-mapping.test.ts",
+      "mode": "100644",
+      "blob": "648eada9670470d28c56ece9f6206a18b827761a"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/calibration/README.md",
+      "mode": "100644",
+      "blob": "5e8b8ebbbd2c7110819b226159f2361aadaa7218"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/calibration/manifest.json",
+      "mode": "100644",
+      "blob": "acb14b39cedad72482fa4c7ca8ca06cd831a3cd3"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/calibration/raw/P01-lateral-correct.json",
+      "mode": "100644",
+      "blob": "e78c8fef22be6f4f5bf2475a1a4f38ff2f51374e"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/calibration/raw/P01-lateral-right-low.json",
+      "mode": "100644",
+      "blob": "2d59231b14b39175af6677e7f744fea52125cbb5"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/calibration/raw/P02-step-correct.json",
+      "mode": "100644",
+      "blob": "f2f6f883f4fea3141fc85d2bd916346812337fc9"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/calibration/raw/P02-step-small.json",
+      "mode": "100644",
+      "blob": "02868e387b32382fd5bedd89386a3b928d2abd2c"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/routine-baseline/baduanjin.json",
+      "mode": "100644",
+      "blob": "a28aaee70e81d1f5ce9a66f761b9e05e3ff90e19"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/routine-baseline/taijiquan.json",
+      "mode": "100644",
+      "blob": "0d605911d5270b98bcd06305fb832278aae2be6a"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/routine-baseline/wuqinxi.json",
+      "mode": "100644",
+      "blob": "32458c1561964c2ef4d6ada686056135b10c44dd"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/routine-baseline/yijinjing.json",
+      "mode": "100644",
+      "blob": "4cbcfd65196aa60fbbb0db747fe1477b7f8c6600"
+    },
+    {
+      "path": "apps/platform/tests/follow-along-matcher.test.ts",
+      "mode": "100644",
+      "blob": "4198fbcd4693c4a748fdceb6f0d41ba404cb12fb"
+    },
+    {
+      "path": "apps/platform/tests/framing-assist.test.ts",
+      "mode": "100644",
+      "blob": "272d9a8b45efc95f97ed44eef16230588ffea97a"
+    },
+    {
+      "path": "apps/platform/tests/framing-profile.test.ts",
+      "mode": "100644",
+      "blob": "071af4be60d2db194dcabbda9ad53a93c17dc750"
+    },
+    {
+      "path": "apps/platform/tests/free-training-session.test.ts",
+      "mode": "100644",
+      "blob": "39718f841b2ae663c18d10f16a05d8b1adada0a0"
+    },
+    {
+      "path": "apps/platform/tests/geometry.test.ts",
+      "mode": "100644",
+      "blob": "62a483a68e7122867b945264ae951678ec78f778"
+    },
+    {
+      "path": "apps/platform/tests/gesture-control.test.ts",
+      "mode": "100644",
+      "blob": "2ccfc087a55bd031ab5671b0cd193504231b9170"
+    },
+    {
+      "path": "apps/platform/tests/helpers/analyzerSelfCheck.ts",
+      "mode": "100644",
+      "blob": "acc5c91a8e5cf80d8f62199cfaa6e0ff08911f2a"
+    },
+    {
+      "path": "apps/platform/tests/helpers/fixtures.ts",
+      "mode": "100644",
+      "blob": "837c2889cafadb1ab67b63275e51e7421105fe24"
+    },
+    {
+      "path": "apps/platform/tests/helpers/reportFixture.ts",
+      "mode": "100644",
+      "blob": "b3fd1ed38d9e802c170547aa15a0f135b316a3a9"
+    },
+    {
+      "path": "apps/platform/tests/helpers/routineFixtures.ts",
+      "mode": "100644",
+      "blob": "f8ae4a900c74bfa6ccdc885353e5bef843aaf9ba"
+    },
+    {
+      "path": "apps/platform/tests/helpers/routineReplay.ts",
+      "mode": "100644",
+      "blob": "470fc1668fb1e42836ae38a632c424c05e18b2dc"
+    },
+    {
+      "path": "apps/platform/tests/jev-client.test.ts",
+      "mode": "100644",
+      "blob": "b1b24d891504f0b314b63c70abc690fe0972e895"
+    },
+    {
+      "path": "apps/platform/tests/jev-decision.test.ts",
+      "mode": "100644",
+      "blob": "fedd116861ac46a073c5a4f1bbacefd2f0520691"
+    },
+    {
+      "path": "apps/platform/tests/jev-proxy.test.ts",
+      "mode": "100644",
+      "blob": "df0ed668316ec25ef0902ca59169cd989d68aef9"
+    },
+    {
+      "path": "apps/platform/tests/knee-raise-feature-extractor.test.ts",
+      "mode": "100644",
+      "blob": "4f89bfd2324b389f7572d93f540100d0523d6380"
+    },
+    {
+      "path": "apps/platform/tests/knee-raise-rules.test.ts",
+      "mode": "100644",
+      "blob": "38841f8e624ba427c9030fbdb206b8807053488c"
+    },
+    {
+      "path": "apps/platform/tests/knee-raise-runtime.test.ts",
+      "mode": "100644",
+      "blob": "a254e3c5554be09653ed955ce7bef37cb3703ab1"
+    },
+    {
+      "path": "apps/platform/tests/knee-raise-scoring.test.ts",
+      "mode": "100644",
+      "blob": "d2310277906ea7c26ae179498ed50ad95428388b"
+    },
+    {
+      "path": "apps/platform/tests/knee-raise-state.test.ts",
+      "mode": "100644",
+      "blob": "89560e10032f2c35a08ad699c7cfd02f188c3545"
+    },
+    {
+      "path": "apps/platform/tests/lateral-raise-rules.test.ts",
+      "mode": "100644",
+      "blob": "d4efaffe82e60493058c25be83556bb27390d1ed"
+    },
+    {
+      "path": "apps/platform/tests/lateral-raise-state.test.ts",
+      "mode": "100644",
+      "blob": "ffbc627c15ee0e2b90cf5a88779a2cb24f259271"
+    },
+    {
+      "path": "apps/platform/tests/llm-eval/agent.eval.ts",
+      "mode": "100644",
+      "blob": "5b1a636cf8763d04d908e290266fa5a68ba09326"
+    },
+    {
+      "path": "apps/platform/tests/llm-eval/coach-chat-real.pw.ts",
+      "mode": "100644",
+      "blob": "cbf1fb3c0d416cd4255c6dbdc0b27120f05986bf"
+    },
+    {
+      "path": "apps/platform/tests/llm-eval/fixtures.ts",
+      "mode": "100644",
+      "blob": "3694c11ab171e74a859e2a7af964f096898043e4"
+    },
+    {
+      "path": "apps/platform/tests/llm-eval/kb-stats.eval.ts",
+      "mode": "100644",
+      "blob": "d8b389971f008f9811f26a1adc46540e413f7cf1"
+    },
+    {
+      "path": "apps/platform/tests/llm-eval/rag-cases.ts",
+      "mode": "100644",
+      "blob": "138ea5e970d4b877dd55a489f1b187afeb374830"
+    },
+    {
+      "path": "apps/platform/tests/llm-eval/rag.eval.ts",
+      "mode": "100644",
+      "blob": "559ba7f3ac6ae765fa42d9dc3f308772a2d3fd7c"
+    },
+    {
+      "path": "apps/platform/tests/llm-eval/tool-snapshot.eval.ts",
+      "mode": "100644",
+      "blob": "0f071e38a0b8dfb38f3c60cc78eb3d3c3230980c"
+    },
+    {
+      "path": "apps/platform/tests/local-adaptive-decision.test.ts",
+      "mode": "100644",
+      "blob": "d951d44c268fa9f5636e7514298763f42ccbec63"
+    },
+    {
+      "path": "apps/platform/tests/mode-hub.test.ts",
+      "mode": "100644",
+      "blob": "6e1d2e81dfe12634a052869cde2e899735b97cbf"
+    },
+    {
+      "path": "apps/platform/tests/onboarding.test.ts",
+      "mode": "100644",
+      "blob": "8b334e2abe8507b63d3be829e36b9ebe51d89b2f"
+    },
+    {
+      "path": "apps/platform/tests/overhead-elbow-ux.test.ts",
+      "mode": "100644",
+      "blob": "c9b30b4b81505de8ee0863f5b3af5d87698ca020"
+    },
+    {
+      "path": "apps/platform/tests/overhead-top-elbow.test.ts",
+      "mode": "100644",
+      "blob": "2263f8d0066b29e4434261c7f522503074c1bd3f"
+    },
+    {
+      "path": "apps/platform/tests/package-smoke/package-smoke.pw.ts",
+      "mode": "100644",
+      "blob": "11e3279ff6337b2ac2fdb35910853b60c31f8317"
+    },
+    {
+      "path": "apps/platform/tests/phase5-course.test.ts",
+      "mode": "100644",
+      "blob": "b64c050f0c45293b4d19e3ad60ad95e47d61faf5"
+    },
+    {
+      "path": "apps/platform/tests/phase5-overhead-raise.test.ts",
+      "mode": "100644",
+      "blob": "a740632af1434ab83173cf8d4109b2c07b01a031"
+    },
+    {
+      "path": "apps/platform/tests/phase5-shoulder-rotation.test.ts",
+      "mode": "100644",
+      "blob": "efcba157b5e4289b931c04ba11f90ca1a97367d8"
+    },
+    {
+      "path": "apps/platform/tests/pose-detector-init.test.ts",
+      "mode": "100644",
+      "blob": "c4a9fdcf0890f712ade28c367e5fe62a8f69a3bd"
+    },
+    {
+      "path": "apps/platform/tests/pose-filter.test.ts",
+      "mode": "100644",
+      "blob": "5b245d1ee7b4518d17e2b6d28464471d2bedcfb0"
+    },
+    {
+      "path": "apps/platform/tests/pose-overlay-visibility.test.ts",
+      "mode": "100644",
+      "blob": "64e5613761fbbe16fca5c574d49f85bfbef92723"
+    },
+    {
+      "path": "apps/platform/tests/public-demo/public-demo-real.pw.ts",
+      "mode": "100644",
+      "blob": "5330d644a6cd0fd21af77d343c3c0b44edf0f009"
+    },
+    {
+      "path": "apps/platform/tests/reference-pose.test.ts",
+      "mode": "100644",
+      "blob": "27e4cf46848a85d43c3f325ed5f972a3b92eb6fb"
+    },
+    {
+      "path": "apps/platform/tests/report-recommendations.test.ts",
+      "mode": "100644",
+      "blob": "3fdd0b84ed78e3533324320b5901a9e87670d939"
+    },
+    {
+      "path": "apps/platform/tests/report-ui.test.ts",
+      "mode": "100644",
+      "blob": "ff21786b6ca571c8fd9e4c6b88bb6eb35c4277fd"
+    },
+    {
+      "path": "apps/platform/tests/routine-analyzer-baduanjin.test.ts",
+      "mode": "100644",
+      "blob": "92903e971d5190826228254cd519e8332f255172"
+    },
+    {
+      "path": "apps/platform/tests/routine-analyzer-classification-lock.test.ts",
+      "mode": "100644",
+      "blob": "58b6a2893cd3734f256f5e6e8a4f451dc7d347d1"
+    },
+    {
+      "path": "apps/platform/tests/routine-analyzer-engine.test.ts",
+      "mode": "100644",
+      "blob": "6e7c7211ed148304b55c8cf8fc30cef2d474f1c1"
+    },
+    {
+      "path": "apps/platform/tests/routine-analyzer-robustness.test.ts",
+      "mode": "100644",
+      "blob": "10477483d6f21c6d4d9e08e066c474204dacdc4d"
+    },
+    {
+      "path": "apps/platform/tests/routine-analyzer-self-check.test.ts",
+      "mode": "100644",
+      "blob": "8e08763c004136140892c321f4c5fb492be556ec"
+    },
+    {
+      "path": "apps/platform/tests/routine-analyzer-taijiquan.test.ts",
+      "mode": "100644",
+      "blob": "443a3dca96f3d8d1a20f2b26bc3ba1afb9804b6c"
+    },
+    {
+      "path": "apps/platform/tests/routine-analyzer-wuqinxi.test.ts",
+      "mode": "100644",
+      "blob": "f2175ec67e5faf84193db7e6903941e4737b4947"
+    },
+    {
+      "path": "apps/platform/tests/routine-analyzer-yijinjing.test.ts",
+      "mode": "100644",
+      "blob": "2807b276870f35199cb37543ab9f08b688d88096"
+    },
+    {
+      "path": "apps/platform/tests/routine-baseline.test.ts",
+      "mode": "100644",
+      "blob": "aac55eb9360ea0a8146414591daa6fb9a8149382"
+    },
+    {
+      "path": "apps/platform/tests/routine-live-checks.test.ts",
+      "mode": "100644",
+      "blob": "1ce028be54140a525c32b8781c6ab9225aae6093"
+    },
+    {
+      "path": "apps/platform/tests/routine-programs.test.ts",
+      "mode": "100644",
+      "blob": "6c043b25d44018a0863ab86dc100e2dd03531edd"
+    },
+    {
+      "path": "apps/platform/tests/routine-report.test.ts",
+      "mode": "100644",
+      "blob": "4789a265ebafc7e2c8dd3f27dc37fb627ca14aaf"
+    },
+    {
+      "path": "apps/platform/tests/routine-session.test.ts",
+      "mode": "100644",
+      "blob": "3c9f0124583635f29088bf144bf7d99e464d7bb6"
+    },
+    {
+      "path": "apps/platform/tests/routine-ui.test.ts",
+      "mode": "100644",
+      "blob": "78fce6c18da597ae43f88a90d85034929d9bb72f"
+    },
+    {
+      "path": "apps/platform/tests/routine-video-files.test.ts",
+      "mode": "100644",
+      "blob": "15df9ab31335726784d4bac2641b1ee32d9b7fc2"
+    },
+    {
+      "path": "apps/platform/tests/scoring-v2-registry.test.ts",
+      "mode": "100644",
+      "blob": "c373af5eea631057da06f1fd8008d8601ac121d3"
+    },
+    {
+      "path": "apps/platform/tests/scoring-v2-routine.test.ts",
+      "mode": "100644",
+      "blob": "6b1b98f29b86b6017ca57cfded3355a447cfe141"
+    },
+    {
+      "path": "apps/platform/tests/scoring-v2-warmup.test.ts",
+      "mode": "100644",
+      "blob": "eacc49361181ef4559094604d97bda199ee35c9f"
+    },
+    {
+      "path": "apps/platform/tests/scoring.test.ts",
+      "mode": "100644",
+      "blob": "afde308096242ea22f52b19c29b20653825cbda3"
+    },
+    {
+      "path": "apps/platform/tests/session-repository.test.ts",
+      "mode": "100644",
+      "blob": "617d95dcd42a680b8fc6c1aa53159267c9059e5f"
+    },
+    {
+      "path": "apps/platform/tests/smart-training-entry.test.ts",
+      "mode": "100644",
+      "blob": "2f46dbc2396aaf643dbb040fdb928cc4e52da97c"
+    },
+    {
+      "path": "apps/platform/tests/squat-demo-sequence.test.ts",
+      "mode": "100644",
+      "blob": "d3b1fd0dd539b8fb38845b1174dcdc6dbdc97da9"
+    },
+    {
+      "path": "apps/platform/tests/squat-feature-extractor.test.ts",
+      "mode": "100644",
+      "blob": "33ef0b4eef6d4b734f6ee06a799ee1e1ac035907"
+    },
+    {
+      "path": "apps/platform/tests/squat-rules.test.ts",
+      "mode": "100644",
+      "blob": "c2113fcf36ac28e733a7f90ddfba5ee13d281299"
+    },
+    {
+      "path": "apps/platform/tests/squat-runtime.test.ts",
+      "mode": "100644",
+      "blob": "82ad201166600f0704c542a91dcf2b08d3733898"
+    },
+    {
+      "path": "apps/platform/tests/squat-scoring.test.ts",
+      "mode": "100644",
+      "blob": "e1f8d10c2edcab7827225d3d86c023d01835f1cb"
+    },
+    {
+      "path": "apps/platform/tests/squat-state.test.ts",
+      "mode": "100644",
+      "blob": "9bc0cfde48a7f3e411c88f352852d4b7aeffc1af"
+    },
+    {
+      "path": "apps/platform/tests/step-jack-feature-extractor.test.ts",
+      "mode": "100644",
+      "blob": "3cb358fedf45e6b63e00124d4f6af95544b93ba5"
+    },
+    {
+      "path": "apps/platform/tests/step-jack-rules.test.ts",
+      "mode": "100644",
+      "blob": "1fbf95c4db57c2dbf15456ed57b94c365d82d04d"
+    },
+    {
+      "path": "apps/platform/tests/step-jack-scoring.test.ts",
+      "mode": "100644",
+      "blob": "fd613e4da2fcd4aae9cee90a59a493ceed3b077f"
+    },
+    {
+      "path": "apps/platform/tests/step-jack-state.test.ts",
+      "mode": "100644",
+      "blob": "dc75931c50f2175d3d2db6ad2f0392609b484861"
+    },
+    {
+      "path": "apps/platform/tests/support/coach-agent-lab-fake-http.ts",
+      "mode": "100644",
+      "blob": "35e7f5e03849bc365c9af562070195bfd9dee9d7"
+    },
+    {
+      "path": "apps/platform/tests/support/coach-agent-lab-local-http.ts",
+      "mode": "100644",
+      "blob": "5bcab0c569d201be7b6bbd1217028c905ce74e56"
+    },
+    {
+      "path": "apps/platform/tests/support/coach-agent-protocol-corpus.ts",
+      "mode": "100644",
+      "blob": "d1d7c9437dc614576a81531982eca44f2c857fdb"
+    },
+    {
+      "path": "apps/platform/tests/support/coach-agent-protocol-http.ts",
+      "mode": "100644",
+      "blob": "1c2bbfeefbb29ef60c9d0efd50ba25de8d395db3"
+    },
+    {
+      "path": "apps/platform/tests/threshold-versioning.test.ts",
+      "mode": "100644",
+      "blob": "86c4186ab2abb184a382b3e44c1dd79284e076a9"
+    },
+    {
+      "path": "apps/platform/tests/training-analysis-adversarial.test.ts",
+      "mode": "100644",
+      "blob": "869f7412db8f25ea12ef90e647d8441890d0f8b0"
+    },
+    {
+      "path": "apps/platform/tests/training-analysis-engine.test.ts",
+      "mode": "100644",
+      "blob": "36e46fcf909032639b067ac9aa59e0d42b2e3e72"
+    },
+    {
+      "path": "apps/platform/tests/training-exit.test.ts",
+      "mode": "100644",
+      "blob": "9c9bfb605f83e3fddd91461cab8719329619e97a"
+    },
+    {
+      "path": "apps/platform/tests/training-history.test.ts",
+      "mode": "100644",
+      "blob": "ebd697e3a2ac5ec34977a3ce0dfab307f976c754"
+    },
+    {
+      "path": "apps/platform/tests/training-report-builder.test.ts",
+      "mode": "100644",
+      "blob": "bfd3534030992cb39973f5a3caa9969524cef6d2"
+    },
+    {
+      "path": "apps/platform/tests/training-session.test.ts",
+      "mode": "100644",
+      "blob": "003e2f401f5c400a5393bdb79332114316ceb917"
+    },
+    {
+      "path": "apps/platform/tests/video-diagnostics.test.ts",
+      "mode": "100644",
+      "blob": "882f2b0a1744becc6ab1d12323ede88973e95e09"
+    },
+    {
+      "path": "apps/platform/tests/visual-web-v1/competition-active.spec.ts",
+      "mode": "100644",
+      "blob": "fd2f517c2355e5771950099bda14d2a8fb27b665"
+    },
+    {
+      "path": "apps/platform/tests/visual-web-v1/web-v1-screens.spec.ts",
+      "mode": "100644",
+      "blob": "516ecbff44a87939b905c88adc150fb2e4e5e074"
+    },
+    {
+      "path": "apps/platform/tests/voice-guide-policy.test.ts",
+      "mode": "100644",
+      "blob": "a7a26f322cf98a95433e85ca054ac2d225b34eae"
+    },
+    {
+      "path": "apps/platform/tests/web-v1.test.ts",
+      "mode": "100644",
+      "blob": "8a736a1255b364ba3b951abad4ea6e32af84f4ca"
+    },
+    {
+      "path": "apps/platform/tests/workshop-continuous.test.ts",
+      "mode": "100644",
+      "blob": "8649725470c6bf9a6435bd0c377777ddc5929f30"
+    },
+    {
+      "path": "apps/platform/tests/workshop-performance.test.ts",
+      "mode": "100644",
+      "blob": "86cdb5ad3a3e23d253db7a08f6ea50ded2d30f01"
+    },
+    {
+      "path": "apps/platform/tests/workshop-recognition.test.ts",
+      "mode": "100644",
+      "blob": "071b6c99b408908ef0d3811f375414fdaf184b47"
+    },
+    {
+      "path": "apps/platform/tests/workshop-session.test.ts",
+      "mode": "100644",
+      "blob": "8a276d245713c5fa219bad42331815f8052e0fe0"
+    },
+    {
+      "path": "apps/platform/tests/workshop-store.test.ts",
+      "mode": "100644",
+      "blob": "4153a65e372b40227cd82759f9a584dc842ae521"
+    },
+    {
+      "path": "apps/platform/tests/workshop-temporal.test.ts",
+      "mode": "100644",
+      "blob": "7747fbb9d4d5b4feac5fc78ff0b2f992fd675337"
+    },
+    {
+      "path": "apps/platform/tests/workshop-ui.test.ts",
+      "mode": "100644",
+      "blob": "1a6fafc536360220718c52fabb6c3f41a916178b"
+    },
+    {
+      "path": "apps/platform/tests/workshop-video.test.ts",
+      "mode": "100644",
+      "blob": "a08383f4d1a8f52973e68ee348a3c12323fc4122"
+    },
+    {
+      "path": "apps/platform/tsconfig.app.json",
+      "mode": "100644",
+      "blob": "0d6ed1f5c17dc99fd82a55a0ca2968bc7d1dcf88"
+    },
+    {
+      "path": "apps/platform/tsconfig.json",
+      "mode": "100644",
+      "blob": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8"
+    },
+    {
+      "path": "apps/platform/tsconfig.node.json",
+      "mode": "100644",
+      "blob": "d60fb9b7adbaa7a2797f6f8f3f8e7c17f24fc98c"
+    },
+    {
+      "path": "apps/platform/vite.coach-sprint.config.ts",
+      "mode": "100644",
+      "blob": "857c6dc6bd52627afb14ce5f796e4ccaef8a4c9d"
+    },
+    {
+      "path": "apps/platform/vite.config.ts",
+      "mode": "100644",
+      "blob": "a675a84ba972292e8ab00c47214a960c3aa527e7"
+    },
+    {
+      "path": "apps/platform/vitest.llm-eval.config.ts",
+      "mode": "100644",
+      "blob": "9cdc167806c0d55c8113570e19bd5db680245fa1"
+    },
+    {
+      "path": "scripts/ci/check-repo-hygiene.mjs",
+      "mode": "100644",
+      "blob": "d005517f20ccbd0a9bbcff9b7c92cbd161201ccf"
+    },
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "blob": "32db4de8d2707d1ee6aa269bd49cdae0d5645c4b",
+      "restored_for_validation": true
+    },
+    {
+      "path": "apps/platform/reviewer_exe/build/icon.svg",
+      "mode": "100644",
+      "blob": "886fafb2ac53a64eabe5af79bffea2cda507e958",
+      "restored_for_validation": true
+    },
+    {
+      "path": "apps/platform/reviewer_exe/build/icon.ico",
+      "mode": "100644",
+      "blob": "6a8b7b86ddfb7da6380cffb2ee450ebd038b7f81",
+      "restored_for_validation": true
+    },
+    {
+      "path": "apps/platform/reviewer_exe/package.json",
+      "mode": "100644",
+      "blob": "e94f14044973922157ae4ff9895d71c62faf68b4",
+      "restored_for_validation": true
+    },
+    {
+      "path": "apps/platform/reviewer_exe/src/main.cjs",
+      "mode": "100644",
+      "blob": "7eb6065db84c5fa730bdcd2c991e3866f13c0f25",
+      "restored_for_validation": true
+    }
+  ]
+}

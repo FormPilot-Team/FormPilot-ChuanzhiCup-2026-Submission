@@ -1,0 +1,8 @@
+# Optional M1/M2 research environment; not needed to run the Web product.
+# Python 3.12.0. numpy/sklearn match the retained training reports;
+# scipy/joblib/threadpoolctl match the locally inspected reference environment.
+numpy==2.4.1
+scikit-learn==1.8.0
+scipy==1.17.0
+joblib==1.5.3
+threadpoolctl==3.6.0

@@ -1,0 +1,34 @@
+# Local dependencies and generated output
+node_modules/
+.pnpm-store/
+dist/
+dist-*/
+test-results*/
+playwright-report/
+coverage/
+*.tsbuildinfo
+__pycache__/
+*.pyc
+.venv/
+.venv-training/
+target/
+/artifacts/
+/apps/motion-games-lab/docs/
+
+# Credentials and local machine settings
+.env
+.env.*
+!*.env.example
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+members.local.json
+*.gguf
+*.safetensors
+
+# Local media overlay: distribution permission has NOT been established.
+/apps/platform/public/assets/routines/*.mp4
+/apps/platform/public/assets/routines/*-poster.jpg
+/apps/platform/public/assets/demos/*.mp4

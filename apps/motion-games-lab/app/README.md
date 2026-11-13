@@ -5,8 +5,8 @@
 ## 运行
 
 ```powershell
-Set-Location E:\FormPilot\motion-games-lab\app
-pnpm install          # 首次运行
+cd apps/motion-games-lab/app  # 从提交仓库根目录执行
+pnpm install --frozen-lockfile  # 首次运行
 pnpm dev              # http://127.0.0.1:5180
 ```
 
