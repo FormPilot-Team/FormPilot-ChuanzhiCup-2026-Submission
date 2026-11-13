@@ -15,6 +15,7 @@
     "assets:measure-pose": "node scripts/measure-pose-assets.mjs",
     "reference:video": "node scripts/extract-video-reference.mjs",
     "jev:server": "node --env-file-if-exists=.env.jev.local server/jevProxy.ts",
+    "agent:bridge": "node server/coachAgent/agent/index.ts",
     "jev:evaluate": "node scripts/jev-evaluate.ts",
     "competition:dev": "vite --host 127.0.0.1",
     "adaptive:evaluate": "node --experimental-transform-types scripts/adaptive-evaluate.ts",
