@@ -162,3 +162,8 @@
 @media (prefers-reduced-motion: reduce) { .fpw .agent-status-dot.wait, .fpw .agent-step.pending .agent-step-dot { animation:none; } }
 @media (max-width: 640px) { .fpw .bubble { max-width:100%; } }
 .fpw .agent-consent { display:flex; gap:8px; align-items:flex-start; margin:0 0 4px; font-size:11px; line-height:1.5; color:var(--ink-soft); }
+
+/* Public AI Coach demo (src/publicDemo): disclosure banner; other boards are not part of the demo. */
+.public-demo-banner { position:relative; z-index:40; display:grid; gap:4px; padding:10px 16px; background:#fff7e6; color:#5a3b00; border-bottom:1px solid #f0d39a; font-size:13px; line-height:1.5; }
+.public-demo-banner strong { font-size:14px; }
+.fp-public-demo .fpw .nav, .fp-public-demo .fpw .global-actions, .fp-public-demo .fpw .bottom-tabs { display:none; }

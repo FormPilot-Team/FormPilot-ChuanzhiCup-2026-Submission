@@ -35,6 +35,11 @@ export interface AgentToolContext {
   recommend: () => CoachDecisionResponse | null
   /** Motion Games Lab service availability as probed by the page; null = unknown. */
   gamesAvailable: boolean | null
+  /**
+   * Public demo only: the records come from the demo's bundled synthetic dataset (a fictional user). Added to every
+   * record result and its evidence so neither the model nor the visitor can take them for the visitor's own data.
+   */
+  datasetNote?: string
 }
 
 export interface ToolCitation { ref: string; chunkId: string; title: string; text: string; source: string; verification: string; url: string | null }
@@ -267,8 +272,8 @@ async function readLastTraining(call: AgentToolCall, context: AgentToolContext, 
   return {
     call, ok: true, errorCode: null, citations: [], elapsedMs: Math.round(performance.now() - started),
     summary: `已读取${label}（${String(data.date)}）`,
-    evidence: [{ kind: 'record', label: `${label} · ${String(data.date)}`, detail: `会话 ${read.latestId} · 经 Dispatcher 授权与校验 · ${notes.length ? '非实时训练数据' : '实时训练'}` }],
-    content: JSON.stringify({ ok: true, kind: label, ...data, dataNotes: [...notes, ...read.receipt.limitations.filter((item) => !/^[A-Z_]+:/u.test(item)).slice(0, 2)], rule: '分数与结论来自 FormPilot 报告，不得修改或换算。' }),
+    evidence: [{ kind: 'record', label: `${context.datasetNote ? '合成示例 · ' : ''}${label} · ${String(data.date)}`, detail: `${context.datasetNote ? `${context.datasetNote} · ` : ''}会话 ${read.latestId} · 经 Dispatcher 授权与校验${context.datasetNote ? '' : ` · ${notes.length ? '非实时训练数据' : '实时训练'}`}` }],
+    content: JSON.stringify({ ok: true, kind: label, ...(context.datasetNote ? { dataset: context.datasetNote } : {}), ...data, dataNotes: [...notes, ...read.receipt.limitations.filter((item) => !/^[A-Z_]+:/u.test(item)).slice(0, 2)], rule: '分数与结论来自 FormPilot 报告，不得修改或换算。' }),
   }
 }
 
@@ -306,8 +311,8 @@ async function compareRecentTraining(call: AgentToolCall, context: AgentToolCont
   return {
     call, ok: true, errorCode: null, citations: [], elapsedMs: Math.round(performance.now() - started),
     summary: data.comparable ? `已比较近期${label}（${String(data.gate)}）` : `近期${label}不可比较`,
-    evidence: [{ kind: 'comparison', label: `${label}历史比较`, detail: `${String(data.gate)}${data.reason ? ` · ${String(data.reason)}` : ''} · 使用报告页同一比较规则` }],
-    content: JSON.stringify({ ok: true, ...data, dataNotes: notes, rule: '只能使用这里的比较结论，指标名称照原样使用；notCompared 中的指标和没有给出的指标（如动作规范、稳定性、波动）不要评价。不可比时必须说无法判断进步，不要自己比较分数。' }),
+    evidence: [{ kind: 'comparison', label: `${context.datasetNote ? '合成示例 · ' : ''}${label}历史比较`, detail: `${context.datasetNote ? `${context.datasetNote} · ` : ''}${String(data.gate)}${data.reason ? ` · ${String(data.reason)}` : ''} · 使用报告页同一比较规则` }],
+    content: JSON.stringify({ ok: true, ...(context.datasetNote ? { dataset: context.datasetNote } : {}), ...data, dataNotes: notes, rule: '只能使用这里的比较结论，指标名称照原样使用；notCompared 中的指标和没有给出的指标（如动作规范、稳定性、波动）不要评价。不可比时必须说无法判断进步，不要自己比较分数。' }),
   }
 }
 

@@ -1,8 +1,20 @@
 import type { AgentTransport } from './agent'
 import { AGENT_PROTOCOL_VERSION, type AgentChatRequest, type AgentStreamEvent } from './protocol'
 
-/** Where the local agent bridge listens (server/coachAgent/agent). Build-time setting; loopback only. */
-export function agentBridgeUrl(env: { VITE_COACH_AGENT_URL?: string } = (import.meta.env ?? {}) as { VITE_COACH_AGENT_URL?: string }): string {
+type AgentEnv = { VITE_COACH_AGENT_URL?: string; VITE_COACH_AGENT_MODE?: string }
+
+/**
+ * Build-time deployment of the free-text agent. `local` (default): the loopback agent bridge on the user's computer.
+ * `public-demo` (`pnpm demo:build` only): the hosted demo gateway on the page's own origin, which serves the
+ * AI-Coach-only demo with bundled synthetic records (server/coachAgent/demo).
+ */
+export function agentDeployment(env: AgentEnv = (import.meta.env ?? {}) as AgentEnv): 'local' | 'public-demo' {
+  return env.VITE_COACH_AGENT_MODE === 'public-demo' ? 'public-demo' : 'local'
+}
+
+/** Where the agent bridge listens. Local: loopback only (server/coachAgent/agent). Public demo: same origin (''). */
+export function agentBridgeUrl(env: AgentEnv = (import.meta.env ?? {}) as AgentEnv): string {
+  if (agentDeployment(env) === 'public-demo') return ''
   const value = env.VITE_COACH_AGENT_URL || 'http://127.0.0.1:4321'
   try {
     const url = new URL(value)
@@ -21,16 +33,19 @@ export interface AgentHealth {
   model: string | null
   /** Bridge's knowledge of VRAM residency: 'loading' while a preload runs; informational only. */
   warm?: 'unknown' | 'loading' | 'warm' | 'failed'
+  /** Demo gateway only: display label of the serving model, e.g. "Qwen3-4B-Instruct · 演示服务器". */
+  label?: string
 }
 
 export async function checkAgentHealth(base = agentBridgeUrl(), fetcher: typeof fetch = fetch, timeoutMs = 2500): Promise<AgentHealth> {
   try {
     const response = await fetcher(`${base}/v1/coach/agent/health`, { signal: AbortSignal.timeout(timeoutMs), cache: 'no-store' })
     if (!response.ok) return { status: 'bridge_unavailable', model: null }
-    const body = await response.json() as { protocol?: string; status?: string; model?: string; warm?: string }
+    const body = await response.json() as { protocol?: string; status?: string; model?: string; warm?: string; label?: unknown }
     if (body.protocol !== AGENT_PROTOCOL_VERSION) return { status: 'bridge_unavailable', model: null }
     const warm = (['unknown', 'loading', 'warm', 'failed'] as const).find((value) => value === body.warm)
-    return { status: body.status === 'ready' ? 'ready' : 'model_unavailable', model: typeof body.model === 'string' ? body.model : null, ...(warm ? { warm } : {}) }
+    const label = typeof body.label === 'string' && body.label.length <= 40 && !/[<>\n]/u.test(body.label) ? body.label : null
+    return { status: body.status === 'ready' ? 'ready' : 'model_unavailable', model: typeof body.model === 'string' ? body.model : null, ...(warm ? { warm } : {}), ...(label ? { label } : {}) }
   } catch {
     return { status: 'bridge_unavailable', model: null }
   }

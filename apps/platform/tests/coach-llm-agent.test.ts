@@ -171,6 +171,20 @@ describe('V1.2 trusted tools (test fixtures)', () => {
     expect(compare.content).not.toMatch(/IMPROVED|DECLINED|STABLE/u)
   })
 
+  it('labels records as the synthetic demo dataset when the public demo sets a dataset note', async () => {
+    const note = '合成示例记录：虚构的示例用户'
+    for (const name of ['read_last_training', 'compare_recent_training'] as const) {
+      const result = await executeAgentTool({ name, arguments: { kind: 'routine' } }, { ...toolContext(), datasetNote: note })
+      expect(result.ok).toBe(true)
+      expect((JSON.parse(result.content) as { dataset?: string }).dataset).toBe(note)
+      expect(result.evidence[0].label.startsWith('合成示例')).toBe(true)
+      expect(result.evidence[0].detail).toContain(note)
+      expect(result.evidence[0].detail).not.toContain('实时训练')
+    }
+    const plain = await executeAgentTool({ name: 'read_last_training', arguments: { kind: 'routine' } }, toolContext())
+    expect(plain.content).not.toContain('"dataset"')
+  })
+
   it('lists only catalogue content', async () => {
     const result = await executeAgentTool({ name: 'get_catalog', arguments: { kind: 'all' } }, toolContext())
     expect(result.content).toContain('八段锦')

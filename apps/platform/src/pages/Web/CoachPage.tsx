@@ -192,21 +192,25 @@ function ModelPanel({ response, elapsedMs }: { response: CoachDecisionResponse; 
  * the user's posture. V1.2: free-text questions go to the local LLM agent (CoachAgentChat → loopback bridge → local
  * Qwen) only when the bridge reports the pinned model ready; otherwise the input stays disabled and says so.
  */
-export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window === 'undefined' ? null : window.localStorage, startInside = false }: { mode?: WebCoachDecisionMode; runtime?: CoachDecisionRuntime; storage?: Pick<Storage, 'getItem'> | null; startInside?: boolean }) {
+/** Public demo only (src/publicDemo): synthetic records + a fictional user's profile, recommendation precomputed. */
+export interface CoachDemoSetup { datasetNote: string; profile: CoachProfile }
+
+export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window === 'undefined' ? null : window.localStorage, startInside = false, demo }: { mode?: WebCoachDecisionMode; runtime?: CoachDecisionRuntime; storage?: Pick<Storage, 'getItem'> | null; startInside?: boolean; demo?: CoachDemoSetup }) {
   const [runtime] = useState<CoachDecisionRuntime>(() => runtimeProp ?? (mode ? { mode, allowExperimentalModel: false, source: 'default' } : resolveCoachDecisionRuntime()))
   const [intro, setIntro] = useState(() => !startInside && !(typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('view')))
   const [view, setView] = useState<CoachView>(() => {
     const requested = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('view')
-    return requested === 'questions' || requested === 'result' || requested === 'plan' ? requested : 'profile'
+    return requested === 'questions' || requested === 'result' || requested === 'plan' ? requested : demo ? 'questions' : 'profile'
   })
   /** Prefill only (never auto-sent): a question handed over from a report page. */
   const [askDraft] = useState(() => (typeof window === 'undefined' ? '' : (new URLSearchParams(window.location.search).get('ask') ?? '').slice(0, 300)))
   /** Separate, explicit consent for the AI Coach chat to read warm-up and routine records (read-only). */
   const [agentRecordsConsent, setAgentRecordsConsent] = useState(false)
-  const [draft, setDraft] = useState<CoachProfile>(INITIAL_PROFILE)
+  const [draft, setDraft] = useState<CoachProfile>(() => demo ? { ...demo.profile } : INITIAL_PROFILE)
   const [scope, setScope] = useState<DataScope>('profile_only')
   const [consent, setConsent] = useState(false)
-  const [run, setRun] = useState<CoachRun | null>(null)
+  // Demo: the fictional user's profile is already confirmed, so the questions panel works on arrival (profile only).
+  const [run, setRun] = useState<CoachRun | null>(() => demo ? runCoachDecision({ ...demo.profile }, 'profile_only', runtime, storage) : null)
   const [asked, setAsked] = useState<Array<{ question: CoachQuestion; at: number }>>([])
   const order = useRef(0)
   const nextOrder = () => { order.current += 1; return order.current }
@@ -215,6 +219,7 @@ export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window 
     recordsConsent: agentRecordsConsent,
     recommend: () => run?.response ?? null,
     gamesAvailable: null,
+    ...(demo ? { datasetNote: demo.datasetNote } : {}),
   }), nextOrder)
 
   const response = run?.response ?? null
@@ -295,7 +300,7 @@ export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window 
             <label className="check-chip"><input type="radio" name="coach-scope" checked={scope === 'profile_only'} onChange={() => { setScope('profile_only'); setConsent(false) }} />仅按画像</label>
             <label className="check-chip"><input type="radio" name="coach-scope" checked={scope === 'local_records'} onChange={() => setScope('local_records')} data-testid="coach-scope-local" />使用本机功法记录（需授权）</label>
           </div>
-          {scope === 'local_records' ? <label className="check-chip" style={{ marginTop: 10 }}><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} data-testid="coach-consent" />允许读取此浏览器中的功法跟练记录与最近报告分项。只读、不上传、不修改；游戏历史未接入。</label> : null}
+          {scope === 'local_records' ? <label className="check-chip" style={{ marginTop: 10 }}><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} data-testid="coach-consent" />{demo ? '允许读取本演示内置的合成示例功法记录（虚构用户）。只读、不修改；游戏历史未接入。' : '允许读取此浏览器中的功法跟练记录与最近报告分项。只读、不上传、不修改；游戏历史未接入。'}</label> : null}
         </fieldset>
         <div className="wizard-actions"><span className="tiny">修改画像后请重新生成。</span><button className="btn btn-primary" type="submit" data-testid="coach-submit">{run ? '更新我的推荐' : '生成推荐'} →</button></div>
       </form>
@@ -339,7 +344,7 @@ export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window 
   ) })) : []
   const questionsPanel = (
     <section className="chat glass card" aria-label="训练问答" data-testid="coach-questions">
-      {panelHead('训练问答', '固定五问来自本次推荐结果 · 自由提问由本机大模型调用只读工具回答')}
+      {panelHead('训练问答', demo ? '固定五问来自本次推荐结果 · 自由提问由在线演示服务上的大模型调用只读工具回答（合成示例数据）' : '固定五问来自本次推荐结果 · 自由提问由本机大模型调用只读工具回答')}
       <CoachAgentChat
         chat={agentChat}
         initialDraft={askDraft}

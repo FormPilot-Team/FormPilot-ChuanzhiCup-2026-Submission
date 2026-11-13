@@ -2,7 +2,7 @@ import { timingSafeEqual } from 'node:crypto'
 import { createServer, request, type IncomingMessage, type ServerResponse } from 'node:http'
 import {
   AGENT_LIMITS, AGENT_PROTOCOL_VERSION, AGENT_SYSTEM_PROMPT, AGENT_TOOLS, parseToolCall, toOllamaMessages, validateAgentChatRequest,
-  type AgentErrorCode, type AgentStreamEvent, type AgentToolCall,
+  type AgentChatRequest, type AgentErrorCode, type AgentStreamEvent, type AgentToolCall,
 } from '../../../src/features/coachLlm/protocol.ts'
 import { resolveLocalConfig } from '../local/config.ts'
 import { verifyInstalledModel } from '../local/transport.ts'
@@ -11,19 +11,19 @@ import { resolveAgentConfig, type AgentBridgeConfigInput, type ResolvedAgentConf
 const MAX_BODY_BYTES = 96_000
 const MAX_STREAM_BYTES = 1_000_000
 
-function duplicate(req: IncomingMessage, name: string): boolean {
+export function duplicate(req: IncomingMessage, name: string): boolean {
   let count = 0
   for (let index = 0; index < req.rawHeaders.length; index += 2) if (req.rawHeaders[index].toLowerCase() === name) count += 1
   return count > 1
 }
 
-function readBody(req: IncomingMessage): Promise<string> {
+export function readBody(req: IncomingMessage, maxBytes = MAX_BODY_BYTES): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = []
     let bytes = 0
     req.on('data', (chunk: Buffer) => {
       bytes += chunk.length
-      if (bytes > MAX_BODY_BYTES) { req.destroy(); reject(new Error('TOO_LARGE')); return }
+      if (bytes > maxBytes) { req.destroy(); reject(new Error('TOO_LARGE')); return }
       chunks.push(chunk)
     })
     req.once('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
@@ -36,7 +36,7 @@ function readBody(req: IncomingMessage): Promise<string> {
  * Forward one /api/chat stream from Ollama, re-emitting only validated events: text deltas, whitelisted tool calls,
  * and final usage metrics. Raw model JSON, thinking text and unknown fields never reach the browser.
  */
-function relayChat(config: ResolvedAgentConfig, body: string, signal: AbortSignal, emit: (event: AgentStreamEvent) => void): Promise<void> {
+export function relayChat(config: Pick<ResolvedAgentConfig, 'modelPort' | 'model'>, body: string, signal: AbortSignal, emit: (event: AgentStreamEvent) => void): Promise<void> {
   return new Promise((resolve, reject) => {
     const req = request({ hostname: '127.0.0.1', family: 4, port: config.modelPort, path: '/api/chat', method: 'POST', agent: false, signal,
       headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body), Accept: 'application/x-ndjson' } }, (res) => {
@@ -95,7 +95,20 @@ function relayChat(config: ResolvedAgentConfig, body: string, signal: AbortSigna
   })
 }
 
-const KNOWN_ERRORS = new Set<AgentErrorCode>(['MODEL_UNAVAILABLE', 'TIMEOUT', 'INVALID_MODEL_OUTPUT', 'INVALID_TOOL_CALL'])
+/** The /api/chat body the bridge sends: server-owned system prompt, tool schemas and sampling options. */
+export function ollamaChatBody(model: string, parsed: AgentChatRequest, systemPrompt: string = AGENT_SYSTEM_PROMPT): string {
+  return JSON.stringify({
+    model,
+    messages: [{ role: 'system', content: systemPrompt }, ...toOllamaMessages(parsed.messages)],
+    ...(parsed.allowTools ? { tools: AGENT_TOOLS } : {}),
+    stream: true,
+    think: false,
+    keep_alive: '30m',
+    options: { temperature: 0.2, top_p: 0.9, num_ctx: AGENT_LIMITS.contextTokens, num_predict: AGENT_LIMITS.maxOutputTokens },
+  })
+}
+
+export const KNOWN_ERRORS = new Set<AgentErrorCode>(['MODEL_UNAVAILABLE', 'TIMEOUT', 'INVALID_MODEL_OUTPUT', 'INVALID_TOOL_CALL'])
 
 /**
  * The V1.2 agent bridge: loopback only, exact Origin allow-list, Host check, optional bearer token, one generation at
@@ -184,15 +197,7 @@ export function createAgentBridge(input: AgentBridgeConfigInput = {}) {
     res.statusCode = 200
     res.setHeader('Content-Type', 'application/x-ndjson; charset=utf-8')
     const emit = (event: AgentStreamEvent) => { if (!res.writableEnded) res.write(`${JSON.stringify(event)}\n`) }
-    const body = JSON.stringify({
-      model: config.model,
-      messages: [{ role: 'system', content: AGENT_SYSTEM_PROMPT }, ...toOllamaMessages(parsed.messages)],
-      ...(parsed.allowTools ? { tools: AGENT_TOOLS } : {}),
-      stream: true,
-      think: false,
-      keep_alive: '30m',
-      options: { temperature: 0.2, top_p: 0.9, num_ctx: AGENT_LIMITS.contextTokens, num_predict: AGENT_LIMITS.maxOutputTokens },
-    })
+    const body = ollamaChatBody(config.model, parsed)
     try {
       await relayChat(config, body, controller.signal, emit)
       warm = 'warm'

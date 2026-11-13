@@ -1,27 +1,33 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import type { AgentAnswer } from '../../features/coachLlm/agent'
+import { agentDeployment } from '../../features/coachLlm/transport'
 import type { AgentChatTurn, ChatTimelineItem, CoachAgentChatState } from './useCoachAgentChat'
+
+/** Public demo build: the model runs on the demo server and the records are the demo's synthetic dataset. */
+const DEMO = agentDeployment() === 'public-demo'
 
 
 const EXAMPLES = ['我今天应该练什么？', '我上一次练得怎么样？主要问题在哪里？', '我最近有没有进步？', '八段锦第二式有哪些常见错误？']
 
 const SOURCE_LABEL: Record<AgentAnswer['source'], string> = {
-  llm: '本机大模型生成',
+  llm: DEMO ? '大模型生成（在线演示服务）' : '本机大模型生成',
   rules_fallback: '规则回答（未采用模型文本）',
   safety_rule: '安全规则回答（不经过大模型）',
 }
 
 const FALLBACK_TEXT: Record<string, string> = {
   VALIDATION_FAILED: '模型回答未通过安全与证据校验',
-  RATE_LIMITED: '本地模型请求过于频繁',
-  BUSY: '本地模型正在回答上一个问题',
-  TIMEOUT: '本地模型响应超时',
-  MODEL_UNAVAILABLE: '本地模型不可用',
+  RATE_LIMITED: DEMO ? '演示服务请求过于频繁，请稍候再问' : '本地模型请求过于频繁',
+  BUSY: DEMO ? '演示服务正在回答其他访问者的问题' : '本地模型正在回答上一个问题',
+  BUDGET_EXCEEDED: '已达到今日演示额度',
+  TIMEOUT: DEMO ? '演示服务响应超时' : '本地模型响应超时',
+  MODEL_UNAVAILABLE: DEMO ? '演示服务的模型不可用' : '本地模型不可用',
   EMPTY_ANSWER: '模型没有给出回答',
   CANCELLED: '已取消',
 }
 
-function modelName(model: string | null): string {
+function modelName(model: string | null, label?: string | null): string {
+  if (DEMO) return label || model || '演示服务模型'
   if (!model) return '本地模型'
   if (model.startsWith('qwen3:4b')) return 'Qwen3-4B-Instruct（本机）'
   return `${model}（本机）`
@@ -94,7 +100,7 @@ function Details({ turnId, answer, open, onToggle }: { turnId: number; answer: A
         {answer.source === 'llm' ? `模型：${modelName(answer.metrics.model)} · 模型首字 ${answer.metrics.ttftMs ?? '—'} ms（内部，校验后才显示）· 总耗时 ${answer.metrics.totalMs} ms · ${answer.metrics.rounds} 轮 · 输出 ${answer.metrics.outputTokens} tokens${answer.metrics.tokensPerSecond ? ` · ${answer.metrics.tokensPerSecond} tokens/s` : ''}` : `总耗时 ${answer.metrics.totalMs} ms`}
         {answer.validation.issues.length ? ` · 校验：${answer.validation.issues.join('、')}` : ' · 校验通过'}
       </p>
-      <p className="tiny">模型文本不作为证据；分数、比较结论和推荐只来自上面的工具结果。模型回答先通过安全与证据校验才显示，未通过时显示规则回答。模型在本机运行，不上传问题或训练记录。</p>
+      <p className="tiny">模型文本不作为证据；分数、比较结论和推荐只来自上面的工具结果。模型回答先通过安全与证据校验才显示，未通过时显示规则回答。{DEMO ? '在线演示：问题与工具整理后的合成示例数据会发送到演示服务器上的模型；本演示不含任何真实训练记录。' : '模型在本机运行，不上传问题或训练记录。'}</p>
     </details>
   )
 }
@@ -132,7 +138,11 @@ export function CoachAgentChat({ chat, intro, timeline = [], prompts, initialDra
     window.setTimeout(() => document.getElementById(`agent-cite-${id}-${ref}`)?.scrollIntoView?.({ block: 'center', behavior: 'smooth' }), 50)
   }
 
-  const statusText = health === null ? '正在连接本地 AI 模型…'
+  const statusText = DEMO
+    ? health === null ? '正在连接在线演示模型…'
+      : ready ? `${modelName(health.model, health.label)} 已就绪 · 在线演示：问题与合成示例数据发送到演示服务器上的模型`
+        : '在线演示模型暂不可用（服务未开启或已达到额度）· 固定五问仍可使用'
+    : health === null ? '正在连接本地 AI 模型…'
     : ready ? `${modelName(health.model)} ${health.warm === 'loading' ? '正在载入显存（首次约 40 秒），可以先提问' : health.warm === 'warm' ? '已就绪' : '可用（若未载入，首个回答需额外等待模型加载）'} · 本机推理，不联网`
       : health.status === 'disabled' ? '本构建未启用本地大模型 · 请使用固定五问'
       : health.status === 'model_unavailable' ? '本地模型服务已启动，但固定的模型文件未通过校验'
@@ -157,7 +167,7 @@ export function CoachAgentChat({ chat, intro, timeline = [], prompts, initialDra
               {turn.answer ? (
                 <>
                   <span className="basis" data-testid="coach-agent-source">
-                    {SOURCE_LABEL[turn.answer.source]}{turn.answer.source === 'llm' ? ` · ${modelName(turn.answer.metrics.model)} · 依据见下方` : ''}
+                    {SOURCE_LABEL[turn.answer.source]}{turn.answer.source === 'llm' ? ` · ${modelName(turn.answer.metrics.model, health?.label)} · 依据见下方` : ''}
                     {turn.answer.fallbackReason ? ` · 原因：${FALLBACK_TEXT[turn.answer.fallbackReason] ?? turn.answer.fallbackReason}` : ''}
                   </span>
                   <Details turnId={turn.id} answer={turn.answer} open={!!openDetails[turn.id]} onToggle={(open) => setOpenDetails((value) => ({ ...value, [turn.id]: open }))} />
@@ -173,12 +183,12 @@ export function CoachAgentChat({ chat, intro, timeline = [], prompts, initialDra
       {ready ? (
         <label className="check-chip agent-consent" data-testid="coach-agent-consent">
           <input type="checkbox" checked={recordsConsent} onChange={(event) => onRecordsConsent(event.target.checked)} />
-          允许 AI 教练读取此浏览器中的热身与功法训练记录（只读、不上传、不修改；模型只看到工具整理后的分数与问题）
+          {DEMO ? '允许 AI 教练读取本演示内置的合成示例训练记录（虚构用户，不是你的数据；只读）' : '允许 AI 教练读取此浏览器中的热身与功法训练记录（只读、不上传、不修改；模型只看到工具整理后的分数与问题）'}
         </label>
       ) : null}
       <form className="chat-input" onSubmit={submit}>
         <input value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={300} disabled={!ready || busy}
-          placeholder={ready ? '自由提问：训练表现、进步、推荐、功法要领…' : health?.status === 'disabled' ? '本构建未启用自由提问' : '自由提问需要本地 AI 模型 · 请先启动本地模型服务'} aria-label="自由提问" data-testid="coach-agent-input" />
+          placeholder={ready ? '自由提问：训练表现、进步、推荐、功法要领…' : health?.status === 'disabled' ? '本构建未启用自由提问' : DEMO ? '在线演示模型暂不可用' : '自由提问需要本地 AI 模型 · 请先启动本地模型服务'} aria-label="自由提问" data-testid="coach-agent-input" />
         {busy ? <button className="btn btn-secondary" type="button" onClick={chat.cancel} data-testid="coach-agent-cancel">停止</button>
           : <button className="btn btn-dark" type="submit" disabled={!ready || !draft.trim()} data-testid="coach-agent-send">发送</button>}
       </form>
