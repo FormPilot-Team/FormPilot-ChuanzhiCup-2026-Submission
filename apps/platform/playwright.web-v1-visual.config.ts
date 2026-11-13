@@ -14,10 +14,14 @@ export default defineConfig({
   workers: 1,
   reporter: 'line',
   timeout: 120_000,
-  use: { baseURL: 'http://127.0.0.1:4175', ...devices['Desktop Chrome'], channel: 'msedge' },
-  webServer: {
-    command: 'npm run competition:preview',
-    url: 'http://127.0.0.1:4175',
-    reuseExistingServer: true,
-  },
+  // FP_VISUAL_URL: capture an already running build instead, e.g. the unzipped competition package served by its own
+  // launcher on http://localhost:4175 (no preview server is started then).
+  use: { baseURL: process.env.FP_VISUAL_URL ?? 'http://127.0.0.1:4175', ...devices['Desktop Chrome'], channel: 'msedge' },
+  ...(process.env.FP_VISUAL_URL ? {} : {
+    webServer: {
+      command: 'npm run competition:preview',
+      url: 'http://127.0.0.1:4175',
+      reuseExistingServer: true,
+    },
+  }),
 })

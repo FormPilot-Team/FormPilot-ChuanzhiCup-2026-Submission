@@ -94,6 +94,20 @@ def main() -> int:
         shutil.copy2(HERE / 'ai-coach-local' / launcher, local_ai / launcher)
     (local_ai / 'package.json').write_text(json.dumps({'name': 'formpilot-ai-coach-local', 'private': True, 'type': 'module'}, indent=2) + chr(10), encoding='utf-8')
 
+    # Traceability: the exact source commit this package was built from (and whether the tree had local edits).
+    commit = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=PLATFORM, capture_output=True, text=True, check=True).stdout.strip()
+    dirty = subprocess.run(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=PLATFORM, capture_output=True, text=True, check=True).stdout.strip()
+    built = __import__('datetime').datetime.now().astimezone().isoformat(timespec='seconds')
+    (package / 'VERSION.txt').write_text('\n'.join([
+        f'FormPilot Web V{args.version} competition package',
+        f'source commit: {commit}' + (' (WITH UNCOMMITTED CHANGES)' if dirty else ''),
+        f'built: {built}',
+        'platform: vite build --mode competition (AI Coach decision model ACTIVE; free-text questions need a local model, see 01)',
+        'games: Motion Games Lab (apps/motion-games-lab/app) production build',
+        'not included: model weights, Ollama, API keys, personal training records',
+        'file list and SHA-256: SHA256SUMS.txt',
+        '',
+    ]), encoding='utf-8')
     files = sorted(p for p in package.rglob('*') if p.is_file())
     leaked = [p for p in files if p.name in FORBIDDEN_NAMES or p.suffix.lower() in FORBIDDEN_SUFFIXES or p.name.lower().startswith('ollama')]
     if leaked:
