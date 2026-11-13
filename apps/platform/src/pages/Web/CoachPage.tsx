@@ -1,6 +1,8 @@
-import { useMemo, useState, type FormEvent, type ReactElement } from 'react'
+import { useMemo, useRef, useState, type FormEvent, type ReactElement } from 'react'
 import { GAMES_PATH, HISTORY_PATH, ROUTINES_PATH } from '../../app/routes'
 import { resolveCoachDecisionRuntime, type CoachDecisionRuntime, type WebCoachDecisionMode } from '../../app/coachDecisionConfig'
+import { CoachAgentChat } from '../../components/web/CoachAgentChat'
+import { useCoachAgentChat } from '../../components/web/useCoachAgentChat'
 import { CoachOrb } from '../../components/web/CoachOrb'
 import { StatusPill, WebEmpty, WebShell } from '../../components/web/WebShell'
 import {
@@ -11,6 +13,7 @@ import { collectLocalDecisionInput } from '../../features/coachAgent/decisionMod
 import { COACH_DECISION_SHADOW_LOG_KEY, COACH_DECISION_SHADOW_LOG_MAX, toShadowLogEntry } from '../../features/coachAgent/decisionModel/engine/shadow'
 import { FOCUS_LABELS } from '../../features/coachAgent/recommendation/engine'
 import type { CoachProfile, CoachQuestion, CoachRecommendation } from '../../features/coachAgent/recommendation/types'
+import type { AgentToolContext } from '../../features/coachLlm/tools'
 import { findWebGame } from '../../features/web/games'
 
 /** Option wording reused from the existing AI Coach profile form (CoachProfile v1, coachAgent/sprint). */
@@ -186,17 +189,33 @@ function ModelPanel({ response, elapsedMs }: { response: CoachDecisionResponse; 
  * AI Coach (Web V1). Profile → risk confirmation → data consent → `recommendCoachDecision` (fp-coach-decision/v1).
  * Ordinary builds: OFF (rules). DEV/acceptance: SHADOW with a labelled panel. Competition build: ACTIVE with the
  * owner-approved experimental model, falling back to rules on abstention or any fault. The page never claims to observe
- * the user's posture, never calls a network service and has no free-text model chat.
+ * the user's posture. V1.2: free-text questions go to the local LLM agent (CoachAgentChat → loopback bridge → local
+ * Qwen) only when the bridge reports the pinned model ready; otherwise the input stays disabled and says so.
  */
 export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window === 'undefined' ? null : window.localStorage, startInside = false }: { mode?: WebCoachDecisionMode; runtime?: CoachDecisionRuntime; storage?: Pick<Storage, 'getItem'> | null; startInside?: boolean }) {
   const [runtime] = useState<CoachDecisionRuntime>(() => runtimeProp ?? (mode ? { mode, allowExperimentalModel: false, source: 'default' } : resolveCoachDecisionRuntime()))
   const [intro, setIntro] = useState(() => !startInside && !(typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('view')))
-  const [view, setView] = useState<CoachView>('profile')
+  const [view, setView] = useState<CoachView>(() => {
+    const requested = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('view')
+    return requested === 'questions' || requested === 'result' || requested === 'plan' ? requested : 'profile'
+  })
+  /** Prefill only (never auto-sent): a question handed over from a report page. */
+  const [askDraft] = useState(() => (typeof window === 'undefined' ? '' : (new URLSearchParams(window.location.search).get('ask') ?? '').slice(0, 300)))
+  /** Separate, explicit consent for the AI Coach chat to read warm-up and routine records (read-only). */
+  const [agentRecordsConsent, setAgentRecordsConsent] = useState(false)
   const [draft, setDraft] = useState<CoachProfile>(INITIAL_PROFILE)
   const [scope, setScope] = useState<DataScope>('profile_only')
   const [consent, setConsent] = useState(false)
   const [run, setRun] = useState<CoachRun | null>(null)
-  const [asked, setAsked] = useState<CoachQuestion[]>([])
+  const [asked, setAsked] = useState<Array<{ question: CoachQuestion; at: number }>>([])
+  const order = useRef(0)
+  const nextOrder = () => { order.current += 1; return order.current }
+  const agentChat = useCoachAgentChat((): AgentToolContext => ({
+    storage, now: () => Date.now(),
+    recordsConsent: agentRecordsConsent,
+    recommend: () => run?.response ?? null,
+    gamesAvailable: null,
+  }), nextOrder)
 
   const response = run?.response ?? null
   const display = response?.display ?? null
@@ -312,20 +331,24 @@ export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window 
     </section>
   )
 
+  const fixedTimeline = display ? asked.map(({ question, at }, index) => ({ at, key: `${question}-${index}`, node: (
+    <div style={{ display: 'grid', gap: 18 }}>
+      <div className="bubble user">{COACH_FIXED_QUESTIONS.find(([id]) => id === question)?.[1]}</div>
+      <div className="bubble coach" data-testid={`coach-answer-${question}`}>{display.answers[question]}<span className="basis">依据：{response?.decisionOrigin === 'model' ? '训练模型排序 + 规则安全筛选' : '自述画像 + 项目规则'}{response?.dataSources.trainingHistory === 'live_local_records' ? ' + 授权本机记录' : ''}</span>{question === 'suitable' && firstChapter && itemHref(firstChapter).href ? <><br /><a className="btn btn-primary" style={{ marginTop: 12 }} href={itemHref(firstChapter).href ?? undefined}>开始训练 →</a></> : null}</div>
+    </div>
+  ) })) : []
   const questionsPanel = (
-    <section className="chat glass card" aria-label="固定五问" data-testid="coach-questions">
-      {panelHead('训练问答', '固定五问 · 回答来自本次推荐结果')}
-      <div className="chat-stream">
-        {!display ? <div className="bubble coach">先完成画像并生成推荐，再选择下面的问题。<span className="basis">依据：尚未生成推荐</span></div> : asked.length === 0 ? <div className="bubble coach">选择下面任一问题，我会根据本次推荐回答。<span className="basis">依据：本次推荐结果</span></div> : null}
-        {display ? asked.map((question, index) => (
-          <div key={`${question}-${index}`} style={{ display: 'grid', gap: 18 }}>
-            <div className="bubble user">{COACH_FIXED_QUESTIONS.find(([id]) => id === question)?.[1]}</div>
-            <div className="bubble coach" data-testid={`coach-answer-${question}`}>{display.answers[question]}<span className="basis">依据：{response?.decisionOrigin === 'model' ? '训练模型排序 + 规则安全筛选' : '自述画像 + 项目规则'}{response?.dataSources.trainingHistory === 'live_local_records' ? ' + 授权本机记录' : ''}</span>{question === 'suitable' && firstChapter && itemHref(firstChapter).href ? <><br /><a className="btn btn-primary" style={{ marginTop: 12 }} href={itemHref(firstChapter).href ?? undefined}>开始训练 →</a></> : null}</div>
-          </div>
-        )) : null}
-      </div>
-      <div className="chat-prompts">{COACH_FIXED_QUESTIONS.map(([id, label]) => <button key={id} type="button" className="prompt" disabled={!display} onClick={() => setAsked((items) => [...items, id])} data-testid={`coach-ask-${id}`}>{label}</button>)}</div>
-      <form className="chat-input" onSubmit={(event) => event.preventDefault()}><input placeholder="自由提问未接入 · 请选择上方固定问题" aria-label="自由提问（未接入）" disabled /><button className="btn btn-dark" type="submit" disabled>发送</button></form>
+    <section className="chat glass card" aria-label="训练问答" data-testid="coach-questions">
+      {panelHead('训练问答', '固定五问来自本次推荐结果 · 自由提问由本机大模型调用只读工具回答')}
+      <CoachAgentChat
+        chat={agentChat}
+        initialDraft={askDraft}
+        recordsConsent={agentRecordsConsent}
+        onRecordsConsent={setAgentRecordsConsent}
+        intro={!display ? <div className="bubble coach">先完成画像并生成推荐，再选择下面的固定问题。<span className="basis">依据：尚未生成推荐</span></div> : asked.length === 0 ? <div className="bubble coach">选择下面任一固定问题，我会根据本次推荐回答。<span className="basis">依据：本次推荐结果</span></div> : null}
+        timeline={fixedTimeline}
+        prompts={<div className="chat-prompts" aria-label="固定五问">{COACH_FIXED_QUESTIONS.map(([id, label]) => <button key={id} type="button" className="prompt" disabled={!display} onClick={() => setAsked((items) => [...items, { question: id, at: nextOrder() }])} data-testid={`coach-ask-${id}`}>{label}</button>)}</div>}
+      />
     </section>
   )
 
@@ -343,7 +366,7 @@ export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window 
   )
 
   const panels: Record<CoachView, ReactElement> = { profile: profilePanel, result: resultPanel, questions: questionsPanel, plan: planPanel }
-  const links: ReadonlyArray<[CoachView, string]> = [['profile', '用户画像'], ['result', '推荐与依据'], ['questions', '固定五问'], ['plan', '推荐计划']]
+  const links: ReadonlyArray<[CoachView, string]> = [['profile', '用户画像'], ['result', '推荐与依据'], ['questions', '训练问答'], ['plan', '推荐计划']]
 
   return (
     <WebShell active="coach" testId="web-coach">

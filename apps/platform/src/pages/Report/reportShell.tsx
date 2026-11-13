@@ -283,12 +283,14 @@ export function MiniBar({ value, tone = 'fair', label }: { value: number | null;
 }
 
 /** The closing call to action of a report: train again, or go to 我的训练. */
-export function ReportActions({ title, description, historyHref, againLabel, onAgain }: {
+export function ReportActions({ title, description, historyHref, againLabel, onAgain, coachHref }: {
   title: string
   description: string
   historyHref: string
   againLabel: string
   onAgain: () => void
+  /** V1.2: opens AI Coach with a prefilled (not sent) question about the latest session. */
+  coachHref?: string
 }) {
   return (
     <section className="fp-card flex flex-col items-start justify-between gap-4 bg-gradient-to-r from-white to-blue-50/80 p-5 sm:flex-row sm:items-center sm:p-6" aria-label="报告操作">
@@ -297,6 +299,7 @@ export function ReportActions({ title, description, historyHref, againLabel, onA
         <p className="mt-0.5 text-pretty text-sm text-slate-600">{description}</p>
       </div>
       <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
+        {coachHref ? <a href={coachHref} className="secondary-button inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" data-testid="report-ask-coach">问 AI 教练（最近一次训练）</a> : null}
         <a href={historyHref} className="secondary-button inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">查看训练记录</a>
         <button type="button" onClick={onAgain} className="primary-button inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">{againLabel}</button>
       </div>
