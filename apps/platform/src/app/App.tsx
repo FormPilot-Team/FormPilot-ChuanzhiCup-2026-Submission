@@ -35,15 +35,18 @@ const RoutineRoutePage = lazy(async () => {
   return { default: module.RoutineRoutePage }
 })
 
-/** Public AI Coach demo (`pnpm demo:build` only; the constant check removes it from every other build). */
-const PublicDemoApp = lazy(() => import('../publicDemo/PublicDemoApp'))
+/**
+ * Public AI Coach demo (`pnpm demo:build` only). The import sits inside the build-time constant check so every other
+ * build drops the chunk entirely (a top-level lazy() would still emit it).
+ */
+const PublicDemoApp = import.meta.env.VITE_COACH_AGENT_MODE === 'public-demo' ? lazy(() => import('../publicDemo/PublicDemoApp')) : null
 
 function WebLoading({ text }: { text: string }) {
   return <div className="grid min-h-dvh place-items-center bg-[#f7fafc] px-4 text-sm font-semibold text-slate-600" role="status">{text}</div>
 }
 
 export default function App() {
-  if (import.meta.env.VITE_COACH_AGENT_MODE === 'public-demo') {
+  if (PublicDemoApp) {
     return <Suspense fallback={<WebLoading text="正在打开 AI 教练在线演示…" />}><PublicDemoApp /></Suspense>
   }
   const { search } = window.location
