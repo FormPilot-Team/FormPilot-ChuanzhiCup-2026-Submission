@@ -87,9 +87,10 @@ pnpm dev --host 127.0.0.1 --port 4173      # 或 competition:build + competition
 | 环境 | 自由提问 | 说明 |
 |---|---|---|
 | 普通 Web 构建 | 本机 Bridge 可用时启用 | 打开「训练问答」后才探测 127.0.0.1:4321；探测失败显示「未连接」，输入框禁用 |
-| 比赛轻量包（competition build） | 同上；包内不含模型 | 模型不进安装包；评委机没有 Bridge 时自动回到固定五问 + M1/M2 |
+| 比赛轻量包（competition build） | 同上；包内不含模型 | 模型不进安装包；评委机没有 Bridge 时自动回到固定五问 + M1/M2。已装好模型环境的电脑可用包内 `ai-coach-local/start-ai-coach-local.cmd` 一键启动 Bridge（不下载任何东西） |
 | LLM 演示环境 | 启用 | Ollama(F:) + Bridge + dev/preview |
 | 无 LLM 回退 | 禁用 | `VITE_COACH_AGENT=off` 构建完全不探测；固定五问、推荐、风险规则不受影响 |
+| 在线演示（只含 AI 教练） | 演示网关可用时启用 | `pnpm demo:build` + `pnpm demo:gateway`；合成示例数据；见 [PUBLIC_DEMO.md](PUBLIC_DEMO.md)。**尚未公开上线** |
 
 ## 6. 测试
 
@@ -97,7 +98,9 @@ pnpm dev --host 127.0.0.1 --port 4173      # 或 competition:build + competition
 |---|---|---|
 | `tests/coach-llm-*.test.ts` | 检索、guard、router、agent 编排（脚本化假传输）、工具 | 无（标注 FAKE） |
 | `tests/coach-agent-bridge-v12.test.ts` | Bridge 边界：Origin/Host、固定模型、请求校验、工具白名单、限流、预加载 | 假 Ollama |
-| `tests/e2e/web-v12-agent.spec.ts` | UI：就绪 / 不可用 / 安全规则 / 校验回退 / 报告跳转 + 授权读取 | 假 Bridge（标注） |
+| `tests/e2e/web-v12-agent.spec.ts` | UI：就绪 / 不可用 / 安全规则 / 校验回退 / 报告跳转 + 授权读取 / 逐段推送的危险草稿从不显示（F） | 假 Bridge（标注） |
+| `tests/coach-agent-demo-gateway.test.ts` | 演示网关：Host/Origin、静态白名单、Key 不外泄、OpenAI 兼容转换、限额、并发、Ollama 上游 | 假上游 |
+| `playwright.public-demo.config.ts` | 在线演示四问（桌面 + 手机）、合成数据标注、无第三方请求 | **真实模型**（经网关） |
 | `tests/llm-eval/agent.eval.ts` | 26 题 Agent 任务集 | **真实本机模型** |
 | `tests/llm-eval/rag.eval.ts` | 20 题 无RAG / RAG / 规则 三组对比 | **真实本机模型** |
 
