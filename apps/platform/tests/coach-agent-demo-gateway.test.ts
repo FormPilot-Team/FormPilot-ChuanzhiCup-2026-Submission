@@ -18,7 +18,8 @@ import { agentBridgeUrl, agentDeployment, checkAgentHealth } from '../src/featur
  * playwright.public-demo.config.ts (evidence in the V1.2 evidence folder, final-round/public-demo/).
  */
 const servers = new Set<Server>()
-const SECRET = 'sk-test-DO-NOT-LEAK-0123456789abcdef'
+// A fake value that is deliberately not shaped like any real provider key (the repo hygiene scan rejects sk-… strings).
+const SECRET = 'fake-upstream-key-DO-NOT-LEAK-0123456789'
 
 async function listen(server: Server, port = 0): Promise<number> {
   servers.add(server)
