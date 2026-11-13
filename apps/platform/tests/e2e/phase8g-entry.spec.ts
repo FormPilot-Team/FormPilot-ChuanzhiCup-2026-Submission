@@ -8,6 +8,17 @@ import { markOnboardingSeen } from './support/onboarding'
 const dialog = (page: Page) => page.getByTestId('onboarding-dialog')
 const step = (page: Page) => page.getByTestId('onboarding-step')
 const storedOnboarding = (page: Page) => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? 'null'), ONBOARDING_STORAGE_KEY)
+// The record is written by the dialog's native `close` event, which the browser dispatches in a later task than the
+// one that hides the dialog (measured on Edge 157: up to ~45 ms on a freshly loaded page). Poll for it after closing.
+const recordedOnboarding = (page: Page) => expect.poll(() => storedOnboarding(page), { message: 'onboarding outcome recorded by the close event' })
+/** Arms a one-shot listener for the dialog's `close` event; await the returned function after closing it. */
+const armCloseEvent = async (page: Page) => {
+  await page.evaluate(() => {
+    const target = document.querySelector('[data-testid="onboarding-dialog"]')!
+    ;(window as unknown as { __onboardingClosed: Promise<void> }).__onboardingClosed = new Promise((resolve) => target.addEventListener('close', () => resolve(), { once: true }))
+  })
+  return () => page.evaluate(() => (window as unknown as { __onboardingClosed: Promise<void> }).__onboardingClosed)
+}
 
 test.describe('8G onboarding', () => {
   test('A: first launch shows the guide once; finishing it returns to the Mode Hub and survives reload', async ({ page }) => {
@@ -31,7 +42,7 @@ test.describe('8G onboarding', () => {
     await expect(dialog(page)).toBeHidden()
     // Web V1: back on the six-board Home.
     await expect(page.getByTestId('home-get-started')).toBeVisible()
-    expect(await storedOnboarding(page)).toMatchObject({ version: 1, outcome: 'completed' })
+    await recordedOnboarding(page).toMatchObject({ version: 1, outcome: 'completed' })
 
     await page.reload()
     await expect(page.getByTestId('home-get-started')).toBeVisible()
@@ -58,7 +69,7 @@ test.describe('8G onboarding', () => {
     await expect(dialog(page)).toBeVisible()
     await page.keyboard.press('Escape')
     await expect(dialog(page)).toBeHidden()
-    expect(await storedOnboarding(page)).toMatchObject({ version: 1, outcome: 'dismissed' })
+    await recordedOnboarding(page).toMatchObject({ version: 1, outcome: 'dismissed' })
     await page.reload()
     await expect(page.getByTestId('home-get-started')).toBeVisible()
     await expect(dialog(page)).toBeHidden()
@@ -68,13 +79,13 @@ test.describe('8G onboarding', () => {
     await expect(dialog(page)).toBeVisible()
     await page.getByRole('button', { name: '关闭使用说明' }).click()
     await expect(dialog(page)).toBeHidden()
-    expect(await storedOnboarding(page)).toMatchObject({ outcome: 'dismissed' })
+    await recordedOnboarding(page).toMatchObject({ outcome: 'dismissed' })
 
     await page.evaluate((key) => localStorage.removeItem(key), ONBOARDING_STORAGE_KEY)
     await page.reload()
     await page.getByRole('button', { name: '跳过' }).click()
     await expect(dialog(page)).toBeHidden()
-    expect(await storedOnboarding(page)).toMatchObject({ outcome: 'dismissed' })
+    await recordedOnboarding(page).toMatchObject({ outcome: 'dismissed' })
   })
 
   // Web V1: 使用说明 is the topbar 帮助 button on every board.
@@ -86,9 +97,12 @@ test.describe('8G onboarding', () => {
     await expect(dialog(page)).toBeVisible()
     await expect(step(page)).toHaveAttribute('data-step', 'welcome')
     await page.getByRole('button', { name: '下一步' }).click()
+    const closed = await armCloseEvent(page)
     await page.keyboard.press('Escape')
     await expect(dialog(page)).toBeHidden()
     await expect(page.getByTestId('web-help')).toBeFocused()
+    // "Unchanged" can only be checked after the close handler has run.
+    await closed()
     expect(await storedOnboarding(page)).toMatchObject({ outcome: 'completed', at: 1 })
 
     await page.getByTestId('web-help').click()
