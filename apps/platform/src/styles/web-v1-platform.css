@@ -147,7 +147,6 @@
 .fpw .agent-step.ok .agent-step-dot { background:#3fbf8f; }
 .fpw .agent-step.fail .agent-step-dot { background:var(--coral); }
 .fpw .agent-step.pending .agent-step-dot { background:var(--blue-deep); animation: agent-pulse 1s ease-in-out infinite; }
-.fpw .agent-caret { display:inline-block; width:7px; height:14px; margin-left:2px; vertical-align:-2px; background:var(--blue-deep); animation: agent-pulse .9s steps(2, start) infinite; }
 .fpw .agent-cite { border:0; padding:0 5px; margin:0 1px; border-radius:6px; background:rgba(121,184,255,.2); color:var(--blue-deep); font-size:11px; font-weight:700; line-height:1.5; cursor:pointer; vertical-align:1px; }
 .fpw .agent-cite:hover { background:rgba(121,184,255,.35); }
 .fpw .agent-details { margin-top:10px; border-top:1px solid var(--line); padding-top:8px; font-size:12px; }
@@ -160,6 +159,6 @@
 .fpw .agent-examples .prompt { background:rgba(167,139,250,.12); border-color:rgba(167,139,250,.3); }
 .fpw .chat-input input:disabled { cursor:not-allowed; }
 @keyframes agent-pulse { 0%, 100% { opacity:1; } 50% { opacity:.35; } }
-@media (prefers-reduced-motion: reduce) { .fpw .agent-status-dot.wait, .fpw .agent-step.pending .agent-step-dot, .fpw .agent-caret { animation:none; } }
+@media (prefers-reduced-motion: reduce) { .fpw .agent-status-dot.wait, .fpw .agent-step.pending .agent-step-dot { animation:none; } }
 @media (max-width: 640px) { .fpw .bubble { max-width:100%; } }
 .fpw .agent-consent { display:flex; gap:8px; align-items:flex-start; margin:0 0 4px; font-size:11px; line-height:1.5; color:var(--ink-soft); }

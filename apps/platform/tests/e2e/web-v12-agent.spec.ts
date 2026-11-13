@@ -34,7 +34,7 @@ async function openQuestions(page: Page) {
   await page.getByTestId('coach-link-questions').click()
 }
 
-test('Web V1.2 A: fake bridge ready → tool progress, streamed answer, model source and expandable citations', async ({ page }) => {
+test('Web V1.2 A: fake bridge ready → tool progress, validated answer, model source and expandable citations', async ({ page }) => {
   const chats = await fakeBridge(page)
   await openQuestions(page)
   await expect(page.getByTestId('coach-agent-status')).toHaveAttribute('data-status', 'ready')
@@ -125,4 +125,60 @@ test('Web V1.2 E: report hand-off prefills (never sends) the question; consented
   const toolMessage = chats[1].messages.at(-1)!
   expect(toolMessage.role).toBe('tool')
   expect(toolMessage.content).toContain('overallScore')
+})
+
+test('Web V1.2 F: a rejected draft streamed slowly never appears on screen before the rule answer replaces it', async ({ page }) => {
+  // FAKE BRIDGE with real incremental streaming: an in-page fetch stub returns a ReadableStream that sends one NDJSON
+  // line every 150 ms, so React gets to render between chunks. A MutationObserver records every text the answer area
+  // ever showed. The draft promises a cure; validation must reject it and the dangerous words must never be visible.
+  await page.route(`${BRIDGE}/v1/coach/agent/health`, (route) => route.fulfill({ json: HEALTH_READY }))
+  await page.addInitScript(({ bridge, doneEvent }) => {
+    const original = window.fetch.bind(window)
+    let round = 0
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      if (!url.startsWith(`${bridge}/v1/coach/agent/chat`)) return original(input, init)
+      round += 1
+      const events = round === 1
+        ? [{ type: 'tool_calls', calls: [{ name: 'search_knowledge', arguments: { query: '八段锦 腰椎', topic: 'baduanjin' } }] }, doneEvent]
+        : [...['坚持练', '八段锦，', '保证能', '治愈', '你的腰椎间盘突出。'].map((text) => ({ type: 'delta', text })), doneEvent]
+      const encoder = new TextEncoder()
+      const stream = new ReadableStream<Uint8Array>({
+        async start(controller) {
+          for (const event of events) {
+            controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`))
+            await new Promise((resolve) => setTimeout(resolve, 150))
+          }
+          controller.close()
+        },
+      })
+      return new Response(stream, { status: 200, headers: { 'Content-Type': 'application/x-ndjson' } })
+    }
+    const seen: string[] = []
+    ;(window as unknown as { __agentSeen: string[] }).__agentSeen = seen
+    const watch = () => new MutationObserver(() => {
+      // Everything the answer bubble shows except the collapsed diagnostics (which name the rejected rule, e.g. MEDICAL_PROMISE).
+      for (const node of document.querySelectorAll('[data-testid="coach-agent-answer"]')) {
+        const copy = node.cloneNode(true) as HTMLElement
+        copy.querySelectorAll('details').forEach((item) => item.remove())
+        seen.push(copy.textContent ?? '')
+      }
+    }).observe(document.body, { subtree: true, childList: true, characterData: true })
+    if (document.body) watch(); else document.addEventListener('DOMContentLoaded', watch)
+  }, { bridge: BRIDGE, doneEvent: done })
+  await openQuestions(page)
+  await expect(page.getByTestId('coach-agent-status')).toHaveAttribute('data-status', 'ready')
+  await page.getByTestId('coach-agent-input').fill('练八段锦能治好腰椎间盘突出吗？')
+  await page.getByTestId('coach-agent-send').click()
+  const answer = page.getByTestId('coach-agent-answer').last()
+  // While the draft streams, only progress is shown.
+  await expect(answer.getByTestId('coach-agent-drafting')).toContainText('校验通过后显示')
+  await expect(answer).toHaveAttribute('data-source', 'rules_fallback', { timeout: 10_000 })
+  await expect(page.getByTestId('coach-agent-source')).toContainText('模型回答未通过安全与证据校验')
+  await expect(answer.getByTestId('coach-agent-text')).not.toContainText('治愈')
+  await expect(answer.getByTestId('coach-agent-text')).toContainText('八段锦')
+  const seen = await page.evaluate(() => (window as unknown as { __agentSeen: string[] }).__agentSeen)
+  expect(seen.length).toBeGreaterThan(3)
+  expect(seen.some((text) => text.includes('模型已生成'))).toBe(true)
+  for (const word of ['保证能', '治愈', '坚持练八段锦']) expect(seen.filter((text) => text.includes(word))).toEqual([])
 })

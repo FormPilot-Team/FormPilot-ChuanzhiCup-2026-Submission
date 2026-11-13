@@ -11,6 +11,11 @@ export interface AgentChatTurn {
   running: boolean
   thinking: boolean
   steps: Array<AgentToolTrace & { pending?: boolean }>
+  /** Characters the model has drafted so far (progress only; the draft itself is not shown before validation). */
+  drafted: number
+  /** The draft is being checked before it may be shown. */
+  checking: boolean
+  /** Validated answer text (or the rule answer). Empty until the turn's `final` event. */
   text: string
   answer: AgentAnswer | null
 }
@@ -66,7 +71,7 @@ export function useCoachAgentChat(getContext: () => AgentToolContext, nextOrder:
     if (!text || busy || !ready || controller.current) return
     const id = nextId.current++
     const history = turns.filter((turn) => turn.answer).slice(-3).map((turn) => ({ question: turn.question, answer: turn.answer!.text }))
-    setTurns((items) => [...items, { id, at: latest.current.nextOrder(), question: text, running: true, thinking: true, steps: [], text: '', answer: null }])
+    setTurns((items) => [...items, { id, at: latest.current.nextOrder(), question: text, running: true, thinking: true, steps: [], drafted: 0, checking: false, text: '', answer: null }])
     const own = new AbortController()
     controller.current = own
     try {
@@ -78,14 +83,14 @@ export function useCoachAgentChat(getContext: () => AgentToolContext, nextOrder:
           if (event.type === 'thinking') update(id, (turn) => ({ ...turn, thinking: true }))
           else if (event.type === 'tool_start') update(id, (turn) => ({ ...turn, thinking: false, steps: [...turn.steps, { name: event.name, label: event.label, arguments: event.arguments, ok: true, summary: '', errorCode: null, elapsedMs: 0, routed: false, pending: true }] }))
           else if (event.type === 'tool_end') update(id, (turn) => ({ ...turn, steps: turn.steps.map((step, index) => (index === turn.steps.length - 1 ? { ...event.trace } : step)) }))
-          else if (event.type === 'delta') update(id, (turn) => ({ ...turn, thinking: false, text: turn.text + event.text }))
-          else if (event.type === 'reset') update(id, (turn) => ({ ...turn, text: '' }))
-          else if (event.type === 'final') update(id, (turn) => ({ ...turn, running: false, thinking: false, text: event.answer.text, answer: event.answer }))
+          else if (event.type === 'drafting') update(id, (turn) => ({ ...turn, drafted: event.chars }))
+          else if (event.type === 'checking') update(id, (turn) => ({ ...turn, thinking: false, checking: true }))
+          else if (event.type === 'final') update(id, (turn) => ({ ...turn, running: false, thinking: false, checking: false, text: event.answer.text, answer: event.answer }))
         },
       })
     } finally {
       if (controller.current === own) controller.current = null
-      update(id, (turn) => (turn.running ? { ...turn, running: false, thinking: false } : turn))
+      update(id, (turn) => (turn.running ? { ...turn, running: false, thinking: false, checking: false } : turn))
     }
   }
 

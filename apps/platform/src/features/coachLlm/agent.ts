@@ -7,6 +7,10 @@ import { executeAgentTool, toolLabel, type AgentToolContext, type ToolCitation, 
  * One V1.2 agent turn: guard → model (native tool calls, streamed) → trusted tool execution → model answer →
  * validation → answer or rule fallback. The orchestration, tool budget, authorization and validation are application
  * code; the model only chooses tools and writes the explanation. Model text and tool evidence stay separate.
+ *
+ * Display rule: model text is streamed from the bridge into this function only. Nothing the model writes leaves it
+ * before `validateAnswer` passes — callers see progress (`drafting` = character count, `checking`) and then exactly one
+ * `final` answer, so unvalidated or rejected text can never flash on screen ahead of the rule fallback.
  */
 
 export interface AgentTransport {
@@ -36,8 +40,10 @@ export type AgentRunEvent =
   | { type: 'thinking'; round: number }
   | { type: 'tool_start'; name: AgentToolName; label: string; arguments: Record<string, unknown> }
   | { type: 'tool_end'; trace: AgentToolTrace }
-  | { type: 'delta'; text: string }
-  | { type: 'reset' }
+  /** Progress only: how many characters the model has drafted this round. Never carries model text. */
+  | { type: 'drafting'; chars: number }
+  /** The draft is complete and is being checked (safety, evidence, citations) before it may be shown. */
+  | { type: 'checking' }
   | { type: 'final'; answer: AgentAnswer }
 
 export interface AgentTurnOptions {
@@ -138,7 +144,7 @@ export async function runAgentTurn(question: string, options: AgentTurnOptions):
         if (event.type === 'delta') {
           if (metrics.ttftMs === null) metrics.ttftMs = Math.round(now() - started)
           content += event.text
-          emit({ type: 'delta', text: event.text })
+          emit({ type: 'drafting', chars: content.length })
         } else if (event.type === 'tool_calls') calls = calls.concat(event.calls)
         else if (event.type === 'done') {
           metrics.model = event.model
@@ -161,7 +167,7 @@ export async function runAgentTurn(question: string, options: AgentTurnOptions):
     }
 
     // Tools requested (by the model or the router): discard interim text and run them in order (deduplicated, budgeted).
-    if (content) emit({ type: 'reset' })
+    if (content) emit({ type: 'drafting', chars: 0 })
     const accepted = calls.slice(0, MAX_TOOL_CALLS_PER_TURN - traces.length)
     messages.push({ role: 'assistant', content: '', toolCalls: accepted })
     for (const call of accepted) {
@@ -186,9 +192,9 @@ export async function runAgentTurn(question: string, options: AgentTurnOptions):
   const notice = flags.includes('medical') ? MEDICAL_NOTICE : null
   if (failure || !answerText.trim()) {
     const text = failure === 'CANCELLED' && !executions.length ? '已停止回答。' : ruleFallbackText(executions, question)
-    if (answerText.trim() || failure) emit({ type: 'reset' })
     return finish({ text, source: 'rules_fallback', notice, validation: { ok: false, issues: [failure ?? 'EMPTY_ANSWER'] }, fallbackReason: failure ?? 'EMPTY_ANSWER', citations, evidence, tools: traces })
   }
+  emit({ type: 'checking' })
   const validation = validateAnswer(answerText, {
     toolText: executions.map((item) => item.content).join(' '), question, citationRefs: citations.map((item) => item.ref), flags,
     // "Called", not "succeeded": after a refused or empty record read, any score in the answer is ungrounded.
@@ -196,7 +202,6 @@ export async function runAgentTurn(question: string, options: AgentTurnOptions):
     usedRecommendation: executions.some((item) => item.call.name === 'recommend_training'),
   })
   if (!validation.ok) {
-    emit({ type: 'reset' })
     return finish({ text: ruleFallbackText(executions, question), source: 'rules_fallback', notice, validation: { ok: false, issues: validation.issues }, fallbackReason: 'VALIDATION_FAILED', citations, evidence, tools: traces })
   }
   return finish({ text: validation.text, source: 'llm', notice, validation: { ok: true, issues: validation.issues }, fallbackReason: null, citations, evidence, tools: traces })

@@ -31,7 +31,7 @@ function modelName(model: string | null): string {
 function AnswerText({ text, onCite }: { text: string; onCite: (ref: string) => void }) {
   const parts = text.split(/(\[K\d+\])/gu)
   return (
-    <span style={{ whiteSpace: 'pre-wrap' }}>
+    <span style={{ whiteSpace: 'pre-wrap' }} data-testid="coach-agent-text">
       {parts.map((part, index) => {
         const match = /^\[(K\d+)\]$/u.exec(part)
         return match
@@ -43,7 +43,7 @@ function AnswerText({ text, onCite }: { text: string; onCite: (ref: string) => v
 }
 
 function StepList({ turn }: { turn: AgentChatTurn }) {
-  if (!turn.steps.length && !turn.thinking) return null
+  if (!turn.steps.length && !turn.thinking && !turn.checking) return null
   return (
     <ol className="agent-steps" data-testid="coach-agent-steps" aria-label="AI 教练处理步骤">
       {turn.steps.map((step, index) => (
@@ -53,7 +53,8 @@ function StepList({ turn }: { turn: AgentChatTurn }) {
           <small>{step.pending ? '进行中…' : `${step.summary} · ${step.elapsedMs} ms`}</small>
         </li>
       ))}
-      {turn.thinking ? <li className="agent-step pending"><span className="agent-step-dot" aria-hidden="true" /><span>{turn.steps.length ? '根据工具结果组织回答' : '理解问题、选择工具'}</span><small>本机模型推理中…</small></li> : null}
+      {turn.thinking ? <li className="agent-step pending" data-testid="coach-agent-drafting"><span className="agent-step-dot" aria-hidden="true" /><span>{turn.steps.length ? '根据工具结果组织回答' : '理解问题、选择工具'}</span><small>{turn.drafted ? `模型已生成 ${turn.drafted} 字，校验通过后显示…` : '本机模型推理中…'}</small></li> : null}
+      {turn.checking ? <li className="agent-step pending" data-testid="coach-agent-checking"><span className="agent-step-dot" aria-hidden="true" /><span>安全与证据校验</span><small>检查医疗表述、分数出处与引用…</small></li> : null}
     </ol>
   )
 }
@@ -90,10 +91,10 @@ function Details({ turnId, answer, open, onToggle }: { turnId: number; answer: A
         </div>
       ) : null}
       <p className="tiny">
-        {answer.source === 'llm' ? `模型：${modelName(answer.metrics.model)} · 首字 ${answer.metrics.ttftMs ?? '—'} ms · 总耗时 ${answer.metrics.totalMs} ms · ${answer.metrics.rounds} 轮 · 输出 ${answer.metrics.outputTokens} tokens${answer.metrics.tokensPerSecond ? ` · ${answer.metrics.tokensPerSecond} tokens/s` : ''}` : `总耗时 ${answer.metrics.totalMs} ms`}
+        {answer.source === 'llm' ? `模型：${modelName(answer.metrics.model)} · 模型首字 ${answer.metrics.ttftMs ?? '—'} ms（内部，校验后才显示）· 总耗时 ${answer.metrics.totalMs} ms · ${answer.metrics.rounds} 轮 · 输出 ${answer.metrics.outputTokens} tokens${answer.metrics.tokensPerSecond ? ` · ${answer.metrics.tokensPerSecond} tokens/s` : ''}` : `总耗时 ${answer.metrics.totalMs} ms`}
         {answer.validation.issues.length ? ` · 校验：${answer.validation.issues.join('、')}` : ' · 校验通过'}
       </p>
-      <p className="tiny">模型文本不作为证据；分数、比较结论和推荐只来自上面的工具结果。模型在本机运行，不上传问题或训练记录。</p>
+      <p className="tiny">模型文本不作为证据；分数、比较结论和推荐只来自上面的工具结果。模型回答先通过安全与证据校验才显示，未通过时显示规则回答。模型在本机运行，不上传问题或训练记录。</p>
     </details>
   )
 }
@@ -121,8 +122,9 @@ export function CoachAgentChat({ chat, intro, timeline = [], prompts, initialDra
   const [draft, setDraft] = useState(initialDraft)
   const [openDetails, setOpenDetails] = useState<Record<number, boolean>>({})
   const streamEnd = useRef<HTMLDivElement>(null)
-  const lastText = turns.length ? turns[turns.length - 1].text.length : 0
-  useEffect(() => { streamEnd.current?.scrollIntoView?.({ block: 'nearest' }) }, [turns.length, timeline.length, lastText])
+  const last = turns.length ? turns[turns.length - 1] : null
+  const lastProgress = last ? `${last.steps.length}:${last.checking}:${last.text.length}` : ''
+  useEffect(() => { streamEnd.current?.scrollIntoView?.({ block: 'nearest' }) }, [turns.length, timeline.length, lastProgress])
 
   const submit = (event: FormEvent) => { event.preventDefault(); if (!draft.trim()) return; const text = draft; setDraft(''); void ask(text) }
   const cite = (id: number, ref: string) => {
@@ -152,7 +154,6 @@ export function CoachAgentChat({ chat, intro, timeline = [], prompts, initialDra
               <StepList turn={turn} />
               {turn.answer?.notice ? <div className="notice" style={{ margin: '0 0 8px' }}>{turn.answer.notice}</div> : null}
               {turn.text ? <AnswerText text={turn.text} onCite={(ref) => cite(turn.id, ref)} /> : turn.running ? null : <span>（没有回答）</span>}
-              {turn.running ? <span className="agent-caret" aria-hidden="true" /> : null}
               {turn.answer ? (
                 <>
                   <span className="basis" data-testid="coach-agent-source">

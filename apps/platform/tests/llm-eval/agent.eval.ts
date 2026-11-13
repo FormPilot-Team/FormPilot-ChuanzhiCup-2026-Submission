@@ -82,7 +82,7 @@ describe('V1.2 agent with the real local model', () => {
     const runs: Array<Record<string, unknown>> = []
     for (const testCase of AGENT_CASES) {
       const events: AgentRunEvent[] = []
-      const answer = await runAgentTurn(testCase.question, { transport, context: toolContext(testCase.context), history: testCase.history, onEvent: (event) => { if (event.type !== 'delta') events.push(event) } })
+      const answer = await runAgentTurn(testCase.question, { transport, context: toolContext(testCase.context), history: testCase.history, onEvent: (event) => { if (event.type !== 'drafting') events.push(event) } })
       const called = answer.tools.map((tool) => tool.name)
       const checks: Record<string, boolean> = {}
       if (testCase.tools) checks.tools = testCase.tools.every((name) => called.includes(name as never))

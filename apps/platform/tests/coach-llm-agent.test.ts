@@ -40,7 +40,8 @@ describe('V1.2 agent orchestration (scripted fake transport)', () => {
     expect(answer.citations[0].chunkId).toBeTruthy()
     expect(answer.text).toContain('[K1]')
     expect(requests[1].messages.at(-1)).toMatchObject({ role: 'tool', toolName: 'search_knowledge' })
-    expect(events.map((event) => event.type)).toEqual(expect.arrayContaining(['thinking', 'tool_start', 'tool_end', 'delta', 'final']))
+    expect(events.map((event) => event.type)).toEqual(expect.arrayContaining(['thinking', 'tool_start', 'tool_end', 'drafting', 'checking', 'final']))
+    expect(events.filter((event) => event.type === 'final')).toHaveLength(1)
   })
 
   it('runs the routed tool itself when the model answers a known intent from memory', async () => {
@@ -48,9 +49,32 @@ describe('V1.2 agent orchestration (scripted fake transport)', () => {
     const events: AgentRunEvent[] = []
     const answer = await runAgentTurn('八段锦第二式有哪些动作要求？', { transport, context: toolContext(), onEvent: (event) => events.push(event) })
     expect(answer.tools[0]).toMatchObject({ name: 'search_knowledge', routed: true })
-    expect(events.some((event) => event.type === 'reset')).toBe(true)
+    expect(events.some((event) => event.type === 'drafting' && event.chars === 0)).toBe(true)
     expect(answer.text).not.toContain('第二式要求马步')
+    expect(JSON.stringify(events.filter((event) => event.type !== 'final'))).not.toContain('第二式要求马步')
     expect(requests).toHaveLength(2)
+  })
+
+  it('never hands unvalidated model text to the caller, even while it is still streaming', async () => {
+    // A dangerous draft streamed in small pieces; validation rejects it and the rule answer replaces it.
+    const pieces = ['坚持', '练八段锦', '保证能', '治愈', '你的腰椎间盘突出。']
+    const dangerous: AgentStreamEvent[] = [...pieces.map((text) => ({ type: 'delta', text }) as AgentStreamEvent), done]
+    const { transport } = scripted([call('search_knowledge', { query: '八段锦 腰椎', topic: 'baduanjin' }), dangerous])
+    const events: AgentRunEvent[] = []
+    const seen: string[] = []
+    const answer = await runAgentTurn('练八段锦能治好腰椎间盘突出吗？', { transport, context: toolContext(), onEvent: (event) => {
+      events.push(event)
+      // Snapshot of everything a UI could render at this moment, taken before the final answer arrives.
+      if (event.type !== 'final') seen.push(JSON.stringify(event))
+    } })
+    expect(answer.source).toBe('rules_fallback')
+    expect(answer.fallbackReason).toBe('VALIDATION_FAILED')
+    for (const piece of ['保证能', '治愈', '腰椎间盘突出。']) expect(seen.join(' ')).not.toContain(piece)
+    expect(answer.text).not.toContain('保证能')
+    expect(events.map((event) => event.type)).toContain('checking')
+    const drafted = events.filter((event): event is Extract<AgentRunEvent, { type: 'drafting' }> => event.type === 'drafting')
+    expect(drafted.at(-1)?.chars).toBe(pieces.join('').length)
+    expect(events.at(-1)?.type).toBe('final')
   })
 
   it('answers acute risk and write requests by rule without calling the model', async () => {
