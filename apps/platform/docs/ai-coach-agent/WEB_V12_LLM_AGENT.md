@@ -90,7 +90,7 @@ pnpm dev --host 127.0.0.1 --port 4173      # 或 competition:build + competition
 | 比赛轻量包（competition build） | 同上；包内不含模型 | 模型不进安装包；评委机没有 Bridge 时自动回到固定五问 + M1/M2。已装好模型环境的电脑可用包内 `ai-coach-local/start-ai-coach-local.cmd` 一键启动 Bridge（不下载任何东西） |
 | LLM 演示环境 | 启用 | Ollama(F:) + Bridge + dev/preview |
 | 无 LLM 回退 | 禁用 | `VITE_COACH_AGENT=off` 构建完全不探测；固定五问、推荐、风险规则不受影响 |
-| 在线演示（只含 AI 教练） | 演示网关可用时启用 | `pnpm demo:build` + `pnpm demo:gateway`；合成示例数据；见 [PUBLIC_DEMO.md](PUBLIC_DEMO.md)。**尚未公开上线** |
+| 在线演示（只含 AI 教练） | 演示网关可用时启用 | `pnpm demo:build` + `pnpm demo:gateway`；合成示例数据；见 [PUBLIC_DEMO.md](PUBLIC_DEMO.md)。**负责人决定本届不部署公网 Demo** |
 
 ## 6. 测试
 
