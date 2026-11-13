@@ -39,8 +39,10 @@ test('Competition A: profile P gets the trained model recommendation with identi
   await expect(panel).toContainText('权重、内容表与目录指纹校验通过')
   await expect(page.getByTestId('coach-model-state')).toHaveText('模型推荐')
   await expect(page.getByTestId('coach-shadow-panel')).toHaveCount(0)
-  // Recommendation runs in the browser: no network request while generating it.
-  expect(requests.filter((url) => !/\.(js|css|png|jpg|webm|woff2?)(\?|$)/.test(url))).toEqual([])
+  // Browsers may defer this page's favicon request until after collection starts.
+  // Ignore only the two same-origin icon URLs; other business requests still fail.
+  const localFavicons = new Set(['/favicon.svg', '/favicon.ico'].map((path) => new URL(path, page.url()).href))
+  expect(requests.filter((url) => !localFavicons.has(url) && !/\.(js|css|png|jpg|webm|woff2?)(\?|$)/.test(url))).toEqual([])
   await page.getByTestId('coach-link-questions').click()
   await page.getByTestId('coach-ask-why').click()
   await expect(page.getByTestId('coach-answer-why')).toContainText('训练模型排序')

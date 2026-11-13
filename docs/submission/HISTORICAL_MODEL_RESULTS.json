@@ -1,0 +1,76 @@
+{
+  "description": "Historical real-model evaluation aggregates, not rerun in this independent-repository task; original reports use synthetic test fixtures, not human clinical data.",
+  "reported_by": "Final V1.2.1 technical handoff, 2026-11-13",
+  "baseline_equivalence": "Final application source matches f6e081202d2f5f7652f11198af2542d755d88b3a; commit equality checked separately.",
+  "records": [
+    {
+      "source_artifact": "agent-eval/run8/agent-eval.json",
+      "source_sha256": "84bda3c44eee24471fa27933984253543c2347ef67212fa83540e8fe2c0768b0",
+      "summary": {
+        "model": "qwen3:4b-instruct-2507-q4_K_M",
+        "at": "2026-11-13T14:22:54.768Z",
+        "cases": 27,
+        "passed": 27,
+        "passRate": 100,
+        "bySource": {
+          "llm": 24,
+          "rules_fallback": 1,
+          "safety_rule": 2
+        },
+        "medianTotalMs": 1381,
+        "data": "TEST FIXTURES: golden warm-up sessions + generated routine records stored as live/normal; not real users."
+      }
+    },
+    {
+      "source_artifact": "rag-eval/run4/rag-eval.json",
+      "source_sha256": "a9d894f924aed3def58ff697d4fde6b3b524fa42f4c8327765014a97f70c068c",
+      "summary": {
+        "model": "qwen3:4b-instruct-2507-q4_K_M",
+        "at": "2026-11-13T14:24:24.240Z",
+        "questions": 20,
+        "meanFactRecall": {
+          "llm_no_rag": 0.35,
+          "llm_rag": 0.95,
+          "rules_only": 0.87
+        },
+        "medianMs": {
+          "llm_no_rag": 1187,
+          "llm_rag": 2010,
+          "rules_only": 0
+        },
+        "ragCitations": {
+          "answersWithCitation": 18,
+          "cited": 82,
+          "relevant": 65
+        },
+        "ragSources": {
+          "llm": 20,
+          "rules_fallback": 0,
+          "safety_rule": 0
+        }
+      }
+    },
+    {
+      "source_artifact": "rag-eval/run4/support-check.json",
+      "source_sha256": "246a3f48bede4b5e2d107e099ec0afae853f99e809c133125040a05b650c83dc",
+      "summary": {
+        "threshold": 0.35,
+        "run": "run4",
+        "arms": {
+          "llm_no_rag": {
+            "sentences": 100,
+            "claimSentences": 78,
+            "unsupportedCandidates": 72,
+            "unsupportedRate": 0.923
+          },
+          "llm_rag": {
+            "sentences": 92,
+            "claimSentences": 54,
+            "unsupportedCandidates": 4,
+            "unsupportedRate": 0.074
+          }
+        }
+      }
+    }
+  ]
+}

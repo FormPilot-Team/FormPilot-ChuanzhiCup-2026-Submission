@@ -1,0 +1,86 @@
+{
+  "period": "2026-11-13 to 2026-11-14 Asia/Shanghai",
+  "baseline": "f6e081202d2f5f7652f11198af2542d755d88b3a",
+  "environment": {
+    "os": "Windows",
+    "node": "24.12.0",
+    "pnpm": "12.5.1",
+    "python": "3.12.0",
+    "browser": "installed Microsoft Edge"
+  },
+  "platform": {
+    "unit_integration_passed": 2220,
+    "typecheck": "PASS",
+    "lint_errors": 0,
+    "lint_existing_warnings": 7,
+    "build": "PASS",
+    "competition_build": "PASS",
+    "full_e2e_first_run": {
+      "passed": 205,
+      "failed": 1,
+      "skipped": 1
+    },
+    "e2e_after_test_url_fix": {
+      "file": "tests/e2e/web-v1.spec.ts",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    "e2e_scope": "All 207 unique cases covered across the full run and targeted rerun; not a new single 207-pass run."
+  },
+  "games": {
+    "unit_passed": 89,
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "build": "PASS",
+    "package_ui_e2e_passed": 15,
+    "input": "synthetic MediaPipe-format landmarks through full motion/game pipeline"
+  },
+  "package": {
+    "source": "61eb6958ab2fdf1578da3c1f9acbb891fdb9b7b4",
+    "sha256": "e46092fc9260fa7fbc6b6c9b99bc9f8933f1d8dc79b50bbfd3fa89ce961973ea",
+    "verified_files": 130,
+    "crc": "PASS",
+    "smoke_passed": 7,
+    "visual_pages_passed": 52,
+    "active_tests_passed": 5,
+    "visual_first_run": "56 passed, 1 same-origin favicon timing false positive; fixed test and reran all 5 ACTIVE cases"
+  },
+  "real_qwen_rerun": false,
+  "m1_m2_retrained": false,
+  "not_verified": [
+    "real human camera training",
+    "Qwen questions using real human records",
+    "reviewer computer",
+    "Tauri desktop build",
+    "media distribution rights",
+    "Wang final PDF"
+  ],
+  "evidence_sha256": {
+    "platform-test-final.log": "3188976ad8684c2ad538ccb6211fa3b82045c605489b6d2eba6ceb62aadafc24",
+    "games-test.log": "444fcbdf6bc12022e16bdad83a525719db96363cfa935ab4cc337e3b660b9005",
+    "platform-e2e.log": "f3392ab6ce3af02d862fb3907c34464674835034cd5b9ab87a094323e89a4757",
+    "platform-web-v1-final.log": "dd18c125797cf14bc8a224246813b7530173e47fd00ea465cbb775249756553f",
+    "competition-active-final.log": "6049812fb23b0025dee5b3543e51a3783cf3ff5181fc405b06a352165d439d44",
+    "package-smoke.log": "a83015ab8e5ec534f57138e442323aa0c25e0a3b23e897f022388a74d945a9c5",
+    "games-e2e.log": "9a23a4ae95761eaa97dd11351aab77601742f83b0936cc534a1b63f940892936",
+    "platform-typecheck.log": "5cfb036289d819b2a87e947d65f4532031dd37753f3cf2def0f77d398eea1737",
+    "platform-lint.log": "f6c978a5bce7c578fcbf0b46f03b2e12f48dd98a3d4c0801c95c2f809ebb07d0",
+    "platform-build.log": "3c012ffb03f99de26f955264458f57894fcee1c8328450764a041ad0cdee2b62",
+    "platform-competition-build-final.log": "a8b9284e7729f0a062af01b59cdc8466d8909271006feb5e15a4900191ed786c",
+    "games-typecheck.log": "5cfb036289d819b2a87e947d65f4532031dd37753f3cf2def0f77d398eea1737",
+    "games-lint.log": "050c69da23536758722729aeda55a8d0fb9d557495ef6d33d70873a3b64a71c1",
+    "games-build.log": "2e62592f67612df2bb38a8d3483f3df4f698c3ccfaac02252476fc812fce9361",
+    "install-platform.log": "6c66e7f1a4184c41ffe4cce58da741adedf5e29060cec9d42ea678267c8bea98",
+    "install-games.log": "6f5791058c9481dd9159bdf7b39428f4da78aa48b9d86400b9d7d2f5536c0dfe",
+    "visual-active.log": "31babbe55580c2f1bfeede2fad82c728fd3aa1b090cacc8f88cf2c25e334ee92",
+    "package-build-final.log": "b59372e0ba4d77467b7d71fdc90b73eabc132998fc657e044100eebeebb68b87",
+    "final-package-verification.json": "4f2d227af6e4f01a2e1323791f0cbbd50930b8c71ee707cbf1c092a9506c719d",
+    "source-after-check.json": "767b13b98208f415db98a14bf1d4cc592f8c71f476365a404f10e19ecfa6d014",
+    "path-and-media-audit.json": "4a3825d9db2da02e316134dbad928837db4da938ff76f3b85b067d2cc6c2de1f",
+    "history-metadata-verification.json": "7ca342e78bac2bbf63a91342de55eade0c83514ff59166a2cd3e55fa45ff6acb",
+    "history-privacy-reviewed.json": "329897d9a0bd5592218264c018f344d020ea3545dc4c8d3bb2baaec72f4e6c6a",
+    "final-source-byte-check.json": "48d1fa838b4e2bdaa4f4b963dc41c7b27ebb728d4bfad063e8c7f8d43e6a3993",
+    "cdm-example-verification.json": "2abe564a0fba1923e4de28139d371952e391be406c62ed67244cc282c48d8083"
+  }
+}

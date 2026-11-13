@@ -1,0 +1,20 @@
+{
+  "product": "FormPilot Web",
+  "version": "1.2.1",
+  "stage": "local-submission-candidate",
+  "source_baseline": "f6e081202d2f5f7652f11198af2542d755d88b3a",
+  "equivalent_development_head": "42a6d58c7a93f545cf2b65c26b27db0f6a4b05c6",
+  "filtered_baseline": "0676506210f8f3f48f3c098a1603b27cac0ff44d",
+  "original_demo_package": {
+    "source": "8e00101dd249c672f177b98aff8c5a1dcc39dfac",
+    "sha256": "5831b223d679f1346e27ad22075ddff86770663fe374e541b1fcbd78a7ea5429"
+  },
+  "independent_validation_package": {
+    "source": "61eb6958ab2fdf1578da3c1f9acbb891fdb9b7b4",
+    "sha256": "e46092fc9260fa7fbc6b6c9b99bc9f8933f1d8dc79b50bbfd3fa89ce961973ea",
+    "distribution": "local-only; media rights pending"
+  },
+  "remote_created": false,
+  "public_release_approved": false,
+  "qwen_real_inference_rerun": false
+}

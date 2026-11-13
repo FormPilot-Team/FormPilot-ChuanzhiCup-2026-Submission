@@ -246,8 +246,10 @@ test('Web V1 J: 动作工坊 opens from 训练中心 and 我的 under its correc
   await expect(page.getByTestId('web-nav-me')).toHaveAttribute('aria-current', 'page')
 })
 
+const gameServiceUrl = new URL(process.env.VITE_MOTION_GAMES_URL ?? 'http://127.0.0.1:5181/')
+
 test('Web V1 K: with no game service the game center says it is not connected and offers only the way back', async ({ page, context }) => {
-  await context.route('http://127.0.0.1:5181/**', (route) => route.abort())
+  await context.route(`${gameServiceUrl.href}**`, (route) => route.abort())
   await page.goto('/games')
   await expect(page.getByTestId('games-service')).toContainText('体感游戏服务未启动')
   await page.getByTestId('game-start-apple').click()
@@ -258,7 +260,7 @@ test('Web V1 K: with no game service the game center says it is not connected an
 })
 
 test('Web V1 L: with Motion Games Lab running, a game opens in its own window and closing it returns to the game center', async ({ page, context, request }) => {
-  const reachable = await request.get('http://127.0.0.1:5181/').then((response) => response.ok()).catch(() => false)
+  const reachable = await request.get(gameServiceUrl.href).then((response) => response.ok()).catch(() => false)
   test.skip(!reachable, 'Motion Games Lab preview (pnpm --dir apps/motion-games-lab/app preview) is not running')
   await page.goto('/games')
   await expect(page.getByTestId('games-service')).toContainText('已连接')
@@ -266,7 +268,7 @@ test('Web V1 L: with Motion Games Lab running, a game opens in its own window an
   const popupPromise = context.waitForEvent('page')
   await page.getByTestId('game-launch').click()
   const popup = await popupPromise
-  await expect(popup).toHaveURL(/127\.0\.0\.1:5181\/\?game=archery$/)
+  await expect(popup).toHaveURL(new URL('?game=archery', gameServiceUrl).href)
   await popup.waitForLoadState('domcontentloaded')
   await expect(popup.locator('body')).toContainText('射箭', { timeout: 20_000 })
   await expect(page.getByTestId('game-running')).toBeVisible()
@@ -276,7 +278,7 @@ test('Web V1 L: with Motion Games Lab running, a game opens in its own window an
 })
 
 test('Web V1 M: AI Coach links a recommended game to its card in the game center', async ({ page, context }) => {
-  await context.route('http://127.0.0.1:5181/**', (route) => route.abort())
+  await context.route(`${gameServiceUrl.href}**`, (route) => route.abort())
   await page.goto('/games?game=boating')
   await expect(page.getByTestId('game-dialog')).toHaveAttribute('open', '')
   await expect(page.locator('#game-dialog-title')).toHaveText('林间划船')

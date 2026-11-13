@@ -63,7 +63,7 @@ scripts/submission/               本地素材恢复与校验工具
 
 ## 环境与安装
 
-本轮验证环境及实际结果见 [VALIDATION.md](docs/submission/VALIDATION.md)。基本环境为 Windows、Node.js **22.18+**（本轮使用 24.12.0）、pnpm **12.5.1**、Python **3.12**（仅素材恢复/离线打包需要），自动化浏览器使用已安装的 Microsoft Edge。测试不自动下载浏览器或 Qwen。
+本轮平台 2,220 单元/集成、游戏 89 单元、三游戏 15 项完整 UI 流程、7 项解压包冒烟均通过；全量平台 E2E 的 1 项失败和 1 项跳过经测试地址修正后相关 13 项复测通过。完整首轮结果、视觉/ACTIVE 验证及限制见 [VALIDATION.md](docs/submission/VALIDATION.md)。基本环境为 Windows、Node.js **22.18+**（本轮使用 24.12.0）、pnpm **12.5.1**、Python **3.12**（仅素材恢复/离线打包需要），自动化浏览器使用已安装的 Microsoft Edge。测试不自动下载浏览器或 Qwen。
 
 从仓库根目录执行，两个应用各自有 `package.json`、`pnpm-lock.yaml` 和 `pnpm-workspace.yaml`：
 
@@ -160,15 +160,15 @@ pnpm test
 pnpm test:e2e
 ```
 
-平台比赛构建运行后，可运行 `pnpm exec playwright test -c playwright.web-v1-visual.config.ts`。完整素材和两端服务运行后，可运行 `pnpm exec playwright test -c playwright.package-smoke.config.ts`，检查四套视频实际播放及平台游戏联通。`tests/llm-eval`、`playwright.llm-demo.config.ts` 是显式真实模型评测，不属于默认单元/E2E 命令。
+平台比赛构建运行后，可运行 `pnpm exec playwright test -c playwright.web-v1-visual.config.ts`。完整素材和两端服务运行后，可运行 `pnpm exec playwright test -c playwright.package-smoke.config.ts`，检查四套视频实际播放及平台游戏联通。若测试解压后的离线包，进入游戏目录运行 `pnpm exec playwright test -c playwright.submission.config.ts`，默认连接该包的 `http://localhost:5181`；保留原 15 项完整游戏测试，不启动另一份游戏服务。`tests/llm-eval`、`playwright.llm-demo.config.ts` 是显式真实模型评测，不属于默认单元/E2E 命令。
 
-V1.2.1 交接中可追溯的历史测试成绩：单元/集成 **2220/2220**；竞赛视觉/ACTIVE **57/57**；解压包冒烟 **7/7**；全量 E2E **204 通过、2 失败、1 跳过**，失败用例单独复测 6/6。真实 Qwen Agent run8 **27/27**；RAG run4 20 题事实召回 **0.35 → 0.95**，无依据句子 **92.3% → 7.4%**。这些是原版本报告，不能冒充本次重跑结果；本次独立仓库的结果单独列在 [VALIDATION.md](docs/submission/VALIDATION.md)。
+V1.2.1 交接中可追溯的历史测试成绩：单元/集成 **2220/2220**；竞赛视觉/ACTIVE **57/57**；解压包冒烟 **7/7**；全量 E2E **204 通过、2 失败、1 跳过**，失败用例单独复测 6/6。真实 Qwen Agent run8 **27/27**；RAG run4 20 题事实召回 **0.35 → 0.95**，无依据句子 **92.3% → 7.4%**。[原始评测汇总及来源 SHA-256](docs/submission/HISTORICAL_MODEL_RESULTS.json)随仓库保留。这些是原版本报告，不能冒充本次重跑结果；本次独立仓库的结果单独列在 [VALIDATION.md](docs/submission/VALIDATION.md)。
 
 自动化包含合成姿态、测试夹具及假上游，不能代替真人摄像头训练、真人记录问答或评委电脑验证。44 条出处、素材授权、非数字幻觉和模型偶发漏引文仍是已知限制。本届没有公网在线演示，不声称具备语音输入、大模型视觉、长期记忆、微调或临床认证。
 
 ## 开发历史、团队与许可
 
-保留真实作者、时间和提交说明的路径过滤历史：基线主线 80 条，另保留 `history/web-v12-development` 分支，合计 131 条历史提交；提交准备改动另作当前真实提交。路径变化导致 SHA 改变，映射见 [commit-map.txt](docs/submission/commit-map.txt)。签名不随重写保留，不声称过滤提交仍具有原签名。
+保留真实作者、时间和提交说明的路径过滤历史：基线主线 80 条，另保留 `history/web-v12-development` 分支，合计 131 条历史提交；提交准备改动另作当前真实提交。路径变化导致 SHA 改变，映射见 [commit-map.txt](docs/submission/commit-map.txt)，重要任务见[开发时间线](docs/submission/DEVELOPMENT_HISTORY.md)。签名不随重写保留，不声称过滤提交仍具有原签名。
 
 官方要求“保留完整的 Git 提交历史”。本仓库只保留作品路径，并非原私有 Monorepo 的全部历史，是否被赛事接受仍需组委会/负责人确认；本地另存未过滤审计副本，不将其当作公开附件。保留的历史包含个人邮箱、内部路径与已识别的测试假 Key，在完成公开审查前不能直接推送 Public。
 
