@@ -109,9 +109,11 @@ def main() -> int:
     (package / ('00-V' + args.version + '-版本记录.md')).write_text(
         '# FormPilot Web V' + args.version + '\n\n'
         '从正式 main 的实际提交重新构建，精确提交与构建时间见 `VERSION.txt`。\n'
-        '本版包含 PR #60 的动作工坊姿态图标与开始/恢复手势修复；识别仍使用 full 模型，等待开始/恢复时使用 lite 手势模型。\n'
-        '保留 V1.2.1 功能；没有新增产品功能，也没有包含 Qwen 权重、Ollama、API Key 或个人训练记录。\n'
-        '包内 V1.2.2 说明、第三方许可、文件清单与校验由 `finalize_v122_package.py` 补齐。\n'
+        + ('本版包含 PR #60 的动作工坊姿态图标与开始/恢复手势修复，以及 PR #62 的提前结束完成徽标、AI Coach 固定回答与下一步重点修正。\n'
+         if args.version == '1.2.3' else
+         '本版包含 PR #60 的动作工坊姿态图标与开始/恢复手势修复；识别仍使用 full 模型，等待开始/恢复时使用 lite 手势模型。\n')
+        + '保留 V1.2.1 功能；没有新增产品功能，也没有包含 Qwen 权重、Ollama、API Key 或个人训练记录。\n'
+        f'包内 V{args.version} 说明、第三方许可、文件清单与校验由 `finalize_v122_package.py --version {args.version}` 补齐。\n'
         '`FILE_MANIFEST.json` 列出 payload（不含自身和 SHA256SUMS.txt）；`SHA256SUMS.txt` 进一步包含 manifest。\n'
         '自动化与摄像头视频重放不能替代真人现场训练验收。实际测试及仍待人工验收项以本次交付的测试结果为准。\n',
         encoding='utf-8')

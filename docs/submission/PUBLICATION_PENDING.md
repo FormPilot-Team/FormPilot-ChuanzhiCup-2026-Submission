@@ -1,3 +1,11 @@
+# V1.2.3 当前状态（2026-11-16）
+
+正式来源为已合并 #60 / #62 的 `4bf15bf1c71b19f9674703f5816d19fb246d7b3f`；PR #61 保持未合并。比赛仓库继续 Private；本轮推送、Actions、包和实际回归状态见 [V123_FINAL_CHECKS.md](V123_FINAL_CHECKS.md)。未授权公开、变更评审账号或提交官网。
+
+以下保留 V1.2.2 / V1.2.1 历史状态和人工交接事项：
+
+---
+
 # V1.2.2 当前状态（2026-11-16）
 
 比赛独立远端已创建为 Private：<https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026>。实际推送和 CI 以 [本轮封版记录](V122_FINAL_CHECKS.md) 和外部提交清单为准。未改 Public，未邀请未核实的评委账号，未正式提交官网。

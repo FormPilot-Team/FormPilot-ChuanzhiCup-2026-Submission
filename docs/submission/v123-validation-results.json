@@ -1,0 +1,124 @@
+{
+  "version": "1.2.3",
+  "sourceSha": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
+  "filteredSourceSha": "e2f487dd5a6d490ce6c3e77fa820c457b0f7f609",
+  "mergeSha": "3383a755a3fdaecbda9b21a5e885591bcd838d19",
+  "status": "INDEPENDENT_LOCAL_CHECKS_PASS_FINAL_CI_AND_PACKAGE_EVIDENCE_PENDING",
+  "sourceVerification": {
+    "files": 1032,
+    "unamended": 1027,
+    "mismatches": 0
+  },
+  "competitionChecks": {
+    "platform": [
+      {
+        "command": "pnpm install --frozen-lockfile --offline",
+        "exit_code": 0,
+        "seconds": 39.62,
+        "log": "platform-install.log",
+        "sha256": "5cc094e862c0dd2b61905f4ac9d0e6cfdf51495af6e761ed7b2d5aba57e0a37b",
+        "at": "2026-11-17T00:05:09.208637+08:00"
+      },
+      {
+        "command": "pnpm typecheck",
+        "exit_code": 0,
+        "seconds": 79.76,
+        "log": "platform-typecheck.log",
+        "sha256": "5cfb036289d819b2a87e947d65f4532031dd37753f3cf2def0f77d398eea1737",
+        "at": "2026-11-17T00:06:29.229662+08:00"
+      },
+      {
+        "command": "pnpm lint",
+        "exit_code": 0,
+        "seconds": 50.84,
+        "log": "platform-lint.log",
+        "sha256": "f6c978a5bce7c578fcbf0b46f03b2e12f48dd98a3d4c0801c95c2f809ebb07d0",
+        "at": "2026-11-17T00:07:20.130142+08:00"
+      },
+      {
+        "command": "pnpm test",
+        "exit_code": 0,
+        "seconds": 42.45,
+        "log": "platform-test.log",
+        "sha256": "b4a70383b627cee6ebf7a874b4a86beb42be4f1f7229472da0e9204230b574f4",
+        "at": "2026-11-17T00:08:02.605776+08:00"
+      },
+      {
+        "command": "pnpm build",
+        "exit_code": 0,
+        "seconds": 56.64,
+        "log": "platform-build.log",
+        "sha256": "d9b4ea68cc6fdb70874e22022c7a6310a70a4ec0a72de3da19463b1d2081525f",
+        "at": "2026-11-17T00:08:59.348156+08:00"
+      },
+      {
+        "command": "pnpm competition:build",
+        "exit_code": 0,
+        "seconds": 31.06,
+        "log": "platform-competition-build.log",
+        "sha256": "dac0dc1a98ea778e54fdac766a04866980335499ee8c9fc5570ad2c762272599",
+        "at": "2026-11-17T00:09:30.436984+08:00"
+      }
+    ],
+    "games": [
+      {
+        "command": "pnpm install --frozen-lockfile --offline",
+        "exit_code": 0,
+        "seconds": 48.39,
+        "log": "games-install.log",
+        "sha256": "58866908fda6793beceb7feb16e9f67e9c360a13890c4a95ca634efdbd5f2b90",
+        "at": "2026-11-17T00:05:17.913392+08:00"
+      },
+      {
+        "command": "pnpm typecheck",
+        "exit_code": 0,
+        "seconds": 61.34,
+        "log": "games-typecheck.log",
+        "sha256": "5cfb036289d819b2a87e947d65f4532031dd37753f3cf2def0f77d398eea1737",
+        "at": "2026-11-17T00:06:19.410812+08:00"
+      },
+      {
+        "command": "pnpm lint",
+        "exit_code": 0,
+        "seconds": 33.84,
+        "log": "games-lint.log",
+        "sha256": "050c69da23536758722729aeda55a8d0fb9d557495ef6d33d70873a3b64a71c1",
+        "at": "2026-11-17T00:06:53.284341+08:00"
+      },
+      {
+        "command": "pnpm test",
+        "exit_code": 0,
+        "seconds": 8.58,
+        "log": "games-test.log",
+        "sha256": "80e9d9e6a54bd6052ca3bf62cb3e0856313c98cf09208f2e782c5addce8af04e",
+        "at": "2026-11-17T00:07:01.866557+08:00"
+      },
+      {
+        "command": "pnpm build",
+        "exit_code": 0,
+        "seconds": 25.52,
+        "log": "games-build.log",
+        "sha256": "cf288c9acaf2a61bbc9f0fccc7cb3f3c42db1d5c209cadcbe7722763882d8e83",
+        "at": "2026-11-17T00:07:27.403327+08:00"
+      }
+    ],
+    "platformUnitTests": 2245,
+    "gamesUnitTests": 89,
+    "platformLintWarnings": 7,
+    "platformLintErrors": 0,
+    "frozenLockfileOfflineInstall": true,
+    "sourceGroupsPreserved": {
+      "apps/motion-games-lab/app/": 129,
+      "apps/platform/public/": 65,
+      "apps/platform/scripts/decision-model/": 83,
+      "apps/platform/server/": 19,
+      "apps/platform/src/": 422
+    }
+  },
+  "finalActions": "PENDING",
+  "package": "PENDING_PARENT_EVIDENCE",
+  "historicalResultsReusedAsCurrent": false,
+  "qwenRealInferenceRerun": false,
+  "physicalCameraHumanAcceptance": false,
+  "evidenceScope": "Independent competition repository current V1.2.3 source and installed dependencies; no fresh browser E2E, physical camera or Qwen inference claimed"
+}

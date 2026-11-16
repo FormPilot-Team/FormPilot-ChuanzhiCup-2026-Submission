@@ -1,3 +1,17 @@
+# V1.2.3 增量来源记录（2026-11-16）
+
+本轮从已合并的正式来源 `4bf15bf1c71b19f9674703f5816d19fb246d7b3f` 增量同步 PR #62，继承 PR #60；PR #61 未合并且不纳入。正式原提交 tree 为 `c2aa3bffef8179bdf945c7a2ca89cd7d88033d66`。只读取得精确 Git 对象，不修改正式项目工作树或共享 refs。
+
+沿用既有文件路径过滤规则，原提交映射为 `e2f487dd5a6d490ce6c3e77fa820c457b0f7f609`，父提交保持为既有 #60 过滤基线 `98c86b6d9c49d6781acc4150b8f75d1174856d68`；以普通 merge `3383a755a3fdaecbda9b21a5e885591bcd838d19` 接到此前比赛提交 `83141790d9ec44e85d4f44838631cc8834590701`。既有提交 SHA、作者、作者/提交者时间与消息均保留；新过滤提交只替换 tree/parent 并移除失效签名。映射追加于 [commit-map.txt](commit-map.txt)，没有 reset、rebase、force-push 或历史重写。
+
+八项 PR #62 源码与测试增量全部按原 blob 同步；基线清单现 **1,032** 文件，其中 **1,027** 项原始 blob 核验通过，另三份便携 README 与两份已披露的测试环境适配继续保留。`competition-active.spec.ts` 的既有同源 favicon 过滤与 PR #62 新回归合并，两者均保留；产品、Agent/RAG、M1/M2 模型、动作工坊及完整游戏源码未删减。源码核验命令：`python scripts/submission/verify_baseline.py`。
+
+仓库继续 Private，只推送明确的比赛 submission/history refs。内部原始视频、个人训练数据、凭据与未过滤正式 Monorepo 历史不纳入本轮增量。既有媒体授权、评审访问和完整历史解释的限制继续适用。
+
+本轮测试、包及 Actions 仅以 [V1.2.3 当前记录](V123_FINAL_CHECKS.md) 为准，旧 V1.2.1/V1.2.2 成绩不能冒充当前通过。
+
+---
+
 # V1.2.2 增量来源记录（2026-11-16）
 
 本轮在原比赛仓库上增量更新，没有重新导出或改写既有 134 个可达提交。正式 main 经 GitHub 实时核验为 `9aba92e22a8238fa85d2192dff105881a0af1ce1`，PR #60 已于 2026-11-16 合并。其 tree 与真实 PR 分支 `7c2e97fec3247cc025c7f11381251f9d9638d504` 同为 `42cbc6fade2188391f48d044f09a94392dc76055`。

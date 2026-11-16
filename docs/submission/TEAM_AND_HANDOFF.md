@@ -33,7 +33,7 @@
 
 ## 一致性检查
 
-最终视频、技术 PDF、产品设计、README 与运行包统一核对：Web V1.2.2、正式来源 main `9aba92e22a8238fa85d2192dff105881a0af1ce1`、比赛仓库最终 SHA、ZIP SHA-256；Qwen3-4B 与 M1/M2 名称和独立版本；RAG run4/Agent run8 的实际轮次；Function Calling 与无 MCP 的实现；AI 标签与合成数据限制；训练/Agent 架构；团队专业背景；视频中的功能与实际运行结果。
+最终视频、技术 PDF、产品设计、README 与运行包统一核对：Web V1.2.3、正式来源 main `4bf15bf1c71b19f9674703f5816d19fb246d7b3f`、比赛仓库最终 SHA、ZIP SHA-256；Qwen3-4B 与 M1/M2 名称和独立版本；RAG run4/Agent run8 的实际轮次；Function Calling 与无 MCP 的实现；AI 标签与合成数据限制；训练/Agent 架构；团队专业背景；视频中的功能与实际运行结果。
 
 ## Private 仓库评审访问方案
 

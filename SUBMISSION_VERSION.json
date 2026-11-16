@@ -1,14 +1,13 @@
 {
   "product": "FormPilot Web",
-  "version": "1.2.2",
-  "stage": "private-technical-candidate-ready-owner-acceptance-pending",
-  "source_baseline": "9aba92e22a8238fa85d2192dff105881a0af1ce1",
-  "equivalent_development_head": "7c2e97fec3247cc025c7f11381251f9d9638d504",
-  "filtered_baseline": "98c86b6d9c49d6781acc4150b8f75d1174856d68",
+  "version": "1.2.3",
+  "stage": "private-v123-local-technical-checks-pass-final-ci-pending",
+  "source_baseline": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
+  "filtered_baseline": "e2f487dd5a6d490ce6c3e77fa820c457b0f7f609",
   "remote_created": true,
   "public_release_approved": false,
   "qwen_real_inference_rerun": false,
-  "previous_source_baseline": "f6e081202d2f5f7652f11198af2542d755d88b3a",
+  "previous_source_baseline": "9aba92e22a8238fa85d2192dff105881a0af1ce1",
   "repository_url": "https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026",
   "repository_visibility": "private",
   "submission_sha_instruction": "git rev-parse HEAD; final frozen Git SHA is recorded in the external submission evidence, avoiding a self-referential commit hash",
@@ -60,5 +59,34 @@
     "prerelease": true,
     "draft": false,
     "previous_v121_rollback_unchanged": true
+  },
+  "merged_change_requests": [
+    60,
+    62
+  ],
+  "pr61_merged": false,
+  "v123_validation": {
+    "status": "INDEPENDENT_LOCAL_TECHNICAL_CHECKS_PASS_FINAL_CI_PENDING",
+    "source_main": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
+    "prior_v121_v122_results_are_historical": true,
+    "independent_competition_ci": "PENDING_FINAL_PUSH",
+    "physical_camera_human_acceptance": false,
+    "actual_qwen_inference_rerun": false,
+    "platform_unit_tests": 2245,
+    "games_unit_tests": 89,
+    "platform_lint_warnings": 7,
+    "platform_lint_errors": 0,
+    "independent_frozen_lockfile_install": true,
+    "independent_typecheck_lint_build": true,
+    "platform_standard_and_competition_build": true,
+    "source_baseline_verification": {
+      "unamended_files": 1027,
+      "mismatches": 0
+    }
+  },
+  "v123_windows_package": {
+    "status": "PENDING_PARENT_FINAL_PACKAGE_EVIDENCE",
+    "source": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
+    "filename": "FormPilot-Web-V1.2.3.zip"
   }
 }

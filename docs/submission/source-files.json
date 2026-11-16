@@ -1,5 +1,5 @@
 {
-  "baseline": "9aba92e22a8238fa85d2192dff105881a0af1ce1",
+  "baseline": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
   "files": [
     {
       "path": ".gitattributes",
@@ -2729,7 +2729,7 @@
     {
       "path": "apps/platform/src/features/coachAgent/recommendation/engine.ts",
       "mode": "100644",
-      "blob": "5e704447a1340f7f7c5d4fcc7fe6dbbe498db286"
+      "blob": "ad3f30004bbe67ec24a26e8a451d611c162c2490"
     },
     {
       "path": "apps/platform/src/features/coachAgent/recommendation/fixtures.ts",
@@ -3944,7 +3944,7 @@
     {
       "path": "apps/platform/src/pages/Training/TrainingPage.tsx",
       "mode": "100644",
-      "blob": "fd6b43e14ed090be30e8476c08ab6e6dfe5ad7dd"
+      "blob": "a01e10b46fdac6987d1657017c3e7b370f686245"
     },
     {
       "path": "apps/platform/src/pages/Training/useTrainingRuntime.ts",
@@ -3954,7 +3954,7 @@
     {
       "path": "apps/platform/src/pages/Web/CoachPage.tsx",
       "mode": "100644",
-      "blob": "bd674dbe155bb9f2a67173a1afd12469b43c08f3"
+      "blob": "b92273027b1592a10ed802f249bcc9f3507a566c"
     },
     {
       "path": "apps/platform/src/pages/Web/GamesCenterPage.tsx",
@@ -4234,7 +4234,7 @@
     {
       "path": "apps/platform/tests/coach-agent-web-service.test.ts",
       "mode": "100644",
-      "blob": "d55cd7460822ce7cbfc797e02b39d6ad12e370b7"
+      "blob": "7c378aed1b3b4d87e28ffc185144999d0be45038"
     },
     {
       "path": "apps/platform/tests/coach-asset-validation.test.ts",
@@ -4297,6 +4297,11 @@
       "blob": "396d8b16df1fb99f563e2ddd68c85cac8b7882c5"
     },
     {
+      "path": "apps/platform/tests/coach-matrix-p1.test.ts",
+      "mode": "100644",
+      "blob": "85667a6b1a2ebab5b42d718a85e5172089ef46b2"
+    },
+    {
       "path": "apps/platform/tests/coach-motion.test.ts",
       "mode": "100644",
       "blob": "797abecfe45e56301f6f3bac965067099cf78d84"
@@ -4334,7 +4339,7 @@
     {
       "path": "apps/platform/tests/e2e/coach-agent-sprint.spec.ts",
       "mode": "100644",
-      "blob": "128a0ce6e11afdde0fcaa5ba8ee76b09702a0cea"
+      "blob": "4379d719c0e1d967cd6321986c52873f94284474"
     },
     {
       "path": "apps/platform/tests/e2e/coach-avatar.spec.ts",
@@ -4505,6 +4510,11 @@
       "path": "apps/platform/tests/e2e/visual.spec.ts",
       "mode": "100644",
       "blob": "00cb93d9dad2930214a87a7cfed5c76e4ba63e78"
+    },
+    {
+      "path": "apps/platform/tests/e2e/warmup-completion.spec.ts",
+      "mode": "100644",
+      "blob": "bf50f587bde2d5b1cb7eb61e98523212e0c9bd83"
     },
     {
       "path": "apps/platform/tests/e2e/web-v1.spec.ts",
@@ -5049,7 +5059,7 @@
     {
       "path": "apps/platform/tests/visual-web-v1/competition-active.spec.ts",
       "mode": "100644",
-      "blob": "fd2f517c2355e5771950099bda14d2a8fb27b665"
+      "blob": "6a1e2bed58d47f2ca2ce3ba59520a23ee2722f22"
     },
     {
       "path": "apps/platform/tests/visual-web-v1/web-v1-screens.spec.ts",
