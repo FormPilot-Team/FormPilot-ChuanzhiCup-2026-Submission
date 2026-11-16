@@ -3,7 +3,7 @@
   "sourceSha": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
   "filteredSourceSha": "e2f487dd5a6d490ce6c3e77fa820c457b0f7f609",
   "mergeSha": "3383a755a3fdaecbda9b21a5e885591bcd838d19",
-  "status": "INDEPENDENT_LOCAL_CHECKS_PASS_FINAL_CI_AND_PACKAGE_EVIDENCE_PENDING",
+  "status": "TECHNICAL_CHECKS_PASS_WITH_DISCLOSED_STOCK_E2E_ASSERTION_FAILURE",
   "sourceVerification": {
     "files": 1032,
     "unamended": 1027,
@@ -115,10 +115,92 @@
       "apps/platform/src/": 422
     }
   },
-  "finalActions": "PENDING",
-  "package": "PENDING_PARENT_EVIDENCE",
+  "finalActions": "Final documentation commit is verified after push; exact immutable SHA and run are in the external FINAL_RESULT.json and the repository Actions page",
+  "package": {
+    "filename": "FormPilot-Web-V1.2.3.zip",
+    "bytes": 188585614,
+    "sha256": "22f9207e16ae30621c1ee8d52ddae924b334926aaad219104c7a256f9af7e441",
+    "files": 404,
+    "dependencyLicenses": 274,
+    "source": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
+    "extractedHashChecks": 403,
+    "extractionMismatches": 0,
+    "release_url": "https://github.com/FormPilot-Team/FormPilot/releases/tag/web-v1.2.3-internal-test",
+    "distribution": "private internal prerelease; public/media/reviewer rights unchanged",
+    "release_status": "PUBLISHED_PRIVATE_PRERELEASE_PARENT_VERIFIED"
+  },
   "historicalResultsReusedAsCurrent": false,
   "qwenRealInferenceRerun": false,
   "physicalCameraHumanAcceptance": false,
-  "evidenceScope": "Independent competition repository current V1.2.3 source and installed dependencies; no fresh browser E2E, physical camera or Qwen inference claimed"
+  "evidenceScope": "Independent competition repository current V1.2.3 source and installed dependencies; no fresh browser E2E, physical camera or Qwen inference claimed",
+  "browserRegression": {
+    "devStock": {
+      "passed": 50,
+      "failed": 1,
+      "skipped": 1,
+      "failure": "Existing coach-agent-sprint legacy next-focus copy assertion no longer matches intentional #62 concrete-focus behavior; original failure retained, not silently patched",
+      "skip": "Game popup skipped in initial dev run; separate probe outcome recorded in final external acceptance"
+    },
+    "independentMergedBehaviorProbe": {
+      "checks": 4,
+      "passed": 4,
+      "source_test_edited": false
+    },
+    "packageActive": {
+      "passed": 6,
+      "failed": 0
+    },
+    "packageSmoke": {
+      "passed": 7,
+      "failed": 0
+    },
+    "cameraVideoReplay": {
+      "passed": true,
+      "physicalCameraTest": false,
+      "fullAndLiteMediaPipe": true,
+      "poseIconHeads": 2,
+      "repetitions": 8,
+      "pauseCountStable": true,
+      "gestureResume": true,
+      "reportVisible": true,
+      "pageErrors": 0
+    },
+    "gamesUi": {
+      "passed": 15,
+      "failed": 0
+    },
+    "devGamePopupProbe": {
+      "passed": true,
+      "checks": 2,
+      "evidence": "tests/package-game-popup/results.json",
+      "note": "Real packaged localhost popup verified; stock 127.0.0.1 Host test remains skipped and is not rewritten as PASS."
+    }
+  },
+  "firstValidatedActions": {
+    "sha": "5d87b502f4040be4f837f40261cfb4e276d989b9",
+    "result": "SUCCESS",
+    "run": "https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026/actions/runs/43904614543"
+  },
+  "finalEvidence": [
+    {
+      "artifact": "unzip-verification.json",
+      "sha256": "f9930a33690e4f4ee9da80711dc4f8abf29bf486f345bda92b90364b7798316b"
+    },
+    {
+      "artifact": "package-camera-replay/result.json",
+      "sha256": "662fd2fec91b021f3aeb92e92520187d5f5ae4130ba051707f54f3b093c0a4f4"
+    },
+    {
+      "artifact": "tests/active-final-e2e/results.json",
+      "sha256": "c60121c047f7ddaf4dfed3600056878729710366c86e41411ef9fbc701c73f3a"
+    },
+    {
+      "artifact": "tests/package-smoke/results.json",
+      "sha256": "ee3db7d9d25feaa09a8bb5b5b0e16cc4fbf7badb5bdafe5f0311c9be26bb2696"
+    },
+    {
+      "artifact": "tests/dev-e2e/results.json",
+      "sha256": "11e42dadf08aa232d4a080cea4304dc1e2a6a322e7857105d594e3dd629133d0"
+    }
+  ]
 }
