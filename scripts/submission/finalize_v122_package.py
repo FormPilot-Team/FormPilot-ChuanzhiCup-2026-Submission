@@ -28,6 +28,9 @@ def main() -> int:
     parser.add_argument('--source-root', type=Path, required=True)
     parser.add_argument('--package', type=Path, required=True)
     parser.add_argument('--version', default='1.2.2')
+    parser.add_argument('--mediapipe-license', type=Path, help='Optional audited upstream LICENSE when the formal source tree lacks third-party/mediapipe/LICENSE')
+    parser.add_argument('--scrollbar-license', type=Path, help='Audited project MIT license for react-remove-scroll-bar (npm package omits its text)')
+    parser.add_argument('--scrollbar-provenance', type=Path, help='Provenance and association limitations for that upstream license')
     args = parser.parse_args()
     source = args.source_root.resolve(strict=True)
     package = args.package.resolve(strict=True)
@@ -37,6 +40,8 @@ def main() -> int:
     version_text = (package / 'VERSION.txt').read_text(encoding='utf-8')
     if 'FormPilot Web V' + args.version not in version_text:
         raise SystemExit('VERSION.txt does not match --version; build the actual version first')
+    version_text = version_text.replace('not included: model weights,', 'not included: Qwen LLM weights,')
+    (package / 'VERSION.txt').write_text(version_text, encoding='utf-8', newline='\n')
     for doc in package.glob('*.md'):
         text = doc.read_text(encoding='utf-8')
         text = re.sub(r'(?<=V)1\.2\.1\b', args.version, text)
@@ -68,7 +73,7 @@ def main() -> int:
                 shutil.copy2(original, copy)
                 files.append({'file': copy.relative_to(package).as_posix(), 'sha256': digest(copy)})
             records.append({'package': identity, 'declaredLicense': info.get('license'), 'notices': files})
-    mediapipe = source / 'third-party' / 'mediapipe' / 'LICENSE'
+    mediapipe = args.mediapipe_license.resolve(strict=True) if args.mediapipe_license else source / 'third-party' / 'mediapipe' / 'LICENSE'
     if not mediapipe.is_file():
         candidates = sorted((source / 'apps/platform/node_modules/.pnpm').glob('@mediapipe+tasks-vision@*/node_modules/@mediapipe/tasks-vision/LICENSE'))
         if candidates:
@@ -77,12 +82,25 @@ def main() -> int:
         raise SystemExit('MediaPipe LICENSE could not be found')
     (licenses / 'mediapipe').mkdir(exist_ok=True)
     shutil.copy2(mediapipe, licenses / 'mediapipe/LICENSE')
+    scrollbar = args.scrollbar_license.resolve(strict=True) if args.scrollbar_license else source / 'third-party/react-remove-scroll-bar/LICENSE'
+    provenance = args.scrollbar_provenance.resolve(strict=True) if args.scrollbar_provenance else source / 'third-party/react-remove-scroll-bar/provenance.json'
+    if not scrollbar.is_file() or not provenance.is_file():
+        raise SystemExit('Missing audited react-remove-scroll-bar MIT text/provenance; supply --scrollbar-license and --scrollbar-provenance')
+    scrollbar_target = licenses / 'react-remove-scroll-bar@2.3.8'
+    scrollbar_target.mkdir(exist_ok=True)
+    shutil.copy2(scrollbar, scrollbar_target / 'LICENSE')
+    shutil.copy2(provenance, scrollbar_target / 'provenance.json')
+    for record in records:
+        if record['package'] == 'react-remove-scroll-bar@2.3.8':
+            record['notices'] = [{'file': (scrollbar_target / 'LICENSE').relative_to(package).as_posix(), 'sha256': digest(scrollbar_target / 'LICENSE')}]
+            record['licenseAssociation'] = 'npm package declares MIT but omits text; fixed upstream project LICENSE supplied, exact npm gitHead unavailable; see provenance.json'
     (licenses / 'dependency-license-inventory.json').write_text(json.dumps(records, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     (package / 'THIRD_PARTY_NOTICES.md').write_text(
         '# Third-party notices / 第三方许可\n\n'
         '本包保留锁定依赖附带的 LICENSE、NOTICE、COPYING 等全文，见 `third-party/`。\n'
         '`third-party/dependency-license-inventory.json` 记录依赖名称、版本、声明许可和通知文件哈希；其中也包含构建与测试工具。\n'
         'MediaPipe 模型和 WASM 按 Apache-2.0 保留许可，见 `third-party/mediapipe/LICENSE`。\n'
+        '`react-remove-scroll-bar@2.3.8` 的 npm 包声明 MIT 但缺许可全文；补充固定上游项目 MIT 文本与 `provenance.json`，其中说明不能验证该 npm gitHead 的关联限制。\n'
         'Qwen 权重和 Ollama 不在本包中。安装这些可选组件时须分别遵循其上游许可。\n\n'
         '视频、海报、教练形象和生成素材的来源与适用范围见 `素材来源.md` 及比赛仓库的 `docs/submission/ASSETS_AND_LICENSES.md`。\n'
         '本包只用于负责人授权的 Private 内部验收；第三方媒体的公开分发权和评审访问范围仍待负责人确认。\n'

@@ -2,7 +2,7 @@
 
 FormPilot 是面向居家规范运动与康复辅助场景的智能运动训练平台，将浏览器姿态识别、动作反馈、训练报告、个性化推荐和可追溯的 AI 问答连接起来。本项目不是医疗诊断系统，没有临床疗效验证。
 
-本次提交版本为 **FormPilot Web V1.2.2**，来源正式 main `9aba92e22a8238fa85d2192dff105881a0af1ce1`，包含 PR #60 的动作工坊图标及开始手势修复。比赛仓库保持 Private；远端地址与比赛仓库自身 SHA 以 [版本记录](SUBMISSION_VERSION.json) 为准。评审访问与待交接项见 [团队与材料交接](docs/submission/TEAM_AND_HANDOFF.md)。本轮采用本地运行，不需要公网在线 Demo。
+本次提交版本为 **FormPilot Web V1.2.2**，来源正式 main `9aba92e22a8238fa85d2192dff105881a0af1ce1`，包含 PR #60 的动作工坊图标及开始手势修复。[独立比赛仓库](https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026)保持 Private，默认分支 `submission`；源码版本说明见 [版本记录](SUBMISSION_VERSION.json)，当前比赛提交可用 `git rev-parse HEAD` 核验。评审访问与待交接项见 [团队与材料交接](docs/submission/TEAM_AND_HANDOFF.md)。本轮采用本地运行，不需要公网在线 Demo。
 
 ## 产品功能
 
@@ -195,7 +195,7 @@ pnpm test:e2e
 
 V1.2.1 交接中可追溯的历史测试成绩：单元/集成 **2220/2220**；竞赛视觉/ACTIVE **57/57**；解压包冒烟 **7/7**；全量 E2E **204 通过、2 失败、1 跳过**，失败用例单独复测 6/6。真实 Qwen Agent run8 **27/27**；RAG run4 20 题事实召回 **0.35 → 0.95**，无依据句子 **92.3% → 7.4%**。[原始评测汇总及来源 SHA-256](docs/submission/HISTORICAL_MODEL_RESULTS.json)随仓库保留。此前独立仓库另有一轮 V1.2.1 验证，单独列在 [VALIDATION.md](docs/submission/VALIDATION.md)；两轮旧结果均不能冒充本次 V1.2.2 重跑。
 
-**V1.2.2 本轮安装、构建、回归、解压运行及 CI 结果**单独记录在 [封版验证记录](docs/submission/V122_FINAL_CHECKS.md)，不使用上面的历史成绩冒充本次结果。
+**V1.2.2 本轮安装、构建、回归、解压运行及 CI 结果**单独记录在 [封版验证记录](docs/submission/V122_FINAL_CHECKS.md)及 [机器可读汇总](docs/submission/v122-validation-results.json)，不使用上面的历史成绩冒充本次结果。
 
 自动化包含合成姿态、测试夹具及假上游，不能代替真人摄像头训练、真人记录问答或评委电脑验证。44 条出处、素材授权、非数字幻觉和模型偶发漏引文仍是已知限制；M2 尚无独立人工/专家标签，多设备 SHADOW 覆盖不足。本届没有公网在线演示，不声称具备语音输入、大模型视觉、长期记忆、微调或临床认证。
 

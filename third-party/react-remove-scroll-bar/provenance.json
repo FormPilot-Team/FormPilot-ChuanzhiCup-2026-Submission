@@ -1,0 +1,16 @@
+{
+  "package": "react-remove-scroll-bar@2.3.8",
+  "npm_registry_url": "https://registry.npmjs.org/react-remove-scroll-bar/2.3.8",
+  "npm_declared_license": "MIT",
+  "npm_gitHead": "b3b1287aad81def2e2ae707274b74531b61ddbaf",
+  "npm_gitHead_status": "GitHub API and raw 404; no v2.3.8 tag exposed",
+  "upstream_license_commit": "7301c160fda44cb8cf2b9fdfde61efad35736196",
+  "license_commit_parent": "29e9fcd1eecf7d3b77a767941c4a57fe461fc1e4",
+  "license_commit_parent_tag": "v2.3.7",
+  "license_commit_date": "2025-05-21T17:01:24Z",
+  "license_commit_change": "adds LICENSE only",
+  "url": "https://raw.githubusercontent.com/theKashey/react-remove-scroll-bar/7301c160fda44cb8cf2b9fdfde61efad35736196/LICENSE",
+  "sha256": "a79aae0c0f21990d9d963bb3c5a79cdcea9a46f8523ba55c58d7fe776b6ebc84",
+  "bytes": 1093,
+  "limitation": "Exact npm 2.3.8 gitHead is unavailable upstream; this is the original upstream project MIT license at its fixed addition commit, not a fabricated template or claimed per-version license"
+}

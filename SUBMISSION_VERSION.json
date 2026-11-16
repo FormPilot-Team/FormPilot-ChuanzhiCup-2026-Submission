@@ -1,19 +1,10 @@
 {
   "product": "FormPilot Web",
   "version": "1.2.2",
-  "stage": "private-submission-preparation",
+  "stage": "private-technical-candidate-ready-owner-acceptance-pending",
   "source_baseline": "9aba92e22a8238fa85d2192dff105881a0af1ce1",
   "equivalent_development_head": "7c2e97fec3247cc025c7f11381251f9d9638d504",
   "filtered_baseline": "98c86b6d9c49d6781acc4150b8f75d1174856d68",
-  "original_demo_package": {
-    "source": "8e00101dd249c672f177b98aff8c5a1dcc39dfac",
-    "sha256": "5831b223d679f1346e27ad22075ddff86770663fe374e541b1fcbd78a7ea5429"
-  },
-  "independent_validation_package": {
-    "source": "61eb6958ab2fdf1578da3c1f9acbb891fdb9b7b4",
-    "sha256": "e46092fc9260fa7fbc6b6c9b99bc9f8933f1d8dc79b50bbfd3fa89ce961973ea",
-    "distribution": "local-only; media rights pending"
-  },
   "remote_created": true,
   "public_release_approved": false,
   "qwen_real_inference_rerun": false,
@@ -22,8 +13,52 @@
   "repository_visibility": "private",
   "submission_sha_instruction": "git rev-parse HEAD; final frozen Git SHA is recorded in the external submission evidence, avoiding a self-referential commit hash",
   "v122_validation": {
-    "status": "IN_PROGRESS",
+    "status": "AUTOMATED_TECHNICAL_CHECKS_PASS_HUMAN_ACCEPTANCE_PENDING",
     "source_main": "9aba92e22a8238fa85d2192dff105881a0af1ce1",
-    "prior_v121_results_are_historical": true
+    "prior_v121_results_are_historical": true,
+    "platform_unit_tests": 2240,
+    "games_unit_tests": 89,
+    "functional_unique_cases": 45,
+    "functional_initial_passed": 43,
+    "functional_initial_navigation_timeouts": 2,
+    "functional_reruns_passed": 4,
+    "warmup_course": 1,
+    "final_package_smoke": 7,
+    "decision_active_fallback": 5,
+    "games_ui": 15,
+    "camera_video_replay": "PASS; real full/lite MediaPipe, 8 repetitions and report; not physical-camera acceptance",
+    "physical_camera_human_acceptance": false,
+    "actual_qwen_inference_rerun": false,
+    "source_baseline_verification": {
+      "unamended_files": 1025,
+      "mismatches": 0
+    },
+    "final_ci_and_frozen_submission_sha": "Recorded outside Git in the submission material FINAL_VERSION_RECORD.json"
+  },
+  "historical_v121_original_demo_package": {
+    "source": "8e00101dd249c672f177b98aff8c5a1dcc39dfac",
+    "sha256": "5831b223d679f1346e27ad22075ddff86770663fe374e541b1fcbd78a7ea5429"
+  },
+  "historical_v121_independent_validation_package": {
+    "source": "61eb6958ab2fdf1578da3c1f9acbb891fdb9b7b4",
+    "sha256": "e46092fc9260fa7fbc6b6c9b99bc9f8933f1d8dc79b50bbfd3fa89ce961973ea",
+    "distribution": "local-only; media rights pending"
+  },
+  "v122_windows_package": {
+    "bytes": 188585346,
+    "sha256": "ecaf6ae7ea50d1f3da7be06ef3801545d650f0f5e1fcc1b59054650bf16a2ce0",
+    "files": 404,
+    "dependencyLicenses": 274,
+    "filename": "FormPilot-Web-V1.2.2.zip",
+    "source": "9aba92e22a8238fa85d2192dff105881a0af1ce1",
+    "distribution": "private internal prerelease; external media rights and reviewer access pending owner confirmation",
+    "release_url": "https://github.com/FormPilot-Team/FormPilot/releases/tag/web-v1.2.2-internal-test",
+    "internal_release_verified": true,
+    "release_id": 446906020,
+    "asset_id": 754466240,
+    "github_digest": "sha256:ecaf6ae7ea50d1f3da7be06ef3801545d650f0f5e1fcc1b59054650bf16a2ce0",
+    "prerelease": true,
+    "draft": false,
+    "previous_v121_rollback_unchanged": true
   }
 }
