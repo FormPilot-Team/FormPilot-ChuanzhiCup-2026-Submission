@@ -163,3 +163,50 @@ test('Custom E: the training page stays inside the target viewports', async ({ p
     await page.screenshot({ path: `test-results/custom-training-${viewport.width}x${viewport.height}.png`, fullPage: true })
   }
 })
+
+test('Custom F: on the real camera pipeline the start gesture is read with the lite model, recognition keeps the full model', async ({ page }) => {
+  test.setTimeout(150_000)
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  const models: string[] = []
+  const failed: string[] = []
+  page.on('request', (request) => { if (request.url().includes('/models/')) models.push(new URL(request.url()).pathname) })
+  page.on('requestfailed', (request) => failed.push(new URL(request.url()).pathname))
+  page.on('response', (response) => { if (response.url().includes('/models/') && response.status() >= 400) failed.push(new URL(response.url()).pathname) })
+  // A person on screen through the real camera pipeline: getUserMedia answers with a video stream.
+  await page.addInitScript((source) => {
+    Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+      configurable: true,
+      value: async () => {
+        const video = document.createElement('video')
+        video.src = source
+        video.muted = true
+        video.playsInline = true
+        video.loop = true
+        await video.play().catch(() => undefined)
+        return (video as HTMLVideoElement & { captureStream: () => MediaStream }).captureStream()
+      },
+    })
+  }, '/assets/demos/lateral-raise.mp4')
+  await seedActions(page, [lateralRaise('custom-e2e-camera')])
+
+  // The V3 recording stayed at 0 / 8: the full model rates hands held together too low for the shared gesture gate.
+  await page.goto('/workshop/custom-e2e-camera/train')
+  await page.getByRole('button', { name: '启用摄像头' }).click()
+  await expect(page.getByText(/摄像头已连接/)).toBeVisible({ timeout: 45_000 })
+  await expect.poll(() => models, { timeout: 30_000 }).toContain('/models/pose_landmarker_lite.task')
+  expect(models).toContain('/models/pose_landmarker_full.task')
+  await expect(courseState(page)).toHaveAttribute('data-course-state', 'PREPARING')
+
+  // Without the lite model the page still trains: the gesture falls back to the recognition frames.
+  models.length = 0
+  await page.route('**/models/pose_landmarker_lite.task', (route) => route.fulfill({ status: 404, body: 'Not Found' }))
+  await page.reload()
+  await page.getByRole('button', { name: '启用摄像头' }).click()
+  await expect(page.getByText(/摄像头已连接/)).toBeVisible({ timeout: 45_000 })
+  await expect.poll(() => failed, { timeout: 30_000 }).toContain('/models/pose_landmarker_lite.task')
+  await page.waitForTimeout(1500)
+  await expect(page.getByText(/摄像头已连接/)).toBeVisible()
+  await expect(courseState(page)).toHaveAttribute('data-course-state', 'PREPARING')
+  expect(errors).toEqual([])
+})

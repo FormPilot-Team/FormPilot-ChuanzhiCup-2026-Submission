@@ -5,7 +5,7 @@ import { useCameraFailure } from '../../features/camera/useCameraFailure'
 import { normalizePoseFrame, type NormalizedPoseFrame } from '../../features/pose/PoseNormalizer'
 import { PoseFilter } from '../../features/pose/PoseFilter'
 import type { PoseFrame } from '../../features/pose/types'
-import { WorkshopPoseDetector, type WorkshopModelVariant } from '../../features/workshop/detector'
+import { WorkshopGestureDetector, WorkshopPoseDetector, type WorkshopModelVariant } from '../../features/workshop/detector'
 import { FIXTURE_ASPECT, FIXTURE_SIZE, fixtureFrame, type FixtureMode } from '../../features/workshop/fixture'
 import type { CapturedPose } from '../../features/workshop/types'
 
@@ -16,7 +16,7 @@ export interface WorkshopFrame {
   pose: NormalizedPoseFrame | null
   /** 滤波后的帧，用于绘制 */
   raw: PoseFrame | null
-  /** 滤波前的检测帧（手势使用自己的轻量滤波） */
+  /** 滤波前的检测帧（手势使用自己的轻量滤波）；传入 gestureFrames 时为手势专用帧，不需要手势时为 null */
   detected: PoseFrame | null
   timestamp: number
   /** 摄像头画面宽 / 高 */
@@ -31,18 +31,26 @@ export interface WorkshopFixtureControl {
 type FixtureWindow = typeof window & { __workshopFixtureMode?: FixtureMode }
 
 /** 动作工坊与自定义训练的摄像头 + 姿态管线；开发环境可用 ?fixture=synthetic 的合成人物代替摄像头 */
-export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = () => true }: {
+export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = () => true, gestureFrames }: {
   synthetic: boolean
   onFrame: (frame: WorkshopFrame) => void
   fixture?: () => WorkshopFixtureControl
   /** 本帧是否绘制骨架（跟练中隐藏，与其他模式一致） */
   showOverlay?: () => boolean
+  /**
+   * 自定义训练：本帧是否需要判断开始 / 继续手势。手势帧来自与热身、功法相同的 lite 模型（见 WorkshopGestureDetector），
+   * 识别、取景和骨架仍用 full 模型；不需要手势时不做这次额外推理。不传时 detected 就是识别帧（动作编辑页）。
+   */
+  gestureFrames?: () => boolean
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const demoImageRef = useRef<HTMLImageElement>(null)
   const overlayRef = useRef<PoseOverlayHandle>(null)
   const cameraRef = useRef<BrowserCameraAdapter | null>(null)
   const detectorRef = useRef<WorkshopPoseDetector | null>(null)
+  const gestureDetectorRef = useRef<WorkshopGestureDetector | null>(null)
+  const gestureFramesRef = useRef(gestureFrames)
+  gestureFramesRef.current = gestureFrames
   const filterRef = useRef<PoseFilter | null>(null)
   const generationRef = useRef(0)
   const rafRef = useRef(0)
@@ -57,12 +65,12 @@ export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = (
 
   const showOverlayRef = useRef(showOverlay)
   showOverlayRef.current = showOverlay
-  const deliver = useCallback((raw: PoseFrame | null, timestamp: number, aspect: number, mirrored: boolean, width: number, height: number) => {
+  const deliver = useCallback((raw: PoseFrame | null, timestamp: number, aspect: number, mirrored: boolean, width: number, height: number, detected: PoseFrame | null = raw) => {
     const filtered = raw ? (filterRef.current ??= new PoseFilter()).push(raw) : null
     const pose = filtered ? normalizePoseFrame(filtered) : null
     if (filtered && showOverlayRef.current()) overlayRef.current?.draw(filtered, [], { mirrored, sourceWidth: width, sourceHeight: height, fit: 'contain' })
     else overlayRef.current?.clear()
-    onFrameRef.current({ pose, raw: filtered, detected: raw, timestamp, aspect })
+    onFrameRef.current({ pose, raw: filtered, detected, timestamp, aspect })
   }, [])
 
   const stop = useCallback(() => {
@@ -112,6 +120,8 @@ export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = (
       const detector = (detectorRef.current ??= new WorkshopPoseDetector())
       await detector.initialize()
       setModelVariant(detector.variant)
+      // 手势模型在后台加载，不推迟开始识别；加载完成前手势沿用识别帧
+      if (gestureFramesRef.current) void (gestureDetectorRef.current ??= new WorkshopGestureDetector()).initialize(detector.variant)
       if (generation !== generationRef.current) return camera.stop(video)
       setMode('live')
       const loop = () => {
@@ -121,7 +131,12 @@ export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = (
           lastVideoTimeRef.current = video.currentTime
           const width = video.videoWidth || 1280
           const height = video.videoHeight || 720
-          deliver(detector.detect(video, now), now, width / height, true, width, height)
+          const raw = detector.detect(video, now)
+          const wantsGesture = gestureFramesRef.current
+          const gestureFrame = !wantsGesture ? raw
+            : wantsGesture() ? (gestureDetectorRef.current ? gestureDetectorRef.current.detect(video, now, raw) : raw)
+              : null
+          deliver(raw, now, width / height, true, width, height, gestureFrame)
         }
         rafRef.current = requestAnimationFrame(loop)
       }
@@ -139,8 +154,10 @@ export function useWorkshopCamera({ synthetic, onFrame, fixture, showOverlay = (
     cancelAnimationFrame(rafRef.current)
     cameraRef.current?.stop()
     const detector = detectorRef.current
+    const gestureDetector = gestureDetectorRef.current
     // 下一个 tick 再关闭，让进行中的 detect() 先完成
     if (detector) window.setTimeout(() => detector.close(), 0)
+    if (gestureDetector) window.setTimeout(() => gestureDetector.close(), 0)
   }, [])
 
   return { videoRef, demoImageRef, overlayRef, mode, failure, modelVariant, start, stop, capturing: mode === 'live' || mode === 'demo' }

@@ -327,6 +327,10 @@ export function useCustomActionRuntime(action: CustomActionDefinition) {
     onFrame,
     fixture: () => ({ mode: fixtureMode(), poses: { start: action.startPose.capture, finish: action.finishPose.capture } }),
     showOverlay: () => shouldShowPoseOverlay(courseRef.current.getSnapshot().state),
+    gestureFrames: () => {
+      const state = courseRef.current.getSnapshot().state
+      return sessionStatusRef.current === 'paused' || state === 'PREPARING' || state === 'COUNTDOWN'
+    },
   })
   const { start: startCamera, stop: stopCameraNow, capturing } = camera
   stopCapture.current = stopCameraNow
