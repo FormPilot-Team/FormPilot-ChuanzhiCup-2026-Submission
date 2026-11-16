@@ -105,7 +105,10 @@ export function TrainingPage() {
   const canPause = active && poseValid && ['START', 'CENTER', 'STANDING', 'READY', 'COMPLETE'].includes(runtime.result.phase)
 
   const capturing = runtime.cameraMode === 'live' || runtime.cameraMode === 'demo'
-  const exerciseComplete = demonstrationSnapshot.state === 'TRANSITION' || demonstrationSnapshot.state === 'COURSE_COMPLETE' || runtime.session.status === 'completed'
+  const exerciseComplete = demonstrationSnapshot.state === 'TRANSITION' || demonstrationSnapshot.state === 'COURSE_COMPLETE'
+    // A reached target stays reached if its transition is paused or ended; the next step resets this timer.
+    || (runtime.courseEnabled && runtime.courseSnapshot.transitionRemainingMs > 0)
+    || (runtime.courseTarget > 0 && runtime.courseProgress >= runtime.courseTarget)
   const toastTone = adaptiveDockState.severity === 'warning' ? 'warning' : adaptiveDockState.severity === 'success' ? 'success' : adaptiveDockState.severity === 'info' ? 'info' : 'neutral'
   const arrangement = useMediaArrangement()
 

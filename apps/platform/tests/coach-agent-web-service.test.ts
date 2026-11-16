@@ -32,7 +32,8 @@ describe('offline Web recommendation data flow', () => {
     expect(response.result.routines.every(item => item.entry.href === null)).toBe(true)
     expect(response.result.games.every(item => item.entry.href === null)).toBe(true)
     expect(response.result.chapters.every(item => item.entry.href?.includes('?form='))).toBe(true)
-    expect(response.answers.first_game).toContain('未配置启动地址')
+    expect(response.answers.first_game).toContain(response.result.games[0].entry.title)
+    expect(response.answers.first_game).not.toContain('未配置启动地址')
   })
 
   it('exposes the five fixed answers with sources and evidence references that resolve within the returned snapshot', () => {

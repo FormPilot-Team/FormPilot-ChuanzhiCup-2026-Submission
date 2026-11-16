@@ -59,6 +59,27 @@ test('Competition B: a risk profile is paused and the model is not used', async 
   await expect(page.getByTestId('coach-model-state')).toHaveText('规则回退')
 })
 
+test('Matrix P1: M2 fixed answers provide a game route and a concrete next-stage chapter', async ({ page }) => {
+  await page.goto('/coach?view=profile')
+  await fill(page, ['日常锻炼', '暂无不适', '上肢'])
+  await expect(page.getByTestId('coach-origin')).toHaveText('训练模型推荐')
+  await expect(page.getByTestId('coach-next-step')).not.toContainText('下一阶段关注：—')
+  await expect(page.getByTestId('coach-rec-racing')).toContainText('尚未接入游戏中心')
+  await expect(page.getByTestId('coach-go-racing')).toHaveCount(0)
+  await page.getByTestId('coach-link-questions').click()
+  await page.getByTestId('coach-ask-first_game').click()
+  const gameAnswer = page.getByTestId('coach-answer-first_game')
+  await expect(gameAnswer).toContainText('林间划船')
+  await expect(gameAnswer).not.toContainText('未配置启动地址')
+  await expect(gameAnswer).not.toContainText('服务已连接')
+  await expect(gameAnswer.getByRole('link', { name: '去游戏中心 →' })).toHaveAttribute('href', '/games?game=boating')
+  await page.getByTestId('coach-ask-next_focus').click()
+  const nextAnswer = page.getByTestId('coach-answer-next_focus')
+  await expect(nextAnswer).toContainText('太极拳 · 云手')
+  await expect(nextAnswer).not.toContainText(/下一阶段可关注：。|StartLux/)
+  await expect(nextAnswer.getByRole('link', { name: '开始训练 →' })).toHaveAttribute('href', '/routines/taijiquan/train?form=tjq-10')
+})
+
 test('Competition C: an out-of-distribution profile abstains and shows the rule recommendation (§9 item 6)', async ({ page }) => {
   await page.goto('/coach?view=profile')
   await fill(page, ['肩颈活动练习', '暂无不适', '肩部', '颈部', '上肢', '下肢'], { preference: 'routine' })

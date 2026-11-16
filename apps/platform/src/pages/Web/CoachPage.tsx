@@ -11,7 +11,7 @@ import {
 } from '../../features/coachAgent/decisionModel/engine'
 import { collectLocalDecisionInput } from '../../features/coachAgent/decisionModel/engine/platform'
 import { COACH_DECISION_SHADOW_LOG_KEY, COACH_DECISION_SHADOW_LOG_MAX, toShadowLogEntry } from '../../features/coachAgent/decisionModel/engine/shadow'
-import { FOCUS_LABELS } from '../../features/coachAgent/recommendation/engine'
+import { FOCUS_LABELS, recommendationFocus } from '../../features/coachAgent/recommendation/engine'
 import type { CoachProfile, CoachQuestion, CoachRecommendation } from '../../features/coachAgent/recommendation/types'
 import type { AgentToolContext } from '../../features/coachLlm/tools'
 import { findWebGame } from '../../features/web/games'
@@ -227,6 +227,7 @@ export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window 
   const result = display?.result ?? null
   const ready = response?.status === 'ready' && result !== null
   const firstChapter = ready ? result.chapters[0] : undefined
+  const firstGame = ready ? result.games[0] : undefined
   const showModel = runtime.mode === 'active'
   const rankOf = (item: CoachRecommendation) => (showModel || runtime.mode === 'shadow') ? response?.ranking.find((x) => x.id === item.entry.id) : undefined
 
@@ -328,7 +329,7 @@ export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window 
             {[['从这一章开始', result.chapters], ['功法方向', result.routines], ['换一种方式练习', result.games]].map(([title, items]) => (items as CoachRecommendation[]).length ? (
               <div key={title as string}><h3 style={{ marginBottom: 9 }}>{title as string}</h3>{(items as CoachRecommendation[]).map((item) => <RecommendationItem key={item.entry.id} item={item} rank={rankOf(item)} origin={response.decisionOrigin} showModel={showModel && response.decisionOrigin === 'model'} />)}</div>
             ) : null)}
-            <div className="tip-card card" data-testid="coach-next-step"><strong>下一步训练建议</strong><p>{firstChapter ? `先练「${firstChapter.entry.title}」，在舒适范围内完成。练完后回到这里重新生成，结合新的记录调整。` : '先从推荐的功法方向中选择一章开始。'}</p>{firstChapter && itemHref(firstChapter).href ? <a className="btn btn-dark" style={{ marginTop: 14 }} href={itemHref(firstChapter).href ?? undefined} data-testid="coach-start-first">开始这项训练</a> : null}<div className="tip-source">下一阶段关注：{result.focus.map((focus) => FOCUS_LABELS[focus]).join('、') || '—'}</div></div>
+            <div className="tip-card card" data-testid="coach-next-step"><strong>下一步训练建议</strong><p>{firstChapter ? `先练「${firstChapter.entry.title}」，在舒适范围内完成。练完后回到这里重新生成，结合新的记录调整。` : '先从推荐的功法方向中选择一章开始。'}</p>{firstChapter && itemHref(firstChapter).href ? <a className="btn btn-dark" style={{ marginTop: 14 }} href={itemHref(firstChapter).href ?? undefined} data-testid="coach-start-first">开始这项训练</a> : null}<div className="tip-source">下一阶段关注：{recommendationFocus(result).map((focus) => FOCUS_LABELS[focus]).join('、') || '完善画像后重新生成推荐'}</div></div>
             <details className="tiny"><summary>说明与局限</summary><ul>{[...new Set([...response.limitations, ...result.limitations, `决策模型：${runtime.mode === 'active' ? 'ACTIVE（竞赛构建，已批准实验性模型）' : runtime.mode === 'shadow' ? 'SHADOW（开发验收，仅后台运行）' : '默认关闭'} · ${EXPERIMENTAL_LABEL}`])].map((line) => <li key={line}>{line}</li>)}</ul></details>
           </>
         )}
@@ -339,7 +340,7 @@ export function CoachPage({ mode, runtime: runtimeProp, storage = typeof window 
   const fixedTimeline = display ? asked.map(({ question, at }, index) => ({ at, key: `${question}-${index}`, node: (
     <div style={{ display: 'grid', gap: 18 }}>
       <div className="bubble user">{COACH_FIXED_QUESTIONS.find(([id]) => id === question)?.[1]}</div>
-      <div className="bubble coach" data-testid={`coach-answer-${question}`}>{display.answers[question]}<span className="basis">依据：{response?.decisionOrigin === 'model' ? '训练模型排序 + 规则安全筛选' : '自述画像 + 项目规则'}{response?.dataSources.trainingHistory === 'live_local_records' ? ' + 授权本机记录' : ''}</span>{question === 'suitable' && firstChapter && itemHref(firstChapter).href ? <><br /><a className="btn btn-primary" style={{ marginTop: 12 }} href={itemHref(firstChapter).href ?? undefined}>开始训练 →</a></> : null}</div>
+      <div className="bubble coach" data-testid={`coach-answer-${question}`}>{display.answers[question]}<span className="basis">依据：{response?.decisionOrigin === 'model' ? '训练模型排序 + 规则安全筛选' : '自述画像 + 项目规则'}{response?.dataSources.trainingHistory === 'live_local_records' ? ' + 授权本机记录' : ''}</span>{(question === 'suitable' || question === 'next_focus') && firstChapter && itemHref(firstChapter).href ? <><br /><a className="btn btn-primary" style={{ marginTop: 12 }} href={itemHref(firstChapter).href ?? undefined}>开始训练 →</a></> : null}{question === 'first_game' && firstGame && itemHref(firstGame).href ? <><br /><a className="btn btn-primary" style={{ marginTop: 12 }} href={itemHref(firstGame).href ?? undefined}>去游戏中心 →</a></> : null}</div>
     </div>
   ) })) : []
   const questionsPanel = (
