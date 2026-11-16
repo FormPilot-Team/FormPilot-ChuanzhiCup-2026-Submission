@@ -28,3 +28,7 @@
 | 2026-11-13 | `aeac2a8d0883` | test(platform): real-model agent and RAG evaluation, V1.2 docs |
 | 2026-11-13 | `dc18b3c046f7` | fix(platform): show agent answers only after validation |
 | 2026-11-13 | `0676506210f8` | feat(platform): Web V1.2.1 Qwen LLM Agent, RAG and final release checks (#58) |
+
+## V1.2.2 真实增量
+
+2026-11-16 正式 main 的 PR #60 修复 `9aba92e…` 经同范围路径过滤映射为 `98c86b6d9c49d6781acc4150b8f75d1174856d68`，保留原元数据与消息，通过普通 merge `5f0e1e35…` 合入此前 submission 分支。修复动作卡片图标与自定义正式训练开始/恢复手势，阈值和正式识别数据不变；新增几何、模型及 E2E 回归。后续 README、封版、CI 和校验提交均按实际当前时间记录。

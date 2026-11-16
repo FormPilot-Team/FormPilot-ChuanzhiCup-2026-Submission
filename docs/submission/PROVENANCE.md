@@ -1,3 +1,19 @@
+# V1.2.2 增量来源记录（2026-11-16）
+
+本轮在原比赛仓库上增量更新，没有重新导出或改写既有 134 个可达提交。正式 main 经 GitHub 实时核验为 `9aba92e22a8238fa85d2192dff105881a0af1ce1`，PR #60 已于 2026-11-16 合并。其 tree 与真实 PR 分支 `7c2e97fec3247cc025c7f11381251f9d9638d504` 同为 `42cbc6fade2188391f48d044f09a94392dc76055`。
+
+仅在既有独立审计库通过正常 Git fetch 取得原始 main 对象。正式工作区的分支、HEAD、refs、既有修改及 worktree 不变；没有 reset/rebase/force-push，没有 E 盘写入。
+
+沿用原路径选择规则增量过滤本次真实提交，保留原作者、提交者、时间及消息，去掉因 tree/parent 改变而失效的签名。原 `9aba92e…` 映射为 `98c86b6d9c49d6781acc4150b8f75d1174856d68`，父提交为既有过滤基线 `0676506…`；通过普通 merge `5f0e1e35ab90172280a570179d0cf2a89c904579` 合入现有 submission 分支。既有提交 SHA 未变，映射追加在 [commit-map.txt](commit-map.txt)。这是真实提交的透明路径过滤，不是伪造一次开发提交。
+
+新增/变更九项产品源码与测试文件全部取原始 blob；两张内部修复对比图按原选择规则排除。基线清单现 1,030 文件；其中 1,025 文件逐字节匹配最新 main，三份便携 README 与两份此前已列明的测试环境兼容调整继续单独说明。`python scripts/submission/verify_baseline.py` 可独立重验。平台完整 src/server/tests、模型、训练代码、游戏、依赖和锁文件均保留。
+
+独立远端为 [FormPilot-Team/FormPilot-ChuanzhiCup-2026](https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026)，保持 **Private**。只推送比赛相关 submission/history refs，不推送未过滤审计库、ignored 媒体或全部开发 refs。第三方媒体、邮箱公开、团队许可与完整历史规则仍待确认；Private 技术备份不代表外部评审访问已获批。
+
+下文是 2026-11-13 首次导出的历史记录，原计数及旧包 hash 只描述当时状态，不是 V1.2.2 本轮结果。
+
+---
+
 # 提交仓库来源与历史
 
 本地导出日期：2026-11-13（北京时间）。正式源码基线：`f6e081202d2f5f7652f11198af2542d755d88b3a`。

@@ -1,6 +1,11 @@
 {
-  "baseline": "f6e081202d2f5f7652f11198af2542d755d88b3a",
+  "baseline": "9aba92e22a8238fa85d2192dff105881a0af1ce1",
   "files": [
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "blob": "32db4de8d2707d1ee6aa269bd49cdae0d5645c4b"
+    },
     {
       "path": "apps/motion-games-lab/PRODUCT.md",
       "mode": "100644",
@@ -1297,6 +1302,26 @@
       "blob": "00caeb11809013e5ce13a2cfb26d32f15c3fb567"
     },
     {
+      "path": "apps/platform/reviewer_exe/build/icon.ico",
+      "mode": "100644",
+      "blob": "6a8b7b86ddfb7da6380cffb2ee450ebd038b7f81"
+    },
+    {
+      "path": "apps/platform/reviewer_exe/build/icon.svg",
+      "mode": "100644",
+      "blob": "886fafb2ac53a64eabe5af79bffea2cda507e958"
+    },
+    {
+      "path": "apps/platform/reviewer_exe/package.json",
+      "mode": "100644",
+      "blob": "e94f14044973922157ae4ff9895d71c62faf68b4"
+    },
+    {
+      "path": "apps/platform/reviewer_exe/src/main.cjs",
+      "mode": "100644",
+      "blob": "7eb6065db84c5fa730bdcd2c991e3866f13c0f25"
+    },
+    {
       "path": "apps/platform/scripts/adaptive-evaluate.ts",
       "mode": "100644",
       "blob": "31cd54b1d8adacd25863e7387ac55c3f39036734"
@@ -2249,7 +2274,7 @@
     {
       "path": "apps/platform/src/components/workshop/PoseSketch.tsx",
       "mode": "100644",
-      "blob": "630b9ffd3ad9398f0ae453fae9cf82553aa85a7f"
+      "blob": "a86b0f1706e49f0a6fef362b9887857f56af421f"
     },
     {
       "path": "apps/platform/src/components/workshop/RecognitionReadout.tsx",
@@ -2260,6 +2285,11 @@
       "path": "apps/platform/src/components/workshop/VideoDemonstrationInput.tsx",
       "mode": "100644",
       "blob": "335c1880b81f5f788faf867347c3e13b17105111"
+    },
+    {
+      "path": "apps/platform/src/components/workshop/poseSketchFigure.ts",
+      "mode": "100644",
+      "blob": "9f53bf6abf890c0e182ba408472029145002e8cc"
     },
     {
       "path": "apps/platform/src/data/demoPose.ts",
@@ -3699,7 +3729,7 @@
     {
       "path": "apps/platform/src/features/workshop/detector.ts",
       "mode": "100644",
-      "blob": "b746d4cef2c7f8c6175bacdd4e6dcc739e77f9f7"
+      "blob": "bb8f6c04e74db6e97376c4fbbd07a3c17e97d19b"
     },
     {
       "path": "apps/platform/src/features/workshop/download.ts",
@@ -3989,12 +4019,12 @@
     {
       "path": "apps/platform/src/pages/Workshop/useCustomActionRuntime.ts",
       "mode": "100644",
-      "blob": "1f5252496726a6bba3286811d89f4a7698a4fc7f"
+      "blob": "34d62e10970f510a0c7746677e3abadb1d131be4"
     },
     {
       "path": "apps/platform/src/pages/Workshop/useWorkshopCamera.ts",
       "mode": "100644",
-      "blob": "fb3b5f80522b374b994d3361ca1fef4e4b33db1a"
+      "blob": "83dd753dca76da8d250a655d8cc768d7bb2b6b06"
     },
     {
       "path": "apps/platform/src/publicDemo/PublicDemoApp.tsx",
@@ -4324,7 +4354,7 @@
     {
       "path": "apps/platform/tests/e2e/custom-training.spec.ts",
       "mode": "100644",
-      "blob": "aac47ce55242710f7b72bfae63dcca3fedf3dcfe"
+      "blob": "4015d8e3e98189e76175495b2baf0062f56c2a97"
     },
     {
       "path": "apps/platform/tests/e2e/framing-assist.spec.ts",
@@ -4575,6 +4605,11 @@
       "path": "apps/platform/tests/fixtures/routine-baseline/yijinjing.json",
       "mode": "100644",
       "blob": "4cbcfd65196aa60fbbb0db747fe1477b7f8c6600"
+    },
+    {
+      "path": "apps/platform/tests/fixtures/workshop-gesture-lite-vs-full.json",
+      "mode": "100644",
+      "blob": "d75c8e8d27674768de5d1400ab0a351b3cdd2401"
     },
     {
       "path": "apps/platform/tests/follow-along-matcher.test.ts",
@@ -5037,9 +5072,19 @@
       "blob": "8649725470c6bf9a6435bd0c377777ddc5929f30"
     },
     {
+      "path": "apps/platform/tests/workshop-gesture-model.test.ts",
+      "mode": "100644",
+      "blob": "15069129abd0902864d99e76fbf5ce659e416a8c"
+    },
+    {
       "path": "apps/platform/tests/workshop-performance.test.ts",
       "mode": "100644",
       "blob": "86cdb5ad3a3e23d253db7a08f6ea50ded2d30f01"
+    },
+    {
+      "path": "apps/platform/tests/workshop-pose-sketch.test.ts",
+      "mode": "100644",
+      "blob": "b8aed39b0419c329d098f79a737ea45c8802884c"
     },
     {
       "path": "apps/platform/tests/workshop-recognition.test.ts",
@@ -5105,36 +5150,6 @@
       "path": "scripts/ci/check-repo-hygiene.mjs",
       "mode": "100644",
       "blob": "d005517f20ccbd0a9bbcff9b7c92cbd161201ccf"
-    },
-    {
-      "path": ".gitattributes",
-      "mode": "100644",
-      "blob": "32db4de8d2707d1ee6aa269bd49cdae0d5645c4b",
-      "restored_for_validation": true
-    },
-    {
-      "path": "apps/platform/reviewer_exe/build/icon.svg",
-      "mode": "100644",
-      "blob": "886fafb2ac53a64eabe5af79bffea2cda507e958",
-      "restored_for_validation": true
-    },
-    {
-      "path": "apps/platform/reviewer_exe/build/icon.ico",
-      "mode": "100644",
-      "blob": "6a8b7b86ddfb7da6380cffb2ee450ebd038b7f81",
-      "restored_for_validation": true
-    },
-    {
-      "path": "apps/platform/reviewer_exe/package.json",
-      "mode": "100644",
-      "blob": "e94f14044973922157ae4ff9895d71c62faf68b4",
-      "restored_for_validation": true
-    },
-    {
-      "path": "apps/platform/reviewer_exe/src/main.cjs",
-      "mode": "100644",
-      "blob": "7eb6065db84c5fa730bdcd2c991e3866f13c0f25",
-      "restored_for_validation": true
     }
   ]
 }

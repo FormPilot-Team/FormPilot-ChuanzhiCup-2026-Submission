@@ -2,7 +2,7 @@
 
 FormPilot 是面向居家规范运动与康复辅助场景的智能运动训练平台，将浏览器姿态识别、动作反馈、训练报告、个性化推荐和可追溯的 AI 问答连接起来。本项目不是医疗诊断系统，没有临床疗效验证。
 
-本仓库是 **Web V1.2.1 的本地独立提交候选**。尚未发布 GitHub/Gitee 仓库，未部署公网演示。正式参赛源码基线为 `f6e081202d2f5f7652f11198af2542d755d88b3a`。代码、素材权限、历史和文档版本的详细说明见 [提交说明](docs/submission/PROVENANCE.md)、[素材与许可](docs/submission/ASSETS_AND_LICENSES.md)及 [版本一致性](docs/submission/VERSION_CONSISTENCY.md)。
+本次提交版本为 **FormPilot Web V1.2.2**，来源正式 main `9aba92e22a8238fa85d2192dff105881a0af1ce1`，包含 PR #60 的动作工坊图标及开始手势修复。比赛仓库保持 Private；远端地址与比赛仓库自身 SHA 以 [版本记录](SUBMISSION_VERSION.json) 为准。评审访问与待交接项见 [团队与材料交接](docs/submission/TEAM_AND_HANDOFF.md)。本轮采用本地运行，不需要公网在线 Demo。
 
 ## 产品功能
 
@@ -13,7 +13,7 @@ FormPilot 是面向居家规范运动与康复辅助场景的智能运动训练�
 | 功法训练 | 八段锦、太极拳、五禽戏、易筋经；标准示范视频、章节选择、整套或单式跟练、相似度与节奏、本节报告 |
 | 游戏中心 | 摘苹果、林间划船、林间射箭，均有完整 React/Phaser 项目和姿态输入；独立服务运行，成绩不写入训练历史 |
 | AI Coach | 用户画像、风险确认、记录授权、M1/M2 推荐与依据、固定五问；可选本机 Qwen 自由问答、工具调用和知识引用 |
-| 我的 | 历史、报告、趋势、设备设置；动作工坊 V2 的动作信息 → 摄像头/本地视频采集 → 识别测试 → 保存 → 训练闭环 |
+| 我的 | 历史、报告、趋势、设备设置；动作工坊 V2 的动作信息 → 摄像头/本地视频采集 → 识别测试 → 保存 → 正式训练与报告；V1.2.2 包含图标及开始手势修复 |
 
 四套功法的视频功能完整保留。视频和部分演示媒体不在 Git 中：需在有权使用这些素材的本地评审环境恢复；缺素材时页面会明确提示无法播放，**仅克隆源码不能复现全部视频**。获取及分发权限仍待负责人确认，不能将“在离线包里”视为已获得分发许可。
 
@@ -44,6 +44,16 @@ flowchart TD
 
 React 19 / TypeScript / Vite 构建平台和游戏，Phaser 3 绘制游戏，MediaPipe 提供姿态检测。浏览器本地保存训练数据；本机模式下提问与工具结果只到回环地址上的 Bridge/Ollama。
 
+**自主实现与基座边界**：团队实现动作训练流程、计数/评分与报告、M1/M2 数据和训练流水线、浏览器推荐引擎、Agent 工具协议与编排、授权控制、检索、答案证据校验及回退。Qwen 的职责是理解提问、选择只读工具和组织解释，不负责识别摄像头画面、计算分数、生成训练记录或绕过安全门禁；没有对 Qwen 进行微调。
+
+## 自研训练决策模型
+
+发布身份为 `fp-cdm-release/1.0.0`，与 Web V1.2.2 的产品版本分别管理。M1 使用参考姿态轨迹的 **1,677 个 3 秒窗口 × 76 特征**学习部位和注意项；M2 使用画像×内容、历史×内容、报告×内容共 **111 个特征**，通过成对逻辑回归、校准和弃权在安全候选池内排序。
+
+M2 v1.0.0 发布权重绑定 M1 v1.0 的 out-of-fold 内容表；M1 v1.1 是后续研究模型，不能写成已替换发布内容表。M2 的 **720 条标签来自单一 AI 标注者、72 个合成场景**，仍为 `ai_experimental`；负责人审阅不等于独立人工或专家验证，适配度也不是医学概率。权重、内容表、目录不匹配或推理异常时回退规则；低适配或分布外会弃权，风险暂停先于模型执行。
+
+历史冻结测试：M1 v1.1 嵌套按功法留一 macro AUC **0.777**；M2 在 6 个族 / 18 个场景上的 NDCG@5 **0.868**、成对准确率 **0.873**。模型相对规则的 NDCG@5 差值 95% CI 为 **−0.024 至 0.122**，跨 0，不能宣称显著优于规则。来源为 [模型报告](apps/platform/docs/ai-coach-agent/decision-model/MODEL_REPORT.md)、[M1 原报告](apps/platform/scripts/decision-model/cdm/artifacts/m1-v11/fp-cdm-m1-v11.report.json)及 [冻结发布清单](apps/platform/scripts/decision-model/cdm/artifacts/integration/release-manifest.json)。这些是历史实验，不是本轮新训练或真人效果验证。
+
 ## 目录
 
 ```text
@@ -63,7 +73,9 @@ scripts/submission/               本地素材恢复与校验工具
 
 ## 环境与安装
 
-本轮平台 2,220 单元/集成、游戏 89 单元、三游戏 15 项完整 UI 流程、7 项解压包冒烟均通过；全量平台 E2E 的 1 项失败和 1 项跳过经测试地址修正后相关 13 项复测通过。完整首轮结果、视觉/ACTIVE 验证及限制见 [VALIDATION.md](docs/submission/VALIDATION.md)。基本环境为 Windows、Node.js **22.18+**（本轮使用 24.12.0）、pnpm **12.5.1**、Python **3.12**（仅素材恢复/离线打包需要），自动化浏览器使用已安装的 Microsoft Edge。测试不自动下载浏览器或 Qwen。
+基本环境为 Windows、Node.js **22.18+**、pnpm **12.5.1**、Python **3.12**（仅素材恢复/离线打包需要），自动化浏览器使用已安装的 Microsoft Edge。平台使用 React / TypeScript / Vite / MediaPipe，游戏使用 React / TypeScript / Vite / Phaser；精确依赖以两个应用自己的 `package.json` 与 `pnpm-lock.yaml` 为准。摄像头需浏览器授权与 `localhost` / `127.0.0.1` 安全上下文。本轮不自动下载浏览器或 Qwen。完整运行和排错步骤见 [V1.2.2 运行说明](docs/submission/RUNNING_V122.md)。
+
+Windows 解压包主程序只需 Windows 10/11、PowerShell 5.1+ 和 Edge/Chrome，不需要 Node、pnpm、Python 或大模型；自由问答才需要可选模型环境。此前独立 V1.2.1 的安装和测试结果保留在 [历史验证](docs/submission/VALIDATION.md)，不能直接充当 V1.2.2 的通过证据。
 
 从仓库根目录执行，两个应用各自有 `package.json`、`pnpm-lock.yaml` 和 `pnpm-workspace.yaml`：
 
@@ -94,7 +106,7 @@ $env:VITE_MOTION_GAMES_URL = 'http://localhost:5181/'
 pnpm dev --host 127.0.0.1 --port 4173 --strictPort --mode competition
 ```
 
-打开 `http://127.0.0.1:4173/`，游戏中心应显示“体感游戏服务已连接”。允许摄像头后才能真人训练；`localhost` 指的是正在使用浏览器的那台电脑。
+打开 `http://127.0.0.1:4173/`，游戏中心应显示“体感游戏服务已连接”。分别进入摘苹果、林间划船、林间射箭；也可直接打开 `http://localhost:5181/` 从大厅进入三款游戏，不需要分别启动三个服务。允许摄像头后才能真人训练；`localhost` 指的是正在使用浏览器的那台电脑。
 
 生产比赛构建：
 
@@ -115,10 +127,10 @@ pnpm competition:preview
 
 ## 素材与离线包
 
-授权未确认的四套功法视频/海报及六个热身视频被整个历史过滤排除；本地验证时作为 `.gitignore` 忽略的素材覆盖层恢复。拿到有权使用的 **V1.2.1 解压包**后，可以从仓库根目录运行：
+授权未确认的四套功法视频/海报及六个热身视频被整个历史过滤排除；本地验证时作为 `.gitignore` 忽略的素材覆盖层恢复。拿到有权使用、且媒体匹配清单的解压包后，可以从仓库根目录运行（V1.2.2 沿用此媒体清单）：
 
 ```powershell
-python scripts/submission/restore_media.py --source-package '<解压后的 FormPilot-Web-V1.2.1 目录>'
+python scripts/submission/restore_media.py --source-package '<已授权的解压包根目录>'
 python scripts/submission/restore_media.py --check
 ```
 
@@ -126,10 +138,16 @@ python scripts/submission/restore_media.py --check
 
 ```powershell
 # 在 apps/platform 内；须先安装两个应用的依赖并恢复素材。
-python -I -B scripts/competition-package/build_package.py --out '<新的输出目录>' --version 1.2.1
+python -I -B scripts/competition-package/build_package.py --out '<全新的输出目录>' --version 1.2.2
 ```
 
-脚本会重新构建两端、写 `VERSION.txt` 和逐文件 SHA-256，再生成 ZIP。新包的提交和生成时间不同，**不能复用旧包 SHA**。既有官方演示候选包 SHA-256 为 `5831b223d679f1346e27ad22075ddff86770663fe374e541b1fcbd78a7ea5429`，它记录旧构建提交 `8e00101`；详见版本一致性表。
+上述脚本重建两端并产生初始包。还必须回到仓库根目录完成 V1.2.2 封包：
+
+```powershell
+python scripts/submission/finalize_v122_package.py --source-root . --package '<全新的输出目录>/FormPilot-Web-V1.2.2'
+```
+
+封包步骤修正包内版本文案、收集已安装依赖的 LICENSE/NOTICE、写 `FILE_MANIFEST.json` 和逐文件 SHA-256，并重新生成最终 ZIP 与 `.zip.sha256`；不能省略并使用初始 ZIP。新包必须重新解压、通过包内 `start-formpilot.cmd` 启动并验收，**不能复用 V1.2.1 的 SHA 或将旧包改名**。本轮包、校验及内部 Release 见 [封版验证记录](docs/submission/V122_FINAL_CHECKS.md)。
 
 ## 可选：本机 Qwen 自由问答
 
@@ -137,17 +155,30 @@ python -I -B scripts/competition-package/build_package.py --out '<新的输出�
 
 完整自由问答需要自行准备 **Ollama 0.40.13**、`qwen3:4b-instruct-2507-q4_K_M`，模型 digest 必须是 `0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0`。模型约 2.5 GB，不在仓库；参考 [Ollama 模型页](https://ollama.com/library/qwen3) 和 [Qwen 模型说明](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)。决定下载时使用 `ollama pull qwen3:4b-instruct-2507-q4_K_M`，下载后核对 digest，不以同名标签代替校验。本轮未下载模型或重跑真实推理。
 
-在已有该环境的电脑上，先启动本机 Ollama（示例端口 11441），再在 `apps/platform` 的另一个终端执行：
+在已有该环境的电脑上，先在独立终端启动本机 Ollama（示例端口 11441）：
+
+```powershell
+$env:OLLAMA_HOST = '127.0.0.1:11441'
+ollama serve
+```
+
+再在 `apps/platform` 的另一个终端执行：
 
 ```powershell
 $env:FP_AGENT_ENABLED = 'true'
+$env:FP_AGENT_PORT = '4321'
 $env:FP_AGENT_OLLAMA_PORT = '11441'
+$env:FP_AGENT_MODEL = 'qwen3:4b-instruct-2507-q4_K_M'
 $env:FP_AGENT_ORIGINS = 'http://127.0.0.1:4173,http://localhost:4175'
 $env:FP_AGENT_PRELOAD = 'false'
 pnpm agent:bridge
 ```
 
+`pnpm agent:bridge` 只读取当前进程环境，不自动加载 `.env`。若将对应 Bridge 配置保存为 `apps/platform/.env.agent.local`，应在平台目录显式使用 `node --env-file=.env.agent.local server/coachAgent/agent/index.ts`；不要仅复制根模板就认为配置已生效。根模板默认 `FP_AGENT_ENABLED=false`，需由环境管理者明确启用。Vite 前端配置与 Bridge 进程配置分别加载。
+
 模型读取会消耗内存/显存，首次冷启动需等待。Bridge 固定本机监听，拒绝非白名单 Origin。打开 AI Coach → 训练问答；查看上次训练或近期进步还需在对话框单独授权。模型完整条件见 [Agent 环境模板](apps/platform/docs/ai-coach-agent/agent.env.example)。
+
+Windows 包可使用 `ai-coach-local\start-ai-coach-local.cmd` 检查已有环境并启动 Bridge；非默认 Ollama 端口用其 `.ps1 -OllamaPort 11441`。启动器不安装或下载模型。模型标签相同但 digest 不符时，Bridge 不会把它当作已验证模型。
 
 ## 测试与已知限制
 
@@ -162,16 +193,27 @@ pnpm test:e2e
 
 平台比赛构建运行后，可运行 `pnpm exec playwright test -c playwright.web-v1-visual.config.ts`。完整素材和两端服务运行后，可运行 `pnpm exec playwright test -c playwright.package-smoke.config.ts`，检查四套视频实际播放及平台游戏联通。若测试解压后的离线包，进入游戏目录运行 `pnpm exec playwright test -c playwright.submission.config.ts`，默认连接该包的 `http://localhost:5181`；保留原 15 项完整游戏测试，不启动另一份游戏服务。`tests/llm-eval`、`playwright.llm-demo.config.ts` 是显式真实模型评测，不属于默认单元/E2E 命令。
 
-V1.2.1 交接中可追溯的历史测试成绩：单元/集成 **2220/2220**；竞赛视觉/ACTIVE **57/57**；解压包冒烟 **7/7**；全量 E2E **204 通过、2 失败、1 跳过**，失败用例单独复测 6/6。真实 Qwen Agent run8 **27/27**；RAG run4 20 题事实召回 **0.35 → 0.95**，无依据句子 **92.3% → 7.4%**。[原始评测汇总及来源 SHA-256](docs/submission/HISTORICAL_MODEL_RESULTS.json)随仓库保留。这些是原版本报告，不能冒充本次重跑结果；本次独立仓库的结果单独列在 [VALIDATION.md](docs/submission/VALIDATION.md)。
+V1.2.1 交接中可追溯的历史测试成绩：单元/集成 **2220/2220**；竞赛视觉/ACTIVE **57/57**；解压包冒烟 **7/7**；全量 E2E **204 通过、2 失败、1 跳过**，失败用例单独复测 6/6。真实 Qwen Agent run8 **27/27**；RAG run4 20 题事实召回 **0.35 → 0.95**，无依据句子 **92.3% → 7.4%**。[原始评测汇总及来源 SHA-256](docs/submission/HISTORICAL_MODEL_RESULTS.json)随仓库保留。此前独立仓库另有一轮 V1.2.1 验证，单独列在 [VALIDATION.md](docs/submission/VALIDATION.md)；两轮旧结果均不能冒充本次 V1.2.2 重跑。
 
-自动化包含合成姿态、测试夹具及假上游，不能代替真人摄像头训练、真人记录问答或评委电脑验证。44 条出处、素材授权、非数字幻觉和模型偶发漏引文仍是已知限制。本届没有公网在线演示，不声称具备语音输入、大模型视觉、长期记忆、微调或临床认证。
+**V1.2.2 本轮安装、构建、回归、解压运行及 CI 结果**单独记录在 [封版验证记录](docs/submission/V122_FINAL_CHECKS.md)，不使用上面的历史成绩冒充本次结果。
+
+自动化包含合成姿态、测试夹具及假上游，不能代替真人摄像头训练、真人记录问答或评委电脑验证。44 条出处、素材授权、非数字幻觉和模型偶发漏引文仍是已知限制；M2 尚无独立人工/专家标签，多设备 SHADOW 覆盖不足。本届没有公网在线演示，不声称具备语音输入、大模型视觉、长期记忆、微调或临床认证。
 
 ## 开发历史、团队与许可
 
-保留真实作者、时间和提交说明的路径过滤历史：基线主线 80 条，另保留 `history/web-v12-development` 分支，合计 131 条历史提交；提交准备改动另作当前真实提交。路径变化导致 SHA 改变，映射见 [commit-map.txt](docs/submission/commit-map.txt)，重要任务见[开发时间线](docs/submission/DEVELOPMENT_HISTORY.md)。签名不随重写保留，不声称过滤提交仍具有原签名。
+保留真实作者、时间和提交说明的路径过滤历史：V1.2.1 时基线主线 80 条，另保留 `history/web-v12-development` 分支，共 131 条历史提交；本轮 PR #60 来源同步及提交准备另作当前真实提交，不回填时间。路径变化导致 SHA 改变，原映射见 [commit-map.txt](docs/submission/commit-map.txt)，重要任务见[开发时间线](docs/submission/DEVELOPMENT_HISTORY.md)，本轮来源见[提交说明](docs/submission/PROVENANCE.md)。签名不随重写保留，不声称过滤提交仍具有原签名。
 
 官方要求“保留完整的 Git 提交历史”。本仓库只保留作品路径，并非原私有 Monorepo 的全部历史，是否被赛事接受仍需组委会/负责人确认；本地另存未过滤审计副本，不将其当作公开附件。保留的历史包含个人邮箱、内部路径与已识别的测试假 Key，在完成公开审查前不能直接推送 Public。
 
-项目维护与最终验收：GitHub `KiyOm1Lykke`。文档与真人体验验收任务负责人：`wang-linn-dw`（#57）。**报名队伍名称、学校、参赛成员名单与分工由负责人确认后补入，Git 作者列表不能替代报名名单。**
+| 团队信息 | 当前状态 |
+| --- | --- |
+| 报名队伍名称、学校、院系与专业背景 | **待负责人按报名资料填写** |
+| 正式参赛成员姓名、GitHub 身份与分工 | **待负责人确认**；Git 作者列表不能替代报名名单 |
+| 指导老师姓名、单位与职称 | **待负责人填写** |
+| 项目责任人与最终验收 | GitHub `KiyOm1Lykke` |
+| 产品设计、技术文档与真人体验验收 | Wang，GitHub `wang-linn-dw`（#57）；正式文件等待交接 |
+| 最终 V5 视频 | CC；最终字幕修复后交接，此职责不自动代表报名成员身份 |
 
-第三方组件和素材的版权归各自权利人所有。MediaPipe 与 Qwen 为 Apache-2.0；React、Vite、Phaser 等依赖的许可见各包 LICENSE。当前未给团队原创源码自行新增开放许可，仓库公开可见也不等于已获第三方媒体再分发权。最终提交地址待负责人确认并创建。
+Wang 的产品设计 Word/PDF、技术方案 Word/最终 PDF、README 审阅和全功能验收记录均保留明确交接项；本轮不覆盖其编辑源文件。最终文件应与 Web V1.2.2、正式主线及比赛仓库最终 SHA 对齐，见 [团队与材料交接](docs/submission/TEAM_AND_HANDOFF.md)。
+
+第三方组件和素材的版权归各自权利人所有。MediaPipe 与 Qwen 为 Apache-2.0；React、Vite、Phaser 等依赖的许可见各包 LICENSE。当前未给团队原创源码自行新增开放许可，Private 仓库或公开可见均不等于已获第三方媒体再分发权。评审账号需负责人核实后授予最小读取权限，并实际验证访问；未经确认不改 Public、不代交官网。

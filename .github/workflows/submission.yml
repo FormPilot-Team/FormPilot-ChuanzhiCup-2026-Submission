@@ -1,0 +1,67 @@
+name: submission-validation
+
+on:
+  push:
+    branches: [submission]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: submission-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-provenance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/submission/verify_baseline.py
+      - run: git fsck --full
+  platform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: apps/platform/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      # These five checks require the separately licensed local video/poster overlay.
+      # The complete suite runs locally after hash-verified media restoration.
+      - run: pnpm exec vitest run --testNamePattern "^(?!.*(ships every referenced video, poster and pose track|the file matches the codecs and length the program declares)).*$"
+      - run: pnpm build
+      - run: pnpm competition:build
+  games:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/motion-games-lab/app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: apps/motion-games-lab/app/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
