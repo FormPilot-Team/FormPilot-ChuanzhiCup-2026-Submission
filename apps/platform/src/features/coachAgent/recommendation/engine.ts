@@ -121,17 +121,27 @@ export function recommendCoach(profile: unknown, context: RecommendationContext)
   }
 }
 
+/** A model can rank content without predicting a focus. Use that content's verified metadata for the display. */
+export function recommendationFocus(result: CoachRecommendationResult): Focus[] {
+  const focus = result.focus.length ? result.focus : (result.chapters[0] ?? result.games[0])?.entry.focuses ?? []
+  return [...new Set(focus)].filter(item => FOCUSES.includes(item)).slice(0, 3)
+}
+
 export function answerCoachQuestion(question: CoachQuestion, result: CoachRecommendationResult): string {
   if (result.status !== 'ready') return result.message
   const firstChapter = result.chapters[0]
   const firstGame = result.games[0]
   if (question === 'suitable') return `${result.routines.length ? `可先了解${result.routines.map(item => item.entry.title).join('、')}。` : '当前没有安全可用的功法候选。'}${firstChapter ? `建议先查看章节「${firstChapter.entry.title}」，按舒适范围练习。` : '暂不建议具体章节。'}这是画像规则建议，不是医学处方。`
-  if (question === 'first_game') return firstGame ? `可先了解「${firstGame.entry.title}」：${firstGame.entry.movement}。${firstGame.reasons[0]}${firstGame.entry.href ? '' : '该游戏是独立应用，当前展示页未配置启动地址。'}` : '当前没有通过风险筛选的游戏，暂不推荐强行开始。'
+  // Independent apps can have a host-provided launcher even when the knowledge catalogue has no href.
+  if (question === 'first_game') return firstGame ? `可先了解「${firstGame.entry.title}」：${firstGame.entry.movement}。${firstGame.reasons[0]}` : '当前没有通过风险筛选的游戏，暂不推荐强行开始。'
   if (question === 'recent_issues') {
     const reports = result.evidence.filter(item => item.category === 'report').slice(0, 3)
     return reports.length ? reports.map(item => `${item.source === 'synthetic' ? '合成报告样例（不代表你的表现）' : '最近本机报告分项'}：${item.title}。${item.detail} 引用：${item.id}。`).join('\n')
       : '证据不足：尚无可用于说明主要问题的有效报告分项。画像中的不适是你的自述，练过某动作也不能证明存在动作缺陷。'
   }
   if (question === 'why') return firstChapter ? `以「${firstChapter.entry.title}」为例：${firstChapter.reasons.join('\n')}知识来源：${firstChapter.entry.sources.join('；')}。` : '当前缺少可解释的章节候选，请先完善画像或咨询专业人员。'
-  return `下一阶段可关注：${result.focus.map(focus => FOCUS_LABELS[focus]).join('、')}。这是画像与已授权证据支持的训练建议，不代表已测得疾病或疗效。${result.evidence.some(item => item.category === 'decision') ? '决策输出仅参与低优先级建议解释，安全规则继续优先。' : 'StartLux 尚无可用输出，继续采用本地规则兜底。'}`
+  const focus = recommendationFocus(result)
+  if (!focus.length) return '当前缺少可执行的训练重点，请完善画像后重新生成推荐。'
+  const next = firstChapter ? `可先从章节「${firstChapter.entry.title}」开始，在舒适范围内练习；完成后结合新的训练记录调整。` : '请从本次推荐中选择适合的项目，在舒适范围内练习。'
+  return `下一阶段可关注：${focus.map(item => FOCUS_LABELS[item]).join('、')}。${next}这是训练建议，不代表已测得疾病或疗效。`
 }
