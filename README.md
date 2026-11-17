@@ -102,7 +102,7 @@ docs/submission/                运行、训练复现、素材许可与源码来
 third-party/                    第三方许可全文与来源
 ```
 
-源码仓库：[FormPilot-Team/FormPilot-ChuanzhiCup-2026-Public](https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026-Public)，公开后评审可直接浏览、克隆并查看历史。作品相关的真实 Git 开发历史保留在仓库中；源码 ZIP 为当前文件快照，精确提交可在仓库执行 `git rev-parse HEAD` 核验。路径导出与原提交的对应关系见[来源说明](docs/submission/PROVENANCE.md)。
+源码仓库：[FormPilot-Team/FormPilot-ChuanzhiCup-2026-Submission](https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026-Submission)，公开后评审可直接浏览、克隆并查看历史。作品相关的真实 Git 开发历史保留在仓库中；源码 ZIP 为当前文件快照，精确提交可在仓库执行 `git rev-parse HEAD` 核验。路径导出与原提交的对应关系见[来源说明](docs/submission/PROVENANCE.md)。
 
 第三方组件和素材版权归各自权利人。MediaPipe 与 Qwen 使用 Apache-2.0，其他依赖按各包许可使用。团队原创源码未声明开放许可证；团队生成教练、原创展示素材、外部视频及参考轨迹的来源与使用说明见[素材与许可](docs/submission/ASSETS_AND_LICENSES.md)。
 

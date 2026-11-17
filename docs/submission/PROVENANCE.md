@@ -8,4 +8,4 @@
 
 [source-files.json](source-files.json) 固定原产品基线文件mode/blob；[publication-files.json](publication-files.json) 精确列出18展示素材、1测试文件与1夹具移除的旧/新blob和SHA-256。`python scripts/submission/verify_baseline.py` 同时验证未改原文件和这些明确覆盖项，不能用白名单忽略任意产品变化。模型、Agent、三游戏与训练运行源码未改。
 
-公开仓库：https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026-Public。运行步骤见[RUNNING.md](RUNNING.md)，素材来源见[ASSETS_AND_LICENSES.md](ASSETS_AND_LICENSES.md)。
+公开仓库：https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026-Submission。运行步骤见[RUNNING.md](RUNNING.md)，素材来源见[ASSETS_AND_LICENSES.md](ASSETS_AND_LICENSES.md)。

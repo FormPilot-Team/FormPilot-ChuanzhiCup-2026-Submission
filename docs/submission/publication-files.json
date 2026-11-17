@@ -134,6 +134,13 @@
       "blob": "d3db2bedbeb5234e03ff726c6f7dc6c95fe745f9",
       "sha256": "ba35995e5d64f43b3e8dc68db583e8d7e3dce901223bc4708126a8db93943796",
       "reason": "Explicit synthetic geometry/visibility regression; original real-person Lite/Full fixture retained only in Private backup."
+    },
+    {
+      "path": "apps/platform/tests/workshop-pose-sketch.test.ts",
+      "previous_blob": "b8aed39b0419c329d098f79a737ea45c8802884c",
+      "blob": "4876fd7c17276a605d8b68a50ad92ea156e43bf0",
+      "sha256": "83c33d82c87fb6d6f807c3b89bb066f010d0155f1c8fc6438214dae18fa2003d",
+      "reason": "Two inline real-recording poses replaced throughout history by explicit programmatic test poses; renderer code unchanged."
     }
   ],
   "removed": [
