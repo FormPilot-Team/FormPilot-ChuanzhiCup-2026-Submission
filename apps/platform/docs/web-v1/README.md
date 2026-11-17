@@ -1,83 +1,22 @@
-# FormPilot Web V1 — 使用与技术集成说明
+# Web 页面与集成
 
-正式比赛入口：`apps/platform`（Vite + React），根路由 `/`。设计来源：`docs/design/chuanzhi-web/formpilot-web/`（PR #52，已获负责人审阅）。
+正式入口是平台根路由 `/`。安装、开发、比赛构建与游戏连接见[运行说明](../../../../docs/submission/RUNNING.md)。
 
-## 1. 启动
+| 板块 | 路由 | 实现 |
+| --- | --- | --- |
+| 首页 | `/` | `pages/Web/HomeV1Page.tsx` |
+| 训练中心 | `/training` | `pages/Web/TrainingCenterPage.tsx` |
+| 功法训练 | `/routines`、`/routines/:id`、`/routines/:id/train` | `RoutinesV1Page`、`RoutineEntryPage`、`RoutineTrainingPage` |
+| 游戏中心 | `/games` | `pages/Web/GamesCenterPage.tsx`，打开独立游戏应用 |
+| AI Coach | `/coach` | `pages/Web/CoachPage.tsx` |
+| 我的与动作工坊 | `/me`、`/history`、`/report/:id`、`/workshop` | 设置、记录、报告与动作工坊页面 |
 
-```powershell
-# 平台（正式构建 + 生产预览，http://127.0.0.1:4175）
-pnpm --dir apps/platform install
-pnpm --dir apps/platform competition:build
-pnpm --dir apps/platform competition:preview
+首页和趋势使用本机真实训练记录；没有记录时显示首次使用状态。趋势只包含可靠的完整热身训练，游戏成绩独立。动作工坊支持动作信息、摄像头或视频示范采集、识别测试、保存与正式训练；隔离的 `temporalPrototype` 属于研究原型。
 
-# 体感游戏（可选；游戏中心需要它才能真正启动游戏，http://127.0.0.1:5181）
-pnpm --dir apps/motion-games-lab/app install
-pnpm --dir apps/motion-games-lab/app build
-pnpm --dir apps/motion-games-lab/app preview
-```
+训练页使用深色沉浸布局。自动取景依据近期关键点边界，在保证四肢可见时放大；关键点缺失时恢复完整画面。视频与骨架共享显示变换，姿态识别输入不受影响。功法示范默认使用匹配参考轨迹的真人视频；没有可用且逐帧对齐的替代素材时不切换数字人。
 
-- 游戏服务地址默认 `http://127.0.0.1:5181/`，构建时可用 `VITE_MOTION_GAMES_URL` 改为部署地址。
-- `competition:build` 是竞赛专用构建（`vite build --mode competition`）：AI Coach 决策模型 ACTIVE（负责人已批准实验性模型）。普通 `build` 为 OFF。
-- 离线竞赛包（Windows，无需 Node）：`python -I -B scripts/competition-package/build_package.py --out <目录>`，生成 `FormPilot-Web-V1.0.0/`（`platform/` + `games/` + `start-formpilot.cmd`）、`SHA256SUMS.txt` 和 ZIP；说明文档在 `scripts/competition-package/docs/`。
-- 功法标准视频 `public/assets/routines/*-standard.mp4` 不进 Git（`.gitignore`），需按 `assets-manifest` 放到本机；缺失时详情页显示“示范视频暂时无法播放”。
-- 开发服务器：`pnpm --dir apps/platform dev`。
+AI Coach 的画像与授权输入经 `collectLocalDecisionInput` → `recommendCoachDecision`。普通构建 OFF，比赛构建 ACTIVE 并允许带身份标识的实验性模型；模型、候选池、弃权和 Guard 契约见[接口说明](../ai-coach-agent/decision-model/WEB_INTEGRATION_READY.md)。SHADOW 仅用于开发验证，本机日志可导出、不会上传。
 
-## 2. 六大板块与路由
+体感游戏服务地址由 `VITE_MOTION_GAMES_URL` 配置。页面检查服务可用性，连接后在新窗口启动摘苹果、林间划船或林间射箭。摄像头及游戏识别在游戏应用内处理。
 
-| 板块 | 路由 | 实现 | 数据来源 |
-| --- | --- | --- | --- |
-| 首页 | `/` | `pages/Web/HomeV1Page.tsx` | 本机热身 / 功法 / 我的动作记录（`features/web/webHistory.ts`） |
-| 训练中心 | `/training` | `pages/Web/TrainingCenterPage.tsx` | 6 个标准动作（`FREE_TRAINING_OPTIONS`）、动作工坊动作库 |
-| 功法训练 | `/routines`、`/routines/:id`、`/routines/:id/train` | `pages/Web/RoutinesV1Page.tsx` + 既有 `RoutineEntryPage`/`RoutineTrainingPage` | `ROUTINE_PROGRAMS`、功法跟练记录 |
-| 游戏中心 | `/games`（`?game=apple\|boating\|archery` 直接打开准备弹窗） | `pages/Web/GamesCenterPage.tsx` | Motion Games Lab（独立应用，新窗口运行） |
-| AI Coach | `/coach`（`?view=profile` 跳过开场页） | `pages/Web/CoachPage.tsx` | `recommendCoachDecision`（fp-coach-decision/v1） |
-| 我的 | `/me`、`/me/settings`、`/history`、`/report/:id`、`/workshop` | `pages/Web/MePage.tsx`、`SettingsPage.tsx` + 既有历史 / 报告 / 动作工坊 | 本机记录 |
-
-保留的既有路由：`/smart-training`、`/train`（含 `/?demo=1…` 诊断入口）、`/history`、`/report/:id`、`/workshop`、`/workshop/new`、`/workshop/:id`、`/workshop/:id/train`。未知路径显示“没有找到这个页面”。
-
-## 3. 设计还原方式
-
-- `scripts/build-web-v1-styles.mjs` 把 #52 的 `styles.css` **逐条复制**为 `src/styles/web-v1.css`：选择器加 `.fpw` 作用域、关键帧加 `fpw-` 前缀、素材路径改为 `/web-v1/…`，放在 Tailwind 的 `components` 层。不手改生成文件；设计源更新后重新运行脚本。
-- 素材复制到 `public/web-v1/`（海报、AI Coach 球体、游戏卡图、首页背景）。
-- 游戏中心原型是 iframe 内的独立页面，类名与主原型冲突，因此在 `src/styles/web-v1-platform.css` 中以 `gc-` 前缀移植，视觉不变；正式产品不使用 iframe。
-- 既有功能页（训练、功法详情 / 跟练、报告、历史、动作工坊）沿用原有页面，顶部导航 `AppHeader` 换成设计稿顶栏与六板块；训练进行页不显示手机底部导航，避免遮挡控制按钮。
-- 唯一文案修改：「动作工作坊」→「动作工坊」。
-
-## 4. 演示数据与真实数据
-
-- 原型中的睡眠、心率、步数、卡路里、“200+ 训练者”、“林同学”等演示数字全部移除。首页浮动卡片改为本机真实训练事实（今日 / 本周 / 连续 / 累计次数、最近训练、我的动作数）或目录事实（4 套功法、6 个动作、3 款游戏）；没有记录时显示 0 与首次使用文案。
-- 趋势图只用“可靠的热身完整训练”综合评分（与历史页相同规则），不少于 2 次才显示；功法、我的动作和游戏不并入。
-- 游戏成绩不写入训练记录，“我的 → 游戏”筛选明确说明。
-
-## 5. AI Coach 与决策模型
-
-- 调用：`runCoachDecision`（`pages/Web/CoachPage.tsx`）= `collectLocalDecisionInput(profile, {consent})` → `recommendCoachDecision(input, { mode })`。不传 `allowExperimentalModel`。
-- 模式开关 `src/app/coachDecisionConfig.ts`：普通开发 / 构建 `off`；`shadow` 仅在 `VITE_COACH_DECISION_MODE=shadow` 构建或 DEV 下 `?coachMode=shadow` 时启用；**竞赛构建（`--mode competition`）为 `active` 并显式传入 `allowExperimentalModel: true`**。模式只由构建模式决定，URL / localStorage / 用户操作都不能开启 ACTIVE（有单测与生产构建 E2E）。
-- ACTIVE 展示：模型身份与版本、完整性校验、每项适配度（注明不是医学概率）、特征贡献、首选把握、弃权与回退原因、数据来源；弃权或任何异常回退规则推荐。
-- 流程：画像（目标 / 困难 / 部位 / 偏好）→ 风险确认 → “我已了解”→ 数据授权（默认仅画像；勾选后才读取本机功法记录）→ 推荐。
-- 展示：`display.result` 的章节 / 功法 / 游戏、每项理由与依据、固定五问（`display.answers`）、推荐计划、下一步建议；章节直接跳转 `/routines/:id/train?form=…`，游戏跳转 `/games?game=…`（体感赛车未接入游戏中心，显示“尚未接入”）。
-- `safety_hold` 只显示暂停与专业咨询提示；`profile_required` 引导补全画像；模型弃权回退规则并提示。
-- SHADOW 开发面板：模型排序、适配度、前 6 个特征贡献条形图、置信度、回退 / 弃权原因、模型发布号；日志写入 `localStorage['formpilot.coach-decision-shadow-log:v1']`（`toShadowLogEntry`，只含内容 ID、结果和耗时），可导出 / 清空，不上传。
-- 模型身份始终标注「实验性模型：AI 标注训练，项目负责人已审阅标签，尚未进行独立人工或专家标注」（2026-11-09 起，见 `docs/ai-coach-agent/decision-model/OWNER_LABEL_REVIEW.md`）。
-- 视觉：AI Coach 首屏与头像使用 PR #54 的透明 WebM 光球（`src/components/web/CoachOrb.tsx`）：先显示 poster，视频解码后接管；减少动态效果时不加载视频；离开屏幕或标签页隐藏时暂停；视频失败保留 poster。素材来源见 `public/web-v1/ASSET_SOURCES.md`。决策模型目录（`features/coachAgent/decisionModel/**`）、权重、契约、Guard 未改动。
-
-## 6. 游戏中心
-
-- 三张卡片（摘苹果、林间划船、林间射箭）沿用设计稿文案与图片。
-- 打开页面时用 `no-cors` 请求检测 Motion Games Lab 是否在运行：在运行 → “开始游戏”在新窗口打开 `…/?game=<id>`，关闭该窗口后弹窗自动回到游戏中心；未运行 → “尚未接入”，只提供“重新检查 / 返回游戏中心”。
-- 平台不模拟游戏、不记录游戏成绩；摄像头与识别全部在游戏应用内完成。
-
-## 7. 测试
-
-```powershell
-pnpm --dir apps/platform typecheck
-pnpm --dir apps/platform lint
-pnpm --dir apps/platform test                        # 含 tests/web-v1.test.ts
-pnpm --dir apps/platform build
-pnpm --dir apps/platform competition:build
-pnpm --dir apps/platform exec playwright test tests/e2e/web-v1.spec.ts   # 游戏启动用例需先运行游戏预览，否则自动 skip
-# 视觉证据（生产预览 :4175，四个视口）
-$env:WEB_V1_SHOTS="<输出目录>"; pnpm --dir apps/platform exec playwright test -c playwright.web-v1-visual.config.ts
-```
-
-E2E 中的摄像头、DEV 合成姿态（`fixture=synthetic`）和本机记录都是模拟输入，不等于真实摄像头或真人验收。
+视觉资源来源见 [ASSET_SOURCES.md](../../public/web-v1/ASSET_SOURCES.md)。样式、自动取景、示范回退和页面行为由单元测试及 `tests/visual-web-v1`、`tests/e2e` 覆盖，合成输入不能代替真人摄像头验证。

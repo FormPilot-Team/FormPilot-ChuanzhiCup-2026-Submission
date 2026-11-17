@@ -1,7 +1,6 @@
 # WEB_INTEGRATION_READY：FormPilot 决策模型 Web 接线说明
 
 适用版本：发布 `fp-cdm-release/1.0.0`，契约 `fp-coach-decision/v1`（冻结），模型 `fp-cdm-m2 v1.0.0`，运行时 `1.2.0`。更新：2026-11-08。
-负责人：KiyOm1Lykke。Web 接收人：wang-linn-dw。也可以直接交给 Codex 按本文接线（最小指令见 `CODEX_WIRING_BRIEF.md`）。
 
 一句话：在 Web 里调用**一个同步函数** `recommendCoachDecision(input, { mode })`，把返回的 `display` 按 Agent Web P0 的方式渲染即可。特征提取、模型加载、排序、校准、弃权、安全复核全部在函数内部完成。
 
@@ -9,21 +8,11 @@
 
 > **2026-11-09 更新（PR #53，Web V1 正式接线）**：项目负责人已审阅 AI 标签（`OWNER_LABEL_REVIEW.md`），身份文案改为「实验性模型：AI 标注训练，项目负责人已审阅标签，尚未进行独立人工或专家标注」（层级仍为 `ai_experimental`，`humanValidation` 仍为 `pending`）。Web V1 的模式由构建决定：普通开发 / 普通构建 OFF；DEV `?coachMode=shadow` 或 `VITE_COACH_DECISION_MODE=shadow` 为 SHADOW；**竞赛专用构建 `competition:build`（`vite build --mode competition`）为 ACTIVE + `allowExperimentalModel: true`**（负责人批准）。实现：`apps/platform/src/app/coachDecisionConfig.ts`、`apps/platform/src/pages/Web/CoachPage.tsx`。下文 §5、§9、§10 中“需负责人批准”的 ACTIVE 已按此执行；其余契约与要求不变。
 
-## 1. 前提：分支与合并顺序
+## 1. 产品调用点
 
-| 顺序 | PR | 内容 | 基线 |
-| --- | --- | --- | --- |
-| 1 | [#49](https://github.com/FormPilot-Team/FormPilot/pull/49) | PR #49 规则排序器（手工权重，作为基线与候选检索的一部分） | `main` |
-| 2 | [#50](https://github.com/FormPilot-Team/FormPilot/pull/50) | fp-cdm 训练流水线、M1、M2（AI 标签实验）、评测 | #49 |
-| 3 | [#51](https://github.com/FormPilot-Team/FormPilot/pull/51) | **决策引擎 `engine/`、发布权重、契约、测试、Lab v3、SHADOW 验收工具、本文档** | #50 |
+正式入口为 `src/pages/Web/CoachPage.tsx`，通过 `collectLocalDecisionInput` 收集已获授权的本机证据，再调用 `recommendCoachDecision`。构建模式在 `src/app/coachDecisionConfig.ts` 中配置。
 
-只能按 #49 → #50 → #51 的顺序合并（每个 PR 的基线是前一个分支）。三个 PR 与其他打开的 PR（#36、#40、#45、#48）没有共同修改的文件。三个 PR 都只改 `apps/platform/src/features/coachAgent/decisionModel/**`、`apps/platform/scripts/decision-model/**`、`apps/platform/tests/coach-*`、`apps/platform/docs/ai-coach-agent/decision-model/**`，**不改任何页面、路由、样式、构建配置或 Agent Web P0 文件**。Web 分支只需在三个 PR 合并后（或先基于本阶段分支）开始接线。负责人决定合并；在此之前可以基于分支 `feat/coach-decision-integration-ready` 联调。
-
-### 1.1 当前代码中的调用点（2026-11-08 复核 main 与 #51）
-
-- Agent Web P0 服务 `getCoachWebRecommendation` 目前**没有页面调用**；引擎 OFF 的输出与它完全相同（只用画像）。
-- 唯一的现有页面是独立的比赛预览页 `src/features/coachAgent/sprint/CoachSprint.tsx`（入口 `sprint/main.tsx`），它直接调用 `recommendCoach(profile, context)`，`context` 可能含合成样例或授权读取的本机证据。**它不等于引擎 OFF**：有证据时规则的理由与 `evidenceIds` 会不同。若正式页面沿用这个页面，用引擎替换 `recommendCoach(profile, context)` 后，历史改由 `collectLocalDecisionInput`（本机）或 `origin: 'synthetic_demo'` 的输入块（演示）传入。
-- 本模型侧 PR 不改这个页面；改哪个页面由 Web 负责人决定。
+历史实验页 `src/features/coachAgent/sprint/CoachSprint.tsx` 保留直接调用 `recommendCoach(profile, context)` 的研究路径；它与只用画像的引擎 OFF 输出并不完全相同。
 
 ## 2. 需要引入的文件与依赖
 
@@ -254,11 +243,11 @@ const res = recommendCoachDecision(input, { mode: COACH_DECISION_MODE })
 
 Lab（`coach-decision-lab-v3.html`）中“现场案例”和“实时决策”区域可以对照验证上述结果，两者调用的是同一个函数。
 
-## 10. SHADOW 验收流程（接线完成后、讨论 ACTIVE 之前）
+## 10. SHADOW 多设备验证协议
 
 目的：在真实页面、真实本机记录上确认接线、安全与稳定性，同时观察模型在真实使用中会怎样回退或弃权。**SHADOW 验收不衡量推荐质量**，质量结论只来自人工标注验证（`scripts/decision-model/cdm/annotation-kit/`）。
 
-**S0 前提**：Web 分支基于 #51（或三个 PR 已合并）；§9 第 1–12 项已通过；只在开发 / 验收构建中设 `COACH_DECISION_MODE = 'shadow'`，`COACH_ALLOW_EXPERIMENTAL = false`；正式构建仍为 `off`。
+**S0 前提**：§9 第 1–12 项已通过；只在开发 / 验收构建中设 `COACH_DECISION_MODE = 'shadow'`，`COACH_ALLOW_EXPERIMENTAL = false`；正式构建仍为 `off`。
 
 **S1 记录**（只在验收构建中）：每次调用后记录一条日志，不含画像答案、历史数值或自由文本：
 
@@ -296,7 +285,7 @@ node <VN> scripts/decision-model/cdm/shadow-acceptance.ts --log deviceA.json --l
 
 结论：任一硬性检查失败为 **FAIL**；全部通过但覆盖不足为 **INSUFFICIENT**；否则 **PASS**。报告的 `observed` 部分只作描述：模型实际运行比例、弃权比例与原因、分布外特征、与规则的差异（`rankingEffect`）、首选章节一致率、数据来源。预期弃权来源见 §8 第 2–3 项（例如刚练过的章节）。检查器自检（合成场景 + 负对照）：`shadow-acceptance.ts --self-test`，结果在 `artifacts/integration/shadow-acceptance-selftest.json`：干净日志硬性检查全部通过、因覆盖不足为 INSUFFICIENT，篡改日志在 H3 失败。
 
-**S4 交给负责人**：SHADOW PASS 只说明可以讨论 ACTIVE。ACTIVE（含 `allowExperimentalModel: true`）仍由负责人单独批准；建议同时参考人工标注验证结果与 `observed` 中的弃权比例。
+**S4 解释结果**：SHADOW PASS 只说明接口、安全与稳定性满足本协议，不证明推荐质量；需同时参考人工标注结果与 `observed` 中的弃权比例。竞赛构建沿用本文开头声明的实验性启用条件。
 
 ## 11. 不要做的事
 

@@ -2,7 +2,7 @@
 
 > 最新完整结果、版本与结论状态以 [MODEL_REPORT.md](MODEL_REPORT.md) 为准。Web 唯一接口为 `engine/` 的 `recommendCoachDecision`，见 [WEB_INTEGRATION_READY.md](WEB_INTEGRATION_READY.md)；下文的 `getCoachCdmRecommendation` 已移除。本文件保留第一轮的设计记录（历史文档，不再更新）。
 
-日期：2026-11-07。分支 `feat/coach-decision-model-trained`，叠加在 PR #49（`feat/coach-decision-model-v1`）之上；PR #49 的手工权重排序器 fp-coach-ranker 原样保留，作为对照基线（只新增了一个只读评测导出）。
+研究日期：2026-11-07。手工权重排序器 fp-coach-ranker（PR #49）保留为对照基线。下文描述第一轮研究时的状态，当前发布以 MODEL_REPORT 为准。
 
 ## 当前状态
 

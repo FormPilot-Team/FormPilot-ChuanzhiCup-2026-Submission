@@ -1,144 +1,26 @@
 {
   "product": "FormPilot Web",
   "version": "1.2.3",
-  "stage": "private-v123-technical-candidate-human-acceptance-pending",
   "source_baseline": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
   "filtered_baseline": "e2f487dd5a6d490ce6c3e77fa820c457b0f7f609",
-  "remote_created": true,
-  "public_release_approved": false,
-  "qwen_real_inference_rerun": false,
-  "previous_source_baseline": "9aba92e22a8238fa85d2192dff105881a0af1ce1",
   "repository_url": "https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026",
   "repository_visibility": "private",
-  "submission_sha_instruction": "git rev-parse HEAD; final frozen Git SHA is recorded in the external submission evidence, avoiding a self-referential commit hash",
-  "v122_validation": {
-    "status": "AUTOMATED_TECHNICAL_CHECKS_PASS_HUMAN_ACCEPTANCE_PENDING",
-    "source_main": "9aba92e22a8238fa85d2192dff105881a0af1ce1",
-    "prior_v121_results_are_historical": true,
-    "platform_unit_tests": 2240,
-    "games_unit_tests": 89,
-    "functional_unique_cases": 45,
-    "functional_initial_passed": 43,
-    "functional_initial_navigation_timeouts": 2,
-    "functional_reruns_passed": 4,
-    "warmup_course": 1,
-    "final_package_smoke": 7,
-    "decision_active_fallback": 5,
-    "games_ui": 15,
-    "camera_video_replay": "PASS; real full/lite MediaPipe, 8 repetitions and report; not physical-camera acceptance",
-    "physical_camera_human_acceptance": false,
-    "actual_qwen_inference_rerun": false,
-    "source_baseline_verification": {
-      "unamended_files": 1025,
-      "mismatches": 0
-    },
-    "final_ci_and_frozen_submission_sha": "Recorded outside Git in the submission material FINAL_VERSION_RECORD.json"
+  "default_branch": "submission",
+  "commit_identity": "git rev-parse HEAD; exact archive commit recorded in the delivered package manifest",
+  "history_mapping": "docs/submission/commit-map.txt",
+  "source_manifest": "docs/submission/source-files.json",
+  "external_media_manifest": "assets-manifest/platform.json",
+  "decision_model": {
+    "release": "fp-cdm-release/1.0.0",
+    "tier": "ai_experimental",
+    "ordinary_build": "off",
+    "competition_build": "active_with_rule_fallback",
+    "independent_human_or_expert_validation": false
   },
-  "historical_v121_original_demo_package": {
-    "source": "8e00101dd249c672f177b98aff8c5a1dcc39dfac",
-    "sha256": "5831b223d679f1346e27ad22075ddff86770663fe374e541b1fcbd78a7ea5429"
-  },
-  "historical_v121_independent_validation_package": {
-    "source": "61eb6958ab2fdf1578da3c1f9acbb891fdb9b7b4",
-    "sha256": "e46092fc9260fa7fbc6b6c9b99bc9f8933f1d8dc79b50bbfd3fa89ce961973ea",
-    "distribution": "local-only; media rights pending"
-  },
-  "v122_windows_package": {
-    "bytes": 188585346,
-    "sha256": "ecaf6ae7ea50d1f3da7be06ef3801545d650f0f5e1fcc1b59054650bf16a2ce0",
-    "files": 404,
-    "dependencyLicenses": 274,
-    "filename": "FormPilot-Web-V1.2.2.zip",
-    "source": "9aba92e22a8238fa85d2192dff105881a0af1ce1",
-    "distribution": "private internal prerelease; external media rights and reviewer access pending owner confirmation",
-    "release_url": "https://github.com/FormPilot-Team/FormPilot/releases/tag/web-v1.2.2-internal-test",
-    "internal_release_verified": true,
-    "release_id": 446906020,
-    "asset_id": 754466240,
-    "github_digest": "sha256:ecaf6ae7ea50d1f3da7be06ef3801545d650f0f5e1fcc1b59054650bf16a2ce0",
-    "prerelease": true,
-    "draft": false,
-    "previous_v121_rollback_unchanged": true
-  },
-  "merged_change_requests": [
-    60,
-    62
-  ],
-  "pr61_merged": false,
-  "v123_validation": {
-    "status": "TECHNICAL_CHECKS_PASS_WITH_DISCLOSED_STOCK_E2E_ASSERTION_FAILURE",
-    "source_main": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
-    "prior_v121_v122_results_are_historical": true,
-    "independent_competition_ci": "First source/doc SHA SUCCESS; final immutable SHA verification recorded externally after final documentation push",
-    "physical_camera_human_acceptance": false,
-    "actual_qwen_inference_rerun": false,
-    "platform_unit_tests": 2245,
-    "games_unit_tests": 89,
-    "platform_lint_warnings": 7,
-    "platform_lint_errors": 0,
-    "independent_frozen_lockfile_install": true,
-    "independent_typecheck_lint_build": true,
-    "platform_standard_and_competition_build": true,
-    "source_baseline_verification": {
-      "unamended_files": 1027,
-      "mismatches": 0
-    },
-    "browser_regression": {
-      "devStock": {
-        "passed": 50,
-        "failed": 1,
-        "skipped": 1,
-        "failure": "Existing coach-agent-sprint legacy next-focus copy assertion no longer matches intentional #62 concrete-focus behavior; original failure retained, not silently patched",
-        "skip": "Game popup skipped in initial dev run; separate probe outcome recorded in final external acceptance"
-      },
-      "independentMergedBehaviorProbe": {
-        "checks": 4,
-        "passed": 4,
-        "source_test_edited": false
-      },
-      "packageActive": {
-        "passed": 6,
-        "failed": 0
-      },
-      "packageSmoke": {
-        "passed": 7,
-        "failed": 0
-      },
-      "cameraVideoReplay": {
-        "passed": true,
-        "physicalCameraTest": false,
-        "fullAndLiteMediaPipe": true,
-        "poseIconHeads": 2,
-        "repetitions": 8,
-        "pauseCountStable": true,
-        "gestureResume": true,
-        "reportVisible": true,
-        "pageErrors": 0
-      },
-      "gamesUi": {
-        "passed": 15,
-        "failed": 0
-      },
-      "devGamePopupProbe": {
-        "passed": true,
-        "checks": 2,
-        "evidence": "tests/package-game-popup/results.json",
-        "note": "Real packaged localhost popup verified; stock 127.0.0.1 Host test remains skipped and is not rewritten as PASS."
-      }
-    },
-    "final_source_sha_and_ci": "External competition/FINAL_RESULT.json; not self-referential"
-  },
-  "v123_windows_package": {
-    "filename": "FormPilot-Web-V1.2.3.zip",
-    "bytes": 188585614,
-    "sha256": "22f9207e16ae30621c1ee8d52ddae924b334926aaad219104c7a256f9af7e441",
-    "files": 404,
-    "dependencyLicenses": 274,
-    "source": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
-    "extractedHashChecks": 403,
-    "extractionMismatches": 0,
-    "release_url": "https://github.com/FormPilot-Team/FormPilot/releases/tag/web-v1.2.3-internal-test",
-    "distribution": "private internal prerelease; public/media/reviewer rights unchanged",
-    "release_status": "PUBLISHED_PRIVATE_PRERELEASE_PARENT_VERIFIED"
+  "optional_language_model": {
+    "runtime": "Ollama 0.40.13",
+    "model": "qwen3:4b-instruct-2507-q4_K_M",
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "included": false
   }
 }

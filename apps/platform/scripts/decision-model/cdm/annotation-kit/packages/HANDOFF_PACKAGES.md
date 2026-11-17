@@ -1,4 +1,4 @@
-# 人工标注包：分发、回收与评测（负责人用）
+# 人工标注协议与评测
 
 状态：**AWAITING_ANNOTATORS**。截至 2026-11-08 没有任何人工标签；本目录与证据目录中没有、也不会生成模拟的人工结果。
 
@@ -11,7 +11,7 @@
 
 两份包的工具与规范逐字节相同，只有编号不同；工具按编号打乱场景顺序。每人 18 个场景（6 个冻结测试族 × 3 种条件），约 180 条评分，15–20 分钟。
 
-生成方式（在 `apps/platform` 下）：`node scripts/decision-model/cdm/annotation-kit/packages/build-packages.mjs --out <dir>`，再把两个文件夹分别压缩。本次生成的包在 `F:\ProjectEvidence\FormPilot\20261108-cdm-final\annotation-packages\`。
+生成方式（在 `apps/platform` 下）：`node scripts/decision-model/cdm/annotation-kit/packages/build-packages.mjs --out <dir>`，再把两个文件夹分别压缩。输出保存在指定目录。
 
 ## 2. 人选与独立性
 
@@ -20,15 +20,13 @@
 - 分别私下发送。两人在都导出之前不讨论具体场景、不看任何系统输出（AI Coach、Lab、PR 演示与代码）。
 - 结论统一写作“团队标注者（非临床）判断”。
 
-（发送标注包属于团队通知，由负责人执行；Claude Code 不发送任何消息。）
-
 ## 3. 回收与评测
 
-1. 收到的两个文件 `fp-cdm-labels-v1-A1.json`、`fp-cdm-labels-v1-A2.json` 原样放入同一个新目录，例如 `F:\ProjectEvidence\FormPilot\<日期>-human-labels\labels\`，不要修改内容。
+1. 收到的两个文件 `fp-cdm-labels-v1-A1.json`、`fp-cdm-labels-v1-A2.json` 原样放入同一个新目录，例如 `<研究输出目录>/labels/`，不要修改内容。
 2. 在 `apps/platform` 下运行：
 
 ```bash
-PY="D:/Dev_Environment/Python312/python.exe -I -B"
+PY="python -I -B"
 $PY scripts/decision-model/cdm/ingest_labels.py --labels-dir <labels> --subset test
 ```
 

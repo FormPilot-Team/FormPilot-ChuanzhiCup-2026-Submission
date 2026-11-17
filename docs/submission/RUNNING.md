@@ -1,12 +1,12 @@
-# FormPilot Web V1.2.2 运行说明
+# FormPilot 运行说明
 
-产品源码来源：正式 main `9aba92e22a8238fa85d2192dff105881a0af1ce1`。比赛仓库自己的 SHA 见根目录 `SUBMISSION_VERSION.json` 及本轮封版验证记录；两者不能混用。
+环境与安装入口见[根 README](../../README.md)。以下命令从仓库根目录开始，注明应用目录的步骤在对应目录执行。
 
-## Windows 测试包
+## Windows 离线包
 
-1. 取得本轮内部 Pre-release 的 `FormPilot-Web-V1.2.2.zip` 和对应 SHA-256；下载访问需要正式 Private 仓库权限。
-2. 执行 `Get-FileHash -LiteralPath .\FormPilot-Web-V1.2.2.zip -Algorithm SHA256`，与本轮校验记录比对。旧 V1.2.1 的校验值不可使用。
-3. 完整解压到新的目录，双击 `start-formpilot.cmd`；不要在 ZIP 内运行，不覆盖回退包。
+1. 取得有权使用的 `FormPilot-Web-V1.2.3.zip` 与配套 SHA-256 清单。
+2. 执行 `Get-FileHash -LiteralPath .\FormPilot-Web-V1.2.3.zip -Algorithm SHA256`，与配套清单比对。
+3. 完整解压到新的目录，双击 `start-formpilot.cmd`；不要在 ZIP 内运行。
 4. 平台打开 `http://localhost:4175/`，三游戏服务运行在 `http://localhost:5181/`。保持启动窗口开启，关闭窗口停止服务。
 5. 首次训练或游戏允许摄像头。正式体验入口不带 `source=synthetic`、`debug` 等测试参数。
 
@@ -89,22 +89,22 @@ pnpm agent:bridge
 
 ## 测试与重建
 
-两个应用目录分别运行 `pnpm typecheck`、`pnpm lint`、`pnpm test`、`pnpm test:e2e`。系统 Edge 是现有浏览器测试配置的依赖；默认测试含假上游与合成姿态，不能替代真人验收或真实 Qwen 推理。
+两个应用目录分别运行 `pnpm typecheck`、`pnpm lint`、`pnpm test`、`pnpm test:e2e`。系统 Edge 是现有浏览器测试配置的依赖；默认测试含假上游与合成姿态，不能替代真人摄像头检查或真实 Qwen 推理。
 
 解压包启动后，平台目录执行 `pnpm exec playwright test -c playwright.package-smoke.config.ts`；游戏目录执行 `pnpm exec playwright test -c playwright.submission.config.ts`。完整素材是四套示范视频播放检查的前提。
 
 从平台目录重新制作 ZIP：
 
 ```powershell
-python -I -B scripts/competition-package/build_package.py --out '<全新的输出目录>' --version 1.2.2
+python -I -B scripts/competition-package/build_package.py --out '<全新的输出目录>' --version 1.2.3
 ```
 
 然后回到仓库根目录执行必需的封包步骤：
 
 ```powershell
-python scripts/submission/finalize_v122_package.py --source-root . --package '<全新的输出目录>/FormPilot-Web-V1.2.2'
+python scripts/submission/finalize_v122_package.py --version 1.2.3 --source-root . --package '<全新的输出目录>/FormPilot-Web-V1.2.3'
 ```
 
-该步骤补齐 V1.2.2 版本文案、依赖 LICENSE/NOTICE、`FILE_MANIFEST.json`、`SHA256SUMS.txt`，重新生成最终 ZIP 与 `.zip.sha256`。它需要两端已按锁文件安装依赖；不下载模型、不改源码、不赋予媒体分发许可。不要分发未封包的初始 ZIP。
+该步骤补齐 V1.2.3 版本文案、依赖 LICENSE/NOTICE、`FILE_MANIFEST.json`、`SHA256SUMS.txt`，重新生成最终 ZIP 与 `.zip.sha256`。它需要两端已按锁文件安装依赖；不下载模型、不改源码、不赋予媒体分发许可。不要分发未封包的初始 ZIP。
 
-重建封包后必须再次解压、通过包内启动器运行、回归并生成新校验值。[本轮封版验证记录](V122_FINAL_CHECKS.md)与历史 V1.2.1 记录分别保留。
+重建后重新解压，使用包内启动器核对平台、三款游戏、媒体播放与模型回退，再生成新校验值。

@@ -1,6 +1,6 @@
 # FormPilot 比赛版可选决策模型 fp-coach-ranker v1.0.0
 
-日期：2026-11-07（Asia/Shanghai）。责任人 KiyOm1Lykke；执行 Claude Code。分支 `feat/coach-decision-model-v1`，基于 `feature/platform-agent-web-p0@81f8fee`（PR #47）。
+历史基线研究日期：2026-11-07。本文件记录手工权重排序器及描述符研究，当前训练模型见 [MODEL_REPORT.md](MODEL_REPORT.md)。
 
 **一句话结论：** 本轮没有训练新权重，也没有复用 StartLux 权重。交付的是一个**确定性、受约束、可解释的排序模型**：特征来自画像、可信目录和由参考姿态轨迹实测的动作描述符，安全门禁和 P0 规则服务保持不变。正式启用开关默认 `off`。
 
@@ -16,7 +16,7 @@
 | --- | --- | --- |
 | A 继续微调 StartLux | **放弃** | 冻结 LoRA 的任务是 Isleward 三种肩部动作的下一回合六分类干预，不是功法/章节/游戏排序；FormPilot 请求在 forward 前就返回 `PROFILE_NOT_IN_MODEL_SCOPE`。训练数据为 108/24/36 条 synthetic 作者标签（`pending_domain_expert`）。权重为 CC BY-NC 4.0，没有商业许可，不能进入比赛提交包。4B 模型冷启动约 274 s，P95 约 667 ms（热态），与同步 Web 推荐不匹配 |
 | B StartLux 只管局部游戏难度，另建推荐模型 | **前半部分保持现状，不在本仓库实施** | StartLux 继续作为 Isleward 内的非商业研究（D1–D3 PR 不动）。FormPilot 没有已批准的难度控制器，也没有 FP 域 profile |
-| C 分类 / LTR / 树模型 | **排序不训练，只做了一个小实验** | 没有“画像→内容”的独立标签：没有真实用户、没有专家标注；`F:\Datasets\...\decision_eval` 是 Isleward 肩部难度测试集，且标记 `exclude_from_training`。在规则或作者标签上训练，最多只能复现它们。唯一做过的学习实验：用 3 个功法学习“描述符→注意标签”阈值，再在第 4 个功法上检验（leave-one-programme-out）。κ 最多提升约 0.1，没有改变任何使用决定 |
+| C 分类 / LTR / 树模型 | **排序不训练，只做了一个小实验** | 没有“画像→内容”的独立标签：没有真实用户、没有专家标注；Isleward 的 `decision_eval` 数据 是 Isleward 肩部难度测试集，且标记 `exclude_from_training`。在规则或作者标签上训练，最多只能复现它们。唯一做过的学习实验：用 3 个功法学习“描述符→注意标签”阈值，再在第 4 个功法上检验（leave-one-programme-out）。κ 最多提升约 0.1，没有改变任何使用决定 |
 | **D+ 规则排序/特征/可解释性优化（选定）** | **实施** | 目录只有 68 项、画像空间可以穷举（89,280 个），因此可以全量验证。新增特征来自项目自有的标准示范参考轨迹（可追溯、可复算）。浏览器内同步运行，零依赖、无 GPU、可回退 |
 
 ## 2. 模型结构
@@ -61,7 +61,7 @@ CoachWebRequest ──► P0 getCoachWebRecommendation（不变） ──► rul
 
 ## 3. 同条件对照（离线、synthetic / 规则一致性评测）
 
-输入为穷举的自述画像空间：89,280 个画像，其中 22,320 个无风险。画像按组合均匀枚举，不代表真实用户分布；在这种枚举下 88.3% 是受限画像。所有数字来自 `F:\ProjectEvidence\FormPilot\20261107-coach-decision-model\evaluation\evaluation-frozen.json`。
+输入为穷举的自述画像空间：89,280 个画像，其中 22,320 个无风险。画像按组合均匀枚举，不代表真实用户分布；在这种枚举下 88.3% 是受限画像。所有数字来自当时冻结的 `evaluation-frozen.json`，原始文件保留于受控研究归档。
 
 | 指标 | P0 规则 | fp-coach-ranker |
 | --- | --- | --- |
@@ -97,7 +97,7 @@ CoachWebRequest ──► P0 getCoachWebRecommendation（不变） ──► rul
 
 ## 5. 复现
 
-在 `apps/platform` 下执行（`VN` 为 `node_modules/.pnpm/vite-node@3.2.4_@types+node_de474a0b50d035fb47eb67fa144202a3/node_modules/vite-node/vite-node.mjs`）：
+通过根目录 `scripts/submission/run_ts.mjs` 运行下列 TypeScript 脚本，方法见[训练复现](../../../../../docs/submission/TRAINING_REPRODUCTION.md)。下列 `node $VN` 是原研究命令中的 vite-node 占位。
 
 ```bash
 node $VN scripts/decision-model/extract-motion-descriptors.ts        # 重新生成描述符（确定性）

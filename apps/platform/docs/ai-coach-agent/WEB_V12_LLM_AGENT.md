@@ -1,6 +1,6 @@
 # Web V1.2 · AI 教练本地大模型 Agent（LLM + 工具调用 + RAG）
 
-> 状态：2026-11-13 实现并以真实本地模型验证；未合并。证据与报告：`F:\ProjectEvidence\FormPilot\20261113-web-v12-ai-upgrade`（`AI_UPGRADE_HANDOFF.md`）。
+> 本文描述已集成的本机 Agent、工具调用与检索。文中模型评测为 2026-11-13 的历史实验，原始汇总见 [HISTORICAL_MODEL_RESULTS.json](../../../../docs/submission/HISTORICAL_MODEL_RESULTS.json)；不表示当前电脑已重跑。
 
 ## 1. 做了什么
 
@@ -20,7 +20,7 @@
 浏览器 CoachAgentChat ──NDJSON──▶ 本地 Agent Bridge (127.0.0.1:4321, server/coachAgent/agent)
    │  runAgentTurn (src/features/coachLlm/agent.ts)            │  Origin 白名单 + Host 校验 + 速率/预算/单并发
    │   1 guard：急性风险 / 改数据请求 → 安全规则回答（不调模型）   │  固定模型 tag + digest（verifyInstalledModel）
-   │   2 模型选择工具（原生 function calling，最多 3 轮 5 次）   └──▶ Ollama 0.40.13 (127.0.0.1:11441, F:\AI)
+   │   2 模型选择工具（原生 function calling，最多 3 轮 5 次）   └──▶ Ollama 0.40.13 (127.0.0.1:11441)
    │   3 浏览器内执行只读工具（授权、校验、报告同一算法）              └─ qwen3:4b-instruct-2507-q4_K_M
    │   4 意图路由兜底：模型未调用应调的工具 → 代码补调并让模型重答
    │   5 模型基于工具结果作答（Bridge 流式传给 runAgentTurn；界面只显示进度字数）
@@ -69,11 +69,13 @@
 
 ## 5. 运行
 
-本地演示环境（Windows，已按 F:\AI 批准目录部署 Ollama 0.40.13 与模型）：
+先准备 Ollama 0.40.13 和 `qwen3:4b-instruct-2507-q4_K_M`，模型 digest 必须匹配根 README；模型不随源码提供。已安装环境下：
 
 ```powershell
-# 1) Ollama（批准的 F: 运行目录；端口 11441）
-F:\ProjectEvidence\FormPilot\20261113-web-v12-ai-upgrade\llm\runtime\start-ollama-11441.cmd
+# 1) Ollama（独立终端，端口 11441）
+$env:OLLAMA_HOST = '127.0.0.1:11441'
+$env:OLLAMA_NO_CLOUD = 'true'
+ollama serve
 # 2) Agent Bridge（另开终端，apps/platform 目录）
 $env:FP_AGENT_ENABLED='true'; $env:FP_AGENT_OLLAMA_PORT='11441'; $env:FP_AGENT_PRELOAD='true'
 $env:FP_AGENT_ORIGINS='http://127.0.0.1:4173,http://localhost:4175'
@@ -88,7 +90,7 @@ pnpm dev --host 127.0.0.1 --port 4173      # 或 competition:build + competition
 |---|---|---|
 | 普通 Web 构建 | 本机 Bridge 可用时启用 | 打开「训练问答」后才探测 127.0.0.1:4321；探测失败显示「未连接」，输入框禁用 |
 | 比赛轻量包（competition build） | 同上；包内不含模型 | 模型不进安装包；评委机没有 Bridge 时自动回到固定五问 + M1/M2。已装好模型环境的电脑可用包内 `ai-coach-local/start-ai-coach-local.cmd` 一键启动 Bridge（不下载任何东西） |
-| LLM 演示环境 | 启用 | Ollama(F:) + Bridge + dev/preview |
+| LLM 演示环境 | 启用 | 本机 Ollama + Bridge + dev/preview |
 | 无 LLM 回退 | 禁用 | `VITE_COACH_AGENT=off` 构建完全不探测；固定五问、推荐、风险规则不受影响 |
 | 在线演示（只含 AI 教练） | 演示网关可用时启用 | `pnpm demo:build` + `pnpm demo:gateway`；合成示例数据；见 [PUBLIC_DEMO.md](PUBLIC_DEMO.md)。**负责人决定本届不部署公网 Demo** |
 
@@ -109,7 +111,7 @@ pnpm dev --host 127.0.0.1 --port 4173      # 或 competition:build + competition
 ## 7. 已知限制
 
 * 4B 模型在无工具时会编造功法要领（无 RAG 事实召回 0.39）；V1.2 用意图路由强制先查资料，不靠模型自觉。
-* 冷启动：模型首次从 USB F: 盘载入约 36.5 s；Bridge 支持 `FP_AGENT_PRELOAD=true` 提前载入。
+* 冷启动：历史测试中模型首次从 USB 存储载入约 36.5 s；具体耗时取决于设备；Bridge 支持 `FP_AGENT_PRELOAD=true` 提前载入。
 * 知识库中 44 条引用来自「待核验」出处，UI 如实显示核验状态。
 * 评测数据为测试夹具（分析测试集的标准热身会话 + 生成的功法记录），不是真人训练。
 * 模型只读文本证据，不看图像；「多模态」= 摄像头姿态识别（MediaPipe）→ 结构化报告 → 模型解释，没有大模型视觉能力。

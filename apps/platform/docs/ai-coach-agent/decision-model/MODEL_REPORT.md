@@ -1,7 +1,8 @@
 # FormPilot Coach Decision Model（fp-cdm）技术报告
 
-更新：2026-11-08（Asia/Shanghai），阶段：最终交付收尾（模型侧冻结，等待 Web 正式接线）。分支 `feat/coach-decision-integration-ready`，PR #51（叠加在 PR #50 → PR #49 → main 之上）。负责执行：Claude Code；负责人：KiyOm1Lykke。
-Web 接线说明：`WEB_INTEGRATION_READY.md`；Codex 最小指令：`CODEX_WIRING_BRIEF.md`；JSON 示例：`examples/`；人工标注包：`scripts/decision-model/cdm/annotation-kit/packages/HANDOFF_PACKAGES.md`。
+研究冻结日期：2026-11-08；竞赛构建状态更新：2026-11-09。下文指标为历史离线实验，保留其方法、原始结果和限制。
+
+接口说明见 `WEB_INTEGRATION_READY.md`，请求与响应示例见 `examples/`，人工标注协议见 `scripts/decision-model/cdm/annotation-kit/packages/HANDOFF_PACKAGES.md`。
 
 ## 0A. 2026-11-09 更新：Web V1 正式接线与竞赛构建（模型未改动）
 
@@ -221,7 +222,7 @@ fp-cdm 在 2,133 个画像（9.6%）上弃权并回退规则：低适配 1,936 �
 | 平台生产构建 `vite build` | 通过 |
 | GitHub CI（#49、#50、#51） | `check` 与 `hygiene` 均通过（收尾推送后重新运行，结果见 PR） |
 
-日志：`F:\ProjectEvidence\FormPilot\20261108-cdm-final\checks\`。
+原始日志保留于受控研究归档；本节记录当时的测试结果。
 
 ### 5.3 性能（E5）
 
@@ -279,10 +280,10 @@ CPU 单线程，开发笔记本；不用 GPU，不联网。收尾阶段重测（
 9. （2026-11-09 已处理）Web 正式页面已在 PR #53 接线并完成 E2E；SHADOW 实地验收只有 1 台设备，判为 INSUFFICIENT。原文：Web 正式页面尚未完成，接线、E2E 与 SHADOW 验收都还没有进行。现有独立预览页 `sprint/CoachSprint.tsx` 直接调用 `recommendCoach(profile, context)`，与引擎 OFF（只用画像的 P0）不完全相同（见 `WEB_INTEGRATION_READY.md` §1.1）。
 10. 浏览器只在 Edge 上实测；性能只在开发笔记本上测过。
 
-## 9. 正式启用条件（需负责人决定）
+## 9. 使用条件与后续验证
 
 1. **人工验证（2026-11-09 起不再阻塞 V1.0，改为未来研究方向；负责人已审阅 AI 标签）**：负责人把两份独立标注包（A1、A2，见 `annotation-kit/packages/HANDOFF_PACKAGES.md`）分别私下发给两名团队成员，每人标注 6 个冻结测试族（18 个场景，约 180 条，约 15–20 分钟）。然后运行 `ingest_labels.py --subset test` 与 `evaluate_human_test.py`，得到人工之间的一致性、AI 与人工的一致性，以及在人工标签上重新计算的规则 / PR #49 / 模型对照（不重新训练）。
 2. 根据第 1 步结果决定：继续以“实验性模型”展示，或补充近期练习等场景并用人工标签重训正式权重（加载器层级随之变为 `human`）。
-3. 合并顺序 #49 → #50 → #51。Web 先以 OFF 接线完成 `WEB_INTEGRATION_READY.md` §9 的 E2E，再在验收构建中按 §10 做 SHADOW 验收（≥ 3 台设备、≥ 30 次调用）。
-4. ACTIVE（并设置 `allowExperimentalModel`）、合并 main、修改安全门禁，均由负责人决定。2026-11-09：负责人批准仅在竞赛专用构建中启用 ACTIVE；普通构建保持 OFF；安全门禁未修改。
+3. 接口行为按 `WEB_INTEGRATION_READY.md` §9 复核；多设备 SHADOW 覆盖按 §10 检查（≥ 3 台设备、≥ 30 次调用），覆盖不足不能标记通过。
+4. 竞赛专用构建启用 ACTIVE 并设置 `allowExperimentalModel`；普通构建保持 OFF。该模式沿用 2026-11-09 的实验性模型使用条件，安全门禁独立执行。
 5. 在比赛目标设备上复测性能；不对外宣称临床效果、专家验证或真实用户效果。

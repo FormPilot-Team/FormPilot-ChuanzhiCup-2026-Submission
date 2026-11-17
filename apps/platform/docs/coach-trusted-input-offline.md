@@ -1,6 +1,6 @@
 # Trusted input and pinned Qwen3 4B: offline integration
 
-This change is default-off. It adds no page, model launcher, download, inference authorization, storage permission or paid service. The independent implementation is based on main; PR #36's privacy projection changes are not included. That PR's frozen audit remains **59/80 AI-draft semantic fidelity, 0/47 declared synthetic-sensitive leaks, Gold 0/2**. Those values describe its frozen output, not main's older projector or these new tests.
+This document records a default-off, offline trusted-input research interface. It is separate from the current Web V1.2 Agent documented in `ai-coach-agent/WEB_V12_LLM_AGENT.md`. The interface adds no page or model launcher. Its historical baseline predates PR #36's privacy projection changes. That PR's frozen audit remains **59/80 AI-draft semantic fidelity, 0/47 declared synthetic-sensitive leaks, Gold 0/2**. Those values describe its frozen output, not main's older projector or these new tests.
 
 ## Data flow and public contract
 
@@ -51,15 +51,15 @@ The original orchestrator, Reader and Dispatcher still enforce storage permissio
 - Model: `qwen3:4b-instruct-2507-q4_K_M`.
 - Official manifest digest: `sha256:0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0`.
 - Existing portable runtime: Ollama `0.40.13`. For this new tag, session exchange and every step verify exact runtime version, tag/digest, qwen3 and Q4_K_M metadata before chat. No pull/install/load action is part of verification.
-- Files remain outside Git at `F:\AI\Models\Ollama`. Neither the legacy compatibility-manifest hash nor weight-blob hash is the Planner digest.
+- Model files remain outside Git in the local Ollama model directory. Neither the legacy compatibility-manifest hash nor weight-blob hash is the Planner digest.
 
 `reserveLocalContext` charges the entire serialized Ollama request, including user context, system prompt, tools/schema and other envelope text, plus a 512-token template allowance and reserved output. The sum must be ≤8192 before metadata/chat dispatch for a step; otherwise the request is rejected without truncation. Actual returned prompt/output usage is independently validated, including combined ≤8192, before any candidate is accepted. All three planning protocols use `num_ctx=8192`; no fallback protocol/model, silent reduction or retry is introduced.
 
-UTF-8 byte count plus 512 is a conservative accounting proxy, **not a verified tokenizer or runtime-template bound**. The offline implementation closes the missing input-plus-output check, but does not certify a fully packed 8192-token real prompt. Template overhead, actual tokenizer behavior and any runtime truncation must be checked under separately authorized inference. Current UI and launcher are not modified; the existing programmatic port/config options must be explicitly used by a later reviewed harness.
+UTF-8 byte count plus 512 is a conservative accounting proxy, **not a verified tokenizer or runtime-template bound**. The offline implementation closes the missing input-plus-output check, but does not certify a fully packed 8192-token real prompt. Template overhead, actual tokenizer behavior and any runtime truncation require separate real-model measurement. The research interface does not itself provide a UI or launcher; its programmatic port/config options must be set by the calling harness.
 
-## Web handoff requirements (no UI implementation)
+## Host display contract
 
-For coordination within wang-linn-dw's Web task, the required display contract is:
+The restricted research interface requires these host states:
 
 - `clarification_required`: fixed prompt to re-enter only the training question, with no name/account/contact/path. Offer a separate explicit bounded request selection and independently selected training record. Never echo an inferred slice or auto-submit a candidate.
 - `review_required`: explain that this wording cannot yet be safely submitted; allow explicit supported selection or cancel. Do not implement a “send anyway” button.
@@ -67,14 +67,14 @@ For coordination within wang-linn-dw's Web task, the required display contract i
 - `ready`: opaque in-memory ticket, not a model authorization or persisted JSON token. Separate informed execution authorization remains required.
 - New input, record/consent change, navigation or cancel must cancel/dispose the prior request. Do not log raw mixed input, tickets, identity sidecars or hashes of private text in telemetry/URLs.
 
-This document assigns no new Issue or code change to that teammate; the owner coordinates actual UI work. Real UI/IPC provenance and interaction acceptance remain untested here.
+Real UI/IPC provenance and interaction acceptance were not tested by this offline research.
 
-## Independent statistics and next-stage gates
+## Historical statistics and validation limits
 
 Keep four separate groups: PR #36 frozen80 (59/80, 0/47), main legacy projector characterization, new admission/calling tests, and fake-HTTP Qwen protocol tests. Refused original inputs are not semantic fixes. Synthetic fake HTTP has no Qwen load and cannot measure model quality, performance or human review.
 
-On main `677731894b13c3d1dde66c54397ece0b7cfcd93a`, the unchanged legacy projector still retains two declared synthetic-sensitive spans (QS-071 and QS-072: **2/47**); only 45/80 outputs equal PR #36's frozen output. The new admission route admits none of those 80 raw free-text inputs and clarifies all 80 mixed submissions. This protects the new restricted entrypoint only. Existing raw callers/UI still need the separate PR #36 work and must not be described as globally repaired by this PR.
+On main `677731894b13c3d1dde66c54397ece0b7cfcd93a`, the unchanged legacy projector still retains two declared synthetic-sensitive spans (QS-071 and QS-072: **2/47**); only 45/80 outputs equal PR #36's frozen output. The new admission route admits none of those 80 raw free-text inputs and clarifies all 80 mixed submissions. This protects the new restricted entrypoint only. This offline result does not establish that every existing caller or UI was repaired.
 
-Gold packages remain two independent blank reviewer packages; actual review is 0/2. AI tests never sign or fill their decisions. Formal Phase1I-1 remains blocked by the original semantic threshold and human review.
+Gold packages remain two independent blank reviewer packages; actual review is 0/2. AI tests never sign or fill their decisions. The original semantic threshold and human-review requirement were not satisfied.
 
-Before any next-stage trial: owner approval of the concrete execution preview; exact committed source/config/dataset/model digest; accepted resource snapshot (RAM≥10 GiB, VRAM≥6 GiB, F≥12 GiB); dedicated loopback service/process environment on F; 8K/timeout/OOM/owned-process cleanup validation; all relevant safety/Gold gates. At most three protocol smoke calls are a separate future authorization, not implied by this code or PR. No automatic service startup, model download, paid API or teammate-task mutation is authorized here.
+Real-model validation remains separate from these offline tests. A reproducible trial must record committed source/configuration, dataset and model digest; measure memory, context/token accounting, timeout and OOM behavior; and verify loopback isolation and cancellation. The original planned resource snapshot was RAM ≥10 GiB, VRAM ≥6 GiB and ≥12 GiB free model storage; these were test preconditions, not measured minimum hardware requirements. No real-model quality, performance or human-review conclusion follows from the fake-HTTP tests.

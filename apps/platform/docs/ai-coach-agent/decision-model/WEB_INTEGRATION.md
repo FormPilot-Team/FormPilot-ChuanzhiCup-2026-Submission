@@ -1,6 +1,6 @@
 # fp-coach-ranker 适配层：Web 集成接口
 
-面向 Web 负责人（wang-linn-dw）。本 PR **没有修改**页面、路由、构建入口、`package.json` 或 P0 文件。下面只描述可以选择接入的接口；是否接入、接在哪里，由 Web 负责人在 #41/#42 的文件归属内决定。
+本文件记录手工权重排序基线的适配层 API。当前产品使用统一训练模型接口，见 [WEB_INTEGRATION_READY.md](WEB_INTEGRATION_READY.md)。
 
 ## 入口
 

@@ -1,9 +1,9 @@
-# Web V1 素材来源（apps/platform/public/web-v1）
+# Web 页面素材来源
 
-| 文件 | 来源 | 说明 |
-| --- | --- | --- |
-| `assets/coach-orb-loop.webm` | PR #54（`44fd623`）`docs/design/chuanzhi-web/formpilot-web/assets/coach-orb-loop.webm`，逐字节复制（git blob `91b4783`） | 用户于设计迭代提供的即梦光球 MP4（2026-11-08，编号 4984），设计侧去除白色背景、边缘羽化、循环衔接，导出 640 × 640 透明 VP9 WebM。用于 AI Coach 首屏光球与教练头像 |
-| `assets/coach-orb-poster.png` | 同上 `assets/coach-orb-poster.png`（git blob `0457866`） | 同一用户视频的透明静态封面；加载前、减少动态效果、视频失败时显示 |
-| 其余 `assets/`、`game/`、`formpilot-orb-bg.png` | PR #52 设计交付 `docs/design/chuanzhi-web/formpilot-web/` | 未替换 |
+| 文件 | 来源与处理 |
+| --- | --- |
+| `assets/coach-orb-loop.webm` | 负责人提供的即梦光球 MP4（2026-11-08，编号 4984）；去除白色背景、边缘羽化、循环衔接，导出 640 × 640 透明 VP9 WebM。原始设计资源对应 Git blob `91b4783` |
+| `assets/coach-orb-poster.png` | 同一视频的透明静态封面，供加载前、减少动态效果及视频失败时使用；原始设计资源对应 Git blob `0457866` |
+| 其余 `assets/`、`game/`、`formpilot-orb-bg.png` | FormPilot Web 设计交付素材，来源于原设计目录 `docs/design/chuanzhi-web/formpilot-web/` |
 
-光球素材依据用户授权用于 FormPilot 团队演示与比赛作品；源素材未附第三方开源许可证，**不声明为 CC0、MIT 或其他开放许可证**。原始 MP4 不包含在仓库中。详见 PR #54 的 `ASSET_SOURCES.md`。
+上述负责人提供的生成素材获授权用于 FormPilot 团队演示与比赛作品。源素材未附第三方开源许可证，不声明为 CC0、MIT 或其他开放许可证，也不据此扩展任意再分发权。原始光球 MP4 不包含在仓库中。

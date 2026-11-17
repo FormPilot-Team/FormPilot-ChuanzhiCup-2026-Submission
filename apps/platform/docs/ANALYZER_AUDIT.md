@@ -1,21 +1,6 @@
-# 四个功法专项分析器 — 阶段 0 只读审计
+# 四套功法专项分析器：参考测量与自检研究
 
-- 日期：2026-10-01
-- 仓库：`E:\FormPilot\FormPilot_v3`，基线 `main` @ `e4fdb41`；工作分支 `feature/routine-analyzers`（已创建，除本文件外没有任何改动，尚未提交）
-- 基线测试：`vitest run` → 82 个文件 / 771 个用例全部通过
-- 方法：只读阅读代码；另外用一个临时脚本（在会话临时目录，不进仓库）读取 `public/assets/routines/*-standard.pose.json`，测量了示范者的静止段与髋中心位置，作为第 4 节里步骤标注的数据依据。
-
----
-
-## 0. 需要你先拍板的三件事
-
-| # | 问题 | 我的建议 |
-|---|---|---|
-| D1 | **“平台篇 manifest 里列出的源文件”指哪些？** 平台 manifest 第二节“完整候选源码序列”列出了 `src/` 和 `reviewer_exe/src/` 下全部 287 个文件，包括 `useRoutineRuntime.ts`、`routineReport.ts`、`session/types.ts`、`RoutineReportView.tsx`。照字面理解，这次改动一个现有文件都不能碰，任务就做不了。 | 按“**平台篇 Word 实际打印的 21 个文件**”（manifest 第一节）理解。这 21 个文件都不需要改，平台篇 Word 的内容就会保持一致。第 3 节列出要改的现有文件，它们都在序列中部（不打印）。新增文件也会进入平台序列中部，所以平台 manifest 第二节的文件列表和总行数（30820）会变，打印内容不变。 |
-| D2 | **新步骤字段（mode / weightShift / category / 主关节轨迹）放在哪里？** | **不改 `programs.ts`**，放进各分析器自己的步骤配置表（按 `chapterId` 索引），再加一个测试，保证四个功法的每一段都标注了。原因：`programs.ts` 的 `version` 注释写的是“章节内容变化就要升版本”，而 `compareWithPrevious` 要求 `programVersion` 相同才对比。如果在 programs 里加字段又升版本，用户所有旧记录都会失去“相比上次”。放在分析器里，`programs.ts`、`RoutineChapterSource` 类型、视频时间和版本号都不用动。 |
-| D3 | **“姿态准确/目标姿态相似度”用什么算？** | 复用 `matcher.ts` 已导出的 `describePose` + `comparePoses`，不修改 matcher。<br>- 太极拳、五禽戏的“姿态”分：取该段 `FollowAlongMatch.similarity` 的平均值（与标准视频同一时刻的相似度）。<br>- 易筋经的“目标姿态”：取该势示范者**最长静止段中点**那一帧作为目标姿态（来自标准姿态轨迹），每个 tick 计算用户与它的相似度（同时比较原样和镜像，取较高者）。 |
-
----
+研究日期：2026-10-01。保留参考姿态轨迹测量、实现规则、扰动实验和负结果。第 4 节为原始标注建议，第 6 节记录最终落实规则，第 7 节为自检结果；阈值仍为暂定，不能视为真人准确性或医学效果验证。
 
 ## 1. 跟练引擎入口：当前式、评分、反馈、报告
 
@@ -113,49 +98,6 @@ interface RoutineAnalyzer<F, E> {
 
 ---
 
-## 3. 新增 / 修改文件清单
-
-### 3.1 修改的现有文件（都不在平台篇 Word 打印的 21 个文件中）
-
-| 文件 | 改动 | 原因 | 对平台篇的影响 |
-|---|---|---|---|
-| `src/pages/Routines/useRoutineRuntime.ts` | +约 10 行：创建、调用、持久化分析引擎，节流输出实时视图 | 引擎接入点 | 在平台序列中部，不打印，Word 不变；序列总行数变化 |
-| `src/features/routines/session/types.ts` | +可选 `analysis` 字段 + 1 行守卫 | 持久化 | 同上 |
-| `src/features/routines/report/routineReport.ts` | +`analysis` 字段（新增，不改现有字段） | 报告字段 | 同上 |
-| `src/pages/Report/RoutineReportView.tsx` | +1 行挂载新的“专项分析”分区组件 | 阶段 4 报告展示 | 同上 |
-| `src/pages/Routines/RoutineTrainingPage.tsx` 或 `src/components/routines/RoutineFeedbackPanel.tsx` | +一行专项实时指标 | 阶段 4 训练页展示 | 同上 |
-| `tests/helpers/routineFixtures.ts`（可能） | 复用或补充辅助函数 | 测试 | 不在任何 manifest 中 |
-
-**不修改：**
-
-- `programs.ts`、`routines/types.ts`（见 D2）；
-- `matcher.ts`、`feedbackPolicy.ts`、`liveChecks.ts`；
-- `RoutineTechniqueEvaluator.ts`、`phaseWindows.ts`、`poseMetrics.ts`；
-- 全部 criteria、`sources.ts`、`techniqueReport.ts`；
-- 摄像头、MediaPipe、滤波、Session、视频、历史、Electron 相关文件。
-
-分析器需要的有符号或特有几何量（例如带方向的转头、肩线与髋线夹角、耳—肩距离），都在分析器自己的文件里实现，不改 `poseMetrics.ts`。
-
-### 3.2 新增文件（暂定路径）
-
-| 文件 | 内容 |
-|---|---|
-| `src/features/routines/analyzers/types.ts` | 接口、`AnalyzerContext`、`MetricResult { metricId, value, targetRange, score }`、反馈条目、报告字段类型 |
-| `…/analyzers/timeWindow.ts` | `TimeWindow<T>`：按时长裁剪的环形缓冲（只写这一次） |
-| `…/analyzers/bodyFrame.ts` | 共享的二维身体坐标：aspect 校正、躯干长归一化、髋中心、肩中心、可见度判断（返回 null 的约定与 poseMetrics 一致） |
-| `…/analyzers/signal.ts` | 共享的信号工具：平滑、速度、加速度、急动度、RMS、滞回穿越计数 |
-| `…/analyzers/RoutineAnalysisEngine.ts` + `registry.ts` + `analysisRecord.ts` | 引擎、注册表、持久化类型与守卫 |
-| `…/analyzers/baduanjin/{config,steps,BaduanjinAnalyzer}.ts` | 到位度（增量） |
-| `…/analyzers/taijiquan/{config,steps,TaijiquanAnalyzer}.ts` | 连续性 |
-| `…/analyzers/wuqinxi/{config,steps,profiles,WuqinxiAnalyzer}.ts` | 五戏 Profile |
-| `…/analyzers/yijinjing/{config,steps,YijinjingAnalyzer}.ts` | 稳定性 |
-| `src/components/routines/RoutineAnalyzerLive.tsx`、`src/pages/Report/RoutineAnalyzerSection.tsx` | 阶段 4 的最小 UI |
-| `tests/helpers/syntheticPose.ts` | 合成关键点生成器：静止、匀速移动、晃动、停顿、单腿站立、躯干扭转、缺点、两踝过近 |
-| `tests/routine-baseline.test.ts` + `tests/fixtures/routine-baseline/*.json` | 阶段 1 快照回归 |
-| `tests/routine-analyzer-{engine,baduanjin,taijiquan,wuqinxi,yijinjing}.test.ts` | 每个分析器 ≥ 6 个用例 |
-
----
-
 ## 4. programs.ts 的步骤结构与缺失字段
 
 现有字段：
@@ -193,7 +135,7 @@ interface RoutineAnalyzer<F, E> {
 | yjj-12 | 掉尾势 | 18% | 1.5 | transition | |
 | yjj-close | 收势 | 55% | 8.6 | transition | ✔ |
 
-transition 势不计算保持完成度。总分按“姿态 0.40 + 稳定性 0.35”重新归一化，稳定性只看动作中的抖动（jitter），不看晃动。这个规则写进 config，请确认。
+transition 势不计算保持完成度。总分按“姿态 0.40 + 稳定性 0.35”重新归一化，稳定性只看动作中的抖动（jitter），不看晃动。
 
 ### 4.2 太极拳 weightShift 标注（建议值 + 示范实测）
 
@@ -259,77 +201,13 @@ transition 势不计算保持完成度。总分按“姿态 0.40 + 稳定性 0.3
 
 ---
 
-## 5. 风险点与回归测试方案
-
-### 5.1 风险
-
-1. **平台文件口径**（D1）：如果你要求连平台序列中部的文件也不能改，引擎就无法接入。需要你确认。
-2. **programs 版本号**（D2）：改 programs 并升版本会破坏历史对比；本方案不改。
-3. **二维近似的局限：**
-   - 太极支撑比例在侧身、背身时可能左右颠倒（示范实测已有 2 式矛盾）；
-   - 五禽戏的躯干前倾、扭转在正面画面中都只是代理量；
-   - 鸟戏的抬脚高度依赖踝点可见；
-   - 猿戏的耸肩需要耳部关键点（7/8），现有代码没用过这两个点。
-
-   这些都会以 PROXY 的形式写进 config 注释和报告说明。
-4. **阈值没有真人标定。** 全部标为 provisional / 待标定。唯一的合理性检查是“示范者自己跑一遍应得高分”，这和 Scoring v2 的单元测试用法相同。它只能证明阈值没有和示范冲突，不代表准确。
-5. **快照稳定性：**
-   - 现有评分没有随机数和墙钟依赖（matcher 的时间都由参数传入），可以做到逐字节一致；
-   - 但报告中的 `record.id`、`startedAt` 必须在夹具里固定。
-6. **报告“只新增字段”：**
-   - `notes`、`focus`、`headline` 不能追加分析器内容，否则快照会变；
-   - `RoutineSessionRecord` 的守卫也不能变严，否则旧记录会被拒。
-7. **性能：**
-   - 每 100 ms 多一次特征提取，都是常数级几何运算；
-   - 每章序列最多约 1300 个样本；
-   - 每 10 s 持久化时对当前章做一次纯函数评估；
-   - 预计开销可以忽略，阶段 3 会给出实测耗时。
-8. **localStorage 体积**：每章只存汇总数值（约 0.5–2 KB），全套 26 段不超过约 50 KB。
-9. **软著：**
-   - 新增的接口、窗口工具和引擎在四篇里是共用代码，四篇之间仍会有可观的重合；
-   - 专项占比在实现完成前无法准确预估，阶段 5 会如实统计，不挑选无关代码来降重。
-
-### 5.2 回归测试方案
-
-1. **基线快照（阶段 1 的第一个提交，先于任何源码改动）：**
-   - 输入：四条真实标准姿态轨迹（仓库内，确定性），加上确定性变换：原样、滞后 0.6 s、镜像、种子固定的噪声、双肘屈曲 30°、间歇丢帧；再加合成生成器序列。
-   - 记录：`RoutineTechniqueEvaluator.snapshot()`、`FollowAlongMatcher` + `RoutineProgressRecorder` 的章节结果、`RoutineFeedbackPolicy` 的输出序列、`liveChecks`、`buildRoutineReport` 全部字段（`criterion` 对象折成 id）。
-   - 夹具在 `e4fdb41` 的代码上生成，存成 JSON。之后断言为：删除新增字段（`analysis`）后，结果与夹具深度相等。
-   - 生成脚本受环境变量保护（`UPDATE_ROUTINE_BASELINE=1`），正常运行只做比较。
-2. 现有 771 个单元测试保持全部通过。
-3. 每个分析器 ≥ 6 个用例，包括：
-   - 好动作得高分、明显错误得低分的对照；
-   - 缺失关键点；
-   - 两踝过近；
-   - 窗口不足（样本少于下限时返回 null，不给分）；
-   - 示范轨迹自测。
-4. 每次提交前运行：
-
-   ```
-   pnpm test
-   pnpm typecheck
-   pnpm lint
-   pnpm build
-   ```
-
-   阶段 4 之后再运行与跟练相关的 e2e：`routines`、`scoring-v2`、`routine-layout`、`round2-usability`、`report-v2`。
-5. 阶段 5：
-   - 平台篇重新生成后，与现有 PDF 的抽取文字逐字比对；
-   - 四篇用 Word 另存 PDF，逐页检查，出 `render_check`。
-
----
-
-确认 D1–D3，并复核第 4 节标 ✔ 的步骤后，我开始阶段 1。
-
----
-
 ## 6. 决策落实与实测（阶段 1–2，2026-10-01）
 
-D1–D3 均按建议采纳：平台篇只锁定 Word 实际打印的 21 个文件；mode / weightShift / category 放进各分析器自己的步骤表（`src/features/routines/analyzers/<功法>/steps.ts`），`programs.ts` 与 `programVersion` 不变；目标姿态相似度复用 `describePose` / `comparePoses`，不改 matcher。
+mode / weightShift / category 放进各分析器自己的步骤表（`src/features/routines/analyzers/<功法>/steps.ts`），`programs.ts` 与 `programVersion` 不变；目标姿态相似度复用 `describePose` / `comparePoses`，不改 matcher。
 
 ### 6.1 易筋经 hold / transition（按规则，不按主观判断）
 
-规则：预备势、收势为 hold；其余势在示范者存在连续静止段 ≥ 1500 ms（`YIJINJING_ANALYZER_CONFIG.stillness.holdMinMs`）时为 hold，否则 transition。静止的测法与第 4.1 节相同（腕、肩、髋六点逐帧最大速度 < 0.25 当前帧躯干长/s，原始位置，不平滑），这是你做决定时依据的测法，实现时没有换成别的定义。`tests/routine-analyzer-yijinjing.test.ts` 用示范轨迹逐势复核规则与步骤表一致。
+规则：预备势、收势为 hold；其余势在示范者存在连续静止段 ≥ 1500 ms（`YIJINJING_ANALYZER_CONFIG.stillness.holdMinMs`）时为 hold，否则 transition。静止的测法与第 4.1 节相同（腕、肩、髋六点逐帧最大速度 < 0.25 当前帧躯干长/s，原始位置，不平滑），实现采用同一定义。`tests/routine-analyzer-yijinjing.test.ts` 用示范轨迹逐势复核规则与步骤表一致。
 
 | 段 | 名称 | 示范最长静止 | 结果 | 与第 4.1 节建议相比 |
 |---|---|---|---|---|
@@ -365,7 +243,7 @@ D1–D3 均按建议采纳：平台篇只锁定 Word 实际打印的 21 个文�
 | 闪通臂 | left | 85% | true |
 | 其余 17 式 | 见步骤表 | 73%–100% / transfer 已知帧 76%–99% | true |
 
-单鞭 ×2、十字手、左下势独立是规则算出来的 false，不是我改的标注：标注方向仍是你定的 left / balanced / transfer，只记录不计分，权重按比例分给其他项。
+单鞭 ×2、十字手、左下势独立是规则算出来的 false，标注方向仍为 left / balanced / transfer，只记录不计分，权重按比例分给其他项。
 
 ### 6.3 八段锦与五禽戏的落实
 

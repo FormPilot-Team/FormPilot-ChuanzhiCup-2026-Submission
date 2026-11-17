@@ -1,24 +1,25 @@
-# 素材、第三方组件与使用边界
+# 素材与许可
 
-2026-11-16 V1.2.2 补充：本轮仅获准在 Private 正式仓库发布新的内部 Pre-release，旧包保留回退；不扩大媒体公开权或外部评审对象。封包后处理保留实际安装依赖的许可全文/通知和 274 项依赖清单。MediaPipe 单独附 Apache-2.0；`react-remove-scroll-bar@2.3.8` npm 缺全文，补固定上游 MIT 和精确来源限制，见 [许可来源](../../third-party/react-remove-scroll-bar/README.md)。其他未随 npm 包附全文的工具链条目在清单中如实保留，不宣称所有第三方许可事项已经关闭。团队源码许可仍待确认。
+团队原创源码未声明开放许可证。第三方组件和素材的版权归各自权利人，需按相应许可及授权范围使用。
 
-源码功能完整保留。本仓库的本地工作目录可以恢复完整视频体验，但源码 Git 历史与本地媒体覆盖层必须分别审查。
-
-| 项目 | 处理 | 公开前状态 |
+| 资源 | 源码中的处理 | 使用边界 |
 | --- | --- | --- |
-| 四套功法标准 MP4、四张海报 | 全历史排除，按清单恢复到本地 ignored 路径 | 第三方带水印素材，公开和受限分发权均需确认 |
-| 六个热身 MP4 | 全历史排除，按清单恢复到本地 ignored 路径 | 包括原来跟踪的侧平举/交替提膝，来源与权限仍待确认 |
-| 四套功法 `.pose.json` | 保留，识别与对齐所需 | 来自上述视频，衍生数据许可需复核 |
-| `public/assets/coach` 教练形象 | 保留 | 真人画面衍生，肖像与素材权利需复核 |
-| `public/web-v1` 页面素材、光球 WebM/PNG | 保留并附原 ASSET_SOURCES.md | 部分由负责人提供的即梦生成，原团队使用授权不能自动扩大到公开分发 |
-| MediaPipe 模型/WASM | 保留 | Apache-2.0，上游 NOTICE/许可义务需在发布包复核 |
-| Qwen/Ollama | 不随仓库分发模型或运行时 | Qwen Apache-2.0，模型标签、digest、运行时版本见 README |
-| React、Vite、Phaser 等 | 锁文件依赖，安装时获取 | 保留各依赖包的 LICENSE，不能把第三方许可当作原创源码许可 |
+| 四套功法标准 MP4、四张海报、六个热身 MP4 | 不纳入 Git，14 个文件的路径、大小与 SHA-256 见 [platform.json](../../assets-manifest/platform.json) | 来源和评审分发权限尚待权利确认；克隆源码不能完整复现视频 |
+| 四套功法 `.pose.json` | 保留，供识别、对齐、评分与研究使用 | 从上述参考视频提取，衍生数据许可仍需复核 |
+| `public/assets/coach` 教练形象 | 保留 | 真人画面衍生，肖像与素材权利仍需复核 |
+| `public/web-v1` 页面素材、光球 WebM/PNG | 保留，[素材来源](../../apps/platform/public/web-v1/ASSET_SOURCES.md)可追溯 | 负责人提供的生成素材获授权用于 FormPilot 团队演示与比赛作品；未声明开放许可证，不能扩大解释为任意再分发许可 |
+| MediaPipe 模型与 WASM | 保留，游戏 WASM 在构建时从锁定依赖复制 | Apache-2.0；[许可全文与来源](../../third-party/mediapipe/README.md)，保留上游版权和通知 |
+| Qwen / Ollama | 不随源码分发模型或运行时 | Qwen Apache-2.0；安装者分别核对模型和运行时许可，版本与 digest 见[运行说明](RUNNING.md) |
+| React、Vite、Phaser 等 | 按各应用锁文件安装 | 遵循各依赖 LICENSE/NOTICE；封包工具从实际安装的依赖收集许可 |
+| `react-remove-scroll-bar@2.3.8` | 补附固定上游 MIT 许可 | npm 包缺单独 LICENSE；精确来源与版本限制见[许可来源](../../third-party/react-remove-scroll-bar/README.md) |
 
-[platform.json](../../assets-manifest/platform.json) 是 14 个本地媒体的明确路径、大小与 SHA-256 清单；不含开发机目录或下载链接。`restore_media.py` 只从用户提供的解压目录恢复，既不下载，也不赋予分发权。
+取得有权使用且匹配清单的媒体后，从仓库根目录恢复：
 
-离线 ZIP、Private 仓库、评审账号访问都不是版权豁免。最终分发前由负责人确认具体用途、受众和权利；若无法确认，可使用独立授权的素材重新制作匹配轨迹并重新验收。不得直接删掉四套功法功能来掩盖授权问题。
+```powershell
+python scripts/submission/restore_media.py --source-package '<已授权的解压包根目录>'
+python scripts/submission/restore_media.py --check
+```
 
-源码作者、参赛成员、第三方权利人分别署名。当前未自行给原创源码新增 MIT/Apache 等开放许可；公开许可和团队授权是发布待确认项。
+恢复工具只按明确清单和哈希复制，不联网，也不赋予许可。缺少媒体时界面提示无法播放，其他功能可运行。替换参考视频时需同步重做匹配姿态轨迹、记录校验值并验证时间对齐。
 
-2026-11-14 补充授权：负责人明确要求将 SHA-256 为 `5831b223…ea5429` 的既有 V1.2.1 原包上传正式 Private 仓库 Release，供有仓库权限的队友内部验收。该具体内部交接已获授权；不扩展为本独立比赛仓库的 Public 发布或第三方媒体公开许可。
+Windows 封包保留已安装依赖的许可全文、通知及清单。仍有未随 npm 包附全文的工具链条目，不能据此宣称所有第三方许可均已关闭。Private 托管或离线交付不改变以上权利边界。

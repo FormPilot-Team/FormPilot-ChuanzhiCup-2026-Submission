@@ -1,10 +1,10 @@
 # AI 教练在线演示（Public Demo Gateway）
 
-状态（2026-11-13）：**代码与部署包已完成，并在本机用真实模型验证。项目负责人已决定本届传智杯不部署公网在线 Demo**；参赛以离线竞赛包 + 本机 Qwen 录屏为准。网关代码保留作技术储备，本仓库不包含任何账号、Key 或公网地址；比赛材料中不得写在线地址。
+本仓库保留可选的 AI 教练演示网关，已完成本机真实模型实验。当前参赛版本采用本地运行，没有部署公网演示地址；网关不是完整平台的在线服务。仓库不包含账号、Key 或公网地址。
 
 ## 1. 它是什么
 
-让没有安装模型的人（评委）打开一个网页就能实际使用 V1.2 的 AI 教练自由提问。范围**只有 AI 教练**，不是完整平台：没有摄像头训练、功法视频、动作工坊和体感游戏。
+可选网关让未安装模型的访问者通过网页使用 AI 教练自由提问。范围**只有 AI 教练**，不是完整平台：没有摄像头训练、功法视频、动作工坊和体感游戏。
 
 ```
 访问者浏览器 ──HTTPS（托管平台 / 反向代理）──▶ 演示网关 server/coachAgent/demo（Node 24，无依赖）
@@ -46,7 +46,7 @@ pnpm demo:gateway                    # → http://127.0.0.1:4330/
 pnpm exec playwright test -c playwright.public-demo.config.ts   # 真实模型四问 + 截图 + 对话记录（桌面 + 手机）
 ```
 
-OpenAI 兼容上游（例如负责人开通的免费云端额度）：
+可选 OpenAI 兼容上游（按具体服务的条款、额度和费用配置）：
 
 ```powershell
 $env:FP_DEMO_UPSTREAM='openai'; $env:FP_DEMO_OPENAI_BASE_URL='https://…/v1'; $env:FP_DEMO_OPENAI_MODEL='…'
@@ -54,14 +54,14 @@ $env:FP_DEMO_OPENAI_API_KEY='…'      # 只在本终端设置，不写入文件
 pnpm demo:upstream-smoke             # 先确认：该模型会调用工具、能根据工具结果作答
 ```
 
-## 5. 公开上线的两条路径（都需要负责人授权）
+## 5. 可选部署方式
 
-| 路径 | 做法 | 需要负责人 | 适合 |
-| --- | --- | --- | --- |
-| A 容器托管 + 云端免费模型 | `pnpm demo:build && pnpm demo:pack` → `dist-public-demo-deploy/`（Dockerfile，端口 7860）。部署到支持 Docker 的平台（如魔搭 Docker 创空间，Beta），在平台的运行时环境变量里设置上游与 Key、`FP_DEMO_PUBLIC_ORIGINS`、`FP_DEMO_FRAME_ANCESTORS`、`FP_DEMO_TRUST_PROXY` | 平台账号 + 实名；模型服务账号 + 实名 + Key；确认免费额度、条款、数据用途；开启“额度用完即停”之类的防扣费开关 | 评审期间 7×24 可访问 |
-| B 负责人电脑 + 临时 HTTPS 隧道 | 本机网关（上游 = 本机 Qwen3-4B）+ 隧道工具把 127.0.0.1:4330 暴露为 https 地址；`FP_DEMO_PUBLIC_ORIGINS=https://<隧道域名>`，`FP_DEMO_TRUST_PROXY` 按隧道设置 | 下载隧道工具；公开网址的授权；电脑与 F 盘全程开机；网址可能每次变化 | 约定时间的现场演示 / 录屏，不适合作为提交材料中的长期网址 |
+| 路径 | 技术配置 | 运行条件 |
+| --- | --- | --- |
+| 容器托管 | `pnpm demo:build` 与 `pnpm demo:pack` 生成 `dist-public-demo-deploy/`（Dockerfile，端口 7860）。运行时配置上游、Key、`FP_DEMO_PUBLIC_ORIGINS`、`FP_DEMO_FRAME_ANCESTORS` 和 `FP_DEMO_TRUST_PROXY` | 托管服务及模型服务账号、适用条款、数据用途和资源/费用预算 |
+| 本机网关与 HTTPS 反向代理 | 本机 Qwen + 网关，通过 HTTPS 代理到回环端口 4330；配置精确 Origin 与受信代理 | 本机服务持续运行、有效域名与 HTTPS；临时隧道地址不适合作为长期入口 |
 
-上线后用 `FP_DEMO_URL=https://… pnpm exec playwright test -c playwright.public-demo.config.ts` 复测四问，再把网址写进材料。
+部署后使用 `FP_DEMO_URL` 指定实际地址，运行 `playwright.public-demo.config.ts` 复核工具调用、合成数据标注及安全回退。当前比赛没有公网部署，以上为可选技术配置。
 
 ## 6. 已知限制
 
