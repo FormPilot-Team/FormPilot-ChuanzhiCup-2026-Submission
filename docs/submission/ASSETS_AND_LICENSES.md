@@ -1,25 +1,18 @@
-# 素材与许可
+# 素材、数据与许可
 
-团队原创源码未声明开放许可证。第三方组件和素材的版权归各自权利人，需按相应许可及授权范围使用。
+团队原创源码尚未声明开放源码许可证；仓库公开可见不等于授予任意再分发许可。第三方组件和素材遵循各自权利与条款。
 
-| 资源 | 源码中的处理 | 使用边界 |
+| 资源 | 公开源码处理 | 来源与决定 |
 | --- | --- | --- |
-| 四套功法标准 MP4、四张海报、六个热身 MP4 | 不纳入 Git，14 个文件的路径、大小与 SHA-256 见 [platform.json](../../assets-manifest/platform.json) | 来源和评审分发权限尚待权利确认；克隆源码不能完整复现视频 |
-| 四套功法 `.pose.json` | 保留，供识别、对齐、评分与研究使用 | 从上述参考视频提取，衍生数据许可仍需复核 |
-| `public/assets/coach` 教练形象 | 保留 | 真人画面衍生，肖像与素材权利仍需复核 |
-| `public/web-v1` 页面素材、光球 WebM/PNG | 保留，[素材来源](../../apps/platform/public/web-v1/ASSET_SOURCES.md)可追溯 | 负责人提供的生成素材获授权用于 FormPilot 团队演示与比赛作品；未声明开放许可证，不能扩大解释为任意再分发许可 |
-| MediaPipe 模型与 WASM | 保留，游戏 WASM 在构建时从锁定依赖复制 | Apache-2.0；[许可全文与来源](../../third-party/mediapipe/README.md)，保留上游版权和通知 |
-| Qwen / Ollama | 不随源码分发模型或运行时 | Qwen Apache-2.0；安装者分别核对模型和运行时许可，版本与 digest 见[运行说明](RUNNING.md) |
-| React、Vite、Phaser 等 | 按各应用锁文件安装 | 遵循各依赖 LICENSE/NOTICE；封包工具从实际安装的依赖收集许可 |
-| `react-remove-scroll-bar@2.3.8` | 补附固定上游 MIT 许可 | npm 包缺单独 LICENSE；精确来源与版本限制见[许可来源](../../third-party/react-remove-scroll-bar/README.md) |
+| 四标准MP4、四海报、六热身MP4 | 14份精确原媒体不在当前树或任何四分支历史 | 清单见assets-manifest/platform.json；自行恢复须有权使用，克隆不会下载原视频 |
+| 四套标准参考pose及既有衍生研究工件 | 保留原始字节，不改评分、M1/M2和冻结实验 | 源自历史参考示范。负责人2026-11-17明确决定现阶段继续使用并随参赛源码保留，后续换为数字人；该决定不冒称已取得第三方视频许可证或授权公开原MP4 |
+| 蓝色运动服Family A教练、动作示范与五个历史头像/欢迎版本，及六姿态锚点 | 保留 | 开发记录已有内置生成和位图来源；负责人在查看完整图组后确认整组为团队AI生成、允许公开。锚点为这些生成图片的真实MediaPipe检测，不是患者记录；纠正此前笼统“真人画面衍生”描述 |
+| public/web-v1全部18份展示媒体 | 全历史替换 | 2026-11-17新编原创几何绘图/数学粒子循环，无原像素或参考pose输入；原图和旧光球不再存在于公开可达对象。精确映射见original-media-manifest.json |
+| 真人比赛片段派生手势测试夹具 | 全历史抽离 | 原始真实Lite/Full验收证据只在Private备份保留；公开测试明确使用程序合成骨架，不冒充真实模型对比 |
+| MediaPipe模型与WASM | 保留 | Apache-2.0，全文与来源见third-party/mediapipe，保留上游版权与通知 |
+| Qwen/Ollama | 不分发权重与运行时 | Qwen Apache-2.0；版本/digest与本地配置见RUNNING.md |
+| React/Vite/Phaser等依赖 | 锁定安装 | 遵循各依赖LICENSE/NOTICE；react-remove-scroll-bar@2.3.8补附MIT许可和精确上游出处 |
 
-取得有权使用且匹配清单的媒体后，从仓库根目录恢复：
+取得有权使用且匹配清单的本地媒体后，可从仓库根执行 `python scripts/submission/restore_media.py --source-package '<本地解压包根目录>'` 和 `--check`。工具仅按哈希复制，不联网、不赋予许可；缺视频不影响构建或非视频功能。
 
-```powershell
-python scripts/submission/restore_media.py --source-package '<已授权的解压包根目录>'
-python scripts/submission/restore_media.py --check
-```
-
-恢复工具只按明确清单和哈希复制，不联网，也不赋予许可。缺少媒体时界面提示无法播放，其他功能可运行。替换参考视频时需同步重做匹配姿态轨迹、记录校验值并验证时间对齐。
-
-Windows 封包保留已安装依赖的许可全文、通知及清单。仍有未随 npm 包附全文的工具链条目，不能据此宣称所有第三方许可均已关闭。Private 托管或离线交付不改变以上权利边界。
+详细整改日期、新旧Git/blob映射和方法见[PUBLICATION_REMEDIATION.md](PUBLICATION_REMEDIATION.md)。本轮未改既有Windows测试包、视频或PDF，也不据仓库公开宣称这些交付物获得新的素材许可。

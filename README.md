@@ -102,6 +102,8 @@ docs/submission/                运行、训练复现、素材许可与源码来
 third-party/                    第三方许可全文与来源
 ```
 
-源码仓库：[FormPilot-Team/FormPilot-ChuanzhiCup-2026](https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026)，评审需取得 Private 仓库读取权限。作品相关的真实 Git 开发历史保留在仓库中；源码 ZIP 为当前文件快照，精确提交可在仓库执行 `git rev-parse HEAD` 核验。路径导出与原提交的对应关系见[来源说明](docs/submission/PROVENANCE.md)。
+源码仓库：[FormPilot-Team/FormPilot-ChuanzhiCup-2026-Public](https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026-Public)，公开后评审可直接浏览、克隆并查看历史。作品相关的真实 Git 开发历史保留在仓库中；源码 ZIP 为当前文件快照，精确提交可在仓库执行 `git rev-parse HEAD` 核验。路径导出与原提交的对应关系见[来源说明](docs/submission/PROVENANCE.md)。
 
-第三方组件和素材版权归各自权利人。MediaPipe 与 Qwen 使用 Apache-2.0，其他依赖按各包许可使用。团队原创源码未声明开放许可证；网页生成素材的比赛使用授权、外部视频及衍生轨迹的许可边界见[素材与许可](docs/submission/ASSETS_AND_LICENSES.md)。
+第三方组件和素材版权归各自权利人。MediaPipe 与 Qwen 使用 Apache-2.0，其他依赖按各包许可使用。团队原创源码未声明开放许可证；团队生成教练、原创展示素材、外部视频及参考轨迹的来源与使用说明见[素材与许可](docs/submission/ASSETS_AND_LICENSES.md)。
+
+公开准备保留全部四条作品分支和143条真实开发提交，个人邮箱替换为已核实账号的GitHub noreply；18份展示媒体使用2026-11-17原创替代，真人手势测试数据改为明确合成测试。产品实现、模型和研究产物保留。新旧提交及素材映射见[公开整改说明](docs/submission/PUBLICATION_REMEDIATION.md)。

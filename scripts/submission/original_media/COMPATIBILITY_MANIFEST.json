@@ -1,0 +1,128 @@
+[
+  {
+    "old_blob": "00caeb11809013e5ce13a2cfb26d32f15c3fb567",
+    "repository_path": "apps/platform/public/web-v1/game/forest-boating.jpg",
+    "format": "JPEG",
+    "width": 738,
+    "height": 463
+  },
+  {
+    "old_blob": "0457866d2663c4db2e36cfb8921e4ae958d31161",
+    "repository_path": "apps/platform/public/web-v1/assets/coach-orb-poster.png",
+    "format": "PNG",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "old_blob": "0869b28c8fa9e3d052f1cfc72304da4efd570177",
+    "repository_path": "apps/platform/public/web-v1/game/forest-archery.jpg",
+    "format": "JPEG",
+    "width": 738,
+    "height": 463
+  },
+  {
+    "old_blob": "0ca61fe0980557249f52a71a72f9b24f12367742",
+    "repository_path": "apps/platform/public/web-v1/assets/yijinjing.jpg",
+    "format": "JPEG",
+    "width": 1079,
+    "height": 1452
+  },
+  {
+    "old_blob": "15545f3faf79fc4d1249518962095a7adafd9fd8",
+    "repository_path": "apps/platform/public/web-v1/game/apple-orchard.jpg",
+    "format": "JPEG",
+    "width": 738,
+    "height": 463
+  },
+  {
+    "old_blob": "17cc1e8d82b6676dc0fe709da4e01df1a5b17711",
+    "repository_path": "apps/platform/public/web-v1/assets/workshop-pose-transparent.png",
+    "format": "PNG",
+    "width": 1024,
+    "height": 1024
+  },
+  {
+    "old_blob": "185c2d8823c80465f179fa7e37a1dd06ea51a76d",
+    "repository_path": "apps/platform/public/web-v1/formpilot-orb-bg.png",
+    "format": "PNG",
+    "width": 1536,
+    "height": 1024
+  },
+  {
+    "old_blob": "2dfa393c574d40fd60a06e3ba4fe8e5db44d6686",
+    "repository_path": "apps/platform/public/web-v1/assets/mute-icon.png",
+    "format": "PNG",
+    "width": 260,
+    "height": 230
+  },
+  {
+    "old_blob": "334101aecb8f81e9229fd83bbb83b5e977bd10f6",
+    "repository_path": "apps/platform/public/web-v1/assets/coach-orb.jpg",
+    "format": "JPEG",
+    "width": 500,
+    "height": 500
+  },
+  {
+    "old_blob": "38904f6d744c36b8093a149e8d0dacdc50c91254",
+    "repository_path": "apps/platform/public/web-v1/assets/taichi.jpg",
+    "format": "JPEG",
+    "width": 1022,
+    "height": 680
+  },
+  {
+    "old_blob": "5120c77e31f1c95decef98075c1314c752c0978f",
+    "repository_path": "apps/platform/public/web-v1/game/apple-app-icon.jpg",
+    "format": "JPEG",
+    "width": 106,
+    "height": 106
+  },
+  {
+    "old_blob": "6d9120f27ece7fda108277e24ecb14993eeeab40",
+    "repository_path": "apps/platform/public/web-v1/assets/badanjin.jpg",
+    "format": "JPEG",
+    "width": 1078,
+    "height": 988
+  },
+  {
+    "old_blob": "7f643a7e75da617df3631075affcc98d52a163a3",
+    "repository_path": "apps/platform/public/web-v1/assets/workshop-pose.jpg",
+    "format": "JPEG",
+    "width": 1024,
+    "height": 1024
+  },
+  {
+    "old_blob": "91b4783450a7c47d9ddffc25b10ac3a7ffdd7a62",
+    "repository_path": "apps/platform/public/web-v1/assets/coach-orb-loop.webm",
+    "format": "WebM/VP9",
+    "width": 640,
+    "height": 640
+  },
+  {
+    "old_blob": "aa41722208b9f958133426722a3dc91126717d8d",
+    "repository_path": "apps/platform/public/web-v1/game/bubble-background.jpg",
+    "format": "JPEG",
+    "width": 1440,
+    "height": 810
+  },
+  {
+    "old_blob": "ab18daeb88528e1fe144118af61f4b45ac0b3af2",
+    "repository_path": "apps/platform/public/web-v1/assets/wuxinqi.jpg",
+    "format": "JPEG",
+    "width": 766,
+    "height": 968
+  },
+  {
+    "old_blob": "bf12686f84dad0d52a3d93e36e18ded7ebd3fbb2",
+    "repository_path": "apps/platform/public/web-v1/assets/mute-icon-preview.png",
+    "format": "PNG",
+    "width": 260,
+    "height": 230
+  },
+  {
+    "old_blob": "d70253c94e79081da31b714e778d99e4304aa244",
+    "repository_path": "apps/platform/public/web-v1/assets/mute-icon.jpg",
+    "format": "JPEG",
+    "width": 368,
+    "height": 488
+  }
+]

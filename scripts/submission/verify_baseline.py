@@ -30,9 +30,30 @@ REMOVED_DOCUMENTS = {
     'apps/platform/docs/web-v1/V1_1_UI_INTEGRATION.md',
 }
 manifest = json.loads((ROOT/'docs/submission/source-files.json').read_text(encoding='utf-8'))
+publication = json.loads((ROOT/'docs/submission/publication-files.json').read_text(encoding='utf-8'))
+publication_files = {entry['path']: entry for entry in publication['files']}
+publication_removed = {entry['path']: entry for entry in publication['removed']}
+publication_checked = 0
 failures = []
 checked = 0
 for entry in manifest['files']:
+    if entry['path'] in publication_removed:
+        change = publication_removed[entry['path']]
+        if entry['blob'] != change['previous_blob'] or (ROOT/entry['path']).exists():
+            failures.append(entry['path'])
+        continue
+    if entry['path'] in publication_files:
+        change = publication_files[entry['path']]
+        path = ROOT/entry['path']
+        if entry['blob'] != change['previous_blob'] or not path.is_file():
+            failures.append(entry['path'])
+            continue
+        data = path.read_bytes()
+        oid = hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+        if oid != change['blob'] or hashlib.sha256(data).hexdigest() != change['sha256']:
+            failures.append(entry['path'])
+        publication_checked += 1
+        continue
     if entry['path'] in REMOVED_DOCUMENTS:
         if (ROOT/entry['path']).exists():
             failures.append(entry['path'])
@@ -51,5 +72,5 @@ for entry in manifest['files']:
     if oid != entry['blob']:
         failures.append(entry['path'])
 print(json.dumps({'baseline':manifest['baseline'],'verified_source_files':checked,
-    'document_and_test_amendments':AMENDMENTS,'removed_internal_documents':sorted(REMOVED_DOCUMENTS),'mismatches':failures},ensure_ascii=False,indent=2))
+    'document_and_test_amendments':AMENDMENTS,'removed_internal_documents':sorted(REMOVED_DOCUMENTS), 'publication_files_verified':publication_checked, 'publication_removals':sorted(publication_removed), 'mismatches':failures},ensure_ascii=False,indent=2))
 raise SystemExit(bool(failures))

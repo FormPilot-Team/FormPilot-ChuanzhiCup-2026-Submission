@@ -2,9 +2,9 @@
   "product": "FormPilot Web",
   "version": "1.2.3",
   "source_baseline": "4bf15bf1c71b19f9674703f5816d19fb246d7b3f",
-  "filtered_baseline": "e2f487dd5a6d490ce6c3e77fa820c457b0f7f609",
-  "repository_url": "https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026",
-  "repository_visibility": "private",
+  "filtered_baseline": "3bf971c640f9491b78db57e28a269e509a8ff62b",
+  "repository_url": "https://github.com/FormPilot-Team/FormPilot-ChuanzhiCup-2026-Public",
+  "repository_visibility": "public",
   "default_branch": "submission",
   "commit_identity": "git rev-parse HEAD; exact archive commit recorded in the delivered package manifest",
   "history_mapping": "docs/submission/commit-map.txt",
@@ -22,5 +22,7 @@
     "model": "qwen3:4b-instruct-2507-q4_K_M",
     "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
     "included": false
-  }
+  },
+  "publication_history_mapping": "docs/submission/publication-commit-map.txt",
+  "publication_overlay": "docs/submission/publication-files.json"
 }
